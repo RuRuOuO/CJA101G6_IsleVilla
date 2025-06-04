@@ -2,10 +2,12 @@ package com.islevilla.product.model;
 
 import com.islevilla.util.HibernateUtil;
 import org.hibernate.Session;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-public class ProductDaoImple implements ProductDao {
+@Repository
+public class ProductDAOImple implements ProductDAO {
     @Override
     public int insert(Product product){
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();

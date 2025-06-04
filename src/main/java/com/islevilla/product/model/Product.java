@@ -3,7 +3,6 @@ package com.islevilla.product.model;
 
 import jakarta.persistence.*;
 
-public class Product {
     @Entity
     @Table(name = "product")
     public class Product {
@@ -82,4 +81,3 @@ public class Product {
         }
     }
 
-}

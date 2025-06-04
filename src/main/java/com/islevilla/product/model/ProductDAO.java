@@ -2,7 +2,7 @@ package com.islevilla.product.model;
 
 import java.util.List;
 
-public interface ProductDao {
+public interface ProductDAO {
     public int insert(Product product);
     public int update(Product product);
     public int delete(Integer productId);
