@@ -14,172 +14,262 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
       rel="stylesheet"
     />
-    <style>
-      .nav-pills .nav-link.active {
-        background-color: #0d6efd;
-      }
-    </style>
+    <!-- 載入字型-->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Kaisei+HarunoUmi&family=Noto+Sans+TC:wght@100..900&family=Noto+Serif+TC:wght@200..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Kaisei+HarunoUmi&family=Noto+Sans+TC:wght@100..900&family=Noto+Serif+HK:wght@200..900&family=Noto+Serif+TC:wght@200..900&display=swap"
+      rel="stylesheet"
+    />
+    <!-- 載入font awesome -->
+    <script
+      src="https://kit.fontawesome.com/d4a9524440.js"
+      crossorigin="anonymous"
+    ></script>
+    <!-- 覆蓋樣式 -->
+    <link
+      rel="stylesheet"
+      href="/src/main/resources/templates/front-end/css/customStyle.css"
+    />
   </head>
   <body class="bg-light">
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-      <div class="container">
-        <a class="navbar-brand" href="#">飯店官網</a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item"><a class="nav-link" href="#">首頁</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">客房介紹</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">最新消息</a></li>
-            <li class="nav-item">
-              <a class="nav-link active" href="#">會員專區</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="container py-5">
-      <h2 class="text-center mb-4">會員專區</h2>
-
-      <div class="row">
-        <!-- 左側垂直選單 -->
-        <div class="col-md-3 mb-4">
-          <div
-            class="nav flex-column nav-pills"
-            id="memberTabs"
-            role="tablist"
-            aria-orientation="vertical"
+    <!-- ========== 統一header開始 ========== -->
+    <header data-bs-theme="light">
+      <nav
+        class="navbar navbar-expand-lg navbar-light fixed-top bg-light shadow-sm"
+      >
+        <div class="container-fluid">
+          <a
+            class="navbar-brand"
+            href="/src/main/resources/templates/front-end/index.html"
+            style="font-family: Kaisei HarunoUmi"
+            >微嶼 Isle Villa</a
           >
-            <button
-              class="nav-link active"
-              id="v-booking-tab"
-              data-bs-toggle="pill"
-              data-bs-target="#v-booking"
-              type="button"
-              role="tab"
-            >
-              訂房管理
-            </button>
-            <button
-              class="nav-link"
-              id="v-shuttle-tab"
-              data-bs-toggle="pill"
-              data-bs-target="#v-shuttle"
-              type="button"
-              role="tab"
-            >
-              接駁預約管理
-            </button>
-            <button
-              class="nav-link"
-              id="v-orders-tab"
-              data-bs-toggle="pill"
-              data-bs-target="#v-orders"
-              type="button"
-              role="tab"
-            >
-              購物訂單管理
-            </button>
-            <button
-              class="nav-link"
-              id="v-profile-tab"
-              data-bs-toggle="pill"
-              data-bs-target="#v-profile"
-              type="button"
-              role="tab"
-            >
-              個人資料管理
-            </button>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarCollapse"
+            aria-controls="navbarCollapse"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div
+            class="collapse navbar-collapse justify-content-center"
+            id="navbarCollapse"
+          >
+            <ul class="navbar-nav mx-auto mb-md-0">
+              <li class="nav-item">
+                <a class="nav-link" href="#">最新消息</a>
+              </li>
+              <li class="nav-item divider align-self-center px-1">|</li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">關於微嶼</a>
+              </li>
+              <li class="nav-item divider align-self-center px-1">|</li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">客房介紹</a>
+              </li>
+              <li class="nav-item divider align-self-center px-1">|</li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">線上購物</a>
+              </li>
+              <li class="nav-item divider align-self-center px-1">|</li>
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  顧客服務
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="#">交通資訊</a></li>
+                  <li><a class="dropdown-item" href="#">天氣資訊</a></li>
+                  <li><a class="dropdown-item" href="#">線上客服</a></li>
+                  <li><a class="dropdown-item" href="#">常見Q&A</a></li>
+                </ul>
+              </li>
+              <li class="nav-item divider align-self-center px-1">|</li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">會員專區</a>
+              </li>
+            </ul>
+            <div class="dropdown">
+              <a
+                class="btn btn-dark dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="fa-solid fa-earth-asia"></i>　語言 Language
+              </a>
+
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">中文</a></li>
+                <li><a class="dropdown-item" href="#">English</a></li>
+              </ul>
+            </div>
           </div>
         </div>
+      </nav>
+      <!-- 佔位元素 -->
+      <div style="height: 60px"></div>
+    </header>
+    <!-- ========== 統一header結束 ========== -->
 
-        <!-- 右側內容區 -->
-        <div class="col-md-9">
-          <div class="tab-content" id="memberTabsContent">
-            <!-- 訂房管理 -->
+    <!-- ========== 頁面內容開始 ========== -->
+    <main>
+      <div class="container py-5">
+        <h2 class="text-center mb-4">會員專區</h2>
+
+        <div class="row">
+          <!-- 左側垂直選單 -->
+          <div class="col-md-3 mb-4">
             <div
-              class="tab-pane fade show active"
-              id="v-booking"
-              role="tabpanel"
-              aria-labelledby="v-booking-tab"
+              class="nav flex-column nav-pills"
+              id="memberTabs"
+              role="tablist"
+              aria-orientation="vertical"
             >
-              <div class="row g-4">
-                <div class="col-md-6">
-                  <div class="card shadow-sm h-100 text-center">
-                    <div class="card-body">
-                      <i class="bi bi-search fs-1 text-primary mb-3"></i>
-                      <h5 class="card-title">查詢訂房</h5>
-                      <p class="card-text">查看您目前的客房預約資訊。</p>
-                      <a href="#" class="btn btn-outline-primary">前往查詢</a>
+              <button
+                class="nav-link active"
+                id="v-booking-tab"
+                data-bs-toggle="pill"
+                data-bs-target="#v-booking"
+                type="button"
+                role="tab"
+              >
+                訂房管理
+              </button>
+              <button
+                class="nav-link"
+                id="v-shuttle-tab"
+                data-bs-toggle="pill"
+                data-bs-target="#v-shuttle"
+                type="button"
+                role="tab"
+              >
+                接駁預約管理
+              </button>
+              <button
+                class="nav-link"
+                id="v-orders-tab"
+                data-bs-toggle="pill"
+                data-bs-target="#v-orders"
+                type="button"
+                role="tab"
+              >
+                購物訂單管理
+              </button>
+              <button
+                class="nav-link"
+                id="v-profile-tab"
+                data-bs-toggle="pill"
+                data-bs-target="#v-profile"
+                type="button"
+                role="tab"
+              >
+                個人資料管理
+              </button>
+            </div>
+          </div>
+
+          <!-- 右側內容區 -->
+          <div class="col-md-9">
+            <div class="tab-content" id="memberTabsContent">
+              <!-- 訂房管理 -->
+              <div
+                class="tab-pane fade show active"
+                id="v-booking"
+                role="tabpanel"
+                aria-labelledby="v-booking-tab"
+              >
+                <div class="row g-4">
+                  <div class="col-md-6">
+                    <div class="card shadow-sm h-100 text-center">
+                      <div class="card-body">
+                        <i class="bi bi-search fs-1 text-primary mb-3"></i>
+                        <h5 class="card-title">查詢訂房</h5>
+                        <p class="card-text">查看您目前的客房預約資訊。</p>
+                        <a href="#" class="btn btn-outline-primary">前往查詢</a>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="card shadow-sm h-100 text-center">
-                    <div class="card-body">
-                      <i class="bi bi-x-circle fs-1 text-danger mb-3"></i>
-                      <h5 class="card-title">取消訂房</h5>
-                      <p class="card-text">取消不需要的客房預約。</p>
-                      <a href="#" class="btn btn-outline-danger">前往取消</a>
+                  <div class="col-md-6">
+                    <div class="card shadow-sm h-100 text-center">
+                      <div class="card-body">
+                        <i class="bi bi-x-circle fs-1 text-danger mb-3"></i>
+                        <h5 class="card-title">取消訂房</h5>
+                        <p class="card-text">取消不需要的客房預約。</p>
+                        <a href="#" class="btn btn-outline-danger">前往取消</a>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <!-- 接駁預約管理（預留） -->
-            <div
-              class="tab-pane fade"
-              id="v-shuttle"
-              role="tabpanel"
-              aria-labelledby="v-shuttle-tab"
-            >
-              <p class="text-muted text-center mt-4">接駁預約功能開發中...</p>
-            </div>
+              <!-- 接駁預約管理（預留） -->
+              <div
+                class="tab-pane fade"
+                id="v-shuttle"
+                role="tabpanel"
+                aria-labelledby="v-shuttle-tab"
+              >
+                <p class="text-muted text-center mt-4">接駁預約功能開發中...</p>
+              </div>
 
-            <!-- 購物訂單管理（預留） -->
-            <div
-              class="tab-pane fade"
-              id="v-orders"
-              role="tabpanel"
-              aria-labelledby="v-orders-tab"
-            >
-              <p class="text-muted text-center mt-4">購物訂單功能開發中...</p>
-            </div>
+              <!-- 購物訂單管理（預留） -->
+              <div
+                class="tab-pane fade"
+                id="v-orders"
+                role="tabpanel"
+                aria-labelledby="v-orders-tab"
+              >
+                <p class="text-muted text-center mt-4">購物訂單功能開發中...</p>
+              </div>
 
-            <!-- 個人資料管理（預留） -->
-            <div
-              class="tab-pane fade"
-              id="v-profile"
-              role="tabpanel"
-              aria-labelledby="v-profile-tab"
-            >
-              <p class="text-muted text-center mt-4">個人資料功能開發中...</p>
+              <!-- 個人資料管理（預留） -->
+              <div
+                class="tab-pane fade"
+                id="v-profile"
+                role="tabpanel"
+                aria-labelledby="v-profile-tab"
+              >
+                <p class="text-muted text-center mt-4">個人資料功能開發中...</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </main>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-light py-4 mt-5">
+    <!-- ========== 統一Footer開始 ========== -->
+    <!-- 聯絡我們 -->
+    <section id="contact" class="py-5 bg-light">
       <div class="container text-center">
-        <p class="mb-1">© 2025 飯店官網</p>
-        <small
-          >地址：台北市範例路123號 ｜ 電話：(02) 1234-5678 ｜
-          Email：info@example.com</small
-        >
+        <h2 class="section-title">聯絡我們</h2>
+        <p>如有合作、批發或其他問題，歡迎來信聯絡我們。</p>
+        <p>Email: service@archipelago.com.tw</p>
+      </div>
+    </section>
+    <footer class="footer py-4">
+      <div class="container text-center">
+        <p class="mb-1">© 2025 Archipelago 島嶼香氛</p>
+        <p class="mb-0">本網站僅為切版練習用途，非官方網站。</p>
       </div>
     </footer>
+    <!-- ========== 統一Footer結束 ========== -->
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

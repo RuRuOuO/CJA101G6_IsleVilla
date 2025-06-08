@@ -1,0 +1,50 @@
+/* 自訂 primary 顏色 */
+/* .btn-primary,
+.bg-primary,
+.text-primary,
+.border-primary {
+  background-color: rgb(200,210,0) !important;
+  color: rgb(255,255,255) !important;
+  border-color: rgb(200,210,0) !important;
+} */
+
+/* 自訂 secondary */
+/* .btn-secondary,
+.bg-secondary,
+.text-secondary,
+.border-secondary {
+  background-color: rgb(130,180,200) !important;
+  color: #fff !important;
+  border-color: lightblue !important;
+} */
+
+/* 可依照需要加上其他色系 */
+
+/* 全站取消圓角 */
+* {
+  border-radius: 0px !important;
+}
+
+/*  */
+.navbar-nav {
+  display: flex;
+  gap: 1rem;
+}
+.btn{
+  box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.1);
+}
+
+* {
+  font-family: "Noto Sans TC", sans-serif;
+}
+
+p, .btn, .nav-link{
+  font-size:15px;
+}
+
+.nav-item.divider {
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.5;
+  font-size: 0.5rem; /* 可調整大小 */
+}
