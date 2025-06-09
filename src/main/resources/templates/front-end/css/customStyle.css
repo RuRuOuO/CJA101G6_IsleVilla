@@ -18,6 +18,10 @@
   border-color: lightblue !important;
 } */
 
+.btn-dark{
+  border: 1px solid white;
+}
+
 /* 可依照需要加上其他色系 */
 
 /* 全站取消圓角 */
@@ -38,7 +42,7 @@
   font-family: "Noto Sans TC", sans-serif;
 }
 
-p, .btn, .nav-link{
+p, .btn, .nav-link, li{
   font-size:15px;
 }
 

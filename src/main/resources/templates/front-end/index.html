@@ -4,29 +4,33 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Archipelago Demo</title>
+
+    <!-- ========== 統一載入樣式段落開始 ========== -->
+    <!-- bootstrap -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
-    <!-- 載入字型-->
+    <!-- 字型-->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Kaisei+HarunoUmi&family=Noto+Sans+TC:wght@100..900&family=Noto+Serif+TC:wght@200..900&display=swap"
       rel="stylesheet"
     />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Kaisei+HarunoUmi&family=Noto+Sans+TC:wght@100..900&family=Noto+Serif+HK:wght@200..900&family=Noto+Serif+TC:wght@200..900&display=swap"
-      rel="stylesheet"
-    />
-    <!-- 載入font awesome -->
+    <!-- font awesome -->
     <script
       src="https://kit.fontawesome.com/d4a9524440.js"
       crossorigin="anonymous"
     ></script>
     <!-- 覆蓋樣式 -->
-    <link rel="stylesheet" href="css/customStyle.css" />
+    <!-- <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/RuRuOuO/CJA101G6_IsleVilla@WeiJing/src/main/resources/templates/front-end/css/customStyle.css"
+    /> -->
+    <link rel="stylesheet" href="./css/customStyle.css" />
+    <!-- ========== 統一載入樣式段落結束 ========== -->
+
     <!-- 首頁微調style -->
     <style>
       body {
@@ -35,8 +39,8 @@
       }
       .hero {
         height: 100vh;
-        background: url("https://images.unsplash.com/photo-1504198458649-3128b932f49b")
-          center/cover no-repeat;
+        background: url("https://images.unsplash.com/photo-1494879540385-bc170b0878a7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")
+          center/cover no-repeat fixed; /* fixed */
         color: white;
         display: flex;
         align-items: center;
@@ -73,7 +77,6 @@
         border-radius: 12px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       }
-
       .square-img {
         position: absolute;
         top: 0;
@@ -82,21 +85,15 @@
         height: 100%;
         object-fit: cover; /* 保持圖片比例並填滿容器 */
       }
-
       /* 最新消息 */
-      /* .news-item img {
-        width: 100%;
-        aspect-ratio: 16 / 9;
-        object-fit: cover;
-      } */
       .card-img-top {
         height: 300px; /* 你可以依需要調整高度 */
         object-fit: cover;
       }
-
       /* about區塊 */
       .about-section {
-        background-image: url("https://images.unsplash.com/photo-1597682496035-b04f723202a4?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"); /* 替換成你的圖片路徑 */
+        background: url("https://images.unsplash.com/photo-1494879540385-bc170b0878a7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")
+          center/cover no-repeat; /* fixed */
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -106,7 +103,6 @@
         justify-content: center;
         position: relative;
       }
-
       .about-section::before {
         content: "";
         position: absolute;
@@ -114,39 +110,37 @@
         left: 0;
         height: 100%;
         width: 100%;
-        background-color: rgba(0, 0, 0, 0.4); /* 加入黑色遮罩提高文字可讀性 */
+        /* 加入黑色遮罩提高文字可讀性 */
+        background-color: rgba(0, 0, 0, 0.4);
         z-index: 1;
       }
-
       .about-section .container {
         position: relative;
         z-index: 2; /* 讓文字層在遮罩之上 */
       }
-
       .about-section p.lead {
         font-size: 1.25rem;
       }
-
       /* 固定在畫面上的立即預定按鈕 */
       .booking-fixed-btn {
         position: fixed;
         bottom: 24px;
-        right: 24px;
+        right: 36px;
         z-index: 1050; /* 確保在其他元素上面 */
-        padding: 12px 20px;
-        font-size: 16px;
-        border-radius: 30px;
-        background-color: #000; /* 可自訂 */
-        color: #fff;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        transition: background-color 0.3s ease;
-        text-decoration: none;
+        /* padding: 12px 20px; */
+        /* font-size: 16px; */
+        /* border-radius: 30px; */
+        /* background-color: #000; */
+        /* color: #fff; */
+        box-shadow: 0 0px 20px rgba(255, 255, 200, 1);
+        /* transition: background-color 0.3s ease; */
+        /* text-decoration: none; */
+        /* border: 1px solid white; */
       }
-
-      .booking-fixed-btn:hover {
+      /* .booking-fixed-btn:hover {
         background-color: #333;
         color: #fff;
-      }
+      } */
     </style>
   </head>
   <body>
@@ -234,19 +228,19 @@
         </div>
       </nav>
       <!-- 佔位元素 -->
-      <div style="height: 60px"></div>
+      <div style="height: 55px"></div>
     </header>
     <!-- ========== 統一header結束 ========== -->
 
     <!-- ========== 頁面內容開始 ========== -->
     <main>
       <section class="hero position-relative">
-        <img
+        <!-- <img
           src="https://images.unsplash.com/photo-1494879540385-bc170b0878a7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
           alt="飯店大圖"
           class="img-fluid w-100"
           style="height: 100vh; object-fit: cover"
-        />
+        /> -->
         <div
           class="hero-text position-absolute top-50 start-50 translate-middle text-white text-center"
         >
@@ -262,17 +256,7 @@
       </section>
 
       <!-- 固定右下角的立即預定按鈕 -->
-      <a href="#booking" class="btn btn-bright booking-fixed-btn"> 立即預定 </a>
-
-      <!-- 品牌故事 -->
-      <!-- <section id="brand" class="py-5 bg-light">
-      <div class="container text-center">
-        <h2 class="section-title">品牌理念</h2>
-        <p class="lead">
-          我們融合自然景觀與記憶氣味，用香氛傳遞台灣土地的溫度。
-        </p>
-      </div>
-    </section> -->
+      <a href="#booking" class="btn btn-dark booking-fixed-btn"> 立即預定 </a>
 
       <!-- 最新消息 -->
       <section class="py-5 bg-light" id="news">
@@ -319,7 +303,7 @@
             <div class="col-md-4">
               <div class="card h-100 shadow-sm">
                 <img
-                  src="https://images.unsplash.com/photo-1601987077301-6578c3b5c6d6"
+                  src="https://images.unsplash.com/photo-1697653664649-936ed36b3c8c?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                   class="card-img-top w-100"
                   alt="消息圖片"
                 />
@@ -340,7 +324,13 @@
         id="about"
         class="about-section text-white d-flex align-items-center"
       >
-        <div class="container">
+        <!-- <img
+          src="https://images.unsplash.com/photo-1494879540385-bc170b0878a7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          alt="飯店大圖"
+          class="img-fluid w-100"
+          style="height: 100vh; object-fit: cover"
+        /> -->
+        <div class="container position-absolute">
           <div class="row justify-content-center">
             <div class="col-lg-8">
               <h2 class="section-title mb-4">About Archipelago</h2>
@@ -422,26 +412,25 @@
       </section>
     </main>
     <!-- ========== 統一Footer開始 ========== -->
-    <!-- 聯絡我們 -->
-    <section id="contact" class="py-5 bg-light">
-      <div class="container text-center">
-        <h2 class="section-title">聯絡我們</h2>
-        <p>如有合作、批發或其他問題，歡迎來信聯絡我們。</p>
-        <p>Email: service@archipelago.com.tw</p>
-      </div>
-    </section>
-    <footer class="footer py-4">
-      <div class="container text-center">
-        <p class="mb-1">© 2025 Archipelago 島嶼香氛</p>
-        <p class="mb-0">本網站僅為切版練習用途，非官方網站。</p>
+    <footer class="footer bg-secondary text-light py-5">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <h5>微嶼 Isle Villa</h5>
+            <p>讓人在片刻停留中，找回生活的溫度。</p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <h5>聯絡我們</h5>
+            <ul class="list-unstyled">
+              <li>地址：台灣台北市信義區123號</li>
+              <li>電話：02-1234-5678</li>
+              <li>Email：info@islevilla.com</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </footer>
     <!-- ========== 統一Footer結束 ========== -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- <script src="./js/include.js"></script>
-    <script>
-      includeHTML("#header-container", "/header.html");
-      includeHTML("#footer-container", "/footer.html");
-    </script> -->
   </body>
 </html>
