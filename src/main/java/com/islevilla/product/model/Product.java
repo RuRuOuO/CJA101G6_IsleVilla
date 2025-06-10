@@ -1,83 +1,42 @@
 package com.islevilla.product.model;
 
 
+import com.islevilla.productcategory.model.ProductCategory;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+
 
     @Entity
     @Table(name = "product")
+    @Data
     public class Product {
         @Column(name = "product_id")
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         @Id
         private Integer productId;
-        @Column(name = "product_category_id")
-        private Integer productCategoryId;
+
+        @ManyToOne
+        @JoinColumn(name = "product_category_id", referencedColumnName = "product_category_id", nullable = false)
+        private ProductCategory productCategory;
+
         @Column(name = "product_name")
+        @NotEmpty(message = "請輸入產品名稱")
         private String productName;
+
+        @NotNull(message = "請輸入價格")
         @Column(name = "product_price")
         private Integer productPrice;
+
         @Column(name = "product_description")
         private String productDescription;
+
+        @NotNull(message = "請輸入庫存量")
         @Column(name = "product_quantity")
         private Integer productQuantity;
+
         @Column(name = "product_status")
         private Byte productStatus; // 0:下架, 1:上架
-
-
-        public Integer getProductId() {
-            return productId;
-        }
-
-        public void setProductId(Integer productId) {
-            this.productId = productId;
-        }
-
-        public Integer getProductCategoryId() {
-            return productCategoryId;
-        }
-
-        public void setProductCategoryId(Integer productCategoryId) {
-            this.productCategoryId = productCategoryId;
-        }
-
-        public String getProductName() {
-            return productName;
-        }
-
-        public void setProductName(String productName) {
-            this.productName = productName;
-        }
-
-        public Integer getProductPrice() {
-            return productPrice;
-        }
-
-        public void setProductPrice(Integer productPrice) {
-            this.productPrice = productPrice;
-        }
-
-        public String getProductDescription() {
-            return productDescription;
-        }
-
-        public void setProductDescription(String productDescription) {
-            this.productDescription = productDescription;
-        }
-
-        public Integer getProductQuantity() {
-            return productQuantity;
-        }
-
-        public void setProductQuantity(Integer productQuantity) {
-            this.productQuantity = productQuantity;
-        }
-
-        public Byte getProductStatus() {
-            return productStatus;
-        }
-
-        public void setProductStatus(Byte productStatus) {
-            this.productStatus = productStatus;
-        }
     }
 

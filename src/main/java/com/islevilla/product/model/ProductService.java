@@ -1,14 +1,28 @@
 package com.islevilla.product.model;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+import java.util.List;
+
+@Component
 public class ProductService {
     @Autowired
-    private ProductDAO productDAO;  // 注入 DAO 層
+    private ProductRepository productRepository;
 
-    public int addProduct(Product product) {
-        return productDAO.insert(product);  // 調用 DAO 層的插入方法
+    public void addProduct(Product product) {
+        productRepository.save(product);
     }
+    public void updateProduct(Product product) {
+        productRepository.save(product);
+    }
+    public void deleteProduct(Integer productId) {
+        if(productRepository.existsById(productId)){
+            productRepository.deleteById(productId);
+        }
+    }
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
+    }
+
 }
