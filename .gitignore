@@ -4,7 +4,6 @@ bin/
 out/
 *.idea
 .DS_Store
-src/resources/application.properties
 
 HELP.md
 target/
