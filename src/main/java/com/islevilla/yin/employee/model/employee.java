@@ -1,4 +1,4 @@
-package com.islevilla.employee.model;
+package com.islevilla.yin.employee.model;
 
 import jakarta.persistence.*;
 import lombok.Data;

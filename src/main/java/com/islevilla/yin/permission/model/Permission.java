@@ -1,4 +1,4 @@
-package com.islevilla.permission.model;
+package com.islevilla.yin.permission.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;

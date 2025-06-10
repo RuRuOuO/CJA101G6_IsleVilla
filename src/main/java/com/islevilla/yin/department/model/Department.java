@@ -1,4 +1,4 @@
-package com.islevilla.department.model;
+package com.islevilla.yin.department.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
