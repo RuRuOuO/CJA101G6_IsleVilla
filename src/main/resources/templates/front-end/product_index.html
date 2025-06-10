@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-TW" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bootstrap demo</title>
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/product_index.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body>
+<!------------------------ header ------------------------>
+<header class="p-3 mb-3 border-bottom">
+    <div class="container">
+        <div
+                class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start"
+        >
+            <a
+                    href="/"
+                    class="d-flex align-items-center mb-2 mb-lg-0 link-body-emphasis text-decoration-none"
+            >
+                <img
+                        src="https://dummyimage.com/100x40/"
+                        alt="Logo"
+                        width="100"
+                        height="40"
+                        class="header-logo"
+                />
+            </a>
+
+            <ul
+                    class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0"
+            >
+                <li>
+                    <a href="#" class="nav-link px-2 link-secondary">飯店介紹</a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link px-2 link-body-emphasis">房間預訂</a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link px-2 link-body-emphasis">接駁預約</a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link px-2 link-body-emphasis">購物商城</a>
+                </li>
+            </ul>
+
+            <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
+                <input
+                        type="search"
+                        class="form-control"
+                        placeholder="Search..."
+                        aria-label="Search"
+                />
+            </form>
+
+            <div class="dropdown text-end">
+                <a
+                        href="#"
+                        class="d-block link-body-emphasis text-decoration-none dropdown-toggle"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                >
+                    <img
+                            src="https://github.com/mdo.png"
+                            alt="mdo"
+                            width="32"
+                            height="32"
+                            class="rounded-circle"
+                    />
+                </a>
+                <ul class="dropdown-menu text-small">
+                    <li><a class="dropdown-item" href="#">我的帳號</a></li>
+                    <li><a class="dropdown-item" href="#">帳號設定</a></li>
+                    <li><a class="dropdown-item" href="#">資料設定</a></li>
+                    <li><hr class="dropdown-divider" /></li>
+                    <li><a class="dropdown-item" href="#">登出</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!------------------------ main ------------------------>
+<main class="container mb-5 mt-5">
+    <!-- 商品分類 -->
+    <h2 class="text-center mb-4">商品分類</h2>
+    <div class="row category-row">
+        <div class="col-2 category-item">
+            <button class="btn btn-outline-primary">
+                <i class="bi bi-grid"></i>
+                <p>全部商品</p>
+            </button>
+        </div>
+        <div class="col-2 category-item">
+            <button class="btn btn-outline-primary">
+                <i class="bi bi-bag"></i>
+                <p>食物禮盒</p>
+            </button>
+        </div>
+        <div class="col-2 category-item">
+            <button class="btn btn-outline-primary">
+                <i class="bi bi-fire"></i>
+                <p>配件飾品</p>
+            </button>
+        </div>
+        <div class="col-2 category-item">
+            <button class="btn btn-outline-primary">
+                <i class="bi bi-bowl"></i>
+                <p>香氛系列</p>
+            </button>
+        </div>
+        <div class="col-2 category-item">
+            <button class="btn btn-outline-primary">
+                <i class="bi bi-cup"></i>
+                <p>精選小物</p>
+            </button>
+        </div>
+    </div>
+
+    <!--空行-->
+    <div class="w-100 d-none d-md-block my-5"></div>
+
+    <!-- 商品卡片 -->
+    <h2 class="text-center">商品列表</h2>
+    <p class="text-center">歡迎來到我們的購物商城！</p>
+
+    <div class="container mt-4">
+        <div class="row g-4">
+            <!-- 商品卡片 1 -->
+            <!-- 迴圈渲染：products 為 Controller 傳入的 List<Product> -->
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3"
+                 th:each="prod : ${products}">
+                <div class="card card d-flex flex-column">
+                    <!-- 假設你在 Product 裡有 imageUrl 欄位，否則保留 placeholder -->
+                    <img src="https://dummyimage.com/300x200/"
+                         class="card-img-top"
+                         alt="商品圖片"/>
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${prod.productName}">商品名稱</h5>
+                        <p class="card-text" th:text="${prod.productDescription}">描述</p>
+                        <p class="price" th:text="'NT$ ' + ${prod.productPrice}">NT$ 0</p>
+                        <a href="#" class="btn btn-primary">加入購物車</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<!------------------------ footer ------------------------>
+<footer></footer>
+<script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
