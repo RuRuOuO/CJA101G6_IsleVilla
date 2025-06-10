@@ -1,4 +1,4 @@
-package com.islevilla.productphoto.model;
+package com.islevilla.yin.productphoto;
 
 import jakarta.persistence.*;
 import lombok.Data;
