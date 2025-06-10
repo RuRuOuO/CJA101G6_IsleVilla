@@ -1,7 +1,7 @@
-package com.islevilla.product.model;
+package com.islevilla.yin.product.model;
 
 
-import com.islevilla.productcategory.model.ProductCategory;
+import com.islevilla.yin.productcategory.model.ProductCategory;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

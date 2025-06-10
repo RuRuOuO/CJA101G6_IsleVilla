@@ -1,4 +1,4 @@
-package com.islevilla.product.model;
+package com.islevilla.yin.product.model;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
