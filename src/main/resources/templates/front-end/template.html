@@ -23,45 +23,14 @@
       crossorigin="anonymous"
     ></script>
     <!-- 覆蓋樣式 -->
-    <!-- <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/gh/RuRuOuO/CJA101G6_IsleVilla@WeiJing/src/main/resources/templates/front-end/css/customStyle.css"
-    /> -->
     <link
       rel="stylesheet"
       href="/src/main/resources/static/front-end/css/customStyle.css"
     />
-    <!-- ===== 統一載入樣式段落結束 ===== -->
+    <!-- ----- 統一載入樣式段落結束 ----- -->
     <!-- ===== 自訂樣式開始 ===== -->
-    <style>
-      /* main {
-        background: url("https://images.unsplash.com/photo-1494879540385-bc170b0878a7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")
-          center/cover no-repeat fixed;
-      } */
-      /* 按鈕樣式 */
-      #memberTabs .nav-link {
-        color: #495057;
-        border-radius: 8px;
-        padding: 0.75rem 1rem;
-        margin-bottom: 0.5rem;
-        transition: all 0.3s ease;
-        text-align: left;
-        font-weight: 500;
-      }
-      /* Hover 效果 */
-      #memberTabs .nav-link:hover {
-        background-color: #e2e6ea;
-        color: #212529;
-      }
-      /* Active 狀態樣式 */
-      #memberTabs .nav-link.active {
-        background-color: black;
-        color: white;
-        font-weight: 600;
-        box-shadow: inset 0 0 0 1px #0a58ca;
-      }
-    </style>
-    <!-- ===== 自訂樣式結束 ===== -->
+    <style></style>
+    <!-- ----- 自訂樣式結束 ----- -->
   </head>
   <body>
     <!-- ===== 統一header開始 ===== -->
@@ -161,133 +130,9 @@
       <div style="height: 55px"></div>
     </header>
     <a href="#booking" class="btn btn-dark booking-fixed-btn"> 立即預定 </a>
-    <!-- ===== 統一header結束 ===== -->
+    <!-- ----- 統一header結束 ----- -->
     <!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
-    <main>
-      <div class="container py-5">
-        <h2 class="text-center mb-4">會員專區</h2>
-        <div class="row">
-          <!-- 左側垂直選單 -->
-          <div class="col-md-3 mb-4">
-            <div
-              class="nav flex-column nav-pills"
-              id="memberTabs"
-              role="tablist"
-              aria-orientation="vertical"
-            >
-              <button
-                class="nav-link active"
-                id="v-booking-tab"
-                data-bs-toggle="pill"
-                data-bs-target="#v-booking"
-                type="button"
-                role="tab"
-              >
-                訂房管理
-              </button>
-              <button
-                class="nav-link"
-                id="v-shuttle-tab"
-                data-bs-toggle="pill"
-                data-bs-target="#v-shuttle"
-                type="button"
-                role="tab"
-              >
-                接駁預約管理
-              </button>
-              <button
-                class="nav-link"
-                id="v-orders-tab"
-                data-bs-toggle="pill"
-                data-bs-target="#v-orders"
-                type="button"
-                role="tab"
-              >
-                購物訂單管理
-              </button>
-              <button
-                class="nav-link"
-                id="v-profile-tab"
-                data-bs-toggle="pill"
-                data-bs-target="#v-profile"
-                type="button"
-                role="tab"
-              >
-                個人資料管理
-              </button>
-            </div>
-          </div>
-          <!-- 右側內容區 -->
-          <div class="col-md-9">
-            <div class="tab-content" id="memberTabsContent">
-              <!-- 訂房管理 -->
-              <div
-                class="tab-pane fade show active"
-                id="v-booking"
-                role="tabpanel"
-                aria-labelledby="v-booking-tab"
-              >
-                <div class="row g-4">
-                  <div class="col-md-6">
-                    <div class="card shadow-sm h-100 text-center">
-                      <div class="card-body">
-                        <i class="bi bi-search fs-1 text-primary mb-3"></i>
-                        <h5 class="card-title">查詢訂房</h5>
-                        <p class="card-text">查看您目前的客房預約資訊。</p>
-                        <a href="#" class="btn btn-outline-dark">前往查詢</a>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="card shadow-sm h-100 text-center">
-                      <div class="card-body">
-                        <i class="bi bi-x-circle fs-1 text-danger mb-3"></i>
-                        <h5 class="card-title">取消訂房</h5>
-                        <p class="card-text">取消不需要的客房預約。</p>
-                        <a href="#" class="btn btn-outline-danger">前往取消</a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- 接駁預約管理（預留） -->
-              <div
-                class="tab-pane fade"
-                id="v-shuttle"
-                role="tabpanel"
-                aria-labelledby="v-shuttle-tab"
-              >
-                <!-- //////////////////// 接駁功能放這裡 //////////////////// -->
-                <p class="text-muted text-center mt-4">接駁預約功能開發中...</p>
-                <!-- //////////////////// 接駁功能放這裡 //////////////////// -->
-              </div>
-              <!-- 購物訂單管理（預留） -->
-              <div
-                class="tab-pane fade"
-                id="v-orders"
-                role="tabpanel"
-                aria-labelledby="v-orders-tab"
-              >
-                <!-- //////////////////// 訂單管理放這裡 //////////////////// -->
-                <p class="text-muted text-center mt-4">購物訂單功能開發中...</p>
-                <!-- //////////////////// 訂單管理放這裡 //////////////////// -->
-              </div>
-              <!-- 個人資料管理（預留） -->
-              <div
-                class="tab-pane fade"
-                id="v-profile"
-                role="tabpanel"
-                aria-labelledby="v-profile-tab"
-              >
-                <!-- //////////////////// 個人資料放這裡 //////////////////// -->
-                <p class="text-muted text-center mt-4">個人資料功能開發中...</p>
-                <!-- //////////////////// 個人資料放這裡 //////////////////// -->
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
+    <main></main>
     <!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
     <!-- ===== 統一Footer開始 ===== -->
     <footer class="footer bg-secondary text-light py-5 justify-content-center">
@@ -313,7 +158,7 @@
         </div>
       </div>
     </footer>
-    <!-- ===== 統一Footer結束 ===== -->
+    <!-- ----- 統一Footer結束 ----- -->
     <!-- ===== 載入BootstrapJS ===== -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   </body>
