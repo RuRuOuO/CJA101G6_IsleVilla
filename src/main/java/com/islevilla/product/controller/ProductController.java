@@ -17,7 +17,7 @@ public class ProductController {
     @GetMapping("/list")
     public String listProducts(Model model) {
         model.addAttribute("products", productService.getAllProducts());
-        return "product_index";    // 對應 src/main/resources/templates/product_index.html
+        return "front-end/product/product_index";    // 對應 src/main/resources/templates/product_index.html
     }
 
 
