@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class NewsService {
@@ -23,5 +24,10 @@ public class NewsService {
     }
     public List<NewsVO> getAll() {
         return newsRepository.findAll();
+    }
+
+    public NewsVO getById(Integer newsId) {
+        Optional<NewsVO> news = newsRepository.findById(newsId);
+        return news.orElse(null);
     }
 }
