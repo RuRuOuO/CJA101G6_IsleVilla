@@ -1,9 +1,10 @@
 package com.islevilla.wei.news.model;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -14,16 +15,19 @@ public class NewsService {
     public void addNews(NewsVO newsVO) {
         newsRepository.save(newsVO);
     }
+
     public void updateNews(NewsVO newsVO) {
         newsRepository.save(newsVO);
     }
+
     public void deleteNews(Integer newsId) {
-        if(newsRepository.existsById(newsId)){
+        if (newsRepository.existsById(newsId)) {
             newsRepository.deleteById(newsId);
         }
     }
-    public List<NewsVO> getAll() {
-        return newsRepository.findAll();
+
+    public Page<NewsVO> getAll(Pageable pageable) {
+        return newsRepository.findAll(pageable);
     }
 
     public NewsVO getById(Integer newsId) {
