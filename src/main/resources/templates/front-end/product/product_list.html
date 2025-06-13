@@ -23,10 +23,13 @@
             crossorigin="anonymous"
     ></script>
     <!-- 覆蓋樣式 -->
-    <link rel="stylesheet" th:href="@{/css/custom_style.css}">
+    <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/gh/RuRuOuO/CJA101G6_IsleVilla@main/src/main/resources/static/css/custom_style.css"
+    />
     <!-- ----- 統一載入樣式段落結束 ----- -->
     <!-- ===== 自訂樣式開始 ===== -->
-    <link rel="stylesheet" href="/css/product_index.css"/>
+    <style></style>
     <!-- ----- 自訂樣式結束 ----- -->
 </head>
 <body>
@@ -129,55 +132,40 @@
 <a href="#booking" class="btn btn-dark booking-fixed-btn"> 立即預定 </a>
 <!-- ----- 統一header結束 ----- -->
 <!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
-<main class="container mb-5 mt-5">
-    <!-- 商品分類 -->
-    <h2 class="text-center mb-4">商品分類</h2>
-    <div class="row category-row">
-        <div class="col-2 category-item">
-            <button class="btn btn-outline-primary">
-                <i class="bi bi-grid"></i>
-                <p>全部商品</p>
-            </button>
-        </div>
-        <div th:each="category : ${category}" class="col-2 category-item">
-            <button class="btn btn-outline-primary">
-                <i class="bi bi-grid"></i>
-                <p th:text="${category.productCategoryName}">商品類別名稱</p>
-            </button>
-        </div>
-    </div>
-
-    <!--空行-->
-    <div class="w-100 d-none d-md-block my-5"></div>
-
-    <!-- 商品卡片 -->
-    <h2 class="text-center">商品列表</h2>
-    <p class="text-center">歡迎來到 微嶼Islevilla 購物商城</p>
-
-    <div class="container mt-4">
-        <div class="row g-4">
-            <!-- 商品卡片 1 -->
-            <!-- 迴圈渲染：products 為 Controller 傳入的 List<Product> -->
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3"
-                 th:each="prod : ${product}">
-                <div class="card card d-flex flex-column">
-                    <!-- 假設你在 Product 裡有 imageUrl 欄位，否則保留 placeholder -->
-                    <img src="https://dummyimage.com/300x200/"
-                         class="card-img-top"
-                         alt="商品圖片"/>
-                    <div class="card-body">
-                        <h5 class="card-title" th:text="${prod.productName}">商品名稱</h5>
-                        <p class="card-text" th:text="${prod.productDescription}">描述</p>
-                        <p class="price" th:text="'NT$ ' + ${prod.productPrice}">NT$ 0</p>
-                        <a href="#" class="btn btn-primary">加入購物車</a>
-                    </div>
-                </div>
-            </div>
-
-        </div>
+<main>
+    <div
+            class="d-flex flex-column flex-shrink-0 p-3 bg-light"
+            style="width: 280px"
+    >
+        <a
+                href="/"
+                class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none"
+        >
+            <span class="fs-4">商品分類</span>
+        </a>
+        <hr />
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li class="nav-item">
+                <a href="#" class="nav-link active" aria-current="page">
+                    <svg class="bi me-2" width="16" height="16">
+                        <use xlink:href="#home"></use>
+                    </svg>
+                    <i class="fa-solid fa-mug-saucer"></i>
+                    <br/>
+                    全部商品
+                </a>
+            </li>
+            <!-- 使用Thymeleaf來動態生成分類列表 -->
+            <li th:each="category : ${category}">
+                <a href="#" class="nav-link link-dark">
+                    <span th:text="${category.productCategoryName}"></span>
+                    <!-- 顯示分類名稱 -->
+                </a>
+            </li>
+        </ul>
+        <hr />
     </div>
 </main>
-
 <!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
 <!-- ===== 統一Footer開始 ===== -->
 <footer class="footer bg-secondary text-light py-5 justify-content-center">

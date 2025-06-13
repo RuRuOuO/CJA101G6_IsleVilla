@@ -24,5 +24,12 @@ public class ProductService {
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
+    public List<Product> getProductByProductCategoryId(Integer productCategoryId) {
+        return productRepository.findByProductCategoryProductCategoryId(productCategoryId);
+    }
+    public Product getProductById(Integer productId) {
+        return productRepository.findById(productId)
+                .orElse(null);
+    }
 
 }

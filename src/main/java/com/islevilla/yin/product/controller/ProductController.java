@@ -18,13 +18,25 @@ public class ProductController {
         this.productCategoryService = productCategoryService;
     }
 
-
+    //商品首頁-產品和產品類別渲染
+    @GetMapping
+    public String homeProduct(Model model) {
+        model.addAttribute("product", productService.getAllProducts());
+        model.addAttribute("category", productCategoryService.getAllProductCategory());
+        return "front-end/product/product_index";
+    }
+    //商品列表頁面-產品渲染
     @GetMapping("/list")
-    public String listProducts(Model model) {
-        model.addAttribute("products", productService.getAllProducts());
-        model.addAttribute("category", productCategoryService.getAllCategories());
-
-        return "front-end/product/product_index";    // 對應 src/main/resources/templates/product_index.html
+    public String listProduct(@RequestParam(value = "categoryId", required = false) Integer categoryId, Model model) {
+        if (categoryId != null) {
+            model.addAttribute("product", productService.getProductByProductCategoryId(categoryId));
+            model.addAttribute("selectedCategory", productCategoryService.getProductCategoryById(categoryId));
+        } else {
+            model.addAttribute("product", productService.getAllProducts());
+            model.addAttribute("selectedCategory", "全部商品");
+        }
+        model.addAttribute("category", productCategoryService.getAllProductCategory());
+        return "front-end/product/product_list";
     }
 
 
