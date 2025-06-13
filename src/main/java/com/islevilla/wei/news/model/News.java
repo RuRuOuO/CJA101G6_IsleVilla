@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "news") // 對應的Table
 @Data
-public class NewsVO {
+public class News {
     @Column(name = "news_id") // 對應的欄位
     @GeneratedValue(strategy = GenerationType.IDENTITY) // 此欄為auto increment
     @Id // 對應到Table的主鍵

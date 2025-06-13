@@ -27,29 +27,29 @@ public class NewsService {
     /**
      * 新增新聞方法
      *
-     * @param newsVO 要新增的新聞物件，包含新聞的所有資訊
+     * @param news 要新增的新聞物件，包含新聞的所有資訊
      *               <p>
      *               功能說明：
      *               - 接收前端傳來的新聞資料
      *               - 呼叫 Repository 的 save() 方法將資料存入資料庫
      *               - JPA 的 save() 方法會自動判斷是新增還是更新（根據主鍵是否存在）
      */
-    public void addNews(NewsVO newsVO) {
-        newsRepository.save(newsVO);
+    public void addNews(News news) {
+        newsRepository.save(news);
     }
 
     /**
      * 更新新聞方法
      *
-     * @param newsVO 要更新的新聞物件，必須包含要更新的新聞 ID
+     * @param news 要更新的新聞物件，必須包含要更新的新聞 ID
      *               <p>
      *               功能說明：
      *               - 接收前端傳來的更新資料
      *               - 同樣使用 save() 方法，但因為 newsVO 已有 ID，所以會執行更新操作
      *               - 如果 ID 不存在於資料庫中，則會新增一筆資料
      */
-    public void updateNews(NewsVO newsVO) {
-        newsRepository.save(newsVO);
+    public void updateNews(News news) {
+        newsRepository.save(news);
     }
 
     /**
@@ -80,7 +80,7 @@ public class NewsService {
      * - Page 物件不只包含資料，還有分頁相關的元資訊
      * - 前端可以根據 Page 物件的資訊來產生分頁導航
      */
-    public Page<NewsVO> getAll(Pageable pageable) {
+    public Page<News> getAll(Pageable pageable) {
         return newsRepository.findAll(pageable);
     }
 
@@ -96,9 +96,9 @@ public class NewsService {
      * - orElse(null) 表示如果 Optional 中沒有值，就回傳 null
      * - 也可以用 orElseThrow() 來拋出自訂例外，或用 orElse(new NewsVO()) 回傳預設物件
      */
-    public NewsVO getById(Integer newsId) {
+    public News getById(Integer newsId) {
         // findById 回傳 Optional<NewsVO>，避免直接處理 null 值
-        Optional<NewsVO> news = newsRepository.findById(newsId);
+        Optional<News> news = newsRepository.findById(newsId);
         // 如果找到資料就回傳，找不到就回傳 null
         return news.orElse(null);
     }

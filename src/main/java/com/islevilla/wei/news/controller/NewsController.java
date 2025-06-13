@@ -1,7 +1,7 @@
 package com.islevilla.wei.news.controller;
 
 import com.islevilla.wei.news.model.NewsService;
-import com.islevilla.wei.news.model.NewsVO;
+import com.islevilla.wei.news.model.News;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,7 +33,7 @@ public class NewsController {
         Pageable pageable = PageRequest.of(page, size, Sort.by("newsTime").descending());
 
         // 呼叫 Service 層取得分頁資料
-        Page<NewsVO> newsPage = newsService.getAll(pageable);
+        Page<News> newsPage = newsService.getAll(pageable);
 
         // 將資料加入到 Model 中，供前端模板使用
         model.addAttribute("newsList", newsPage.getContent());        // 當前頁的新聞資料
@@ -42,13 +42,31 @@ public class NewsController {
         model.addAttribute("totalItems", newsPage.getTotalElements()); // 總筆數
 
         // 返回模板路徑，對應到 src/main/resources/templates/front-end/news/newsList.html
-        return "front-end/news/newsList";
+        return "front-end/news/listAllNews";
+    }
+
+    @GetMapping("/news/{newsId}")
+    public String newsDetail(@PathVariable Integer newsId, Model model) {
+        // 根據消息 ID 查詢單筆消息資料
+        News news = newsService.getById(newsId);
+
+        // 檢查消息是否存在
+        if (news == null) {
+            // 如果消息不存在，重導向到消息列表頁面
+            return "redirect:/news";
+        }
+
+        // 將消息資料加入到 Model 中，供前端模板使用
+        model.addAttribute("news", news);
+
+        // 返回消息詳情模板路徑
+        return "front-end/news/listOneNews";
     }
 
     @GetMapping("/news/image/{newsId}")
     public ResponseEntity<byte[]> getNewsImage(@PathVariable Integer newsId) {
         // 根據新聞 ID 查詢新聞資料
-        NewsVO news = newsService.getById(newsId);
+        News news = newsService.getById(newsId);
 
         // 檢查新聞是否存在且有圖片資料
         if (news != null && news.getNewsImage() != null) {
