@@ -1,105 +1,105 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8"/>
-    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <head>
+    <meta charset="UTF-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
     <title>微嶼 | Isle Villa</title>
     <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
-</head>
-<body>
-<!-- ===== 載入Header ===== -->
-<div th:replace="~{fragments/fragments :: header}"></div>
-<!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
-<main>
-    <!-- 最新消息 -->
-    <section class="py-5 bg-light shadow-sm" id="news">
+  </head>
+  <body>
+    <!-- ===== 載入Header ===== -->
+    <div th:replace="~{fragments/fragments :: header}"></div>
+    <!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
+    <main>
+      <!-- 最新消息 -->
+      <section class="py-5 bg-light shadow-sm" id="news">
         <div class="container">
-            <h2 class="section-title text-center mb-5">最新消息一覽</h2>
-            <div class="row g-4">
-                <!-- 使用 Thymeleaf 遍歷新聞列表 -->
-                <div class="col-md-4" th:each="news : ${newsList}">
-                    <div class="card h-100 shadow-sm">
-                        <!-- 圖片-->
-                        <img
-                                alt="消息圖片"
-                                class="card-img-top w-100"
-                                th:if="${news.newsImage != null}"
-                                th:src="@{'/news/image/' + ${news.newsId}}"
-                        />
-                        <!-- 預設圖片 -->
-                        <img
-                                alt="消息圖片"
-                                class="card-img-top w-100"
-                                src="https://images.unsplash.com/photo-1681452816108-d75e2a08f75d?q=80&w=2076&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                                style="height: 200px; object-fit: cover"
-                                th:unless="${news.newsImage != null}"
-                        />
-                        <div class="card-body">
-                            <h5 class="card-title" th:text="${news.newsTitle}">標題</h5>
-                            <p
-                                    class="text-muted small"
-                                    th:text="${#temporals.format(news.newsTime, 'yyyy/MM/dd')}"
-                            >
-                                日期
-                            </p>
-                            <p class="card-text" th:text="${news.newsContent}">內容</p>
-                        </div>
-                    </div>
+          <h2 class="section-title text-center mb-5">最新消息一覽</h2>
+          <div class="row g-4">
+            <!-- 使用 Thymeleaf 遍歷新聞列表 -->
+            <div class="col-md-4" th:each="news : ${newsList}">
+              <div class="card h-100 shadow-sm">
+                <!-- 圖片-->
+                <img
+                  alt="消息圖片"
+                  class="card-img-top w-100"
+                  th:if="${news.newsImage != null}"
+                  th:src="@{'/news/image/' + ${news.newsId}}"
+                />
+                <!-- 預設圖片 -->
+                <img
+                  alt="消息圖片"
+                  class="card-img-top w-100"
+                  src="https://images.unsplash.com/photo-1681452816108-d75e2a08f75d?q=80&w=2076&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                  style="height: 200px; object-fit: cover"
+                  th:unless="${news.newsImage != null}"
+                />
+                <div class="card-body">
+                  <h5 class="card-title" th:text="${news.newsTitle}">標題</h5>
+                  <p
+                    class="text-muted small"
+                    th:text="${#temporals.format(news.newsTime, 'yyyy/MM/dd')}"
+                  >
+                    日期
+                  </p>
+                  <p class="card-text" th:text="${news.newsContent}">內容</p>
                 </div>
+              </div>
             </div>
+          </div>
 
-            <!-- 分頁導航 -->
-            <nav aria-label="Page navigation" class="mt-5">
-                <ul class="pagination justify-content-center">
-                    <!-- 上一頁 -->
-                    <li
-                            class="page-item"
-                            th:classappend="${currentPage == 0} ? 'disabled'"
-                    >
-                        <a
-                                aria-label="Previous"
-                                class="page-link"
-                                th:href="@{/news(page=${currentPage - 1})}"
-                        >
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
+          <!-- 分頁導航 -->
+          <nav aria-label="Page navigation" class="mt-5">
+            <ul class="pagination justify-content-center">
+              <!-- 上一頁 -->
+              <li
+                class="page-item"
+                th:classappend="${currentPage == 0} ? 'disabled'"
+              >
+                <a
+                  aria-label="Previous"
+                  class="page-link"
+                  th:href="@{/news(page=${currentPage - 1})}"
+                >
+                  <span aria-hidden="true">&laquo;</span>
+                </a>
+              </li>
 
-                    <!-- 頁碼 -->
-                    <li
-                            class="page-item"
-                            th:classappend="${currentPage == i} ? 'active'"
-                            th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                    >
-                        <a
-                                class="page-link"
-                                th:href="@{/news(page=${i})}"
-                                th:text="${i + 1}"
-                        >1</a
-                        >
-                    </li>
+              <!-- 頁碼 -->
+              <li
+                class="page-item"
+                th:classappend="${currentPage == i} ? 'active'"
+                th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+              >
+                <a
+                  class="page-link"
+                  th:href="@{/news(page=${i})}"
+                  th:text="${i + 1}"
+                  >1</a
+                >
+              </li>
 
-                    <!-- 下一頁 -->
-                    <li
-                            class="page-item"
-                            th:classappend="${currentPage == totalPages - 1} ? 'disabled'"
-                    >
-                        <a
-                                aria-label="Next"
-                                class="page-link"
-                                th:href="@{/news(page=${currentPage + 1})}"
-                        >
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+              <!-- 下一頁 -->
+              <li
+                class="page-item"
+                th:classappend="${currentPage == totalPages - 1} ? 'disabled'"
+              >
+                <a
+                  aria-label="Next"
+                  class="page-link"
+                  th:href="@{/news(page=${currentPage + 1})}"
+                >
+                  <span aria-hidden="true">&raquo;</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
         </div>
-    </section>
-</main>
-<!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
-<!-- ========== 載入Footer ========== -->
-<div th:replace="~{fragments/fragments :: footer}"></div>
-</body>
+      </section>
+    </main>
+    <!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
+    <!-- ========== 載入Footer ========== -->
+    <div th:replace="~{fragments/fragments :: footer}"></div>
+  </body>
 </html>

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@Controller
+@Controller // 標記為 Spring MVC 控制器，可以處理 HTTP 請求並返回視圖
 public class NewsController {
 
     @Autowired
@@ -23,61 +23,81 @@ public class NewsController {
 
     @GetMapping("/news")
     public String newsList(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "9") int size,
+            // @RequestParam 從網址參數中取值，defaultValue 設定預設值
+            @RequestParam(defaultValue = "0") int page,    // 頁碼從 0 開始
+            @RequestParam(defaultValue = "9") int size,    // 每頁 9 筆新聞
             Model model) {
+
+        // 建立分頁物件，設定頁碼、每頁筆數、排序方式
+        // Sort.by("newsTime").descending() 表示按新聞時間降序排列（最新的在前面）
         Pageable pageable = PageRequest.of(page, size, Sort.by("newsTime").descending());
+
+        // 呼叫 Service 層取得分頁資料
         Page<NewsVO> newsPage = newsService.getAll(pageable);
 
-        model.addAttribute("newsList", newsPage.getContent());
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", newsPage.getTotalPages());
-        model.addAttribute("totalItems", newsPage.getTotalElements());
+        // 將資料加入到 Model 中，供前端模板使用
+        model.addAttribute("newsList", newsPage.getContent());        // 當前頁的新聞資料
+        model.addAttribute("currentPage", page);                      // 目前頁碼
+        model.addAttribute("totalPages", newsPage.getTotalPages());   // 總頁數
+        model.addAttribute("totalItems", newsPage.getTotalElements()); // 總筆數
 
+        // 返回模板路徑，對應到 src/main/resources/templates/front-end/news/newsList.html
         return "front-end/news/newsList";
     }
 
     @GetMapping("/news/image/{newsId}")
     public ResponseEntity<byte[]> getNewsImage(@PathVariable Integer newsId) {
+        // 根據新聞 ID 查詢新聞資料
         NewsVO news = newsService.getById(newsId);
+
+        // 檢查新聞是否存在且有圖片資料
         if (news != null && news.getNewsImage() != null) {
+            // 取得圖片的二進位資料
             byte[] imageData = news.getNewsImage();
+
+            // 根據圖片資料判斷圖片格式（JPEG、PNG、GIF 等）
             MediaType mediaType = getMediaType(imageData);
+
+            // 如果能成功識別圖片格式
             if (mediaType != null) {
+                // 建立成功的 HTTP 響應
                 return ResponseEntity.ok()
-                        .contentType(mediaType)
-                        .body(imageData);
+                        .contentType(mediaType)  // 設定正確的 Content-Type
+                        .body(imageData);        // 回傳圖片資料
             }
         }
+
+        // 如果新聞不存在或沒有圖片，回傳 404 Not Found
         return ResponseEntity.notFound().build();
     }
 
     private MediaType getMediaType(byte[] imageData) {
+        // 如果檔案太小（少於 4 個位元組），無法判斷格式
         if (imageData.length < 4) {
             return null;
         }
 
         // 檢查圖片格式的魔數（Magic Numbers）
+
+        // JPEG 格式：檔頭為 FF D8
         if (imageData[0] == (byte) 0xFF && imageData[1] == (byte) 0xD8) {
             return MediaType.IMAGE_JPEG;
         }
+
+        // PNG 格式：檔頭為 89 50 4E 47 (對應 ASCII 的 ".PNG")
         if (imageData[0] == (byte) 0x89 && imageData[1] == (byte) 0x50 &&
                 imageData[2] == (byte) 0x4E && imageData[3] == (byte) 0x47) {
             return MediaType.IMAGE_PNG;
         }
+
+        // GIF 格式：檔頭為 47 49 46 (對應 ASCII 的 "GIF")
         if (imageData[0] == (byte) 0x47 && imageData[1] == (byte) 0x49 &&
                 imageData[2] == (byte) 0x46) {
             return MediaType.IMAGE_GIF;
         }
-        if (imageData[0] == (byte) 0x42 && imageData[1] == (byte) 0x4D) {
-            return MediaType.parseMediaType("image/bmp");
-        }
-        if (imageData[0] == (byte) 0x52 && imageData[1] == (byte) 0x49 &&
-                imageData[2] == (byte) 0x46 && imageData[3] == (byte) 0x46) {
-            return MediaType.parseMediaType("image/webp");
-        }
 
-        // 如果無法識別格式，預設返回 JPEG
+        // 如果無法識別格式，預設回傳 JPEG
+        // 這是一個安全的預設值，大多數瀏覽器都支援 JPEG 格式
         return MediaType.IMAGE_JPEG;
     }
 }

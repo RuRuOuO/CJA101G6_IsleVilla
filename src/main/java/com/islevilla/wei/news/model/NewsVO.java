@@ -26,6 +26,6 @@ public class NewsVO {
     @Column(name = "news_image")
     private byte[] newsImage;
 
-    @Column(name = "news_time", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "news_time", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP") // 預設值為新增消息當下時間
     private LocalDateTime newsTime;
 }
