@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="zh-TW" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>會員登入系統</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --shadow-light: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .auth-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 420px;
+            overflow: hidden;
+        }
+
+        .auth-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .auth-header {
+            text-align: center;
+            padding: 2rem 2rem 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .auth-header h2 {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-header p {
+            color: #6c757d;
+            margin-bottom: 0;
+        }
+
+        .auth-body {
+            padding: 2rem;
+        }
+
+        .form-floating {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-floating > .form-control {
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            padding-top: 1.625rem;
+            padding-bottom: 0.625rem;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+
+        .form-floating > .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.15);
+            background-color: white;
+            transform: translateY(-2px);
+        }
+
+        .form-floating > label {
+            color: #6c757d;
+            padding-left: 1rem;
+        }
+
+        .btn-gradient {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-gradient::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-gradient:hover::before {
+            left: 100%;
+        }
+
+        .social-login .btn {
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            padding: 12px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .social-login .btn:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .divider {
+            position: relative;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #dee2e6;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 1rem;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .auth-links {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .auth-links a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            margin: 0 0.5rem;
+        }
+
+        .auth-links a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .form-check {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-check-input:checked {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+
+        .form-check-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.15);
+        }
+
+        .alert-success {
+            border-radius: 12px;
+            border: none;
+            background-color: #d1e7dd;
+            color: #0a3622;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-page {
+            display: none;
+        }
+
+        .auth-page.active {
+            display: block;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .form-floating {
+            position: relative;
+        }
+
+        @media (max-width: 576px) {
+            .auth-container {
+                padding: 1rem 0.5rem;
+            }
+            
+            .auth-body {
+                padding: 1.5rem;
+            }
+            
+            .auth-header {
+                padding: 1.5rem 1.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+	<!-- ===== 載入Header ===== -->
+    <div th:replace="~{fragments/fragments :: header}"></div>
+    <div class="auth-container">
+        <div class="auth-card fade-in">
+            
+            <!-- 登入頁面 -->
+            <div class="auth-page active" id="loginPage">
+                <div class="auth-header">
+                    <h2><i class="bi bi-person-circle text-primary"></i> 歡迎回來</h2>
+                    <p class="mb-0">登入您的帳戶以繼續</p>
+                </div>
+                
+                <div class="auth-body">
+                    <form id="loginForm">
+                        <div class="form-floating">
+                            <input type="email" class="form-control" id="loginEmail" placeholder="name@example.com" required>
+                            <label for="loginEmail"><i class="bi bi-envelope me-2"></i>電子郵件</label>
+                        </div>
+                        
+                        <div class="form-floating">
+                            <input type="password" class="form-control" id="loginPassword" placeholder="Password" required>
+                            <label for="loginPassword"><i class="bi bi-lock me-2"></i>密碼</label>
+                            <button type="button" class="password-toggle" onclick="togglePassword('loginPassword')">
+                                <i class="bi bi-eye" id="loginPasswordToggle"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="rememberMe">
+                            <label class="form-check-label" for="rememberMe">
+                                記住我
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-gradient text-white w-100 mb-3">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>登入
+                        </button>
+                    </form>
+                    
+                    <div class="divider">
+                        <span>或使用社交帳號登入</span>
+                    </div>
+                    
+                    <div class="social-login row g-2">
+                        <div class="col-6">
+                            <button class="btn w-100" onclick="socialLogin('google')">
+                                <i class="bi bi-google text-danger me-2"></i>Google
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn w-100" onclick="socialLogin('facebook')">
+                                <i class="bi bi-facebook text-primary me-2"></i>Facebook
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="auth-links">
+                        <a href="#" onclick="showPage('forgotPage')">忘記密碼？</a> |
+                        <a href="#" onclick="showPage('registerPage')">建立新帳戶</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 註冊頁面 -->
+            <div class="auth-page" id="registerPage">
+                <div class="auth-header">
+                    <h2><i class="bi bi-person-plus text-success"></i> 建立帳戶</h2>
+                    <p class="mb-0">加入我們開始您的旅程</p>
+                </div>
+                
+                <div class="auth-body">
+                    <form id="registerForm">
+                        <!-- 基本資料 -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="lastName" placeholder="姓氏" required>
+                                    <label for="lastName"><i class="bi bi-person me-2"></i>姓氏</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="firstName" placeholder="名字" required>
+                                    <label for="firstName"><i class="bi bi-person me-2"></i>名字</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-floating">
+                            <input type="email" class="form-control" id="registerEmail" placeholder="name@example.com" required>
+                            <label for="registerEmail"><i class="bi bi-envelope me-2"></i>電子郵件</label>
+                        </div>
+                        
+                        <div class="form-floating">
+                            <input type="tel" class="form-control" id="phoneNumber" placeholder="手機號碼" required>
+                            <label for="phoneNumber"><i class="bi bi-phone me-2"></i>手機號碼</label>
+                        </div>
+                        
+                        <!-- 生日和性別 -->
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-floating">
+                                    <input type="date" class="form-control" id="birthDate" required>
+                                    <label for="birthDate"><i class="bi bi-calendar me-2"></i>生日</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <select class="form-select" id="gender" required>
+                                        <option value="">選擇</option>
+                                        <option value="male">男</option>
+                                        <option value="female">女</option>
+                                        <option value="other">其他</option>
+                                        <option value="prefer-not-to-say">不願透露</option>
+                                    </select>
+                                    <label for="gender"><i class="bi bi-gender-ambiguous me-2"></i>性別</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 地址資訊 -->
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <select class="form-select" id="country">
+                                        <option value="TW" selected>台灣</option>
+                                        <option value="CN">中國</option>
+                                        <option value="HK">香港</option>
+                                        <option value="US">美國</option>
+                                        <option value="JP">日本</option>
+                                    </select>
+                                    <label for="country"><i class="bi bi-globe me-2"></i>國家</label>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="form-floating">
+                                    <select class="form-select" id="city">
+                                        <option value="">選擇縣市</option>
+                                        <option value="taipei">台北市</option>
+                                        <option value="new-taipei">新北市</option>
+                                        <option value="taoyuan">桃園市</option>
+                                        <option value="taichung">台中市</option>
+                                        <option value="tainan">台南市</option>
+                                        <option value="kaohsiung">高雄市</option>
+                                    </select>
+                                    <label for="city"><i class="bi bi-geo-alt me-2"></i>縣市</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 密碼 -->
+                        <div class="form-floating">
+                            <input type="password" class="form-control" id="registerPassword" placeholder="Password" required>
+                            <label for="registerPassword"><i class="bi bi-lock me-2"></i>密碼 (至少8位字元)</label>
+                            <button type="button" class="password-toggle" onclick="togglePassword('registerPassword')">
+                                <i class="bi bi-eye" id="registerPasswordToggle"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="form-floating">
+                            <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password" required>
+                            <label for="confirmPassword"><i class="bi bi-lock-fill me-2"></i>確認密碼</label>
+                            <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">
+                                <i class="bi bi-eye" id="confirmPasswordToggle"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- 密碼強度指示器 -->
+                        <div id="passwordStrength" class="mb-3" style="display: none;">
+                            <small class="text-muted">密碼強度：</small>
+                            <div class="progress" style="height: 4px;">
+                                <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                            <small class="password-requirements text-muted">
+                                <div>• 至少8個字元</div>
+                                <div>• 包含大小寫字母</div>
+                                <div>• 包含數字</div>
+                            </small>
+                        </div>
+                        
+                        <!-- 推薦人代碼 -->
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="referralCode" placeholder="推薦人代碼 (選填)">
+                            <label for="referralCode"><i class="bi bi-gift me-2"></i>推薦人代碼 (選填)</label>
+                        </div>
+                        
+                        <!-- 通知偏好 -->
+                        <div class="mb-3">
+                            <small class="text-muted">通知偏好：</small>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="emailNotification" checked>
+                                <label class="form-check-label" for="emailNotification">
+                                    接收電子郵件通知
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="smsNotification">
+                                <label class="form-check-label" for="smsNotification">
+                                    接收簡訊通知
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="promotionEmail" checked>
+                                <label class="form-check-label" for="promotionEmail">
+                                    接收優惠活動訊息
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- 年齡確認和條款同意 -->
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="ageConfirm" required>
+                            <label class="form-check-label" for="ageConfirm">
+                                我確認已滿18歲
+                            </label>
+                        </div>
+                        
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                            <label class="form-check-label" for="agreeTerms">
+                                我同意 <a href="#" class="text-decoration-none">服務條款</a> 和 <a href="#" class="text-decoration-none">隱私政策</a>
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-gradient text-white w-100 mb-3">
+                            <i class="bi bi-person-check me-2"></i>建立帳戶
+                        </button>
+                    </form>
+                    
+                    <div class="divider">
+                        <span>或使用社交帳號註冊</span>
+                    </div>
+                    
+                    <div class="social-login row g-2">
+                        <div class="col-6">
+                            <button class="btn w-100" onclick="socialLogin('google')">
+                                <i class="bi bi-google text-danger me-2"></i>Google
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn w-100" onclick="socialLogin('facebook')">
+                                <i class="bi bi-facebook text-primary me-2"></i>Facebook
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="auth-links">
+                        <a href="#" onclick="showPage('loginPage')">已有帳戶？立即登入</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 忘記密碼頁面 -->
+            <div class="auth-page" id="forgotPage">
+                <div class="auth-header">
+                    <h2><i class="bi bi-key text-warning"></i> 重設密碼</h2>
+                    <p class="mb-0">輸入您的電子郵件以重設密碼</p>
+                </div>
+                
+                <div class="auth-body">
+                    <div id="forgotSuccess" class="alert alert-success d-none" role="alert">
+                        <i class="bi bi-check-circle me-2"></i>
+                        重設密碼連結已發送至您的電子郵件！請檢查您的收件箱。
+                    </div>
+                    
+                    <form id="forgotForm">
+                        <div class="form-floating">
+                            <input type="email" class="form-control" id="forgotEmail" placeholder="name@example.com" required>
+                            <label for="forgotEmail"><i class="bi bi-envelope me-2"></i>電子郵件</label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-gradient text-white w-100 mb-3">
+                            <i class="bi bi-send me-2"></i>發送重設連結
+                        </button>
+                    </form>
+                    
+                    <div class="auth-links">
+                        <a href="#" onclick="showPage('loginPage')">
+                            <i class="bi bi-arrow-left me-1"></i>返回登入
+                        </a> |
+                        <a href="#" onclick="showPage('registerPage')">建立新帳戶</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // 頁面切換功能
+        function showPage(pageId) {
+            // 隱藏所有頁面
+            document.querySelectorAll('.auth-page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // 顯示目標頁面
+            const targetPage = document.getElementById(pageId);
+            targetPage.classList.add('active');
+            
+            // 添加淡入動畫
+            targetPage.style.animation = 'none';
+            setTimeout(() => {
+                targetPage.style.animation = 'fadeIn 0.5s ease-in-out';
+            }, 10);
+        }
+
+        // 密碼顯示/隱藏切換
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const toggle = document.getElementById(inputId + 'Toggle');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                toggle.className = 'bi bi-eye-slash';
+            } else {
+                input.type = 'password';
+                toggle.className = 'bi bi-eye';
+            }
+        }
+
+        // 社交登入功能
+        function socialLogin(provider) {
+            // 顯示 Bootstrap Toast 通知
+            showToast(`正在使用 ${provider} 登入...`, 'info');
+        }
+
+        // Toast 通知功能
+        function showToast(message, type = 'success') {
+            // 創建 toast 容器（如果不存在）
+            let toastContainer = document.getElementById('toastContainer');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toastContainer';
+                toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+                toastContainer.style.zIndex = '9999';
+                document.body.appendChild(toastContainer);
+            }
+
+            // 創建 toast 元素
+            const toastId = 'toast_' + Date.now();
+            const toastHtml = `
+                <div id="${toastId}" class="toast align-items-center text-bg-${type} border-0" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+            
+            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+            
+            // 顯示 toast
+            const toastElement = document.getElementById(toastId);
+            const toast = new bootstrap.Toast(toastElement);
+            toast.show();
+            
+            // 自動清理
+            toastElement.addEventListener('hidden.bs.toast', () => {
+                toastElement.remove();
+            });
+        }
+
+        // 表單驗證和提交處理
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // 簡單驗證
+            if (!email || !password) {
+                showToast('請填寫所有必填欄位！', 'warning');
+                return;
+            }
+            
+            // 模擬登入過程
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>登入中...';
+            submitBtn.disabled = true;
+            
+            setTimeout(() => {
+                showToast('登入成功！歡迎回來', 'success');
+                submitBtn.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i>登入';
+                submitBtn.disabled = false;
+            }, 1500);
+        });
+
+        // 密碼強度檢查
+        function checkPasswordStrength(password) {
+            const strengthIndicator = document.getElementById('passwordStrength');
+            const progressBar = strengthIndicator.querySelector('.progress-bar');
+            
+            if (!password) {
+                strengthIndicator.style.display = 'none';
+                return;
+            }
+            
+            strengthIndicator.style.display = 'block';
+            
+            let strength = 0;
+            let color = 'danger';
+            let text = '弱';
+            
+            // 長度檢查
+            if (password.length >= 8) strength += 25;
+            if (password.length >= 12) strength += 10;
+            
+            // 包含小寫字母
+            if (/[a-z]/.test(password)) strength += 20;
+            
+            // 包含大寫字母
+            if (/[A-Z]/.test(password)) strength += 20;
+            
+            // 包含數字
+            if (/\d/.test(password)) strength += 15;
+            
+            // 包含特殊字符
+            if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength += 10;
+            
+            if (strength >= 80) {
+                color = 'success';
+                text = '強';
+            } else if (strength >= 60) {
+                color = 'info';
+                text = '中等';
+            } else if (strength >= 40) {
+                color = 'warning';
+                text = '普通';
+            }
+            
+            progressBar.style.width = strength + '%';
+            progressBar.className = `progress-bar bg-${color}`;
+        }
+
+        // 註冊表單處理
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 取得表單數據
+            const formData = {
+                lastName: document.getElementById('lastName').value,
+                firstName: document.getElementById('firstName').value,
+                email: document.getElementById('registerEmail').value,
+                phone: document.getElementById('phoneNumber').value,
+                birthDate: document.getElementById('birthDate').value,
+                gender: document.getElementById('gender').value,
+                country: document.getElementById('country').value,
+                city: document.getElementById('city').value,
+                password: document.getElementById('registerPassword').value,
+                confirmPassword: document.getElementById('confirmPassword').value,
+                agreeTerms: document.getElementById('agreeTerms').checked,
+                ageConfirm: document.getElementById('ageConfirm').checked
+            };
+            
+            // 驗證必填欄位
+            if (!formData.lastName || !formData.firstName || !formData.email || 
+                !formData.phone || !formData.birthDate || !formData.gender || 
+                !formData.password || !formData.confirmPassword) {
+                showToast('請填寫所有必填欄位！', 'warning');
+                return;
+            }
+            
+            // 密碼驗證
+            if (formData.password !== formData.confirmPassword) {
+                showToast('密碼確認不符！', 'danger');
+                return;
+            }
+            
+            if (formData.password.length < 8) {
+                showToast('密碼長度至少需要8個字元！', 'warning');
+                return;
+            }
+            
+            // 年齡和條款確認
+            if (!formData.ageConfirm) {
+                showToast('請確認您已滿18歲！', 'warning');
+                return;
+            }
+            
+            if (!formData.agreeTerms) {
+                showToast('請同意服務條款和隱私政策！', 'warning');
+                return;
+            }
+            
+            // 電話號碼格式驗證
+            const phoneRegex = /^[0-9+\-\s()]{8,15}$/;
+            if (!phoneRegex.test(formData.phone)) {
+                showToast('請輸入有效的手機號碼！', 'warning');
+                return;
+            }
+            
+            // 年齡驗證（確保滿18歲）
+            const today = new Date();
+            const birthDate = new Date(formData.birthDate);
+            const age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            
+            if (age < 18 || (age === 18 && monthDiff < 0) || 
+                (age === 18 && monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                showToast('您必須滿18歲才能註冊！', 'warning');
+                return;
+            }
+            
+            // 模擬註冊過程
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>建立中...';
+            submitBtn.disabled = true;
+            
+            setTimeout(() => {
+                showToast('註冊成功！請檢查您的電子郵件進行驗證', 'success');
+                submitBtn.innerHTML = '<i class="bi bi-person-check me-2"></i>建立帳戶';
+                submitBtn.disabled = false;
+                
+                // 3秒後跳轉到登入頁面
+                setTimeout(() => {
+                    showPage('loginPage');
+                }, 2000);
+            }, 1500);
+        });
+
+        // 忘記密碼表單處理
+        document.getElementById('forgotForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('forgotEmail').value;
+            
+            if (!email) {
+                showToast('請輸入您的電子郵件！', 'warning');
+                return;
+            }
+            
+            // 模擬發送過程
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>發送中...';
+            submitBtn.disabled = true;
+            
+            setTimeout(() => {
+                document.getElementById('forgotSuccess').classList.remove('d-none');
+                document.getElementById('forgotForm').style.display = 'none';
+                submitBtn.innerHTML = '<i class="bi bi-send me-2"></i>發送重設連結';
+                submitBtn.disabled = false;
+                
+                // 5秒後重置頁面並返回登入
+                setTimeout(() => {
+                    document.getElementById('forgotSuccess').classList.add('d-none');
+                    document.getElementById('forgotForm').style.display = 'block';
+                    document.getElementById('forgotEmail').value = '';
+                    showPage('loginPage');
+                }, 5000);
+            }, 1500);
+        });
+
+        // 頁面載入完成後的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 為所有輸入框添加實時驗證
+            document.querySelectorAll('input[required]').forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (!this.value.trim()) {
+                        this.classList.add('is-invalid');
+                    } else {
+                        this.classList.remove('is-invalid');
+                        this.classList.add('is-valid');
+                    }
+                });
+                
+                input.addEventListener('input', function() {
+                    if (this.classList.contains('is-invalid') && this.value.trim()) {
+                        this.classList.remove('is-invalid');
+                        this.classList.add('is-valid');
+                    }
+                });
+            });
+            
+            // 密碼強度即時檢查
+            document.getElementById('registerPassword').addEventListener('input', function() {
+                checkPasswordStrength(this.value);
+            });
+            
+            // 密碼確認實時驗證
+            document.getElementById('confirmPassword').addEventListener('input', function() {
+                const password = document.getElementById('registerPassword').value;
+                if (this.value && this.value !== password) {
+                    this.classList.add('is-invalid');
+                    this.classList.remove('is-valid');
+                } else if (this.value === password && password) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                }
+            });
+            
+            // 電子郵件格式驗證
+            document.getElementById('registerEmail').addEventListener('blur', function() {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (this.value && !emailRegex.test(this.value)) {
+                    this.classList.add('is-invalid');
+                    this.classList.remove('is-valid');
+                }
+            });
+            
+            // 手機號碼格式驗證
+            document.getElementById('phoneNumber').addEventListener('blur', function() {
+                const phoneRegex = /^[0-9+\-\s()]{8,15}$/;
+                if (this.value && !phoneRegex.test(this.value)) {
+                    this.classList.add('is-invalid');
+                    this.classList.remove('is-valid');
+                }
+            });
+            
+            // 生日驗證（確保滿18歲）
+            document.getElementById('birthDate').addEventListener('change', function() {
+                const today = new Date();
+                const birthDate = new Date(this.value);
+                const age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                
+                if (age < 18 || (age === 18 && monthDiff < 0) || 
+                    (age === 18 && monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    this.classList.add('is-invalid');
+                    this.classList.remove('is-valid');
+                    showToast('您必須滿18歲才能註冊', 'warning');
+                } else {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                }
+            });
+        });
+    </script>
+	<!-- ========== 載入Footer及Bootstrap JS ========== -->
+    <div th:replace="~{fragments/fragments :: footer}"></div>
+</body>
+</html>
