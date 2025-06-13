@@ -77,10 +77,10 @@ p, .btn, .nav-link, li{
   object-fit: cover;
 }
 
-.container{
-  padding-left:3em;
-  padding-right:3em;
-}
+/*.container{*/
+/*  padding-left:3em;*/
+/*  padding-right:3em;*/
+/*}*/
 
 /* 固定在畫面上的立即預定按鈕 */
 .booking-fixed-btn {
