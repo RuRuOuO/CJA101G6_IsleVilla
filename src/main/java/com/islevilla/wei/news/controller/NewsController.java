@@ -11,9 +11,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Controller // 標記為 Spring MVC 控制器，可以處理 HTTP 請求並返回視圖
 public class NewsController {
@@ -43,6 +45,31 @@ public class NewsController {
 
         // 返回模板路徑，對應到 src/main/resources/templates/front-end/news/newsList.html
         return "front-end/news/listAllNews";
+    }
+
+    // 新增消息頁面
+    @GetMapping("/news/add")
+    public String addNewsPage(Model model) { // model: spring自動建立的物件，用來傳遞資料
+        model.addAttribute("news", new News()); // ✅ news 名稱要對應上
+        return "front-end/news/addNews";
+    }
+
+    // 新增消息
+    @PostMapping("/news/add")
+    public String addNews(@ModelAttribute("news") News news) {
+        MultipartFile file = news.getUpFiles();
+        if (!file.isEmpty()) {
+            try {
+                news.setNewsImage(file.getBytes()); // 把上傳檔案轉成 byte[]
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        // ✅ 主動在後端設定時間
+        news.setNewsTime(LocalDateTime.now());
+
+        newsService.save(news);
+        return "redirect:/news";
     }
 
     @GetMapping("/news/{newsId}")
@@ -79,8 +106,7 @@ public class NewsController {
             // 如果能成功識別圖片格式
             if (mediaType != null) {
                 // 建立成功的 HTTP 響應
-                return ResponseEntity.ok()
-                        .contentType(mediaType)  // 設定正確的 Content-Type
+                return ResponseEntity.ok().contentType(mediaType)  // 設定正確的 Content-Type
                         .body(imageData);        // 回傳圖片資料
             }
         }
@@ -103,14 +129,12 @@ public class NewsController {
         }
 
         // PNG 格式：檔頭為 89 50 4E 47 (對應 ASCII 的 ".PNG")
-        if (imageData[0] == (byte) 0x89 && imageData[1] == (byte) 0x50 &&
-                imageData[2] == (byte) 0x4E && imageData[3] == (byte) 0x47) {
+        if (imageData[0] == (byte) 0x89 && imageData[1] == (byte) 0x50 && imageData[2] == (byte) 0x4E && imageData[3] == (byte) 0x47) {
             return MediaType.IMAGE_PNG;
         }
 
         // GIF 格式：檔頭為 47 49 46 (對應 ASCII 的 "GIF")
-        if (imageData[0] == (byte) 0x47 && imageData[1] == (byte) 0x49 &&
-                imageData[2] == (byte) 0x46) {
+        if (imageData[0] == (byte) 0x47 && imageData[1] == (byte) 0x49 && imageData[2] == (byte) 0x46) {
             return MediaType.IMAGE_GIF;
         }
 

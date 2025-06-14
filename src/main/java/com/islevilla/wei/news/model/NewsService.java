@@ -102,4 +102,9 @@ public class NewsService {
         // 如果找到資料就回傳，找不到就回傳 null
         return news.orElse(null);
     }
+
+    // 更動資料的save方法
+    public void save(News news) {
+        newsRepository.save(news);
+    }
 }
