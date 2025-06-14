@@ -26,7 +26,7 @@ public class ProductService {
             productRepository.deleteById(productId);
         }
     }
-    public Product getOneProduct(Integer productId) {
+    public Product getProductById(Integer productId) {
         return productRepository.findById(productId)
                 .orElse(null);
     }

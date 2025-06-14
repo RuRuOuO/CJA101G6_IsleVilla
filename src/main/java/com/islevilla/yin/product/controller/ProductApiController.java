@@ -11,12 +11,21 @@ import org.springframework.web.bind.annotation.*;
 public class ProductApiController {
     @Autowired
     private ProductService productService;
-    @Autowired
-    private ProductCategoryService productCategoryService;
+
 
     // 新增產品
     @PostMapping("add")
     public void addProduct(@RequestBody Product product) {
         productService.addProduct(product);
+    }
+    // 修改商品
+    @PostMapping("update")
+    public void updateProduct(@RequestBody Product product) {
+        productService.updateProduct(product);
+    }
+    // 刪除商品
+    @PostMapping("delete")
+    public void deleteProduct(@RequestParam Integer productId) {
+        productService.deleteProduct(productId);
     }
 }

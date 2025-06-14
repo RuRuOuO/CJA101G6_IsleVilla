@@ -86,6 +86,15 @@ public class ProductController {
 //        model.addAttribute("category", productCategoryService.getAllProductCategory());
 //        return "front-end/product/product_list";
 //    }
+@GetMapping("/new")
+public String newProduct(@RequestParam(required = false) Integer productId, Model model) {
+    Product product = (productId != null) ? productService.getProductById(productId) : new Product();
+    model.addAttribute("product", product);
+    model.addAttribute("category", productCategoryService.getAllProductCategory());
+    return "back-end/product/product_new"; // 這裡就是你的表單頁面路徑
+}
+
+
 
 
 }
