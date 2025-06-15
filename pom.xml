@@ -35,6 +35,10 @@
                 <artifactId>spring-boot-starter-test</artifactId>
                 <scope>test</scope>
             </dependency>
+            <dependency><!--AOP-->
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-aop</artifactId>
+            </dependency>
 
 
 
@@ -245,6 +249,8 @@
                 <artifactId>jakarta.el</artifactId>
                 <version>4.0.2</version>
             </dependency>
+
+
 
         </dependencies>
 
