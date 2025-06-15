@@ -4,7 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -28,45 +32,29 @@ public class NewsService {
      * 新增新聞方法
      *
      * @param news 要新增的新聞物件，包含新聞的所有資訊
-     *               <p>
-     *               功能說明：
-     *               - 接收前端傳來的新聞資料
-     *               - 呼叫 Repository 的 save() 方法將資料存入資料庫
-     *               - JPA 的 save() 方法會自動判斷是新增還是更新（根據主鍵是否存在）
+     *             <p>
+     *             功能說明：
+     *             - 接收前端傳來的新聞資料
+     *             - 呼叫 Repository 的 save() 方法將資料存入資料庫
+     *             - JPA 的 save() 方法會自動判斷是新增還是更新（根據主鍵是否存在）
      */
     public void addNews(News news) {
-        newsRepository.save(news);
-    }
-
-    /**
-     * 更新新聞方法
-     *
-     * @param news 要更新的新聞物件，必須包含要更新的新聞 ID
-     *               <p>
-     *               功能說明：
-     *               - 接收前端傳來的更新資料
-     *               - 同樣使用 save() 方法，但因為 newsVO 已有 ID，所以會執行更新操作
-     *               - 如果 ID 不存在於資料庫中，則會新增一筆資料
-     */
-    public void updateNews(News news) {
-        newsRepository.save(news);
-    }
-
-    /**
-     * 刪除新聞方法
-     *
-     * @param newsId 要刪除的新聞 ID
-     *               <p>
-     *               功能說明：
-     *               - 先檢查該 ID 的新聞是否存在於資料庫中
-     *               - 如果存在才執行刪除操作，避免刪除不存在的資料時拋出例外
-     *               - 這是一種防禦性程式設計的做法
-     */
-    public void deleteNews(Integer newsId) {
-        // 先檢查資料是否存在，避免刪除不存在的資料時發生錯誤
-        if (newsRepository.existsById(newsId)) {
-            newsRepository.deleteById(newsId);
+        MultipartFile file = news.getUpFiles();
+        if (file != null && !file.isEmpty()) {
+            try {
+                news.setNewsImage(file.getBytes());
+            } catch (IOException e) {
+                throw new RuntimeException("圖片處理失敗", e);
+            }
         }
+        news.setNewsTime(LocalDateTime.now());
+        newsRepository.save(news);
+    }
+
+    // 修改最新消息
+    public void updateNews(News news) {
+        news.setNewsTime(LocalDateTime.now());
+        newsRepository.save(news);
     }
 
     /**
@@ -82,6 +70,14 @@ public class NewsService {
      */
     public Page<News> getAll(Pageable pageable) {
         return newsRepository.findAll(pageable);
+    }
+
+    public Page<News> getPublished(Pageable pageable) {
+        return newsRepository.findAllByNewsStatus(1, pageable);
+    }
+
+    public List<News> getLatestThreeNews() {
+        return newsRepository.findTop3ByOrderByNewsTimeDesc();
     }
 
     /**
