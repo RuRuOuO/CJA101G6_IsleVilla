@@ -1,7 +1,7 @@
 package com.islevilla.wei.news.controller;
 
-import com.islevilla.wei.news.model.NewsService;
 import com.islevilla.wei.news.model.News;
+import com.islevilla.wei.news.model.NewsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,18 +12,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.time.LocalDateTime;
 
 @Controller // 標記為 Spring MVC 控制器，可以處理 HTTP 請求並返回視圖
+@RequestMapping("/news")
 public class NewsController {
 
     @Autowired
     private NewsService newsService;
 
-    @GetMapping("/news")
+    // 顯示全部消息
+    @GetMapping("/list")
     public String newsList(
             // @RequestParam 從網址參數中取值，defaultValue 設定預設值
             @RequestParam(defaultValue = "0") int page,    // 頁碼從 0 開始
@@ -48,31 +46,20 @@ public class NewsController {
     }
 
     // 新增消息頁面
-    @GetMapping("/news/add")
+    @GetMapping("/add")
     public String addNewsPage(Model model) { // model: spring自動建立的物件，用來傳遞資料
         model.addAttribute("news", new News()); // ✅ news 名稱要對應上
         return "front-end/news/addNews";
     }
 
     // 新增消息
-    @PostMapping("/news/add")
+    @PostMapping("/add")
     public String addNews(@ModelAttribute("news") News news) {
-        MultipartFile file = news.getUpFiles();
-        if (!file.isEmpty()) {
-            try {
-                news.setNewsImage(file.getBytes()); // 把上傳檔案轉成 byte[]
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        // ✅ 主動在後端設定時間
-        news.setNewsTime(LocalDateTime.now());
-
-        newsService.save(news);
-        return "redirect:/news";
+        newsService.addNews(news);
+        return "redirect:/news/list";
     }
 
-    @GetMapping("/news/{newsId}")
+    @GetMapping("/{newsId}")
     public String newsDetail(@PathVariable Integer newsId, Model model) {
         // 根據消息 ID 查詢單筆消息資料
         News news = newsService.getById(newsId);
@@ -90,7 +77,7 @@ public class NewsController {
         return "front-end/news/listOneNews";
     }
 
-    @GetMapping("/news/image/{newsId}")
+    @GetMapping("/image/{newsId}")
     public ResponseEntity<byte[]> getNewsImage(@PathVariable Integer newsId) {
         // 根據新聞 ID 查詢新聞資料
         News news = newsService.getById(newsId);
