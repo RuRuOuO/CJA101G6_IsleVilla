@@ -24,11 +24,10 @@
 }
 
 .category-item button:hover {
-    background-color: #f8f9fa; /* 滑鼠懸停背景顏色 */
-    border-color: #007bff; /* 滑鼠懸停邊框顏色 */
+    background-color: lightgrey; /* 滑鼠懸停背景顏色 */
+    border-color: dimgrey; /* 滑鼠懸停邊框顏色 */
 }
 
-/* 輪流排列的樣式 */
 .category-row {
     display: flex;
     justify-content: center;
@@ -38,23 +37,4 @@
 .category-col-2 {
     flex: 0 0 auto;
     width: 160px;
-}
-.card {
-    width: 100%;
-    min-height: 380px;
-    max-height: 420px;
-    display: flex;
-    flex-direction: column;
-}
-
-.card-img-top {
-    height: 180px;
-    object-fit: cover;
-}
-
-.card-body {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
 }
