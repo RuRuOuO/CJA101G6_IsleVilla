@@ -2,6 +2,8 @@ package com.islevilla.lai.members.model;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
@@ -24,17 +26,13 @@ public class Members {
     @NotEmpty(message = "請輸入password_hash")
 	private String memberPasswordHash;
 	
-	@Column(name = "member_password_salt")
-    @NotEmpty(message = "請輸入password_salt")
-	private String memberPasswordSalt;
-	
 	@Column(name = "member_name")
     @NotEmpty(message = "請輸入您的姓名")
 	private String memberName;
 	
 	@Column(name = "member_birthdate")
     @NotEmpty(message = "請輸入您的生日")
-	private Date memberBirthdate;
+	private LocalDate memberBirthdate;
 	
 	@Column(name = "member_gender")
     @NotEmpty(message = "請輸入您的性別")
@@ -48,20 +46,21 @@ public class Members {
     @NotEmpty(message = "請輸入您的地址")
 	private String memberAddress;
 	
-	@Column(name = "member_photo")
+	@Lob
+	@Column(name = "member_photo", columnDefinition = "LONGBLOB")
 	private byte[] memberPhoto;
 	
 	@Column(name = "member_created_at")
     @NotEmpty(message = "請填入會員建立時間")
-	private Timestamp memberCreatedAt;
+	private LocalDateTime memberCreatedAt;
 	
 	@Column(name = "member_updated_at")
     @NotEmpty(message = "請填入會員更新時間")
-	private Timestamp memberUpdatedAt;
+	private LocalDateTime memberUpdatedAt;
 	
 	@Column(name = "member_last_login_time")
     @NotEmpty(message = "請填入最後登入時間")
-	private Timestamp memberLastLoginTime;
+	private LocalDateTime memberLastLoginTime;
 	
 	@Column(name = "member_status")
     @NotEmpty(message = "請填入會員狀態")
