@@ -12,17 +12,44 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Controller // 標記為 Spring MVC 控制器，可以處理 HTTP 請求並返回視圖
-@RequestMapping("/news")
 public class NewsController {
 
     @Autowired
     private NewsService newsService;
 
-    // 顯示全部消息
-    @GetMapping("/list")
+    // 前台顯示全部消息
+    @GetMapping("/news/list")
     public String newsList(
+            // @RequestParam 從網址參數中取值，defaultValue 設定預設值
+            @RequestParam(defaultValue = "0") int page,    // 頁碼從 0 開始
+            @RequestParam(defaultValue = "9") int size,    // 每頁 9 筆新聞
+            Model model) {
+
+        // 建立分頁物件，設定頁碼、每頁筆數、排序方式
+        // Sort.by("newsTime").descending() 表示按新聞時間降序排列（最新的在前面）
+        Pageable pageable = PageRequest.of(page, size, Sort.by("newsTime").descending());
+
+        // 呼叫 Service 層取得分頁資料
+        Page<News> newsPage = newsService.getPublished(pageable);
+
+        // 將資料加入到 Model 中，供前端模板使用
+        model.addAttribute("newsList", newsPage.getContent());        // 當前頁的新聞資料
+        model.addAttribute("currentPage", page);                      // 目前頁碼
+        model.addAttribute("totalPages", newsPage.getTotalPages());   // 總頁數
+        model.addAttribute("totalItems", newsPage.getTotalElements()); // 總筆數
+
+        // 返回模板路徑，對應到 src/main/resources/templates/front-end/news/newsList.html
+        return "front-end/news/listAllNews";
+    }
+
+    // 後台顯示全部消息
+    @GetMapping("/backend/news/list")
+    public String backNewsList(
             // @RequestParam 從網址參數中取值，defaultValue 設定預設值
             @RequestParam(defaultValue = "0") int page,    // 頁碼從 0 開始
             @RequestParam(defaultValue = "9") int size,    // 每頁 9 筆新聞
@@ -42,24 +69,57 @@ public class NewsController {
         model.addAttribute("totalItems", newsPage.getTotalElements()); // 總筆數
 
         // 返回模板路徑，對應到 src/main/resources/templates/front-end/news/newsList.html
-        return "front-end/news/listAllNews";
+        return "back-end/news/listAllNews";
     }
 
     // 新增消息頁面
-    @GetMapping("/add")
+    @GetMapping("/backend/news/add")
     public String addNewsPage(Model model) { // model: spring自動建立的物件，用來傳遞資料
         model.addAttribute("news", new News()); // ✅ news 名稱要對應上
-        return "front-end/news/addNews";
+        return "back-end/news/addNews";
     }
 
     // 新增消息
-    @PostMapping("/add")
+    @PostMapping("/backend/news/add")
     public String addNews(@ModelAttribute("news") News news) {
         newsService.addNews(news);
-        return "redirect:/news/list";
+        return "redirect:/backend/news/list";
     }
 
-    @GetMapping("/{newsId}")
+    // 更新
+    @GetMapping("/backend/news/edit/{id}")
+    public String editNews(@PathVariable("id") Integer id, Model model) {
+        News news = newsService.getById(id); // 假設這方法存在
+        model.addAttribute("news", news);
+        return "back-end/news/update_news_input"; // 指向你要渲染的編輯畫面
+    }
+
+    @PostMapping("/backend/news/update")
+    public String updateNews(
+            @ModelAttribute("news") News news,
+            @RequestParam("newsImageFile") MultipartFile imageFile) {
+
+        // 取得原始資料（含原圖）
+        News originalNews = newsService.getById(news.getNewsId());
+
+        // 若使用者沒有上傳新圖片，就保留原圖片
+        if (imageFile == null || imageFile.isEmpty()) {
+            news.setNewsImage(originalNews.getNewsImage());
+        } else {
+            try {
+                news.setNewsImage(imageFile.getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+                // 若出錯，也保留原圖
+                news.setNewsImage(originalNews.getNewsImage());
+            }
+        }
+
+        newsService.updateNews(news);
+        return "redirect:/backend/news/list";
+    }
+
+    @GetMapping("/news/{newsId}")
     public String newsDetail(@PathVariable Integer newsId, Model model) {
         // 根據消息 ID 查詢單筆消息資料
         News news = newsService.getById(newsId);
@@ -67,7 +127,7 @@ public class NewsController {
         // 檢查消息是否存在
         if (news == null) {
             // 如果消息不存在，重導向到消息列表頁面
-            return "redirect:/news";
+            return "redirect:/news/list";
         }
 
         // 將消息資料加入到 Model 中，供前端模板使用
@@ -77,7 +137,7 @@ public class NewsController {
         return "front-end/news/listOneNews";
     }
 
-    @GetMapping("/image/{newsId}")
+    @GetMapping("/news/image/{newsId}")
     public ResponseEntity<byte[]> getNewsImage(@PathVariable Integer newsId) {
         // 根據新聞 ID 查詢新聞資料
         News news = newsService.getById(newsId);

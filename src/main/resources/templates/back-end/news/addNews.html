@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
 </head>
 <body>
 <main>
     <div class="container">
         <h2>新增最新消息</h2>
-        <a class="btn btn-dark" th:href="@{/news/list}">回到消息列表</a>
-        <form th:action="@{/news/add}" method="post" th:object="${news}" enctype="multipart/form-data">
+        <a class="btn btn-dark" th:href="@{/backend/news/list}">回到消息列表</a>
+        <form th:action="@{/backend/news/add}" method="post" th:object="${news}" enctype="multipart/form-data">
             <div>
                 <label>標題</label><input type="text" th:field="*{newsTitle}"
                                           onclick="hideContent('newsTitle.errors');"><br/>
@@ -30,6 +32,13 @@
                 <div id="image-preview">
                     <img src="preview-image" style="display:none" alt="預覽圖片">
                 </div>
+            </div>
+            <div>
+                <label>狀態</label>
+                <select th:field="*{newsStatus}">
+                    <option value="1">上架</option>
+                    <option value="0">下架</option>
+                </select>
             </div>
             <div>
                 <button type="submit" class="btn-submit" id="submit">新增消息</button>
