@@ -175,7 +175,7 @@
         <!-- 看更多 -->
         <div class="container mt-4 text-center">
             <a
-                    href="/src/main/resources/templates/front-end/news/newsList.html"
+                    th:href="@{/news/list}"
                     class="btn btn-primary"
             >
                 看更多 <i class="fa-solid fa-arrow-right"></i>
@@ -253,7 +253,7 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <h2 class="mb-5 mt-3">線上購物</h2>
+                    <h2 class="mb-5 mt-3">購物商城</h2>
                     <p>
                         將旅途中的美好收藏，延續回日常生活。<br/>
                         從香氛到小物，<br/>
@@ -264,7 +264,7 @@
                     </p>
                     <!-- 看更多 -->
                     <a
-                            href="/src/main/resources/templates/front-end/news/newsList.html"
+                            th:href="@{/product}"
                             class="btn btn-primary mt-4"
                     >
                         看更多 <i class="fa-solid fa-arrow-right"></i>
@@ -322,7 +322,7 @@
                     </p>
                     <!-- 看更多 -->
                     <a
-                            href="/src/main/resources/templates/front-end/news/newsList.html"
+                            th:href="@{/member}"
                             class="btn btn-primary mt-4"
                     >
                         看更多 <i class="fa-solid fa-arrow-right"></i>

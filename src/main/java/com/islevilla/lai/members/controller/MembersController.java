@@ -4,14 +4,11 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,11 +33,13 @@ public class MembersController {
 	
 	// 顯示登入頁面
 	@GetMapping("/member-login")
-    public String showLoginPage(Model model, HttpSession session) {
+    public String showLoginPage(HttpSession session) {
         // 如果用戶已經登入，重定向到首頁
         if (session.getAttribute("member") != null) {
+        	System.out.println("目前已經登入！\n目前登入中的會員：" + ((Members) session.getAttribute("member")).getMemberName());
             return "redirect:/";
         }
+        System.out.println("進入登入頁面");
         return "front-end/member/member-login";
     }
 	
@@ -126,21 +125,19 @@ public class MembersController {
     
     // 顯示註冊頁面
     @GetMapping("/member-register")
-    public String showRegisterPage(Model model, HttpSession session) {
+    public String showRegisterPage(HttpSession session) {
         // 如果用戶已經登入，重定向到首頁
         if (session.getAttribute("member") != null) {
+        	System.out.println("目前已經登入！\n目前登入中的會員：" + ((Members) session.getAttribute("member")).getMemberName());
             return "redirect:/";
         }
-        
-        model.addAttribute("member", new Members());
+        System.out.println("進入註冊頁面");
         return "front-end/member/member-register";
     }
     
- // 處理註冊請求 (施工中)
+    // 處理註冊請求
     @PostMapping("/member-register")
-    public String register(@ModelAttribute Members members,
-                          BindingResult bindingResult,
-                          @RequestParam("memberEmail") String memberEmail,
+    public String register(@RequestParam("memberEmail") String memberEmail,
                           @RequestParam("memberPassword") String memberPassword,
                           @RequestParam("confirmPassword") String confirmPassword,
                           @RequestParam("memberName") String memberName,                          
@@ -153,85 +150,140 @@ public class MembersController {
                           RedirectAttributes redirectAttributes) {
         
         try {
-            // 後端驗證
-            if (bindingResult.hasErrors()) {
-                model.addAttribute("error", "請檢查輸入的資料格式");
-                return "member-register";
-            }
-
-            // 驗證電子信箱是否已存在
-            if (membersService.existsByEmail(memberEmail)) {
-                model.addAttribute("error", "此電子信箱已被註冊");
-                return "member-register";
-            }
-
-            // 驗證密碼確認
-            if (!memberPassword.equals(confirmPassword)) {
-                model.addAttribute("error", "密碼確認不一致");
-                return "member-register";
-            }
-
-            // 驗證密碼強度
-            if (!isValidPassword(memberPassword)) {
-                model.addAttribute("error", "密碼至少需要8個字元，並包含英文字母和數字");
-                return "member-register";
-            }
-
-            // 驗證年齡
-            if (!isValidAge(memberBirthdate)) {
-                model.addAttribute("error", "年齡必須滿13歲");
-                return "member-register";
-            }
-
-            // 驗證電話號碼
-            if (!isValidPhoneNumber(memberPhone)) {
-                model.addAttribute("error", "請輸入有效的台灣電話號碼");
-                return "member-register";
+        	// Step 1. 驗證必填欄位
+            if (memberEmail == null || memberEmail.trim().isEmpty()) {
+                model.addAttribute("error", "請輸入電子信箱");
+                return "front-end/member/member-register";
             }
             
-            // 驗證電話號碼是否已存在
-            if (membersService.existsByPhone(memberPhone)) {
-                model.addAttribute("error", "此電話號碼已被註冊");
-                return "member-register";
+            if (memberPassword == null || memberPassword.trim().isEmpty()) {
+                model.addAttribute("error", "請輸入密碼");
+                return "front-end/member/member-register";
+            }
+            
+            if (memberName == null || memberName.trim().isEmpty()) {
+                model.addAttribute("error", "請輸入姓名");
+                return "front-end/member/member-register";
+            }
+            
+            if (memberBirthdate == null) {
+                model.addAttribute("error", "請選擇生日");
+                return "front-end/member/member-register";
+            }
+            
+            if (memberGender == null) {
+                model.addAttribute("error", "請選擇性別");
+                return "front-end/member/member-register";
+            }
+            
+            if (memberPhone == null || memberPhone.trim().isEmpty()) {
+                model.addAttribute("error", "請輸入電話號碼");
+                return "front-end/member/member-register";
+            }
+            
+            if (memberAddress == null || memberAddress.trim().isEmpty()) {
+                model.addAttribute("error", "請輸入地址");
+                return "front-end/member/member-register";
+            }
+            
+            // Step 2. 各項驗證
+            // Step 2.1 驗證電子信箱格式
+            if (!isValidEmail(memberEmail)) {
+                model.addAttribute("error", "請輸入有效的電子信箱格式");
+                return "front-end/member/member-register";
+            }
+            
+            // Step 2.2 驗證電子信箱是否已存在
+            if (membersService.existsByEmail(memberEmail)) {
+                model.addAttribute("error", "此電子信箱已被註冊");
+                return "front-end/member/member-register";
             }
 
+            // Step 2.3 驗證密碼確認
+            if (!memberPassword.equals(confirmPassword)) {
+                model.addAttribute("error", "密碼確認不一致");
+                return "front-end/member/member-register";
+            }
+
+            // Step 2.4 驗證密碼強度
+            if (!isValidPassword(memberPassword)) {
+                model.addAttribute("error", "密碼至少需要8個字元，並包含英文字母和數字");
+                return "front-end/member/member-register";
+            }
+
+            // Step 2.5 驗證姓名長度
+            if (memberName.length() > 30) {
+                model.addAttribute("error", "姓名長度不能超過30個字");
+                return "front-end/member/member-register";
+            }
+            
+            // Step 2.6 驗證年齡
+            if (!isValidAge(memberBirthdate)) {
+                model.addAttribute("error", "年齡必須滿18歲");
+                return "front-end/member/member-register";
+            }
+            
+            // Step 2.7 驗證性別值
+            if (memberGender < 0 || memberGender > 2) {
+                model.addAttribute("error", "請選擇有效的性別");
+                return "front-end/member/member-register";
+            }
+            
+            // Step 2.8 驗證電話號碼格式
+            if (!isValidPhoneNumber(memberPhone)) {
+                model.addAttribute("error", "請輸入有效的臺灣電話號碼");
+                return "front-end/member/member-register";
+            }
+            
+            // Step 2.9 驗證電話號碼是否已存在
+            if (membersService.existsByPhone(memberPhone)) {
+                model.addAttribute("error", "此電話號碼已被註冊");
+                return "front-end/member/member-register";
+            }
+            
+            // Step 2.10 驗證地址長度
+            if (memberAddress.length() > 200) {
+                model.addAttribute("error", "地址長度不能超過200個字");
+                return "front-end/member/member-register";
+            }
+
+            // Step 3. 建立會員物件
+            Members member = new Members();
+            member.setMemberEmail(memberEmail);                       // 2. 會員信箱
+            member.setMemberPasswordHash(pc.hashing(memberPassword)); // 3. 會員雜湊密碼
+            member.setMemberName(memberName);                         // 4. 會員姓名
+            member.setMemberBirthdate(memberBirthdate);               // 5. 會員生日
+            member.setMemberGender(memberGender);                     // 6. 會員性別
+            member.setMemberPhone(memberPhone);                       // 7. 會員電話
+            member.setMemberAddress(memberAddress);                   // 8. 會員地址
+            
             // 處理照片上傳
             if (photoFile != null && !photoFile.isEmpty()) {
                 byte[] photoData = handlePhotoUpload(photoFile);
                 if (photoData == null) {
-                    model.addAttribute("error", "照片上傳失敗，請檢查檔案格式和大小");
-                    return "member-register";
+                    model.addAttribute("error", "照片上傳失敗，請檢查檔案格式和大小（支援JPG、PNG、GIF，不超過5MB）");
+                    return "front-end/member/member-register";
                 }
-                members.setMemberPhoto(photoData); // 9. 會員照片
+                member.setMemberPhoto(photoData);                     // 9. 會員照片
             }
             
-            // 設定接收到的參數到 members 物件
-            members.setMemberEmail(memberEmail); // 2. 會員信箱
-            members.setMemberPasswordHash(pc.hashing(memberPassword)); // 3. 會員雜湊密碼
-            members.setMemberName(memberName);   // 4. 會員姓名
-            members.setMemberBirthdate(memberBirthdate); // 5. 會員生日
-            members.setMemberGender(memberGender); // 6. 會員性別
-            members.setMemberPhone(memberPhone); // 7. 會員電話
-            members.setMemberAddress(memberAddress); // 8. 會員地址
-            // 9. 會員照片(在前面)
-            members.setMemberCreatedAt(LocalDateTime.now()); // 10. 會員建立日期
-            members.setMemberUpdatedAt(LocalDateTime.now()); // 11. 會員更新日期
-            members.setMemberLastLoginTime(LocalDateTime.now()); // 12. 會員最後登入時間
-            members.setMemberStatus(0); // 會員狀態 (預設為0:未驗證)
+            // 10. 會員建立日期
+            // 11. 會員更新日期
+            // 12. 會員最後登入時間
+            // 13. 會員狀態 (預設為0:未驗證)
+            
 
-            // 註冊會員
-            System.out.println("準備註冊");
-            membersService.addMember(members);
-            System.out.println("註冊成功");
+            // Step 4. 註冊會員
+            System.out.println("準備註冊......");
+            membersService.addMember(member);
+            System.out.println("註冊成功！請使用您的帳號密碼登入");
             
             redirectAttributes.addFlashAttribute("success", "註冊成功！請使用您的帳號密碼登入");
             return "redirect:/member-login";
 
         } catch (Exception e) {
-        	System.out.println("註冊失敗！\n錯誤訊息：" + e);
+        	System.err.println("註冊失敗：" + e.getMessage());
         	model.addAttribute("error", "註冊過程發生錯誤，請稍後再試");
-            System.out.println("註冊失敗！\n錯誤訊息：" + e);
-//            return "redirect:/member-register";
             return "front-end/member/member-register";
         }
     }
@@ -249,28 +301,109 @@ public class MembersController {
     public String showForgotPasswordPage(HttpSession session) {
         // 如果用戶已經登入，重定向到首頁
         if (session.getAttribute("member") != null) {
+        	System.out.println("目前已經登入！\n目前登入中的會員：" + ((Members) session.getAttribute("member")).getMemberName());
             return "redirect:/";
         }
         return "front-end/member/member-forgot-password";
     }
     
-    // 處理登出
-    @GetMapping("/logout")
-    public String logout(HttpServletRequest request) {
-        HttpSession session = request.getSession(false); // false: 如果沒 session 就不建立
-        if (session != null) {
-            session.invalidate();
+//    // 處理登出
+//    @GetMapping("/logout")
+//    public String logout(HttpServletRequest request) {
+//        HttpSession session = request.getSession(false); // false: 如果沒 session 就不建立
+//        if (session != null) {
+//            session.invalidate();
+//        }
+//        return "redirect:/login"; // 回登入畫面
+//    }
+//
+//    @GetMapping("/testlogin")
+//    public String testLogin(HttpServletRequest request) {
+//
+//        return "redirect:/testlogin/testlogin"; // 回登入畫面
+//    }
+    
+    // -------------------------------登出----------------------------------- //
+    // 顯示登出確認頁面
+    @GetMapping("/member-logout")
+    public String showLogoutPage(HttpSession session, Model model) {
+        // 檢查是否已登入
+        Members member = (Members) session.getAttribute("member");
+        if (member == null) {
+            // 如果沒有登入，直接跳轉到登入頁面
+        	System.out.println("找不到登入紀錄，即將跳轉到登入頁面......");
+            return "redirect:/member-login";
         }
-        return "redirect:/login"; // 回登入畫面
-    }
-
-    @GetMapping("/testlogin")
-    public String testLogin(HttpServletRequest request) {
-
-        return "redirect:/testlogin/testlogin"; // 回登入畫面
+        
+        // 將會員資訊傳給頁面顯示
+        model.addAttribute("member", member);
+        return "front-end/member/member-logout";
     }
     
- // 工具方法
+    // 處理登出請求
+    @PostMapping("/member-logout")
+    public String logout(HttpSession session, 
+                        HttpServletRequest request,
+                        RedirectAttributes redirectAttributes) {
+        
+        try {
+            // 獲取當前登入的會員資訊（記錄日誌用）
+            Members member = (Members) session.getAttribute("member");
+            
+            if (member != null) {
+                System.out.println("會員 " + member.getMemberName() + " (ID: " + member.getMemberId() + ") 於 " 
+                                 + LocalDateTime.now() + " 登出");
+            }
+            
+            // 清除 session
+            session.invalidate();
+            
+            // 清除可能的 cookies（如果有使用記住我功能）
+//            Cookie[] cookies = request.getCookies();
+//            if (cookies != null) {
+//                for (Cookie cookie : cookies) {
+//                    if ("JSESSIONID".equals(cookie.getName()) || 
+//                        "rememberMe".equals(cookie.getName())) {
+//                        cookie.setMaxAge(0);
+//                        cookie.setPath("/");
+//                        // response.addCookie(cookie); // 需要在方法參數加入 HttpServletResponse response
+//                    }
+//                }
+//            }
+            
+            // 添加成功訊息
+            redirectAttributes.addFlashAttribute("logoutSuccess", true);
+            redirectAttributes.addFlashAttribute("message", "您已成功登出，感謝您的使用！");
+            
+            return "redirect:/member-logout-success";
+            
+        } catch (Exception e) {
+            System.err.println("登出過程發生錯誤: " + e.getMessage());
+            e.printStackTrace();
+            
+            // 即使發生錯誤也要清除 session
+            if (session != null) {
+                try {
+                    session.invalidate();
+                } catch (IllegalStateException ise) {
+                    // Session 可能已經無效，忽略此錯誤
+                }
+            }
+            
+            redirectAttributes.addFlashAttribute("error", "登出過程發生錯誤，但您已安全登出");
+            return "redirect:/member-logout-success";
+        }
+    }
+    
+    // 顯示登出成功頁面
+    @GetMapping("/member-logout-success")
+    public String showLogoutSuccessPage(Model model) {
+        return "front-end/member/member-logout-success";
+    }
+    
+    
+    /* ------------------------------------------工具方法--------------------------------- */
+    // 有效電子郵件驗證
     private boolean isValidEmail(String email) {
         return email != null && email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
     }
