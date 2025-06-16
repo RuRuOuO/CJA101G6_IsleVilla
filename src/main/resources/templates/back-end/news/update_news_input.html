@@ -8,6 +8,7 @@
 <main>
     <div class="container">
         <h1>修改消息</h1>
+        <a class="btn btn-dark" th:href="@{/backend/news/list}">回到消息列表</a>
         <form th:action="@{/backend/news/update}" method="post" th:object="${news}" enctype="multipart/form-data">
             <div>
                 <label>編號</label>

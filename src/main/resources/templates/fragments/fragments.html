@@ -25,23 +25,9 @@
                 href="https://cdn.jsdelivr.net/gh/RuRuOuO/CJA101G6_IsleVilla@main/src/main/resources/static/css/custom_style.css"
                 rel="stylesheet"
         />
+        <link rel="stylesheet" href="/static/css/custom_style.css">
         <!-- bootstrap icon -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
-        <style>
-            html, body {
-                height: 100%;
-                margin: 0;
-            }
-
-            body {
-                display: flex;
-                flex-direction: column;
-            }
-
-            main {
-                flex: 1;
-            }
-        </style>
     </th:block>
     <!-- ----- 統一載入樣式段落結束 ----- -->
 </head>
@@ -87,7 +73,7 @@
                     </li>
                     <li class="nav-item divider align-self-center px-1">|</li>
                     <li class="nav-item">
-                        <a class="nav-link" href="@{/product}">線上購物</a>
+                        <a class="nav-link" th:href="@{/product}">購物商城</a>
                     </li>
                     <li class="nav-item divider align-self-center px-1">|</li>
                     <li class="nav-item dropdown">
@@ -111,26 +97,15 @@
                     <li class="nav-item">
                         <a
                                 class="nav-link"
-                                href="/src/main/resources/templates/front-end/member/memberInfo.html"
+                                th:href="@{/member}"
                         >會員專區</a
                         >
                     </li>
                 </ul>
-                <div class="dropdown">
-                    <a
-                            aria-expanded="false"
-                            class="btn btn-dark dropdown-toggle"
-                            data-bs-toggle="dropdown"
-                            href="#"
-                            role="button"
-                    >
-                        <i class="fa-solid fa-earth-asia"></i>　語言 Language
-                    </a>
-
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">中文</a></li>
-                        <li><a class="dropdown-item" href="#">English</a></li>
-                    </ul>
+                <div>
+                    <li class="btn btn-dark">
+                        <a class="nav-link" th:href="@{/member-login}"><i class="bi bi-box-arrow-in-right"></i> 會員登入</a>
+                    </li>
                 </div>
             </div>
         </div>
@@ -144,7 +119,7 @@
         class="footer bg-secondary text-light py-5 justify-content-center"
         th:fragment="footer"
 >
-    <a class="btn btn-dark booking-fixed-btn" href="#booking"> 立即預定 </a>
+    <a class="btn btn-dark booking-fixed-btn" href="#booking"> 立即預訂 </a>
     <div class="container">
         <div class="row">
             <div class="col-md-6 mb-3">
