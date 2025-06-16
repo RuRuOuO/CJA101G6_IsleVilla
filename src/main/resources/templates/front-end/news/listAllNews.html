@@ -20,7 +20,7 @@
                 <!-- 使用 Thymeleaf 遍歷新聞列表 -->
                 <div class="col-md-4" th:each="news : ${newsList}">
                     <!-- 新增a標籤讓整個卡片可以點擊，並加上樣式 -->
-                    <a th:href="@{'/news/' + ${news.newsId}}" class="text-decoration-none">
+                    <a class="text-decoration-none" th:href="@{'/news/' + ${news.newsId}}">
                         <div class="card h-100 shadow-sm">
                             <!-- 圖片-->
                             <img
@@ -63,7 +63,7 @@
                         <a
                                 aria-label="Previous"
                                 class="page-link"
-                                th:href="@{/news(page=${currentPage - 1})}"
+                                th:href="@{/news/list(page=${currentPage - 1})}"
                         >
                             <span aria-hidden="true">&laquo;</span>
                         </a>
@@ -77,7 +77,7 @@
                     >
                         <a
                                 class="page-link"
-                                th:href="@{/news(page=${i})}"
+                                th:href="@{/news/list(page=${i})}"
                                 th:text="${i + 1}"
                         >1</a
                         >
@@ -91,9 +91,9 @@
                         <a
                                 aria-label="Next"
                                 class="page-link"
-                                th:href="@{/news(page=${currentPage + 1})}"
+                                th:href="@{/news/list(page=${currentPage + 1})}"
                         >
-                            <span aria-hidden="true">&raquo;</span>
+                            <span aria-hidden="true">&raquo;</span></a>
                     </li>
                 </ul>
             </nav>

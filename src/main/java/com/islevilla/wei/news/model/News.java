@@ -30,6 +30,9 @@ public class News {
     @Column(name = "news_time", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP") // 預設值為新增消息當下時間
     private LocalDateTime newsTime;
 
+    @Column(name = "news_status")
+    private Integer newsStatus; // 0=下架, 1=上架
+
     // ✅ 不要存進資料庫的欄位，加上 @Transient
     @Transient
     private MultipartFile upFiles; // ✅ 一定要有這行！
