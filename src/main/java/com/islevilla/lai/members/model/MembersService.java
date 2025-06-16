@@ -2,13 +2,11 @@ package com.islevilla.lai.members.model;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.islevilla.lai.util.PasswordConvert;
 
@@ -24,75 +22,63 @@ public class MembersService {
 	@Autowired
 	private SessionFactory sessionFactory;
 	
-	@Transactional
-	public void addMember(Members members) {
-		membersRepository.save(members);
+	// 新增會員
+	public void addMember(Members member) {
+		membersRepository.save(member);
 	}
 	
-	@Transactional
-	public void updateMember(Members members) {
-		membersRepository.save(members);
+	// 更新會員
+	public Members updateMember(Members member) {
+		member.setMemberUpdatedAt(LocalDateTime.now());
+		return membersRepository.save(member);
 	}
 	
+	// 刪除會員
 	public void deleteMember(Integer memberId) {
 		if (membersRepository.existsById(memberId)) {
-//			repository.deleteById(memberId);
+			membersRepository.deleteByMemberId(memberId);
 		}
 	}
 	
+	// 根據會員編號取得會員
 	public Members getOneMember(Integer memberId) {
 		Optional<Members> optional = membersRepository.findById(memberId);
-//		return optional.get();
 		return optional.orElse(null);  // public T orElse(T other) : 如果值存在就回傳其值，否則回傳other的值
 	}
 	
-	public boolean login(String email, String inputPassword) {
-        Members members = membersRepository.findByEmail(email);
-        return members != null && pc.passwordVerify(members.getMemberPasswordHash(), inputPassword);
-    }
-	
+	// 根據電子信箱取得會員
 	public Members getMemberByEmail(String memberEmail) {
-        return membersRepository.findByEmail(memberEmail);
+		Optional<Members> optional = membersRepository.findByMemberEmail(memberEmail);
+        return optional.orElse(null);
     }
 	
+	// 取得所有會員
 	public List<Members> getAll() {
 		return membersRepository.findAll();
 	}
 	
 	// 會員登入驗證
     public Members authenticateMember(String email, String password) {
-//        Optional<Members> membersOpt = membersRepository.findByMemberEmailAndMemberStatus(email, 1);
-//        Optional<Members> membersOpt = membersRepository.findByMemberEmailAndMemberStatus(email, 1);
-//        Optional<Members> membersOpt0 = membersRepository.findByMemberEmailAndMemberStatus(email, 0);
-//        if (membersOpt.isPresent() || membersOpt0.isPresent()) {
-//            Members members = membersOpt.get();
-//            System.out.println(members);
-//            if (pc.passwordVerify(members.getMemberPasswordHash(), password)) {
-//                return members;
-//            }
-//        }
-        
-        Optional<Members> membersOpt1 = membersRepository.findByMemberEmail(email);
-        if (membersOpt1.isPresent()) {
-            Members members = membersOpt1.get();
-            System.out.println(members);
-            if (pc.passwordVerify(members.getMemberPasswordHash(), password)) {
-            	System.out.println("Login Successfully!");
-                return members;
+        Optional<Members> membersOpt = membersRepository.findByMemberEmail(email);
+        if (membersOpt.isPresent()) {
+            Members member = membersOpt.get();
+            System.out.println("找到會員：" + member.getMemberEmail());
+            // 驗證密碼
+            if (pc.passwordVerify(member.getMemberPasswordHash(), password)) {
+            	System.out.println("密碼驗證成功！");
+                return member;
             }
-            System.out.println("Login Failed by Wrong Password!");
+            System.out.println("密碼驗證失敗！");
         } else {
-        	System.out.println("Login Failed by Wrong Email!");
+        	System.out.println("找不到該電子信箱的會員：" + email);
         }
-        
         return null;
     }
 	
     // 更新最後登入時間
-    @Transactional
-    public void updateMemberLastLoginTime(Integer memberId, LocalDateTime lastLoginTime) {
-    	System.out.println(LocalDateTime.now());
-        membersRepository.updateMemberLastLoginTime(memberId, lastLoginTime);
+    public void updateMemberLastLoginTime(Integer memberId, LocalDateTime memberLastLoginTime) {
+        membersRepository.updateMemberLastLoginTime(memberId, memberLastLoginTime);
+        System.out.println("已更新會員最後登入時間: " + memberLastLoginTime);
     }
     
     // 檢查電子信箱是否已存在
@@ -103,4 +89,22 @@ public class MembersService {
 	public boolean existsByPhone(String memberPhone) {
 		 return membersRepository.existsByMemberPhone(memberPhone);
 	}
+	
+	// 根據電子信箱和狀態查找會員
+    public Members getMemberByEmailAndStatus(String memberEmail, Integer memberStatus) {
+        Optional<Members> optional = membersRepository.findByMemberEmailAndMemberStatus(memberEmail, memberStatus);
+        return optional.orElse(null);
+    }
+    
+    // 更新會員狀態
+    public void updateMemberStatus(Integer memberId, Integer memberStatus) {
+        membersRepository.updateMemberStatus(memberId, memberStatus, LocalDateTime.now());
+        System.out.println("已更新會員狀態: memberId=" + memberId + ", status=" + memberStatus);
+    }
+	
+	// 驗證會員登入 (舊方法)
+//	public boolean login(String email, String inputPassword) {
+//        Members members = membersRepository.findByEmail(email);
+//        return members != null && pc.passwordVerify(members.getMemberPasswordHash(), inputPassword);
+//    }
 }
