@@ -26,7 +26,7 @@
                             <span th:text="${error}"></span>
                         </div>
 
-                        <form th:action="@{/member-register}" method="post" id="registerForm" enctype="multipart/form-data">
+                        <form th:action="@{/member/register}" method="post" id="registerForm" enctype="multipart/form-data">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="memberEmail" class="form-label">電子信箱 <span class="text-danger">*</span></label>
@@ -127,7 +127,7 @@
                         <hr class="my-4">
                         
                         <div class="text-center">
-                            <p class="mb-0">已經有帳號了？ <a href="/member-login" class="text-decoration-none fw-bold">立即登入</a></p>
+                            <p class="mb-0">已經有帳號了？ <a href="/member/login" class="text-decoration-none fw-bold">立即登入</a></p>
                         </div>
                     </div>
                 </div>
