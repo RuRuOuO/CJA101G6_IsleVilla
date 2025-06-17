@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>會員註冊</title>
+    <!-- ===== 載入統一樣式 ===== -->
+	<th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+    <link href="/css/member-auth.css" rel="stylesheet">
+</head>
+<body>
+	<!-- ===== 載入Header ===== -->
+	<div th:replace="~{fragments/fragments :: header}"></div>
+    <div class="container-fluid min-vh-100 py-4">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bold text-primary">會員註冊</h2>
+                            <p class="text-muted">請填寫以下資訊完成註冊</p>
+                        </div>
+
+                        <!-- 錯誤訊息顯示 -->
+                        <div th:if="${error}" class="alert alert-danger" role="alert">
+                            <span th:text="${error}"></span>
+                        </div>
+
+                        <form th:action="@{/member-register}" method="post" id="registerForm" enctype="multipart/form-data">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="memberEmail" class="form-label">電子信箱 <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control" id="memberEmail" name="memberEmail" 
+                                           th:value="${member?.memberEmail}" placeholder="請輸入電子信箱" required>
+                                    <div class="invalid-feedback" id="emailError"></div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="memberName" class="form-label">姓名 <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="memberName" name="memberName" 
+                                           th:value="${member?.memberName}" placeholder="請輸入姓名" required maxlength="30">
+                                    <div class="invalid-feedback" id="nameError"></div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="memberPassword" class="form-label">密碼 <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="memberPassword" name="memberPassword" 
+                                               placeholder="請輸入密碼" required>
+                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword1">
+                                            <i class="fas fa-eye" id="toggleIcon1"></i>
+                                        </button>
+                                    </div>
+                                    <div class="form-text">密碼至少8位數，需包含英文字母和數字</div>
+                                    <div class="invalid-feedback" id="passwordError"></div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="confirmPassword" class="form-label">確認密碼 <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" 
+                                               placeholder="請再次輸入密碼" required>
+                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword2">
+                                            <i class="fas fa-eye" id="toggleIcon2"></i>
+                                        </button>
+                                    </div>
+                                    <div class="invalid-feedback" id="confirmPasswordError"></div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="memberBirthdate" class="form-label">生日 <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="memberBirthdate" name="memberBirthdate" 
+                                           th:value="${member?.memberBirthdate}" required>
+                                    <div class="invalid-feedback" id="birthdateError"></div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="memberGender" class="form-label">性別 <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="memberGender" name="memberGender" required>
+                                        <option value="">請選擇性別</option>
+                                        <option value="0" th:selected="${member?.memberGender == 0}">男生</option>
+                                        <option value="1" th:selected="${member?.memberGender == 1}">女生</option>
+                                        <option value="2" th:selected="${member?.memberGender == 2}">其他</option>
+                                    </select>
+                                    <div class="invalid-feedback" id="genderError"></div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="memberPhone" class="form-label">電話號碼 <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" id="memberPhone" name="memberPhone" 
+                                       th:value="${member?.memberPhone}" placeholder="請輸入電話號碼" required maxlength="20">
+                                <div class="invalid-feedback" id="phoneError"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="memberAddress" class="form-label">地址 <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="memberAddress" name="memberAddress" rows="3" 
+                                          placeholder="請輸入完整地址" required maxlength="200" th:text="${member?.memberAddress}"></textarea>
+                                <div class="invalid-feedback" id="addressError"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="memberPhoto" class="form-label">個人照片</label>
+                                <input type="file" class="form-control" id="memberPhoto" name="memberPhoto" accept="image/*">
+                                <div class="form-text">支援 JPG、PNG、GIF 格式，檔案大小不超過 5MB</div>
+                                <div class="invalid-feedback" id="photoError"></div>
+                            </div>
+
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="agreeTerms" required>
+                                <label class="form-check-label" for="agreeTerms">
+                                    我同意 <a href="#" class="text-decoration-none">服務條款</a> 和 <a href="#" class="text-decoration-none">隱私政策</a>
+                                </label>
+                                <div class="invalid-feedback" id="termsError"></div>
+                            </div>
+
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn btn-primary btn-lg">註冊</button>
+                            </div>
+                        </form>
+
+                        <hr class="my-4">
+                        
+                        <div class="text-center">
+                            <p class="mb-0">已經有帳號了？ <a href="/member-login" class="text-decoration-none fw-bold">立即登入</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/member-auth.js"></script>
+    <!-- ========== 載入Footer及Bootstrap JS ========== -->
+	<div th:replace="~{fragments/fragments :: footer}"></div>
+</body>
+</html>

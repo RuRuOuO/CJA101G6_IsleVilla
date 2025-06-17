@@ -91,3 +91,17 @@ p, .btn, .nav-link, li{
   z-index: 1050; /* 確保在其他元素上面 */
   box-shadow: 0 0px 20px rgba(255, 255, 200, 1);
 }
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}

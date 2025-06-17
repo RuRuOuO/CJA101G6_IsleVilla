@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<main>
+    <div class="container">
+        <h1>修改消息</h1>
+        <a class="btn btn-dark" th:href="@{/backend/news/list}">回到消息列表</a>
+        <form th:action="@{/backend/news/update}" method="post" th:object="${news}" enctype="multipart/form-data">
+            <div>
+                <label>編號</label>
+                <input type="text" th:field="*{newsId}" readonly>
+            </div>
+            <div>
+                <label>標題</label>
+                <input type="text" th:field="*{newsTitle}">
+            </div>
+            <div>
+                <label>內文</label>
+                <input type="text" th:field="*{newsContent}">
+            </div>
+            <div>
+                <label>時間</label>
+                <input type="text" th:field="*{newsTime}">
+            </div>
+            <!-- 顯示原本的圖片 -->
+            <div>
+                <label>原圖</label><br>
+                <img th:if="${news.newsImage != null}"
+                     th:src="@{'/news/image/' + ${news.newsId}}"
+                     style="max-width: 300px;" alt="原圖片"/>
+                <p th:if="${news.newsImage == null}">目前沒有圖片</p>
+            </div>
+            <!-- 上傳新圖 -->
+            <div>
+                <label>上傳新圖片（可略過）</label>
+                <input type="file" name="newsImageFile"/>
+            </div>
+            <div>
+                <label>狀態</label>
+                <select th:field="*{newsStatus}">
+                    <option value="1">上架</option>
+                    <option value="0">下架</option>
+                </select>
+            </div>
+            <div>
+                <button type="submit">送出</button>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>
