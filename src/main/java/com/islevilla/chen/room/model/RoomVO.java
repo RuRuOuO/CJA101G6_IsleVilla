@@ -15,14 +15,14 @@ public class RoomVO {
 	
 	@Id
 	@Column(name= "room_id")
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="roomId")
+//	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="room_id")
 	@NotBlank(message = "房間號碼: 請勿空白")
 	@Pattern(regexp="^[(0-9)]$", message="房間號碼:格式錯誤，請輸入數字")
 	private int roomId;
 	
-	@Column(name= "room_type")//FK
-	@ManyToOne
-	@JoinColumn(name="roomTypeId",referencedColumnName = "roomTypeId")
+	@Column(name= "room_type_id")
+//	@ManyToOne//FK
+//	@JoinColumn(name="room_type_id",referencedColumnName = "room_type_id")
 	@NotBlank(message = "房型號碼: 請勿空白")
 	@Pattern(regexp="^[(0-9)]$", message="房型編號:格式錯誤，請輸入數字")
 	private int roomTypeId;

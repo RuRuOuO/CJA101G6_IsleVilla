@@ -20,9 +20,9 @@ public class RoomTypePhotoVO {
 	@Pattern(regexp="^[(0-9)]$", message="房型圖片編號:格式錯誤，請輸入數字")
 	private int roomTypePhotoId;
 	
-	@Column(name = "room_type_id") //FK
-	@ManyToOne
-	@JoinColumn(name="roomTypeId",referencedColumnName = "roomTypeId")
+	@Column(name = "room_type_id")
+//	@ManyToOne //FK
+//	@JoinColumn(name="room_type_id",referencedColumnName = "room_type_id")
 	@NotBlank(message = "房型編號: 請勿空白")
 	@Pattern(regexp="^[(0-9)]$", message="房型編號:格式錯誤，請輸入數字")
 	private int roomTypeId;

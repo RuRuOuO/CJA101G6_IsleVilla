@@ -3,18 +3,20 @@ package com.islevilla.chen.roomType.model;
 import java.io.Serializable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import lombok.Data;
 
 
 @Entity // Hibernate：這是一個資料表對應的 Java 類別
 @Table(name="room_type") // Hibernate：指定資料表名稱
+@Data
 public class RoomTypeVO implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	@Id // Hibernate：主鍵
 	@Column(name="room_type_id") // Hibernate：對應欄位名稱
 	@GeneratedValue(strategy = GenerationType.IDENTITY) // Hibernate：MySQL 的 auto_increment 對應寫法
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="roomTypeId")
-	@OrderBy("roomTypeId asc")
+//	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="room_type_id")
+	@OrderBy("room_type_id asc")
 	@NotBlank(message = "房型編號: 請勿空白")
 	@Pattern(regexp="^[(0-9)]$", message="房型編號:格式錯誤，請輸入數字")
 	private int roomTypeId;
@@ -57,82 +59,5 @@ public class RoomTypeVO implements Serializable{
 	//使用下拉選單
 	private byte roomTypeSaleStatus;
 	
-	public RoomTypeVO() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-	
-	public RoomTypeVO(int roomTypeId, String roomTypeCode, String roomTypeName, int roomTypeQuantity,
-			int roomTypeCapacity, String roomTypeContent, int roomTypePrice, byte roomTypeSaleStatus) {
-		super();
-		this.roomTypeId = roomTypeId;
-		this.roomTypeCode = roomTypeCode;
-		this.roomTypeName = roomTypeName;
-		this.roomTypeQuantity = roomTypeQuantity;
-		this.roomTypeCapacity = roomTypeCapacity;
-		this.roomTypeContent = roomTypeContent;
-		this.roomTypePrice = roomTypePrice;
-		this.roomTypeSaleStatus = roomTypeSaleStatus;
-	}
-
-	@Override
-	public String toString() {
-		return "roomTypeVO [roomTypeId=" + roomTypeId + ", roomTypeCode=" + roomTypeCode + ", roomTypeName="
-				+ roomTypeName + ", roomTypeQuantity=" + roomTypeQuantity + ", roomTypeCapacity=" + roomTypeCapacity
-				+ ", roomTypeContent=" + roomTypeContent + ", roomTypePrice=" + roomTypePrice + ", roomTypeSaleStatus="
-				+ roomTypeSaleStatus + "]";
-	}
-
-	
-	public int getRoomTypeId() {
-		return roomTypeId;
-	}
-	public void setRoomTypeId(int roomTypeId) {
-		this.roomTypeId = roomTypeId;
-	}
-	public String getRoomTypeCode() {
-		return roomTypeCode;
-	}
-	public void setRoomTypeCode(String roomTypeCode) {
-		this.roomTypeCode = roomTypeCode;
-	}
-	public String getRoomTypeName() {
-		return roomTypeName;
-	}
-	public void setRoomTypeName(String roomTypeName) {
-		this.roomTypeName = roomTypeName;
-	}
-	public int getRoomTypeQuantity() {
-		return roomTypeQuantity;
-	}
-	public void setRoomTypeQuantity(int roomTypeQuantity) {
-		this.roomTypeQuantity = roomTypeQuantity;
-	}
-	public int getRoomTypeCapacity() {
-		return roomTypeCapacity;
-	}
-	public void setRoomTypeCapacity(int roomTypeCapacity) {
-		this.roomTypeCapacity = roomTypeCapacity;
-	}
-	public String getRoomTypeContent() {
-		return roomTypeContent;
-	}
-	public void setRoomTypeContent(String roomTypeContent) {
-		this.roomTypeContent = roomTypeContent;
-	}
-	public int getRoomTypePrice() {
-		return roomTypePrice;
-	}
-	public void setRoomTypePrice(int roomTypePrice) {
-		this.roomTypePrice = roomTypePrice;
-	}
-	public byte getRoomTypeSaleStatus() {
-		return roomTypeSaleStatus;
-	}
-	public void setRoomTypeSaleStatus(byte roomTypeSaleStatus) {
-		this.roomTypeSaleStatus = roomTypeSaleStatus;
-	}
-
-
 }
 
