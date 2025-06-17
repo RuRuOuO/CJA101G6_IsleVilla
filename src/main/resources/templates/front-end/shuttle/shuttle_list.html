@@ -87,7 +87,7 @@ font awesome
 		<div class="container my-5">
 			<h1 class="mb-4">接駁班次列表</h1>
 
-			<a class="btn btn-primary mb-3" th:href="@{/shuttleSchedule/add}">➕
+			<a class="btn btn-primary mb-3" th:href="@{/shuttle/add}">➕
 				新增班次</a>
 
 			<div class="table-responsive">
@@ -109,9 +109,9 @@ font awesome
 							<td th:text="${shuttle.arrivalTime}">09:00</td>
 
 							<td><a class="btn btn-sm btn-info"
-								th:href="@{/shuttleSchedule/edit/{id}(id=${shuttle.id})}">
+								th:href="@{/shuttle/edit/{id}(id=${shuttle.id})}">
 									✏️ 修改</a> <a class="btn btn-sm btn-danger"
-								th:href="@{/shuttleSchedule/delete/{id}(id=${shuttle.id})}"
+								th:href="@{/shuttle/delete/{id}(id=${shuttle.id})}"
 								onclick="return confirm('確定要刪除嗎？');">🗑 刪除</a></td>
 						</tr>
 					</tbody>

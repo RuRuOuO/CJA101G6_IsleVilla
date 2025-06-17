@@ -8,7 +8,7 @@
         function submitForm() {
             const id = document.getElementById("shuttleId").value;
             if (id) {
-                window.location.href = "/shuttleSchedule/get/" + id;
+                window.location.href = "/shuttle/get/" + id;
             } else {
                 alert("請輸入班次編號");
             }
@@ -25,7 +25,7 @@
         <input type="number" id="shuttleId" name="shuttleId" class="form-control" placeholder="例如：1">
     </div>
     <button class="btn btn-primary" onclick="submitForm()">查詢</button>
-    <a href="/shuttleSchedule/list" class="btn btn-secondary">返回列表</a>
+    <a href="/shuttle/list" class="btn btn-secondary">返回列表</a>
 
     <hr />
 

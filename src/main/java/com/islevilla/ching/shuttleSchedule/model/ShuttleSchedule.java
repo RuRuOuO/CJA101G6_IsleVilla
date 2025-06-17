@@ -16,21 +16,12 @@ public class ShuttleSchedule {
     @Column(name = "shuttle_direction")
     private Integer direction;
 
-    @NotNull(message = "請輸入出發時間")
     @Column(name = "shuttle_departure_time")
     private LocalTime departureTime;
 
-    @NotNull(message = "請輸入抵達時間")
     @Column(name = "shuttle_arrival_time")
     private LocalTime arrivalTime;
 
-    @Override
-    public String toString() {
-        return " ShuttleSchedule {" + " 接駁班次編號  = " + id + 
-                ", 去程 / 回程 = " + (direction != null && direction == 0 ? "去程" : "回程") + 
-                ", 出發時間    = " + departureTime +
-                ", 抵達時間    = " + arrivalTime + " } ";
-    }
 
 	public Integer getId() {
 		return id;
