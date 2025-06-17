@@ -77,10 +77,10 @@ p, .btn, .nav-link, li{
   object-fit: cover;
 }
 
-.container{
-  padding-left:3em;
-  padding-right:3em;
-}
+/*.container{*/
+/*  padding-left:3em;*/
+/*  padding-right:3em;*/
+/*}*/
 
 /* 固定在畫面上的立即預定按鈕 */
 .booking-fixed-btn {
@@ -90,4 +90,18 @@ p, .btn, .nav-link, li{
   padding: 12px 30px;
   z-index: 1050; /* 確保在其他元素上面 */
   box-shadow: 0 0px 20px rgba(255, 255, 200, 1);
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
 }

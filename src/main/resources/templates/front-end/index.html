@@ -1,219 +1,102 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>微嶼 | Isle Villa</title>
-    <!-- ===== 統一載入樣式段落開始 ===== -->
-    <!-- bootstrap -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <!-- 字型-->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Kaisei+HarunoUmi&family=Noto+Sans+TC:wght@100..900&family=Noto+Serif+TC:wght@200..900&display=swap"
-      rel="stylesheet"
-    />
-    <!-- font awesome -->
-    <script
-      src="https://kit.fontawesome.com/d4a9524440.js"
-      crossorigin="anonymous"
-    ></script>
-    <!-- 覆蓋樣式 -->
-    <!-- <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/gh/RuRuOuO/CJA101G6_IsleVilla@WeiJing/src/main/resources/templates/front-end/css/customStyle.css"
-    /> -->
-    <link
-      rel="stylesheet"
-      href="/src/main/resources/static/css/custom_style.css"
-    />
-    <!-- ===== 統一載入樣式段落結束 ===== -->
-    <!-- ===== 自訂樣式開始 ===== -->
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+    <!-- ===== 自訂樣式 ===== -->
     <style>
-      body {
-        font-family: "Helvetica Neue", sans-serif;
-        background-color: #fdfdfd;
-      }
-      .hero {
-        background: url("https://images.unsplash.com/photo-1494879540385-bc170b0878a7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")
-          center/cover no-repeat fixed; /* fixed */
-      }
-      .hero h1 {
-        font-size: 3.5rem;
-        /* font-weight: bold; */
-        text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
-      }
-      .hero p {
-        text-shadow: 1px 1px 4px rgba(0, 0, 0, 1);
-      }
-      .section-title {
-        font-weight: bold;
-        font-size: 2rem;
-        margin-bottom: 1rem;
-      }
-      /* 方形圖片區塊 */
-      .square-img-wrapper {
-        position: relative;
-        width: 100%;
-        padding-top: 80%; /* 高度 = 寬度，產生正方形 */
-        overflow: hidden;
-        border-radius: 12px;
-        /* box-shadow: 5px 5px 20px rgba(0, 0, 0, 1); */
-      }
-      .square-img {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover; /* 保持圖片比例並填滿容器 */
-        box-shadow: inset 0 0px 20px rgba(0, 0, 0, 1);
-      }
-      /* about區塊 */
-      .about-section {
-        background: url("https://images.unsplash.com/photo-1494879540385-bc170b0878a7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")
-          center/cover no-repeat; /* fixed */
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        min-height: 80vh; /* 讓整區達到滿版高度 */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-      }
-      .about-section::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: 100%;
-        /* 加入黑色遮罩提高文字可讀性 */
-        background-color: rgba(0, 0, 0, 0.2);
-        z-index: 1;
-      }
-      .about-section .container {
-        position: relative;
-        z-index: 2; /* 讓文字層在遮罩之上 */
-      }
-      .lead {
-        font-size: 17px;
-        text-shadow: 1px 1px 3px rgba(0, 0, 0, 1);
-      }
+        body {
+            font-family: "Helvetica Neue", sans-serif;
+            background-color: #fdfdfd;
+        }
+
+        .hero {
+            background: url("https://images.unsplash.com/photo-1494879540385-bc170b0878a7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D") center/cover no-repeat fixed; /* fixed */
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            /* font-weight: bold; */
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero p {
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 1);
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        /* 方形圖片區塊 */
+        .square-img-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 80%; /* 高度 = 寬度，產生正方形 */
+            overflow: hidden;
+            border-radius: 12px;
+            /* box-shadow: 5px 5px 20px rgba(0, 0, 0, 1); */
+        }
+
+        .square-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 保持圖片比例並填滿容器 */
+            box-shadow: inset 0 0px 20px rgba(0, 0, 0, 1);
+        }
+
+        /* about區塊 */
+        .about-section {
+            background: url("https://images.unsplash.com/photo-1509600110300-21b9d5fedeb7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D") center/cover no-repeat; /* fixed */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 80vh; /* 讓整區達到滿版高度 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .about-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            /* 加入黑色遮罩提高文字可讀性 */
+            /*background-color: rgba(0, 0, 0, 0.2);*/
+            z-index: 1;
+        }
+
+        .about-section .container {
+            position: relative;
+            z-index: 2; /* 讓文字層在遮罩之上 */
+        }
+
+        .lead {
+            font-size: 17px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 1);
+        }
     </style>
-    <!-- ===== 自訂樣式結束 ===== -->
-  </head>
-  <body>
-    <!-- ===== 統一header開始 ===== -->
-    <header data-bs-theme="light">
-      <nav
-        class="navbar navbar-expand-lg navbar-light fixed-top bg-light shadow-sm"
-      >
-        <div class="container">
-          <a
-            class="navbar-brand"
-            href="/src/main/resources/templates/front-end/index.html"
-            style="font-family: Kaisei HarunoUmi"
-            >微嶼 Isle Villa</a
-          >
-          <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarCollapse"
-            aria-controls="navbarCollapse"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div
-            class="collapse navbar-collapse justify-content-center"
-            id="navbarCollapse"
-          >
-            <ul class="navbar-nav mx-auto mb-md-0">
-              <li class="nav-item">
-                <a
-                  class="nav-link"
-                  href="/src/main/resources/templates/front-end/news/newsList.html"
-                  >最新消息</a
-                >
-              </li>
-              <li class="nav-item divider align-self-center px-1">|</li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">關於微嶼</a>
-              </li>
-              <li class="nav-item divider align-self-center px-1">|</li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">客房介紹</a>
-              </li>
-              <li class="nav-item divider align-self-center px-1">|</li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">線上購物</a>
-              </li>
-              <li class="nav-item divider align-self-center px-1">|</li>
-              <li class="nav-item dropdown">
-                <a
-                  class="nav-link dropdown-toggle"
-                  href="#"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  顧客服務
-                </a>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="#">交通資訊</a></li>
-                  <li><a class="dropdown-item" href="#">天氣資訊</a></li>
-                  <li><a class="dropdown-item" href="#">線上客服</a></li>
-                  <li><a class="dropdown-item" href="#">常見Q&A</a></li>
-                </ul>
-              </li>
-              <li class="nav-item divider align-self-center px-1">|</li>
-              <li class="nav-item">
-                <a
-                  class="nav-link"
-                  href="/src/main/resources/templates/front-end/member/memberInfo.html"
-                  >會員專區</a
-                >
-              </li>
-            </ul>
-            <div class="dropdown">
-              <a
-                class="btn btn-dark dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <i class="fa-solid fa-earth-asia"></i>　語言 Language
-              </a>
-
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">中文</a></li>
-                <li><a class="dropdown-item" href="#">English</a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </nav>
-      <!-- 佔位元素 -->
-      <div style="height: 55px"></div>
-    </header>
-    <!-- 固定右下角的立即預定按鈕 -->
-    <a href="#booking" class="btn btn-dark booking-fixed-btn"> 立即預定 </a>
-    <!-- ===== 統一header結束 ===== -->
-
-    <!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
-    <main>
-      <section
-        class="hero d-flex align-items-center justify-content-center text-white text-center min-vh-100"
-      >
+</head>
+<body>
+<!-- ===== 載入Header ===== -->
+<div th:replace="~{fragments/fragments :: header}"></div>
+<!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
+<main>
+    <section
+            class="hero d-flex align-items-center justify-content-center text-white text-center min-vh-100"
+    >
         <!-- <img
           src="https://images.unsplash.com/photo-1494879540385-bc170b0878a7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
           alt="飯店大圖"
@@ -221,89 +104,89 @@
           style="height: 100vh; object-fit: cover"
         /> -->
         <div class="container">
-          <h1 style="font-family: Kaisei HarunoUmi; font-size: 6rem">
-            微<br />嶼
-          </h1>
-          <p class="lead">
-            讓人在片刻停留中，找回單純的喜悅與內在的平衡。<br />
-            微嶼，是為了那些想暫時離開喧囂、重新感受生活溫度的人而存在。
-          </p>
+            <h1 style="font-family: Kaisei HarunoUmi; font-size: 6rem">
+                微<br/>嶼
+            </h1>
+            <p class="lead">
+                讓人在片刻停留中，找回單純的喜悅與內在的平衡。<br/>
+                微嶼，是為了那些想暫時離開喧囂、重新感受生活溫度的人而存在。
+            </p>
         </div>
-      </section>
+    </section>
 
-      <!-- 最新消息 -->
-      <section class="py-5 bg-light shadow-sm" id="news">
+    <!-- 最新消息 -->
+    <section class="py-5 bg-light shadow-sm" id="news">
         <div class="container">
-          <h2 class="section-title text-center mb-5">最新消息</h2>
-          <div class="row g-4">
-            <!-- 消息卡片 1 -->
-            <div class="col-md-4">
-              <div class="card h-100 shadow-sm">
-                <img
-                  src="https://images.unsplash.com/photo-1681452816108-d75e2a08f75d?q=80&w=2076&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                  class="card-img-top w-100"
-                  alt="消息圖片"
-                />
-                <div class="card-body">
-                  <h5 class="card-title">春季香氛新品上市</h5>
-                  <p class="text-muted small">2025/06/01</p>
-                  <p class="card-text">
-                    全新「森林與海」系列正式登場，靈感來自台灣山海之間的氣味記憶。
-                  </p>
+            <h2 class="section-title text-center mb-5">最新消息</h2>
+            <div class="row g-4">
+                <!-- 消息卡片 1 -->
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        <img
+                                src="https://images.unsplash.com/photo-1681452816108-d75e2a08f75d?q=80&w=2076&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                class="card-img-top w-100"
+                                alt="消息圖片"
+                        />
+                        <div class="card-body">
+                            <h5 class="card-title">春季香氛新品上市</h5>
+                            <p class="text-muted small">2025/06/01</p>
+                            <p class="card-text">
+                                全新「森林與海」系列正式登場，靈感來自台灣山海之間的氣味記憶。
+                            </p>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </div>
-            <!-- 消息卡片 2 -->
-            <div class="col-md-4">
-              <div class="card h-100 shadow-sm">
-                <img
-                  src="https://images.unsplash.com/photo-1585351923007-bf6a01cb19de?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                  class="card-img-top w-100"
-                  alt="消息圖片"
-                />
-                <div class="card-body">
-                  <h5 class="card-title">夏日快閃活動</h5>
-                  <p class="text-muted small">2025/05/20</p>
-                  <p class="card-text">
-                    我們將於華山文創園區舉辦線下體驗活動，現場提供試香與特惠組。
-                  </p>
+                <!-- 消息卡片 2 -->
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        <img
+                                src="https://images.unsplash.com/photo-1585351923007-bf6a01cb19de?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                class="card-img-top w-100"
+                                alt="消息圖片"
+                        />
+                        <div class="card-body">
+                            <h5 class="card-title">夏日快閃活動</h5>
+                            <p class="text-muted small">2025/05/20</p>
+                            <p class="card-text">
+                                我們將於華山文創園區舉辦線下體驗活動，現場提供試香與特惠組。
+                            </p>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </div>
-            <!-- 消息卡片 3 -->
-            <div class="col-md-4">
-              <div class="card h-100 shadow-sm">
-                <img
-                  src="https://images.unsplash.com/photo-1697653664649-936ed36b3c8c?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                  class="card-img-top w-100"
-                  alt="消息圖片"
-                />
-                <div class="card-body">
-                  <h5 class="card-title">母親節限時優惠</h5>
-                  <p class="text-muted small">2025/04/28</p>
-                  <p class="card-text">
-                    即日起至 5/12，全館商品滿千免運，再享香氛蠟燭加購價。
-                  </p>
+                <!-- 消息卡片 3 -->
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        <img
+                                src="https://images.unsplash.com/photo-1697653664649-936ed36b3c8c?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                class="card-img-top w-100"
+                                alt="消息圖片"
+                        />
+                        <div class="card-body">
+                            <h5 class="card-title">母親節限時優惠</h5>
+                            <p class="text-muted small">2025/04/28</p>
+                            <p class="card-text">
+                                即日起至 5/12，全館商品滿千免運，再享香氛蠟燭加購價。
+                            </p>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
         </div>
         <!-- 看更多 -->
         <div class="container mt-4 text-center">
-          <a
-            href="/src/main/resources/templates/front-end/news/newsList.html"
-            class="btn btn-primary"
-          >
-            看更多 <i class="fa-solid fa-arrow-right"></i>
-          </a>
+            <a
+                    th:href="@{/news/list}"
+                    class="btn btn-primary"
+            >
+                看更多 <i class="fa-solid fa-arrow-right"></i>
+            </a>
         </div>
-      </section>
-      <!-- about區塊 -->
-      <section
-        id="about"
-        class="about-section text-white d-flex align-items-center"
-      >
+    </section>
+    <!-- about區塊 -->
+    <section
+            id="about"
+            class="about-section text-white d-flex align-items-center"
+    >
         <!-- <img
           src="https://images.unsplash.com/photo-1494879540385-bc170b0878a7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
           alt="飯店大圖"
@@ -311,188 +194,146 @@
           style="height: 100vh; object-fit: cover"
         /> -->
         <div class="container">
-          <div class="row">
-            <div class="col-lg-8">
-              <h2 class="section-title mb-4">ABOUT</h2>
-              <p class="lead">
-                微嶼，是一座隱身在海洋與時光之間的島嶼。<br />
-                我們相信，旅行不只是抵達，而是找回心的節奏。<br />
-                在這裡，每一次呼吸都像是一場溫柔的慢舞，每一個角落都藏著生活的詩意。<br />
-                來微嶼，與自己好好相遇。
-              </p>
+            <div class="row">
+                <div class="col-lg-8">
+                    <h2 class="section-title mb-4">ABOUT</h2>
+                    <p class="lead">
+                        微嶼，是一座隱身在海洋與時光之間的島嶼。<br/>
+                        我們相信，旅行不只是抵達，而是找回心的節奏。<br/>
+                        在這裡，每一次呼吸都像是一場溫柔的慢舞，每一個角落都藏著生活的詩意。<br/>
+                        來微嶼，與自己好好相遇。
+                    </p>
+                </div>
             </div>
-          </div>
         </div>
-      </section>
+    </section>
 
-      <!-- 交錯區塊 with 正方形圖片 -->
-      <section class="py-5">
+    <!-- 交錯區塊 with 正方形圖片 -->
+    <section class="py-5">
         <div class="container">
-          <!-- 區塊 左 -->
-          <div class="row align-items-center my-0">
-            <div class="col-md-6">
-              <div class="square-img-wrapper">
-                <img
-                  src="https://images.unsplash.com/photo-1681452816108-d75e2a08f75d?q=80&w=2076&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                  alt="客房介紹圖片"
-                  class="square-img shadow-sm"
-                />
-              </div>
+            <!-- 區塊 左 -->
+            <div class="row align-items-center my-0">
+                <div class="col-md-6">
+                    <div class="square-img-wrapper">
+                        <img
+                                src="https://images.unsplash.com/photo-1681452816108-d75e2a08f75d?q=80&w=2076&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="客房介紹圖片"
+                                class="square-img shadow-sm"
+                        />
+                    </div>
+                </div>
+                <div class="col-md-6 px-5">
+                    <h2 class="mb-5 mt-3">客房介紹</h2>
+                    <p>
+                        我們為每位旅人準備了一方靜謐天地，<br/>
+                        讓光影、風聲與你共眠。<br/>
+                        從窗外灑落的日光，到房內細緻的擺設，<br/>
+                        每個細節都為你打造專屬的島嶼日常。<br/>
+                        <br/>
+                        無論是獨處、療癒或與愛同行，這裡都是最溫柔的容身之處。<br/>
+                    </p>
+                    <!-- 看更多 -->
+                    <a
+                            href="/src/main/resources/templates/front-end/news/newsList.html"
+                            class="btn btn-primary mt-4"
+                    >
+                        看更多 <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
             </div>
-            <div class="col-md-6 px-5">
-              <h2 class="mb-5 mt-3">客房介紹</h2>
-              <p>
-                我們為每位旅人準備了一方靜謐天地，<br />
-                讓光影、風聲與你共眠。<br />
-                從窗外灑落的日光，到房內細緻的擺設，<br />
-                每個細節都為你打造專屬的島嶼日常。<br />
-                <br />
-                無論是獨處、療癒或與愛同行，這裡都是最溫柔的容身之處。<br />
-              </p>
-              <!-- 看更多 -->
-              <a
-                href="/src/main/resources/templates/front-end/news/newsList.html"
-                class="btn btn-primary mt-4"
-              >
-                看更多 <i class="fa-solid fa-arrow-right"></i>
-              </a>
+            <!-- 區塊 右 -->
+            <div class="row align-items-center flex-md-row-reverse mb-5">
+                <div class="col-md-6">
+                    <div class="square-img-wrapper">
+                        <img
+                                src="https://images.unsplash.com/photo-1585351923007-bf6a01cb19de?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="線上購物圖片"
+                                class="square-img shadow-sm"
+                        />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h2 class="mb-5 mt-3">購物商城</h2>
+                    <p>
+                        將旅途中的美好收藏，延續回日常生活。<br/>
+                        從香氛到小物，<br/>
+                        每一件商品都是微嶼的延伸與回聲。<br/>
+                        <br/>
+                        即使回到城市，也能在熟悉的日常裡，感受到島嶼的氣息與記憶的溫度。<br/>
+                        你喜歡的風景，現在也能帶回家。
+                    </p>
+                    <!-- 看更多 -->
+                    <a
+                            th:href="@{/product}"
+                            class="btn btn-primary mt-4"
+                    >
+                        看更多 <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
             </div>
-          </div>
-          <!-- 區塊 右 -->
-          <div class="row align-items-center flex-md-row-reverse mb-5">
-            <div class="col-md-6">
-              <div class="square-img-wrapper">
-                <img
-                  src="https://images.unsplash.com/photo-1585351923007-bf6a01cb19de?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                  alt="線上購物圖片"
-                  class="square-img shadow-sm"
-                />
-              </div>
+            <!-- 區塊 左 -->
+            <div class="row align-items-center mb-5">
+                <div class="col-md-6">
+                    <div class="square-img-wrapper">
+                        <img
+                                src="https://images.unsplash.com/photo-1497256654106-4a29efafb831?q=80&w=2099&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="顧客服務圖片"
+                                class="square-img shadow-sm"
+                        />
+                    </div>
+                </div>
+                <div class="col-md-6 px-5">
+                    <h3 class="mb-5 mt-3">顧客服務</h3>
+                    <p>
+                        我們相信，美好的旅程來自每一個被照顧的細節。<br/>
+                        從預訂到入住，從提問到離開，<br/>
+                        微嶼的每一位夥伴都願意成為你旅途中的溫柔後盾。<br/>
+                        <br/>
+                        如果你需要，我們一直都在，不只是服務，更是一份真誠的陪伴。
+                    </p>
+                    <!-- 看更多 -->
+                    <a
+                            href="/src/main/resources/templates/front-end/news/newsList.html"
+                            class="btn btn-primary mt-4"
+                    >
+                        看更多 <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
             </div>
-            <div class="col-md-6">
-              <h2 class="mb-5 mt-3">線上購物</h2>
-              <p>
-                將旅途中的美好收藏，延續回日常生活。<br />
-                從香氛到小物，<br />
-                每一件商品都是微嶼的延伸與回聲。<br />
-                <br />
-                即使回到城市，也能在熟悉的日常裡，感受到島嶼的氣息與記憶的溫度。<br />
-                你喜歡的風景，現在也能帶回家。
-              </p>
-              <!-- 看更多 -->
-              <a
-                href="/src/main/resources/templates/front-end/news/newsList.html"
-                class="btn btn-primary mt-4"
-              >
-                看更多 <i class="fa-solid fa-arrow-right"></i>
-              </a>
+            <!-- 區塊 右 -->
+            <div class="row align-items-center flex-md-row-reverse mb-5">
+                <div class="col-md-6">
+                    <div class="square-img-wrapper">
+                        <img
+                                src="https://images.unsplash.com/photo-1585351923007-bf6a01cb19de?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                alt="會員專區圖片"
+                                class="square-img shadow-sm"
+                        />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h3 class="mb-5 mt-3">會員專區</h3>
+                    <p>
+                        微嶼會員專區是專屬為你打造的心靈棲所。<br/>
+                        加入後，不只能搶先體驗限定活動與專屬優惠，<br/>
+                        更能收下來自島嶼的驚喜與溫暖。<br/>
+                        <br/>
+                        讓我們陪你，一次又一次，重返那段最舒服的時光。
+                    </p>
+                    <!-- 看更多 -->
+                    <a
+                            th:href="@{/member}"
+                            class="btn btn-primary mt-4"
+                    >
+                        看更多 <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
             </div>
-          </div>
-          <!-- 區塊 左 -->
-          <div class="row align-items-center mb-5">
-            <div class="col-md-6">
-              <div class="square-img-wrapper">
-                <img
-                  src="https://images.unsplash.com/photo-1497256654106-4a29efafb831?q=80&w=2099&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                  alt="顧客服務圖片"
-                  class="square-img shadow-sm"
-                />
-              </div>
-            </div>
-            <div class="col-md-6 px-5">
-              <h3 class="mb-5 mt-3">顧客服務</h3>
-              <p>
-                我們相信，美好的旅程來自每一個被照顧的細節。<br />
-                從預訂到入住，從提問到離開，<br />
-                微嶼的每一位夥伴都願意成為你旅途中的溫柔後盾。<br />
-                <br />
-                如果你需要，我們一直都在，不只是服務，更是一份真誠的陪伴。
-              </p>
-              <!-- 看更多 -->
-              <a
-                href="/src/main/resources/templates/front-end/news/newsList.html"
-                class="btn btn-primary mt-4"
-              >
-                看更多 <i class="fa-solid fa-arrow-right"></i>
-              </a>
-            </div>
-          </div>
-          <!-- 區塊 右 -->
-          <div class="row align-items-center flex-md-row-reverse mb-5">
-            <div class="col-md-6">
-              <div class="square-img-wrapper">
-                <img
-                  src="https://images.unsplash.com/photo-1585351923007-bf6a01cb19de?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                  alt="會員專區圖片"
-                  class="square-img shadow-sm"
-                />
-              </div>
-            </div>
-            <div class="col-md-6">
-              <h3 class="mb-5 mt-3">會員專區</h3>
-              <p>
-                微嶼會員專區是專屬為你打造的心靈棲所。<br />
-                加入後，不只能搶先體驗限定活動與專屬優惠，<br />
-                更能收下來自島嶼的驚喜與溫暖。<br />
-                <br />
-                讓我們陪你，一次又一次，重返那段最舒服的時光。
-              </p>
-              <!-- 看更多 -->
-              <a
-                href="/src/main/resources/templates/front-end/news/newsList.html"
-                class="btn btn-primary mt-4"
-              >
-                看更多 <i class="fa-solid fa-arrow-right"></i>
-              </a>
-            </div>
-          </div>
         </div>
-      </section>
-
-      <!-- FAQ -->
-      <!-- <section id="faq" class="py-5">
-        <div class="container">
-          <h2 class="section-title text-center mb-4">常見問題</h2>
-          <div class="faq-item">
-            <h5>Q：是否有實體店面？</h5>
-            <p>A：目前為純網路販售，請透過本官網下單。</p>
-          </div>
-          <div class="faq-item">
-            <h5>Q：商品有提供試香嗎？</h5>
-            <p>A：部分商品可加購試香包，詳情見商品頁面。</p>
-          </div>
-        </div>
-      </section> -->
-    </main>
-    <!-- ========== 頁面內容結束 ========== -->
-
-    <!-- ========== 統一Footer開始 ========== -->
-    <footer class="footer bg-secondary text-light py-5 justify-content-center">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <h3 style="font-family: Kaisei HarunoUmi">微嶼 Isle Villa</h3>
-            <p>讓人在片刻停留中，找回生活的溫度。</p>
-            <i class="fa-brands fa-facebook mx-1"></i>
-            <i class="fa-brands fa-instagram mx-1"></i>
-            <i class="fa-brands fa-line mx-1"></i>
-            <i class="fa-brands fa-youtube mx-1"></i>
-          </div>
-          <div class="col-md-6 mb-3">
-            <h5>聯絡我們</h5>
-            <ul class="list-unstyled mt-3">
-              <li class="mt-1">地址：台灣台北市信義區123號</li>
-              <li class="mt-1">電話：02-1234-5678</li>
-              <li class="mt-1">傳真：03-25541859</li>
-              <li class="mt-1">信箱：info@islevilla.com</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </footer>
-    <!-- ========== 統一Footer結束 ========== -->
-
-    <!-- ========== 載入BootstrapJS ========== -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  </body>
+    </section>
+</main>
+<!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
+<!-- ========== 載入Footer ========== -->
+<div th:replace="~{fragments/fragments :: footer}"></div>
+</body>
 </html>
