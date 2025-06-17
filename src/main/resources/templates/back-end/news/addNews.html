@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+</head>
+<body>
+<main>
+    <div class="container">
+        <h2>新增最新消息</h2>
+        <a class="btn btn-dark" th:href="@{/backend/news/list}">回到消息列表</a>
+        <form th:action="@{/backend/news/add}" method="post" th:object="${news}" enctype="multipart/form-data">
+            <div>
+                <label>標題</label><input type="text" th:field="*{newsTitle}"
+                                          onclick="hideContent('newsTitle.errors');"><br/>
+                <span th:if="${#fields.hasErrors('newsTitle')}" th:errors="*{newsTitle}"
+                      class="error" id="newsTitle.errors">
+            </span>
+            </div>
+            <div>
+                <label>內容</label><input type="text" th:field="*{newsContent}"
+                                          onclick="hideContent('newsContent.errors')"/><br><span
+                    th:errors="*{newsContent}"
+                    class="error" id="newsContent.errors"></span>
+            </div>
+            <div>
+                <label>上傳圖片</label><input type="file" th:field="*{upFiles}" id="upFiles" accept="image/*"
+                                              onchange="previewImage()"/>
+                <span class="error" th:utext="${errorMessage}" id="upFiles.errors"></span>
+                <div id="image-preview">
+                    <img src="preview-image" style="display:none" alt="預覽圖片">
+                </div>
+            </div>
+            <div>
+                <label>狀態</label>
+                <select th:field="*{newsStatus}">
+                    <option value="1">上架</option>
+                    <option value="0">下架</option>
+                </select>
+            </div>
+            <div>
+                <button type="submit" class="btn-submit" id="submit">新增消息</button>
+                <button type="reset" class="btn-reset" onclick="resetForm()">重設表單</button>
+            </div>
+        </form>
+    </div>
+</main>
+<script type="text/javascript">
+    // 清除提示信息
+    function hideContent(elementId) {
+        var element = document.getElementById(elementId);
+        if (element) {
+            element.style.display = "none";
+        }
+    }
+
+    // 重設表單
+    function resetForm() {
+        document.getElementById('preview-image').style.display = 'none';
+        hideContent('newsTitle.errors');
+        hideContent('newsTime.errors');
+        hideContent('newsContent.errors');
+        hideContent('upFiles.errors');
+    }
+
+    // 照片上傳-預覽功能
+    var filereader_support = typeof FileReader != 'undefined';
+    if (!filereader_support) {
+        alert("您的瀏覽器不支援檔案預覽功能");
+    }
+
+    var acceptedTypes = {
+        'image/png': true,
+        'image/jpeg': true,
+        'image/jpg': true,
+        'image/gif': true
+    };
+
+    function previewImage() {
+        var fileInput = document.getElementById("upFiles");
+        var previewImg = document.getElementById("preview-image");
+
+        if (fileInput.files && fileInput.files[0]) {
+            var file = fileInput.files[0];
+
+            if (filereader_support && acceptedTypes[file.type]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImg.src = e.target.result;
+                    previewImg.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+                document.getElementById('submit').disabled = false;
+            } else {
+                alert("請上傳有效的圖片格式 (PNG, JPEG, JPG, GIF)");
+                fileInput.value = '';
+                previewImg.style.display = 'none';
+                document.getElementById('submit').disabled = true;
+            }
+        }
+    }
+
+    // 設定預設日期為今天
+    document.addEventListener('DOMContentLoaded', function () {
+        var today = new Date().toISOString().split('T')[0];
+        var dateInput = document.querySelector('input[type="date"]');
+        if (dateInput && !dateInput.value) {
+            dateInput.value = today;
+        }
+    });
+</script>
+</body>
+</html>
