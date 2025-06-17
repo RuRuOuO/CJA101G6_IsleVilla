@@ -91,7 +91,14 @@ public String newProduct(@RequestParam(required = false) Integer productId, Mode
     Product product = (productId != null) ? productService.getProductById(productId) : new Product();
     model.addAttribute("product", product);
     model.addAttribute("category", productCategoryService.getAllProductCategory());
-    return "back-end/product/product_new"; // 這裡就是你的表單頁面路徑
+    return "back-end/product/newProduct"; // 這裡就是你的表單頁面路徑
+}
+
+@GetMapping("/list")
+    public String listProduct(@RequestParam(required = false) Integer productId, Model model) {
+        Product porduct = productService.getProductById(productId);
+        model.addAttribute("product", porduct);
+        return "front-end/product/product_list";
 }
 
 
