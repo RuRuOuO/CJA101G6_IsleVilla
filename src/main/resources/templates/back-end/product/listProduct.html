@@ -8,7 +8,7 @@
 <body>
 <div class="container mt-5">
   <h2 class="mb-4">商品總覽</h2>
-  <a href="/product/add" class="btn btn-success mb-4">新增商品</a>
+  <a href="/product/backend/new" class="btn btn-success mb-4">新增商品</a>
   <table class="table table-striped">
     <thead>
     <tr>
@@ -22,7 +22,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="prod : ${products}">
+    <tr th:each="prod : ${product}">
       <td th:text="${prod.productId}">1</td>
       <td th:text="${prod.productName}">商品名稱</td>
       <td th:text="${prod.productPrice}">100</td>
@@ -31,7 +31,7 @@
       <td th:text="${prod.productCategory.productCategoryName}">類別名稱</td>
       <td>
         <!-- 修改按鈕 -->
-        <a href="/product/edit/{id}" th:href="@{/product/edit/{id}(id=${prod.productId})}" class="btn btn-primary btn-sm">修改</a>
+        <a href="/product/backend/edit/{id}" th:href="@{/product/backend/edit/{id}(id=${prod.productId})}" class="btn btn-primary btn-sm">修改</a>
         <!-- 刪除按鈕 -->
         <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" th:data-id="${prod.productId}" th:data-name="${prod.productName}">
           刪除
@@ -50,7 +50,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <p>您確定要刪除商品 <span id="productName"></span> 嗎？此操作無法恢復。</p>
+          <p>您確定要刪除商品 <span id="productName"></span> 嗎？</p>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
@@ -70,8 +70,8 @@
   // 監聽刪除按鈕
   document.querySelectorAll('button[data-bs-toggle="modal"]').forEach(button => {
     button.addEventListener('click', function() {
-      const productId = this.getAttribute('data-bs-id');
-      const productName = this.getAttribute('data-bs-name');
+      const productId = this.getAttribute('data-id');
+      const productName = this.getAttribute('data-name');
 
       // 顯示商品名稱
       document.getElementById('productName').textContent = productName;
