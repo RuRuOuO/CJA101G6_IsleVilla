@@ -3,11 +3,12 @@
 .bg-primary,
 .text-primary,
 .border-primary {
-  background-color: rgb(200,210,0) !important;
-  color: rgb(255,255,255) !important;
-  border-color: rgb(200,210,0) !important;
+    background-color: rgb(200, 210, 0) !important;
+    color: rgb(255, 255, 255) !important;
+    border-color: rgb(200, 210, 0) !important;
 }
-/* 
+
+/*
 .btn-dark,
 .bg-dark,
 .text-dark,
@@ -29,52 +30,53 @@
 
 /* Hover 效果 */
 .nav-link:hover {
-  background-color: #e2e6ea;
-  color: #212529;
+    background-color: #e2e6ea;
+    color: #212529;
 }
 
-.btn-dark{
-  border: 1px solid white;
+.btn-dark {
+    border: 1px solid white;
 }
 
 /* 可依照需要加上其他色系 */
 
 /* 全站取消圓角 */
 * {
-  border-radius: 0px !important;
+    border-radius: 0px !important;
 }
 
 /*  */
 .navbar-nav {
-  display: flex;
-  gap: 1rem;
+    display: flex;
+    gap: 1rem;
 }
-.btn{
-  box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.1);
+
+.btn {
+    box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.1);
 }
 
 * {
-  font-family: "Noto Sans TC", sans-serif;
+    font-family: "Noto Sans TC", sans-serif;
 }
 
-p, .btn, .nav-link, li{
-  font-size:15px;
+p, .btn, .nav-link, li {
+    font-size: 15px;
 }
 
 .nav-item.divider {
-  pointer-events: none;
-  user-select: none;
-  opacity: 0.5;
-  font-size: 0.5rem; /* 可調整大小 */
+    pointer-events: none;
+    user-select: none;
+    opacity: 0.5;
+    font-size: 0.5rem; /* 可調整大小 */
 }
 
 .footer li {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 .card-img-top {
-  height: 300px; /* 你可以依需要調整高度 */
-  object-fit: cover;
+    height: 300px; /* 你可以依需要調整高度 */
+    object-fit: cover;
 }
 
 /*.container{*/
@@ -84,24 +86,40 @@ p, .btn, .nav-link, li{
 
 /* 固定在畫面上的立即預定按鈕 */
 .booking-fixed-btn {
-  position: fixed;
-  bottom: 48px;
-  right: 60px;
-  padding: 12px 30px;
-  z-index: 1050; /* 確保在其他元素上面 */
-  box-shadow: 0 0px 20px rgba(255, 255, 200, 1);
+    position: fixed;
+    bottom: 48px;
+    right: 60px;
+    padding: 12px 30px;
+    z-index: 1050; /* 確保在其他元素上面 */
+    box-shadow: 0 0px 20px rgba(255, 255, 200, 1);
 }
 
 html, body {
-  height: 100%;
-  margin: 0;
+    height: 100%;
+    margin: 0;
 }
 
 body {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 main {
-  flex: 1;
+    flex: 1;
+}
+
+.error {
+  color: #ff0000;
+  font-style: italic;
+  font-weight: lighter;
+}
+
+.errorblock {
+  color: #000;
+  background-color: #ffEEEE;
+  border: 3px solid #ff0000;
+  padding: 5px;
+  margin: 5px;
+  width: 500px;
+  font-weight: normal;
 }
