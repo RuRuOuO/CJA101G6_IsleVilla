@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>微嶼 | Isle Villa</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+</head>
+<body>
+<!-- ===== 載入Header ===== -->
+<div th:replace="~{fragments/fragments :: header}"></div>
+<!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
+<main>
+    <div class="container-fluid">
+        <div class="d-flex">
+            <!-- 左側側邊欄 -->
+            <div class="d-flex flex-column flex-shrink-0 p-3 bg-light" style="width: 280px;">
+                <h4 class="mb-3">商品分類</h4>
+                <ul class="nav nav-pills flex-column mb-auto">
+                    <li class="nav-item">
+                        <a th:href="@{/product/list}" class="nav-link link-dark"
+                           th:classappend="${selectedCategoryId} == null ? ' active' : ''">
+                            全部商品
+                        </a>
+                    </li>
+                    <li th:each="category : ${category}" class="nav-item">
+                        <a th:href="@{/product/list(productCategoryId=${category.productCategoryId})}"
+                           class="nav-link link-dark"
+                           th:classappend="${category.productCategoryId} == ${selectedCategoryId} ? ' active' : ''"
+                           th:text="${category.productCategoryName}"></a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 右側商品展示區 -->
+            <div class="container mt-4">
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    <div class="col" th:each="prod : ${product}">
+                        <div class="card h-100">
+                            <img th:src="${prod.productImageUrl}" class="card-img-top" alt="商品圖片" />
+                            <div class="card-body">
+                                <h5 class="card-title" th:text="${prod.productName}"></h5>
+                                <p class="card-text" th:text="${prod.productDescription}"></p>
+                                <p class="price mt-auto" th:text="'$' + ${prod.productPrice}"></p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="#" class="btn btn-primary">加入購物車</a>                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</main>
+<!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
+<!-- ========== 載入Footer ========== -->
+<div th:replace="~{fragments/fragments :: footer}"></div>
+</body>
+</html>
