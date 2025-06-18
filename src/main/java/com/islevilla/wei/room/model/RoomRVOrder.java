@@ -44,8 +44,8 @@ public class RoomRVOrder {
     @JoinColumn(name = "room_promotion_id")
     private Promotion promotion;
 
-    @Column(name = "rv_remake")
-    private String remake;
+    @Column(name = "rv_remark")
+    private String remark;
 
     @Column(name = "room_total_amount")
     @Min(value = 0, message = "金額不能為負數")

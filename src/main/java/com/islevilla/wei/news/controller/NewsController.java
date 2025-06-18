@@ -3,6 +3,7 @@ package com.islevilla.wei.news.controller;
 import com.islevilla.wei.PageUtil;
 import com.islevilla.wei.news.model.News;
 import com.islevilla.wei.news.model.NewsService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,11 +32,12 @@ public class NewsController {
             // @RequestParam 從網址參數中取值，defaultValue 設定預設值
             @RequestParam(defaultValue = "0") int page,    // 頁碼從 0 開始
             @RequestParam(defaultValue = "9") int size,    // 每頁 9 筆新聞
-            Model model) {
+            Model model,
+            HttpServletRequest request) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("newsTime").descending());
         Page<News> newsPage = newsService.getPublished(pageable);
 
-        PageUtil.ModelWithPage(newsPage, model, page, "newsList");
+        PageUtil.ModelWithPage(newsPage, model, page, "newsList", request);
         // 返回模板路徑，對應到 src/main/resources/templates/front-end/news/newsList.html
         return "front-end/news/listAllNews";
     }
@@ -46,11 +48,12 @@ public class NewsController {
             // @RequestParam 從網址參數中取值，defaultValue 設定預設值
             @RequestParam(defaultValue = "0") int page,    // 頁碼從 0 開始
             @RequestParam(defaultValue = "9") int size,    // 每頁 9 筆新聞
-            Model model) {
+            Model model,
+            HttpServletRequest request) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("newsTime").descending());
         Page<News> newsPage = newsService.getPublished(pageable);
 
-        PageUtil.ModelWithPage(newsPage, model, page, "newsList");
+        PageUtil.ModelWithPage(newsPage, model, page, "newsList", request);
 
         // 返回模板路徑，對應到 src/main/resources/templates/front-end/news/newsList.html
         return "back-end/news/listAllNews";

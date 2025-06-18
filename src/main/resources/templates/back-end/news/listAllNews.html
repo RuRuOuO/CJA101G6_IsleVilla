@@ -8,8 +8,6 @@
     <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
 </head>
 <body>
-<!--&lt;!&ndash; ===== 載入Header ===== &ndash;&gt;-->
-<!--<div th:replace="~{fragments/fragments :: header}"></div>-->
 <!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
 <main>
     <!-- 最新消息 -->
@@ -18,43 +16,6 @@
             <h2 class="section-title text-center mb-5">最新消息一覽</h2>
             <!--新增最新消息-->
             <a class="btn btn-dark" th:href="@{/backend/news/add}">新增最新消息</a>
-            <!--            <div class="row g-4">-->
-            <!--                &lt;!&ndash; 使用 Thymeleaf 遍歷新聞列表 &ndash;&gt;-->
-            <!--                <div class="col-md-4" th:each="news : ${newsList}">-->
-            <!--                    &lt;!&ndash; 新增a標籤讓整個卡片可以點擊，並加上樣式 &ndash;&gt;-->
-            <!--                    <a class="text-decoration-none" th:href="@{'/backend/news/edit/' + ${news.newsId}}">-->
-            <!--                        <div class="card h-100 shadow-sm">-->
-            <!--                            &lt;!&ndash; 圖片&ndash;&gt;-->
-            <!--                            <img-->
-            <!--                                    alt="消息圖片"-->
-            <!--                                    class="card-img-top w-100"-->
-            <!--                                    th:if="${news.newsImage != null}"-->
-            <!--                                    th:src="@{'/news/image/' + ${news.newsId}}"-->
-            <!--                            />-->
-            <!--                            &lt;!&ndash; 預設圖片 &ndash;&gt;-->
-            <!--                            <img-->
-            <!--                                    alt="消息圖片"-->
-            <!--                                    class="card-img-top w-100"-->
-            <!--                                    src="https://images.unsplash.com/photo-1624474161796-7685c6919523?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"-->
-            <!--                                    style="height: 200px; object-fit: cover"-->
-            <!--                                    th:unless="${news.newsImage != null}"-->
-            <!--                            />-->
-            <!--                            <div class="card-body">-->
-            <!--                                <span>【</span><span th:text="${news.newsId}"></span><span>】</span>-->
-            <!--                                <h5 class="card-title" th:text="${news.newsTitle}">標題</h5>-->
-            <!--                                <p-->
-            <!--                                        class="text-muted small"-->
-            <!--                                        th:text="${#temporals.format(news.newsTime, 'yyyy/MM/dd hh:mm')}"-->
-            <!--                                >-->
-            <!--                                    日期-->
-            <!--                                </p>-->
-            <!--                                <p class="card-text" th:text="${news.newsContent}">內容</p>-->
-            <!--                                <p class="card-text" th:text="${news.newsStatus == 1 ? '上架' : '下架'}">狀態</p>-->
-            <!--                            </div>-->
-            <!--                        </div>-->
-            <!--                    </a>-->
-            <!--                </div>-->
-            <!--            </div>-->
             <table>
                 <thead>
                 <tr>
@@ -74,9 +35,9 @@
                         <td th:text="${news.newsContent}"></td>
                         <td th:text="${news.newsTime}"></td>
                         <td>
-                            <img th:if="${news.newsImage != null}"
-                                 th:src="@{'/news/image/' + ${news.newsId}}"
-                                 style="width: 100px; height: auto;" alt="消息圖片"/>
+                            <img alt="消息圖片"
+                                 style="width: 100px; height: auto;"
+                                 th:if="${news.newsImage != null}" th:src="@{'/news/image/' + ${news.newsId}}"/>
                             <!-- 沒有圖片時顯示文字 -->
                             <span th:unless="${news.newsImage != null}">無圖片</span>
                         </td>
@@ -90,55 +51,11 @@
             </table>
 
             <!-- 分頁導航 -->
-            <nav aria-label="Page navigation" class="mt-5">
-                <ul class="pagination justify-content-center">
-                    <!-- 上一頁 -->
-                    <li
-                            class="page-item"
-                            th:classappend="${currentPage == 0} ? 'disabled'"
-                    >
-                        <a
-                                aria-label="Previous"
-                                class="page-link"
-                                th:href="@{/backend/news/list(page=${currentPage - 1})}"
-                        >
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-
-                    <!-- 頁碼 -->
-                    <li
-                            class="page-item"
-                            th:classappend="${currentPage == i} ? 'active'"
-                            th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                    >
-                        <a
-                                class="page-link"
-                                th:href="@{/backend/news/list(page=${i})}"
-                                th:text="${i + 1}"
-                        >1</a
-                        >
-                    </li>
-
-                    <!-- 下一頁 -->
-                    <li
-                            class="page-item"
-                            th:classappend="${currentPage == totalPages - 1} ? 'disabled'"
-                    >
-                        <a
-                                aria-label="Next"
-                                class="page-link"
-                                th:href="@{/backend/news/list(page=${currentPage + 1})}"
-                        >
-                            <span aria-hidden="true">&raquo;</span></a>
-                    </li>
-                </ul>
-            </nav>
+            <th:block
+                    th:replace="~{fragments/fragments :: paginationFragment(currentPage=${currentPage}, totalPages=${totalPages}, pageURL=${pageURL})}"/>
         </div>
     </section>
 </main>
 <!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
-<!--&lt;!&ndash; ========== 載入Footer ========== &ndash;&gt;-->
-<!--<div th:replace="~{fragments/fragments :: footer}"></div>-->
 </body>
 </html>

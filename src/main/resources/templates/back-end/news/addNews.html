@@ -11,24 +11,24 @@
     <div class="container">
         <h2>新增最新消息</h2>
         <a class="btn btn-dark" th:href="@{/backend/news/list}">回到消息列表</a>
-        <form th:action="@{/backend/news/add}" method="post" th:object="${news}" enctype="multipart/form-data">
+        <form enctype="multipart/form-data" method="post" th:action="@{/backend/news/add}" th:object="${news}">
             <div>
-                <label>標題</label><input type="text" th:field="*{newsTitle}"
-                                          onclick="hideContent('newsTitle.errors');">
-                <span class="error" th:if="${#fields.hasErrors('newsTitle')}"
-                      th:errors="*{newsTitle}" id="newsTitle.errors"></span>
+                <label>標題</label><input onclick="hideContent('newsTitle.errors');" th:field="*{newsTitle}"
+                                          type="text">
+                <span class="error" id="newsTitle.errors"
+                      th:errors="*{newsTitle}" th:if="${#fields.hasErrors('newsTitle')}"></span>
             </div>
             <div>
-                <label>內容</label><input type="text" th:field="*{newsContent}"
-                                          onclick="hideContent('newsContent.errors')"/>
-                <span class="error" th:if="${#fields.hasErrors('newsContent')}"
-                      th:errors="*{newsContent}" id="newsContent.errors"></span>
+                <label>內容</label><input onclick="hideContent('newsContent.errors')" th:field="*{newsContent}"
+                                          type="text"/>
+                <span class="error" id="newsContent.errors"
+                      th:errors="*{newsContent}" th:if="${#fields.hasErrors('newsContent')}"></span>
             </div>
             <div>
-                <label>上傳圖片</label><input type="file" th:field="*{upFiles}" id="upFiles" accept="image/*"
-                                              onchange="previewImage()"/>
+                <label>上傳圖片</label><input accept="image/*" id="upFiles" onchange="previewImage()" th:field="*{upFiles}"
+                                              type="file"/>
                 <div id="image-preview">
-                    <img src="preview-image" style="display:none" alt="預覽圖片">
+                    <img alt="預覽圖片" src="preview-image" style="display:none">
                 </div>
             </div>
             <div>
@@ -39,8 +39,8 @@
                 </select>
             </div>
             <div>
-                <button type="submit" class="btn-submit" id="submit">新增消息</button>
-                <button type="reset" class="btn-reset" onclick="resetForm()">重設表單</button>
+                <button class="btn-submit" id="submit" type="submit">新增消息</button>
+                <button class="btn-reset" onclick="resetForm()" type="reset">重設表單</button>
             </div>
         </form>
     </div>

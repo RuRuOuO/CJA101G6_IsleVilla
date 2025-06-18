@@ -22,71 +22,29 @@
                     <!-- 新增a標籤讓整個卡片可以點擊，並加上樣式 -->
                     <a class="text-decoration-none" th:href="@{'/news/' + ${news.newsId}}">
                         <div class="card fixed-card shadow-sm">
-                            <img class="card-img-top"
+                            <img alt="消息圖片"
+                                 class="card-img-top"
                                  th:if="${news.newsImage != null}"
-                                 th:src="@{'/news/image/' + ${news.newsId}}"
-                                 alt="消息圖片" />
+                                 th:src="@{'/news/image/' + ${news.newsId}}"/>
 
-                            <img class="card-img-top"
-                                 th:unless="${news.newsImage != null}"
+                            <img alt="預設圖片"
+                                 class="card-img-top"
                                  src="https://images.unsplash.com/photo-1624474161796-7685c6919523?q=80&w=1974&auto=format&fit=crop"
-                                 alt="預設圖片" />
+                                 th:unless="${news.newsImage != null}"/>
 
                             <div class="card-body">
                                 <h5 class="card-title" th:text="${news.newsTitle}">標題</h5>
-                                <p class="text-muted" th:text="${#temporals.format(news.newsTime, 'yyyy/MM/dd')}">日期</p>
+                                <p class="text-muted" th:text="${#temporals.format(news.newsTime, 'yyyy/MM/dd')}">
+                                    日期</p>
                                 <p class="card-text" th:text="${news.newsContent}">內容</p>
                             </div>
                         </div>
                     </a>
                 </div>
             </div>
-
             <!-- 分頁導航 -->
-            <nav aria-label="Page navigation" class="mt-5">
-                <ul class="pagination justify-content-center">
-                    <!-- 上一頁 -->
-                    <li
-                            class="page-item"
-                            th:classappend="${currentPage == 0} ? 'disabled'"
-                    >
-                        <a
-                                aria-label="Previous"
-                                class="page-link"
-                                th:href="@{/news/list(page=${currentPage - 1})}"
-                        >
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-
-                    <!-- 頁碼 -->
-                    <li
-                            class="page-item"
-                            th:classappend="${currentPage == i} ? 'active'"
-                            th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                    >
-                        <a
-                                class="page-link"
-                                th:href="@{/news/list(page=${i})}"
-                                th:text="${i + 1}"
-                        >1</a
-                        >
-                    </li>
-
-                    <!-- 下一頁 -->
-                    <li
-                            class="page-item"
-                            th:classappend="${currentPage == totalPages - 1} ? 'disabled'"
-                    >
-                        <a
-                                aria-label="Next"
-                                class="page-link"
-                                th:href="@{/news/list(page=${currentPage + 1})}"
-                        >
-                            <span aria-hidden="true">&raquo;</span></a>
-                    </li>
-                </ul>
-            </nav>
+            <th:block
+                    th:replace="~{fragments/fragments :: paginationFragment(currentPage=${currentPage}, totalPages=${totalPages}, pageURL=${pageURL})}"/>
         </div>
     </section>
 </main>
