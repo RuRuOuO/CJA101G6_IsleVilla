@@ -1,53 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>修改消息</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
 </head>
 <body>
 <main>
-    <div class="container">
-        <h1>修改消息</h1>
-        <a class="btn btn-dark" th:href="@{/backend/news/list}">回到消息列表</a>
-        <form enctype="multipart/form-data" method="post" th:action="@{/backend/news/update}" th:object="${news}">
-            <div>
-                <label>編號</label>
-                <input readonly th:field="*{newsId}" type="text">
+    <div class="container py-5">
+        <h1 class="mb-4">修改消息</h1>
+
+        <a class="btn btn-secondary mb-4" th:href="@{/backend/news/list}">← 回到消息列表</a>
+
+        <form class="row g-3" enctype="multipart/form-data" method="post" th:action="@{/backend/news/update}"
+              th:object="${news}">
+
+            <div class="col-12">
+                <label for="newsId" class="form-label">編號</label>
+                <input type="text" id="newsId" th:field="*{newsId}" class="form-control" readonly>
             </div>
-            <div>
-                <label>標題</label>
-                <input th:field="*{newsTitle}" type="text">
+
+            <div class="col-12">
+                <label for="newsTitle" class="form-label">標題</label>
+                <input type="text" id="newsTitle" th:field="*{newsTitle}" class="form-control">
             </div>
-            <div>
-                <label>內文</label>
-                <input th:field="*{newsContent}" type="text">
+
+            <div class="col-12">
+                <label for="newsContent" class="form-label">內文</label>
+                <textarea id="newsContent" th:field="*{newsContent}" class="form-control" rows="3"></textarea>
             </div>
-            <div>
-                <label>時間</label>
-                <input th:field="*{newsTime}" type="text">
+
+            <div class="col-12">
+                <label for="newsTime" class="form-label">時間</label>
+                <input type="text" id="newsTime" th:field="*{newsTime}" class="form-control">
             </div>
+
             <!-- 顯示原本的圖片 -->
-            <div>
-                <label>原圖</label><br>
-                <img alt="原圖片"
-                     style="max-width: 300px;"
-                     th:if="${news.newsImage != null}" th:src="@{'/news/image/' + ${news.newsId}}"/>
-                <p th:if="${news.newsImage == null}">目前沒有圖片</p>
+            <div class="col-12">
+                <label class="form-label">原圖</label><br>
+                <img th:if="${news.newsImage != null}" th:src="@{'/news/image/' + ${news.newsId}}"
+                     alt="原圖片" class="img-thumbnail" style="max-width: 300px;">
+                <p th:if="${news.newsImage == null}" class="text-muted">目前沒有圖片</p>
             </div>
-            <!-- 上傳新圖 -->
-            <div>
-                <label>上傳新圖片（可略過）</label>
-                <input name="newsImageFile" type="file"/>
+
+            <!-- 上傳新圖片 -->
+            <div class="col-12">
+                <label for="newsImageFile" class="form-label">上傳新圖片（可略過）</label>
+                <input type="file" id="newsImageFile" name="newsImageFile" class="form-control">
             </div>
-            <div>
-                <label>狀態</label>
-                <select th:field="*{newsStatus}">
+
+            <div class="col-12">
+                <label for="newsStatus" class="form-label">狀態</label>
+                <select id="newsStatus" th:field="*{newsStatus}" class="form-select">
                     <option value="1">上架</option>
                     <option value="0">下架</option>
                 </select>
             </div>
-            <div>
-                <button type="submit">送出</button>
+
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">送出</button>
             </div>
         </form>
     </div>

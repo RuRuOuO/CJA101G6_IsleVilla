@@ -12,8 +12,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-
 
 @Controller
 public class RoomRVOrderController {
@@ -21,7 +21,7 @@ public class RoomRVOrderController {
     private RoomRVOrderService roomRVOrderService;
 
     // 後台顯示全部訂單
-    @GetMapping("/backened/room/reservation/order/list")
+    @GetMapping("/backend/room/reservation/order/list")
     public String roomRVOrderList(
             // @RequestParam 從網址參數中取值，defaultValue設定預設值
             @RequestParam(defaultValue = "0") int page, // 頁碼從0開始
@@ -36,5 +36,12 @@ public class RoomRVOrderController {
         PageUtil.ModelWithPage(roomRVOrderPage, model, page, "roomRVOrderList", request);
 
         return "back-end/roomRVOrder/listAllRoomRVOrder";
+    }
+
+    @GetMapping("/backend/room/reservation/order/{id}")
+    public String getOneRoomRVOrder(@PathVariable("id") Integer id, Model model) {
+        RoomRVOrder roomRVOrder = roomRVOrderService.getById(id);
+        model.addAttribute("roomRVOrder", roomRVOrder);
+        return "back-end/roomRVOrder/listOneRoomRVOrder";
     }
 }

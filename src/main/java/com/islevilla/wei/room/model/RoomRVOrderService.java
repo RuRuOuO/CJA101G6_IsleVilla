@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 
 @Service
 public class RoomRVOrderService {
@@ -13,5 +15,10 @@ public class RoomRVOrderService {
 
     public Page<RoomRVOrder> getAll(Pageable pageable) {
         return roomRVOrderRepository.findAll(pageable);
+    }
+
+    public RoomRVOrder getById(Integer id) {
+        Optional<RoomRVOrder> roomRVOrder = roomRVOrderRepository.findById(id);
+        return roomRVOrder.orElse(null);
     }
 }

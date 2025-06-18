@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <title>後台 | 所有訂單一覽</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+</head>
+<body>
+<!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
+<main>
+    <div class="d-flex justify-content-center align-items-center">
+        a
+        <div class="container">
+            <table class="table table-striped-columns shadow-sm">
+            </table>
+            <!-- ========== 載入分頁 ========== -->
+            <th:block
+                    th:replace="~{fragments/fragments :: paginationFragment(currentPage=${currentPage}, totalPages=${totalPages}, pageURL=${pageURL})}"/>
+
+        </div>
+    </div>
+</main>
+<!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
+</body>
+</html>
