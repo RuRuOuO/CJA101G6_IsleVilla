@@ -2,13 +2,14 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>商品編輯</title>
+  <title>編輯商品</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="container mt-5">
   <h2 class="mb-4">編輯商品</h2>
-  <form method="post" th:action="@{/product/update}" th:object="${product}">
+  <form method="post" th:action="@{/product/edit}" th:object="${product}">
+    <input type="hidden" th:field="*{productId}">
     <div class="mb-3">
       <label for="productName" class="form-label">商品名稱</label>
       <input type="text" class="form-control" id="productName" th:field="*{productName}" required>
@@ -46,36 +47,9 @@
         </option>
       </select>
     </div>
-    <button type="submit" class="btn btn-primary">儲存</button>
+    <button type="submit" class="btn btn-primary">儲存修改</button>
   </form>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-  document.querySelector('form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const form = e.target;
-    const data = {
-      productName: form.productName.value,
-      productPrice: form.productPrice.value,
-      productDescription: form.productDescription.value,
-      productQuantity: form.productQuantity.value,
-      productStatus: form.productStatus.value,
-      productCategory: {
-        productCategoryId: form['productCategory.productCategoryId'].value
-      }
-    };
-    const response = await fetch('/product/add', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(data)
-    });
-    if (response.ok) {
-      alert('商品已儲存');
-      window.location.href = '/product'; // 儲存後導向商品列表
-    } else {
-      alert('儲存失敗');
-    }
-  });
-</script>
 </body>
 </html>
