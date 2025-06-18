@@ -2,6 +2,7 @@ package com.islevilla.wei.news.controller;
 
 import com.islevilla.wei.news.model.News;
 import com.islevilla.wei.news.model.NewsService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -81,7 +83,13 @@ public class NewsController {
 
     // 新增消息
     @PostMapping("/backend/news/add")
-    public String addNews(@ModelAttribute("news") News news) {
+    public String addNews(@Valid @ModelAttribute("news") News news,
+                          BindingResult result,
+                          Model model) {
+        if (result.hasErrors()) {
+            return "back-end/news/addNews";
+        }
+
         newsService.addNews(news);
         return "redirect:/backend/news/list";
     }
