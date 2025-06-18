@@ -9,7 +9,7 @@ import lombok.Data;
 @Entity
 @Table(name = "room_reservation_detail")
 @Data
-public class RoomReservationDetail {
+public class RoomRVDetail {
     @Column(name = "room_reservation_detail_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -17,7 +17,7 @@ public class RoomReservationDetail {
 
     @ManyToOne // 一個訂單能有多筆明細
     @JoinColumn(name = "room_reservation_id", nullable = false)
-    private RoomReservationOrder roomReservationOrder;
+    private RoomRVOrder roomRVOrder;
 
     @ManyToOne
     @JoinColumn(name = "room_id")

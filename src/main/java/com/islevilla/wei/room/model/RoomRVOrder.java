@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "room_reservation_order")
 @Data
-public class RoomReservationOrder {
+public class RoomRVOrder {
     @Column(name = "room_reservation_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
