@@ -8,26 +8,22 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+//資料傳輸API
 @RestController
 @RequestMapping("/product")
 public class ProductApiController {
     @Autowired
     private ProductService productService;
 
-
     // 送出新增產品
     @PostMapping("/add")
     public void addProduct(@RequestBody Product product) {
         productService.addProduct(product);
     }
-//    // 送出修改商品
-//    @PostMapping("/edit")
-//    public void updateProduct(@Valid @RequestBody Product product) {
-//        productService.updateProduct(product);
-//    }
-    // 刪除商品
-    @DeleteMapping("/delete/{productId}")
-    public void deleteProduct(@PathVariable Integer productId) {
-        productService.deleteProduct(productId);
+    // 送出修改商品
+    @PostMapping("/edit")
+    public void updateProduct(@Valid @RequestBody Product product) {
+        productService.updateProduct(product);
     }
+
 }
