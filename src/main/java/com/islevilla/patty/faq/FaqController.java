@@ -1,15 +1,16 @@
-package com.islevilla.patty.customerservice;
+package com.islevilla.patty.faq;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-public class TransportationController {
+public class FaqController {
     
-    @GetMapping("/transportation")
-    public String transportation() {
+    @GetMapping("/faq")
+    public String faq() {
         // 添加需要的數據
         // model.addAttribute("newsList", newsService.getAllNews());
         
-        return "front-end/customer/transportation";
+        return "front-end/customer/faq";
     }
 }
