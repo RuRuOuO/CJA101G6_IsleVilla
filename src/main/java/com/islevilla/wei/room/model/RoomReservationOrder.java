@@ -1,7 +1,8 @@
 package com.islevilla.wei.room.model;
 
 import com.islevilla.lai.members.model.Members;
-import com.islevilla.wei.room.model.temp.Promotion;
+import com.islevilla.patty.promotion.model.Promotion;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
