@@ -77,7 +77,7 @@ public class NewsService {
     }
 
     public List<News> getLatestThreeNews() {
-        return newsRepository.findTop3ByOrderByNewsTimeDesc();
+        return newsRepository.findTop3ByNewsStatusOrderByNewsTimeDesc(1);
     }
 
     /**
