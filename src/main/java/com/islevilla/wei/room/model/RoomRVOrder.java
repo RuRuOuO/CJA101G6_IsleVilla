@@ -20,7 +20,7 @@ public class RoomRVOrder {
     private Integer roomReservationId;
 
     @ManyToOne
-    @JoinColumn(name = "member_id",referencedColumnName ="member_id", nullable = false)
+    @JoinColumn(name = "member_id", referencedColumnName = "member_id", nullable = false)
     @NotNull(message = "請輸入會員編號")
     private Members members;
 

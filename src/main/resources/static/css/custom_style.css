@@ -13,19 +13,17 @@
 .bg-dark,
 .border-dark,
 .nav-link.active {
-    background: linear-gradient(to right top, rgb(0, 0, 0) 0%, rgb(81, 127, 164) 100%) !important;
+    /*background: linear-gradient(to right, rgb(0, 0, 0) 0%, rgb(81, 127, 164) 100%) !important;*/
+    background: linear-gradient(to right, rgb(0, 0, 0) 0%, rgb(81, 127, 164) 100%) !important;
     color: rgb(255, 255, 255) !important;
-}
-
-.btn-dark {
     border: 1px solid white;
 }
 
 /* Hover 效果 */
-.nav-link:hover {
-    background-color: #e2e6ea;
-    color: #212529;
-}
+/*.nav-link:hover {*/
+/*    background-color: #e2e6ea;*/
+/*    color: #212529;*/
+/*}*/
 
 
 /* ==================== 統一樣式 ==================== */
@@ -67,7 +65,12 @@ li {
 
 /* 按鈕陰影 */
 .btn {
+    border: 1px solid white;
     box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.1);
+}
+
+.btn:hover{
+    border: 1px solid white;
 }
 
 /* 卡片圖片尺寸設定 */
@@ -83,7 +86,7 @@ li {
     right: 60px;
     padding: 12px 30px;
     z-index: 1050;
-    box-shadow: 0 0px 20px rgba(200, 255, 255, 1);
+    box-shadow: 0 0px 20px rgba(255, 255, 255, 1);
 }
 
 
