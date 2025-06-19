@@ -31,7 +31,7 @@
                             <span th:text="${success}"></span>
                         </div>
                         
-                        <form th:action="@{/member-login}" method="post" id="loginForm">
+                        <form th:action="@{/member/login}" method="post" id="loginForm">
                             <div class="mb-3">
                                 <label for="memberEmail" class="form-label">電子信箱</label>
                                 <div class="input-group">
@@ -65,14 +65,14 @@
                             </div>
 
                             <div class="text-center">
-                                <a href="/member-forgot-password" class="text-decoration-none">忘記密碼？</a>
+                                <a href="/member/forgot-password" class="text-decoration-none">忘記密碼？</a>
                             </div>
                         </form>
 
                         <hr class="my-4">
                         
                         <div class="text-center">
-                            <p class="mb-0">還沒有帳號？ <a href="/member-register" class="text-decoration-none fw-bold">立即註冊</a></p>
+                            <p class="mb-0">還沒有帳號？ <a href="/member/register" class="text-decoration-none fw-bold">立即註冊</a></p>
                         </div>
                     </div>
                 </div>
