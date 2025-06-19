@@ -18,16 +18,16 @@ import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.Query; //Hibernate 5 開始 取代原 org.hibernate.Query 介面
 
-import com.islevilla.patty.model.EmpVO;
-import com.dept.model.DeptVO;
+import com.islevilla.patty.promotion.model.Promotion;
 
-public class HibernateUtil_CompositeQuery_Emp3 {
+
+public class HibernateUtil_CompositeQuery_Promotion {
 
 	public static Predicate get_aPredicate_For_AnyDB(CriteriaBuilder builder, Root<Promotion> root, String columnName, String value) {
 
 		Predicate predicate = null;
 
-		if ("empno".equals(columnName)) // 用於Integer
+		if ("roomPromotionId".equals(columnName)) // 用於Integer
 			predicate = builder.equal(root.get(columnName), Integer.valueOf(value));
 		else if ("sal".equals(columnName) || "comm".equals(columnName)) // 用於Double
 			predicate = builder.equal(root.get(columnName), Double.valueOf(value));
@@ -36,27 +36,27 @@ public class HibernateUtil_CompositeQuery_Emp3 {
 		else if ("hiredate".equals(columnName)) // 用於date
 			predicate = builder.equal(root.get(columnName), java.sql.Date.valueOf(value));
 		else if ("deptno".equals(columnName)) {
-			DeptVO deptVO = new DeptVO();
-			deptVO.setDeptno(Integer.valueOf(value));
-			predicate = builder.equal(root.get("deptVO"), deptVO);
+			Promotion promotion = new Promotion();
+			promotion.setRoomPromotionId(Integer.valueOf(value));
+			predicate = builder.equal(root.get("promotion"), promotion);
 		}
 
 		return predicate;
 	}
 
 	@SuppressWarnings("unchecked")
-	public static List<EmpVO> getAllC(Map<String, String[]> map, Session session) {
+	public static List<Promotion> getAllC(Map<String, String[]> map, Session session) {
 
 //		Session session = HibernateUtil.getSessionFactory().openSession();
 		Transaction tx = session.beginTransaction();
-		List<EmpVO> list = null;
+		List<Promotion> list = null;
 		try {
 			// 【●創建 CriteriaBuilder】
 			CriteriaBuilder builder = session.getCriteriaBuilder();
 			// 【●創建 CriteriaQuery】
-			CriteriaQuery<EmpVO> criteriaQuery = builder.createQuery(EmpVO.class);
+			CriteriaQuery<Promotion> criteriaQuery = builder.createQuery(Promotion.class);
 			// 【●創建 Root】
-			Root<EmpVO> root = criteriaQuery.from(EmpVO.class);
+			Root<Promotion> root = criteriaQuery.from(Promotion.class);
 
 			List<Predicate> predicateList = new ArrayList<Predicate>();
 			
@@ -72,7 +72,7 @@ public class HibernateUtil_CompositeQuery_Emp3 {
 			}
 			System.out.println("predicateList.size()="+predicateList.size());
 			criteriaQuery.where(predicateList.toArray(new Predicate[predicateList.size()]));
-			criteriaQuery.orderBy(builder.asc(root.get("empno")));
+			criteriaQuery.orderBy(builder.asc(root.get("roomPromotionId")));
 			// 【●最後完成創建 javax.persistence.Query●】
 			Query query = session.createQuery(criteriaQuery); //javax.persistence.Query; //Hibernate 5 開始 取代原 org.hibernate.Query 介面
 			list = query.getResultList();

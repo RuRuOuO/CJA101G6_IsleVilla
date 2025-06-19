@@ -31,8 +31,6 @@ public class PromotionController {
 	@Autowired
 	PromotionService promotionSvc;
 
-	@Autowired
-	RoomPromotionPriceService promotionPriceSvc;
 
 	/*
 	 * This method will serve as addEmp.html handler.
@@ -48,22 +46,12 @@ public class PromotionController {
 	 * This method will be called on addEmp.html form submission, handling POST request It also validates the user input
 	 */
 	@PostMapping("insert")
-	public String insert(@Valid Promotion promotion, BindingResult result, ModelMap model,
-			@RequestParam("upFiles") MultipartFile[] parts) throws IOException {
+	public String insert(@Valid Promotion promotion, BindingResult result, ModelMap model) throws IOException {
 
 		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
 		// 去除BindingResult中upFiles欄位的FieldError紀錄 --> 見第172行
-		result = removeFieldError(promotion, result, "upFiles");
-
-		if (parts[0].isEmpty()) { // 使用者未選擇要上傳的圖片時
-			model.addAttribute("errorMessage", "員工照片: 請上傳照片");
-		} else {
-			for (MultipartFile multipartFile : parts) {
-				byte[] buf = multipartFile.getBytes();
-				promotion.setUpFiles(buf);
-			}
-		}
-		if (result.hasErrors() || parts[0].isEmpty()) {
+		
+		if (result.hasErrors()) {
 			return "back-end/promotion/addPromotion";
 		}
 		/*************************** 2.開始新增資料 *****************************************/
@@ -95,23 +83,11 @@ public class PromotionController {
 	 * This method will be called on update_emp_input.html form submission, handling POST request It also validates the user input
 	 */
 	@PostMapping("update")
-	public String update(@Valid Promotion promotion, BindingResult result, ModelMap model,
-			@RequestParam("upFiles") MultipartFile[] parts) throws IOException {
+	public String update(@Valid Promotion promotion, BindingResult result, ModelMap model) throws IOException {
 
 		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
 		// 去除BindingResult中upFiles欄位的FieldError紀錄 --> 見第172行
-		result = removeFieldError(promotion, result, "upFiles");
 
-		if (parts[0].isEmpty()) { // 使用者未選擇要上傳的新圖片時
-			// EmpService empSvc = new EmpService();
-			byte[] upFiles = promotionSvc.getOnePromotion(promotion.getRoomPromotionId()).getUpFiles();
-			promotion.setUpFiles(upFiles);
-		} else {
-			for (MultipartFile multipartFile : parts) {
-				byte[] upFiles = multipartFile.getBytes();
-				promotion.setUpFiles(upFiles);
-			}
-		}
 		if (result.hasErrors()) {
 			return "back-end/promotion/update_promotion_input";
 		}
@@ -128,43 +104,43 @@ public class PromotionController {
 	/*
 	 * This method will be called on listAllEmp.html form submission, handling POST request
 	 */
-	@PostMapping("delete")
-	public String delete(@RequestParam("RoomPromotionId") String roomPromotionId, ModelMap model) {
-		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
-		/*************************** 2.開始刪除資料 *****************************************/
-		// EmpService empSvc = new EmpService();
-		promotionSvc.deletePromotion(Integer.valueOf(roomPromotionId));
-		/*************************** 3.刪除完成,準備轉交(Send the Success view) **************/
-		List<Promotion> list = promotionSvc.getAll();
-		model.addAttribute("promotionListData", list); // for listAllEmp.html 第85行用
-		model.addAttribute("success", "- (刪除成功)");
-		return "back-end/promotion/listAllPromotion"; // 刪除完成後轉交listAllEmp.html
-	}
+//	@PostMapping("delete")
+//	public String delete(@RequestParam("RoomPromotionId") String roomPromotionId, ModelMap model) {
+//		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
+//		/*************************** 2.開始刪除資料 *****************************************/
+//		// EmpService empSvc = new EmpService();
+//		promotionSvc.deletePromotion(Integer.valueOf(roomPromotionId));
+//		/*************************** 3.刪除完成,準備轉交(Send the Success view) **************/
+//		List<Promotion> list = promotionSvc.getAll();
+//		model.addAttribute("promotionListData", list); // for listAllEmp.html 第85行用
+//		model.addAttribute("success", "- (刪除成功)");
+//		return "back-end/promotion/listAllPromotion"; // 刪除完成後轉交listAllEmp.html
+//	}
 
 	/*
 	 * 第一種作法 Method used to populate the List Data in view. 如 : 
 	 * <form:select path="deptno" id="deptno" items="${deptListData}" itemValue="deptno" itemLabel="dname" />
 	 */
-	@ModelAttribute("roomPromotionPriceListData")
-	protected List<RoomPromotionPrice> referenceListData() {
-		// DeptService deptSvc = new DeptService();
-		List<RoomPromotionPrice> list = roomPromotionPriceSvc.getAll();
-		return list;
-	}
+//	@ModelAttribute("roomPromotionPriceListData")
+//	protected List<RoomPromotionPrice> referenceListData() {
+//		// DeptService deptSvc = new DeptService();
+//		List<RoomPromotionPrice> list = roomPromotionPriceSvc.getAll();
+//		return list;
+//	}
 
 	/*
 	 * 【 第二種作法 】 Method used to populate the Map Data in view. 如 : 
 	 * <form:select path="deptno" id="deptno" items="${depMapData}" />
 	 */
-	@ModelAttribute("roomPromotionPriceMapData") //
-	protected Map<Integer, String> referenceMapData() {
-		Map<Integer, String> map = new LinkedHashMap<Integer, String>();
-		map.put(10, "財務部");
-		map.put(20, "研發部");
-		map.put(30, "業務部");
-		map.put(40, "生管部");
-		return map;
-	}
+//	@ModelAttribute("roomPromotionPriceMapData") //
+//	protected Map<Integer, String> referenceMapData() {
+//		Map<Integer, String> map = new LinkedHashMap<Integer, String>();
+//		map.put(10, "財務部");
+//		map.put(20, "研發部");
+//		map.put(30, "業務部");
+//		map.put(40, "生管部");
+//		return map;
+//	}
 
 	// 去除BindingResult中某個欄位的FieldError紀錄
 	public BindingResult removeFieldError(Promotion promotion, BindingResult result, String removedFieldname) {
@@ -181,12 +157,12 @@ public class PromotionController {
 	/*
 	 * This method will be called on select_page.html form submission, handling POST request
 	 */
-	@PostMapping("listPromotion_ByCompositeQuery")
-	public String listAllPromotion(HttpServletRequest req, Model model) {
-		Map<String, String[]> map = req.getParameterMap();
-		List<Promotion> list = promotionSvc.getAll(map);
-		model.addAttribute("promotionListData", list); // for listAllEmp.html 第85行用
-		return "back-end/promotion/listAllPromotion";
-	}
+//	@PostMapping("listPromotion_ByCompositeQuery")
+//	public String listAllPromotion(HttpServletRequest req, Model model) {
+//		Map<String, String[]> map = req.getParameterMap();
+//		List<Promotion> list = promotionSvc.getAll(map);
+//		model.addAttribute("promotionListData", list); // for listAllEmp.html 第85行用
+//		return "back-end/promotion/listAllPromotion";
+//	}
 
 }

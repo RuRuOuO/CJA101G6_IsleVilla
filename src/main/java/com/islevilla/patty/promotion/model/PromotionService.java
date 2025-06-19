@@ -9,7 +9,6 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import hibernate.util.CompositeQuery.HibernateUtil_CompositeQuery_Promotion;
 
 
 @Service("promotionService")
@@ -21,19 +20,14 @@ public class PromotionService {
 	@Autowired
     private SessionFactory sessionFactory;
 
-	public void addEmp(Promotion promotion) {
+	public void addPromotion(Promotion promotion) {
 		repository.save(promotion);
 	}
 
-	public void updateEmp(Promotion promotion) {
+	public void updatePromotion(Promotion promotion) {
 		repository.save(promotion);
 	}
 
-	public void deletePromotion(Integer roomPromotionId) {
-		if (repository.existsById(roomPromotionId))
-			repository.deleteByRoomPromotionId(roomPromotionId);
-//		    repository.deleteById(empno);
-	}
 
 	public Promotion getOnePromotion(Integer roomPromotionId) {
 		Optional<Promotion> optional = repository.findById(roomPromotionId);
@@ -45,8 +39,8 @@ public class PromotionService {
 		return repository.findAll();
 	}
 
-	public List<Promotion> getAll(Map<String, String[]> map) {
-		return HibernateUtil_CompositeQuery_Promotion.getAllC(map,sessionFactory.openSession());
-	}
+//	public List<Promotion> getAll(Map<String, String[]> map) {
+//		return HibernateUtil_CompositeQuery_Promotion.getAllC(map,sessionFactory.openSession());
+//	}
 
 }
