@@ -1,32 +1,12 @@
 /* 自訂 primary 顏色 */
 .btn-primary,
 .bg-primary,
-.text-primary,
 .border-primary {
-    background-color: rgb(200, 210, 0) !important;
+    /*background-color: rgb(200, 210, 0) !important;*/
+    background: linear-gradient(135deg, #00d4ff 0%, #0099b3 50%, #00a8cc 100%) !important;
     color: rgb(255, 255, 255) !important;
-    border-color: rgb(200, 210, 0) !important;
+    border-color: rgb(255, 255, 255) !important;
 }
-
-/*
-.btn-dark,
-.bg-dark,
-.text-dark,
-.border-dark {
-  background-color: rgb(0,40,60) !important;
-  color: rgb(255,255,255) !important;
-  border-color: rgb(255,255,255) !important;
-} */
-
-/* 自訂 secondary */
-/* .btn-secondary,
-.bg-secondary,
-.text-secondary,
-.border-secondary {
-  background-color: rgb(130,180,200) !important;
-  color: #fff !important;
-  border-color: lightblue !important;
-} */
 
 /* Hover 效果 */
 .nav-link:hover {
@@ -79,11 +59,6 @@ p, .btn, .nav-link, li {
     object-fit: cover;
 }
 
-/*.container{*/
-/*  padding-left:3em;*/
-/*  padding-right:3em;*/
-/*}*/
-
 /* 固定在畫面上的立即預定按鈕 */
 .booking-fixed-btn {
     position: fixed;
@@ -102,6 +77,8 @@ html, body {
 body {
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
+    padding-bottom: 264px; /* 預留 footer 高度 */
 }
 
 main {
