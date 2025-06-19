@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>微嶼 | Isle Villa</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+    <!-- ===== 載入自訂樣式 ===== -->
+    <link rel="stylesheet" href="/css/product_index.css"/>
+</head>
+<body>
+<!-- ===== 載入Header ===== -->
+<div th:replace="~{fragments/fragments :: header}"></div>
+<!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
+<main class="container mb-5 mt-5">
+    <!-- 商品分類 -->
+    <h2 class="text-center mb-4">商品分類</h2>
+    <div class="row category-row">
+
+        <div class="col-2 category-item">
+            <a th:href="@{/product/list}">
+                <button class="btn btn-outline-primary">
+                    <p>全部商品</p>
+                </button>
+            </a>
+        </div>
+        <!-- 使用Thymeleaf動態生成分類列表 -->
+        <div th:each="category : ${category}" class="col-2 category-item">
+            <a th:href="@{/product/list(productCategoryId=${category.productCategoryId})}">
+                <button class="btn btn-outline-primary">
+                    <p th:text="${category.productCategoryName}">商品類別名稱</p>
+                </button>
+            </a>
+        </div>
+
+
+        <!--空行-->
+        <div class="w-100 d-none d-md-block my-5"></div>
+
+        <!-- 商品卡片 -->
+        <h2 class="text-center">商品列表</h2>
+        <p class="text-center">歡迎來到 微嶼Islevilla 購物商城</p>
+
+        <div class="container mt-4">
+            <div class="row g-4">
+                <!-- 商品卡片 1 -->
+                <!-- 迴圈渲染：products 為 Controller 傳入的 List<Product> -->
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3"
+                     th:each="prod : ${product}">
+                    <div class="card h-100 d-flex flex-column">
+                        <img th:src="${prod.productImageUrl}"
+                             class="card-img-top img-fluid"
+                             style="height: 200px; object-fit: cover;"
+                             alt="商品圖片"
+                        />
+
+
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title" th:text="${prod.productName}">商品名稱</h5>
+                            <p class="card-text" th:text="${prod.productDescription}">描述</p>
+                            <p class="price mt-auto" th:text="'NT$ ' + ${prod.productPrice}">NT$ 0</p>
+
+                            <!-- 加入購物車按鈕 -->
+                            <form th:action="@{/addToCart}" method="post" class="d-inline">
+                                <input type="hidden" name="productId" th:value="${prod.productId}" />
+                                <input type="hidden" name="quantity" value="1" /> <!-- 預設數量為 1 -->
+                                <button type="submit" class="btn btn-primary btn-sm ms-2">加入購物車</button>
+                            </form>
+                        </div>
+
+
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+</main>
+
+<!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
+<!-- ========== 載入Footer ========== -->
+<div th:replace="~{fragments/fragments :: footer}"></div>
+</body>
+</html>

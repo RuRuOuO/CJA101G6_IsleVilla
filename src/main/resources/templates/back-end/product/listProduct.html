@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>商品總覽</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+  <h2 class="mb-4">商品總覽</h2>
+  <a href="/product/backend/new" class="btn btn-success mb-4">新增商品</a>
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th>#</th>
+      <th>商品名稱</th>
+      <th>價格</th>
+      <th>庫存量</th>
+      <th>狀態</th>
+      <th>類別</th>
+      <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="prod : ${product}">
+      <td th:text="${prod.productId}">1</td>
+      <td th:text="${prod.productName}">商品名稱</td>
+      <td th:text="${prod.productPrice}">100</td>
+      <td th:text="${prod.productQuantity}">50</td>
+      <td th:text="${prod.productStatus == 1 ? '上架' : '下架'}">上架</td>
+      <td th:text="${prod.productCategory.productCategoryName}">類別名稱</td>
+      <td>
+        <!-- 修改按鈕 -->
+        <a href="/product/backend/edit/{id}" th:href="@{/product/backend/edit/{id}(id=${prod.productId})}" class="btn btn-primary btn-sm">修改</a>
+        <!-- 刪除按鈕 -->
+        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" th:data-id="${prod.productId}" th:data-name="${prod.productName}">
+          刪除
+        </button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <!-- 刪除確認 Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">確認刪除商品</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>您確定要刪除商品 <span id="productName"></span> 嗎？</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+          <button type="button" class="btn btn-danger" id="confirmDeleteBtn">刪除</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // 設定刪除按鈕和 modal
+  const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+  let currentProductId = null;
+
+  // 監聽刪除按鈕
+  document.querySelectorAll('button[data-bs-toggle="modal"]').forEach(button => {
+    button.addEventListener('click', function() {
+      const productId = this.getAttribute('data-id');
+      const productName = this.getAttribute('data-name');
+
+      // 顯示商品名稱
+      document.getElementById('productName').textContent = productName;
+      currentProductId = productId;
+    });
+  });
+
+  // 確認刪除
+  document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+    const response = await fetch(`/product/delete/${currentProductId}`, {
+      method: 'DELETE'
+    });
+
+    if (response.ok) {
+      alert('商品已刪除');
+      window.location.reload(); // 重新載入頁面
+    } else {
+      alert('刪除失敗');
+    }
+
+    deleteModal.hide(); // 隱藏 modal
+  });
+</script>
+</body>
+</html>

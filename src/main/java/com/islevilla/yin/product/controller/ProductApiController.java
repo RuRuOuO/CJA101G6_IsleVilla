@@ -2,8 +2,10 @@ package com.islevilla.yin.product.controller;
 
 import com.islevilla.yin.product.model.Product;
 import com.islevilla.yin.product.model.ProductService;
-import com.islevilla.yin.productcategory.model.ProductCategoryService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,19 +15,19 @@ public class ProductApiController {
     private ProductService productService;
 
 
-    // 新增產品
-    @PostMapping("add")
+    // 送出新增產品
+    @PostMapping("/add")
     public void addProduct(@RequestBody Product product) {
         productService.addProduct(product);
     }
-    // 修改商品
-    @PostMapping("update")
-    public void updateProduct(@RequestBody Product product) {
-        productService.updateProduct(product);
-    }
+//    // 送出修改商品
+//    @PostMapping("/edit")
+//    public void updateProduct(@Valid @RequestBody Product product) {
+//        productService.updateProduct(product);
+//    }
     // 刪除商品
-    @PostMapping("delete")
-    public void deleteProduct(@RequestParam Integer productId) {
+    @DeleteMapping("/delete/{productId}")
+    public void deleteProduct(@PathVariable Integer productId) {
         productService.deleteProduct(productId);
     }
 }

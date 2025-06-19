@@ -14,21 +14,19 @@
         <form th:action="@{/backend/news/add}" method="post" th:object="${news}" enctype="multipart/form-data">
             <div>
                 <label>標題</label><input type="text" th:field="*{newsTitle}"
-                                          onclick="hideContent('newsTitle.errors');"><br/>
-                <span th:if="${#fields.hasErrors('newsTitle')}" th:errors="*{newsTitle}"
-                      class="error" id="newsTitle.errors">
-            </span>
+                                          onclick="hideContent('newsTitle.errors');">
+                <span class="error" th:if="${#fields.hasErrors('newsTitle')}"
+                      th:errors="*{newsTitle}" id="newsTitle.errors"></span>
             </div>
             <div>
                 <label>內容</label><input type="text" th:field="*{newsContent}"
-                                          onclick="hideContent('newsContent.errors')"/><br><span
-                    th:errors="*{newsContent}"
-                    class="error" id="newsContent.errors"></span>
+                                          onclick="hideContent('newsContent.errors')"/>
+                <span class="error" th:if="${#fields.hasErrors('newsContent')}"
+                      th:errors="*{newsContent}" id="newsContent.errors"></span>
             </div>
             <div>
                 <label>上傳圖片</label><input type="file" th:field="*{upFiles}" id="upFiles" accept="image/*"
                                               onchange="previewImage()"/>
-                <span class="error" th:utext="${errorMessage}" id="upFiles.errors"></span>
                 <div id="image-preview">
                     <img src="preview-image" style="display:none" alt="預覽圖片">
                 </div>
