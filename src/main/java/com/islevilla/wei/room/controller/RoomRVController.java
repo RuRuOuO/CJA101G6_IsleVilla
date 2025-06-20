@@ -1,6 +1,8 @@
 package com.islevilla.wei.room.controller;
 
 import com.islevilla.lai.members.model.Members;
+import com.islevilla.lai.members.model.MembersRepository;
+import com.islevilla.lai.members.model.MembersService;
 import com.islevilla.wei.PageUtil;
 import com.islevilla.wei.room.model.RoomRVDetail;
 import com.islevilla.wei.room.model.RoomRVDetailService;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.lang.reflect.Member;
 import java.util.List;
 
 @Controller
@@ -59,19 +62,38 @@ public class RoomRVController {
         return "back-end/roomRVOrder/listOneRoomRVOrder";
     }
 
+//    // 前台渲染會員訂單
+//    @GetMapping("/member/room/list")
+//    public String getRoomRVOrdersFromMember(Model model, HttpSession session) {
+//        // 從session抓出登入的會員物件
+//         Members loginMember = (Members) session.getAttribute("member");
+//        if (loginMember == null) {
+//            return "redirect:/member/login";
+//        }
+//
+//        // 查詢訂單
+//        List<RoomRVOrder> orderList = roomRVOrderService.getRoomRVOrderByMember(loginMember);
+//        model.addAttribute("orderList", orderList);
+//
+//        return "front-end/member/member-room-list";
+//    }
+
+    @Autowired
+    MembersRepository membersRepository;
+    @Autowired
+    MembersService membersService;
     // 前台渲染會員訂單
-    @GetMapping("/member")
-    public String getRoomRVOrdersFromMember(Model model, HttpSession session) {
-        // 從session抓出登入的會員物件
-        Members loginMember = (Members) session.getAttribute("member");
+    @GetMapping("/member/room/list")
+    public String getRoomRVOrdersFromMember(Model model) {
+        Members loginMember = membersService.getOneMember(8);
+//        Members loginMember = membersRepository.findById(3);
         if (loginMember == null) {
             return "redirect:/member/login";
         }
-
         // 查詢訂單
         List<RoomRVOrder> orderList = roomRVOrderService.getRoomRVOrderByMember(loginMember);
         model.addAttribute("orderList", orderList);
 
-        return "front-end/member/memberInfo";
+        return "front-end/member/member-room-list";
     }
 }
