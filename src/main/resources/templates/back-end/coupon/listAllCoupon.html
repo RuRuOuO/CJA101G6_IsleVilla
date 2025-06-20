@@ -47,15 +47,15 @@
                                                    th:attr="id='input-minSpend-' + ${iterStat.index}" required />
                                         </td>
                                         <td>
-                                            <span th:text="${#temporals.format(coupon.startDate, 'yyyy-MM-dd HH:mm')}" th:attr="id='text-startDate-' + ${iterStat.index}"></span>
-                                            <input type="datetime-local" name="startDate"
+                                            <span th:text="${#temporals.format(coupon.startDate, 'yyyy-MM-dd')}" th:attr="id='text-startDate-' + ${iterStat.index}"></span>
+                                            <input type="date" name="startDate"
                                                    th:value="${startDateMap[coupon.couponId]}"
                                                    class="form-control d-none"
                                                    th:attr="id='input-startDate-' + ${iterStat.index}" required />
                                         </td>
                                         <td>
-                                            <span th:text="${#temporals.format(coupon.endDate, 'yyyy-MM-dd HH:mm')}" th:attr="id='text-endDate-' + ${iterStat.index}"></span>
-                                            <input type="datetime-local" name="endDate"
+                                            <span th:text="${#temporals.format(coupon.endDate, 'yyyy-MM-dd')}" th:attr="id='text-endDate-' + ${iterStat.index}"></span>
+                                            <input type="date" name="endDate"
                                                    th:value="${endDateMap[coupon.couponId]}"
                                                    class="form-control d-none"
                                                    th:attr="id='input-endDate-' + ${iterStat.index}" required />
@@ -63,22 +63,29 @@
                                         <td>
                                             <button type="button" class="btn btn-primary btn-sm"
                                                     th:attr="id='editBtn-' + ${iterStat.index}"
-                                                    th:onclick="'enableEditRow(' + ${iterStat.index} + ')'"
+                                                    th:onclick="|enableEditRow(${iterStat.index})|"
                                             >修改</button>
                                             <button type="submit" class="btn btn-success btn-sm d-none"
                                                     th:attr="id='saveBtn-' + ${iterStat.index}"
+                                                    onclick="return validateRow([[${iterStat.index}]])"
                                             >儲存</button>
                                             <button type="button" class="btn btn-secondary btn-sm d-none"
                                                     th:attr="id='cancelBtn-' + ${iterStat.index}"
-                                                    th:onclick="'cancelEditRow(' + ${iterStat.index} + ')'"
+                                                    th:onclick="|cancelEditRow(${iterStat.index})|"
                                             >取消</button>
                                             <a th:href="@{/coupon/delete(couponId=${coupon.couponId})}" class="btn btn-danger btn-sm" onclick="return confirm('確定要刪除此優惠券嗎？')">刪除</a>
+                                            <div th:if="${rowErrorMap != null and rowErrorMap[coupon.couponId] != null}" class="text-danger">
+                                                <ul>
+                                                    <li th:each="msg : ${rowErrorMap[coupon.couponId]}" th:text="${msg}"></li>
+                                                </ul>
+                                            </div>
                                         </td>
                                     </form>
                                 </tr>
                             </tbody>
                         </table>
                         <div class="mt-3">
+                            <a href="/coupon/add" class="btn btn-success">新增優惠券</a>
                             <a href="/coupon/select_page" class="btn btn-secondary">返回查詢</a>
                             <a href="/" class="btn btn-secondary">返回首頁</a>
                         </div>
@@ -111,6 +118,30 @@
             document.getElementById('editBtn-' + idx).classList.remove('d-none');
             document.getElementById('saveBtn-' + idx).classList.add('d-none');
             document.getElementById('cancelBtn-' + idx).classList.add('d-none');
+        }
+        function validateRow(idx) {
+            let code = document.getElementById('input-couponCode-' + idx).value;
+            let discount = document.getElementById('input-discountValue-' + idx).value;
+            let minSpend = document.getElementById('input-minSpend-' + idx).value;
+            let startDate = document.getElementById('input-startDate-' + idx).value;
+            let endDate = document.getElementById('input-endDate-' + idx).value;
+            let errors = [];
+
+            if (!code) errors.push('優惠券代碼必填');
+            if (!discount || !minSpend || Number(discount) > Number(minSpend)) errors.push('折扣金額必須小於或等於最低消費金額');
+            if (!startDate || !endDate) errors.push('請輸入完整的啟用日期與結束日期');
+            if (startDate && endDate && startDate > endDate) errors.push('結束日期不能小於啟用日期');
+            // 其他驗證可自行擴充
+
+            let errorDiv = document.getElementById('row-error-' + idx);
+            if (errors.length > 0) {
+                errorDiv.innerHTML = errors.join('<br>');
+                errorDiv.style.display = 'block';
+                return false;
+            } else {
+                errorDiv.style.display = 'none';
+                return true;
+            }
         }
     </script>
 </body>

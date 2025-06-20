@@ -210,7 +210,18 @@ public class ProductOrderController {
 
     // 顯示所有訂單
     @GetMapping("listAllProductOrder")
-    public String listAllProductOrder(Model model) {
+    public String listAllProductOrder(
+        @RequestParam(value = "memberId", required = false) Integer memberId,
+        @RequestParam(value = "orderStatus", required = false) Integer orderStatus,
+        Model model) {
+
+        List<ProductOrder> list;
+        if (memberId != null || orderStatus != null) {
+            list = productOrderSvc.findByMemberIdAndStatus(memberId, orderStatus);
+        } else {
+            list = productOrderSvc.getAll();
+        }
+        model.addAttribute("productOrderListData", list);
         return "back-end/product-order/listAllProductOrder";
     }
 

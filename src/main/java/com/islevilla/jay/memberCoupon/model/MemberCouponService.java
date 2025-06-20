@@ -79,9 +79,10 @@ public class MemberCouponService {
         }
 
         Coupon coupon = memberCoupon.getCoupon();
-        return orderAmount >= coupon.getMinSpend() &&
-               coupon.getStartDate().isBefore(java.time.LocalDateTime.now()) &&
-               coupon.getEndDate().isAfter(java.time.LocalDateTime.now());
+        java.time.LocalDate today = java.time.LocalDate.now();
+        return orderAmount >= coupon.getMinSpend()
+                && (coupon.getStartDate() == null || !coupon.getStartDate().isAfter(today))
+                && (coupon.getEndDate() == null || !coupon.getEndDate().isBefore(today));
     }
 
     // 計算優惠券折扣金額
