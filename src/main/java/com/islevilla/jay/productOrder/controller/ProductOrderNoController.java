@@ -3,6 +3,8 @@ package com.islevilla.jay.productOrder.controller;
 import java.util.List;
 import java.util.Set;
 
+import com.islevilla.lai.members.model.Members;
+import com.islevilla.lai.members.model.MembersService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -17,13 +19,12 @@ import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.islevilla.member.model.MemberService;
-import com.islevilla.member.model.MemberVO;
 import com.islevilla.jay.productOrder.model.ProductOrderService;
 import com.islevilla.jay.productOrder.model.ProductOrder;
 import com.islevilla.jay.productOrderDetail.model.ProductOrderDetailService;
@@ -37,8 +38,8 @@ public class ProductOrderNoController {
     @Autowired
     ProductOrderService productOrderSvc;
     
-    @Autowired 
-    MemberService memSvc;
+    @Autowired
+    MembersService memSvc;
     
     @Autowired
     ProductOrderDetailService orderDetailSvc;
@@ -56,7 +57,7 @@ public class ProductOrderNoController {
         List<ProductOrder> list = productOrderSvc.getAll();
         model.addAttribute("productOrderListData", list); 
         
-        List<MemberVO> list3 = memSvc.getAll();
+        List<Members> list3 = memSvc.getAll();
         model.addAttribute("memListData", list3);
         
         List<ProductOrderDetail> orderDetailData = orderDetailSvc.findByProductOrderId(Integer.valueOf(productOrderId));
@@ -88,7 +89,7 @@ public class ProductOrderNoController {
         List<ProductOrder> list = productOrderSvc.getAll();
         model.addAttribute("productOrderListData", list); 
         
-        List<MemberVO> list3 = memSvc.getAll();
+        List<Members> list3 = memSvc.getAll();
         model.addAttribute("memListData", list3);
         
         if (productOrder == null) {
@@ -113,10 +114,18 @@ public class ProductOrderNoController {
         List<ProductOrder> list = productOrderSvc.getAll();
         model.addAttribute("productOrderListData", list);    
         
-        model.addAttribute("memberVO", new MemberVO());
-        List<MemberVO> list3 = memSvc.getAll();
+        model.addAttribute("memberVO", new Members());
+        List<Members> list3 = memSvc.getAll();
         model.addAttribute("memListData", list3);
         String message = strBuilder.toString();
         return new ModelAndView("back-end/product-order/select_page", "errorMessage", "請修正以下錯誤:<br>"+message);
+    }
+
+    // 顯示指定會員的所有歷史訂單
+    @GetMapping("/member/memberOrderList")
+    public String showMemberHistoryOrders(@RequestParam("memberId") Integer memberId, Model model) {
+        List<ProductOrder> orderList = productOrderSvc.getMemAllOrder(memberId);
+        model.addAttribute("orderList", orderList);
+        return "front-end/product-order/memberOrderList";
     }
 } 

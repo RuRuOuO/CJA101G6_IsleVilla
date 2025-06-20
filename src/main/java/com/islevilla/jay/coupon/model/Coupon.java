@@ -4,7 +4,7 @@ package com.islevilla.jay.coupon.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "coupon")
@@ -26,10 +26,10 @@ public class Coupon {
     private Integer minSpend;
 
     @Column(name = "start_date", nullable = false)
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
     @Column(name = "end_date", nullable = false)
-    private LocalDateTime endDate;
+    private LocalDate endDate;
 
     public Coupon() {}
 
@@ -65,19 +65,19 @@ public class Coupon {
         this.minSpend = minSpend;
     }
 
-    public LocalDateTime getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDateTime startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public LocalDateTime getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(LocalDateTime endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 

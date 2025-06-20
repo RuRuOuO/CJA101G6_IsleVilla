@@ -20,16 +20,31 @@ public class CouponService {
         return couponRepository.findAll();
     }
 
-    public Optional<Coupon> findById(Integer id) {
-        return couponRepository.findById(id);
+    public Optional<Coupon> findById(Integer couponId) {
+        return couponRepository.findById(couponId);
     }
 
     public Coupon save(Coupon coupon) {
         return couponRepository.save(coupon);
     }
 
-    public void deleteById(Integer id) {
-        couponRepository.deleteById(id);
+    public void deleteById(Integer couponId) {
+        couponRepository.deleteById(couponId);
+    }
+
+    // 根據優惠券代碼查詢
+    public List<Coupon> findByCouponCode(String couponCode) {
+        return couponRepository.findByCouponCode(couponCode);
+    }
+
+    // 根據最低消費金額查詢
+    public List<Coupon> findByMinSpend(Integer minSpend) {
+        return couponRepository.findByMinSpend(minSpend);
+    }
+
+    // 模糊查詢優惠券代碼
+    public List<Coupon> findByCouponCodeContaining(String keyword) {
+        return couponRepository.findByCouponCodeContaining(keyword);
     }
 }
 

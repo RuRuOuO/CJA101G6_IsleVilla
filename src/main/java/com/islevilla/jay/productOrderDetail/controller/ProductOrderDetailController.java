@@ -58,7 +58,7 @@ public class ProductOrderDetailController {
         try {
             // 驗證訂單和商品是否存在
             ProductOrder order = orderSvc.getOneProductOrder(orderDetail.getId().getProductOrderId());
-            Product product = productSvc.getOneProduct(orderDetail.getId().getProductId());
+            Product product = productSvc.getProductById(orderDetail.getId().getProductId());
 
             if (order == null) {
                 throw new IllegalArgumentException("無法找到訂單編號: " + orderDetail.getId().getProductOrderId());

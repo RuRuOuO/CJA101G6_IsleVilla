@@ -1,13 +1,16 @@
 package com.islevilla.jay.productOrder.controller;
 
+import com.islevilla.jay.coupon.model.Coupon;
 import com.islevilla.jay.coupon.model.CouponService;
-import com.islevilla.member.model.MemberService;
+import com.islevilla.jay.memberCoupon.model.MemberCouponService;
+import com.islevilla.lai.members.model.Members;
+import com.islevilla.lai.members.model.MembersService;
 import com.islevilla.jay.productOrder.model.ProductOrder;
 import com.islevilla.jay.productOrder.model.ProductOrderService;
 import com.islevilla.jay.productOrderDetail.model.ProductOrderDetail;
 import com.islevilla.jay.productOrderDetail.model.ProductOrderDetailService;
-import com.islevilla.jay.cart.model.CartService;
-import com.islevilla.jay.cart.model.CartVO;
+import com.islevilla.yin.cart.model.CartService;
+import com.islevilla.yin.cart.model.CartDTO;
 import com.islevilla.yin.product.model.Product;
 import com.islevilla.yin.product.model.ProductService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,8 +28,10 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -37,7 +42,7 @@ public class ProductOrderController {
     ProductOrderService productOrderSvc;
 
     @Autowired
-    MemberService memberSvc;
+    MembersService memberSvc;
 
     @Autowired
     CouponService couponSvc;
@@ -50,6 +55,9 @@ public class ProductOrderController {
 
     @Autowired
     ProductService productSvc;
+
+    @Autowired
+    MemberCouponService memberCouponSvc;
 
     /*
      * This method will serve as addProductOrder.html handler.
@@ -81,13 +89,14 @@ public class ProductOrderController {
             ModelMap model) throws IOException {
         
         /*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
-        MemberVO loggedInMember = (MemberVO) session.getAttribute("loggedInMember");
+        Members loggedInMember = (Members) session.getAttribute("loggedInMember");
         
         if (loggedInMember == null) {
             return "redirect:/member/loginMem"; 
         }
         
         Integer loginMemNo = loggedInMember.getMemberId();
+        String userId = String.valueOf(loginMemNo); // 會員ID作為Redis購物車key
         
         if (productOrder.getOrderTime() == null) {
             productOrder.setOrderTime(LocalDateTime.now());  
@@ -95,23 +104,27 @@ public class ProductOrderController {
     
         if (result.hasErrors()) {
             System.out.println(result);
-            MemberVO memberVO = memberSvc.getOneMember(loginMemNo);
-            List<CartVO> cartDetails = cartSvc.getMemAllList(loginMemNo);
-            model.addAttribute("memberVO", memberVO);
+            Members members = memberSvc.getOneMember(loginMemNo);
+            List<CartDTO> cartDetails = cartSvc.getCartItems(userId);
+            model.addAttribute("memberVO", members);
             model.addAttribute("cartDetails", cartDetails);
             return "front-end/product-order/checkout";
         }
 
         /*************************** 2.開始新增資料 *****************************************/
         try {
-            MemberVO memberVO = memberSvc.getOneMember(loginMemNo);
-            productOrder.setMember(memberVO);
+            Members members = memberSvc.getOneMember(loginMemNo);
+            productOrder.setMember(members);
             
             if (couponId != null) {
-                Coupon coupon = couponSvc.getOneCoupon(couponId);
-                if (coupon != null) {
+                Optional<Coupon> couponOpt = couponSvc.findById(couponId);
+                if (couponOpt.isPresent()) {
+                    Coupon coupon = couponOpt.get();
                     productOrder.setCoupon(coupon);
-                    productOrder.setDiscountAmount(coupon.getDiscountAmount());
+                    productOrder.setDiscountAmount(coupon.getDiscountValue());
+                    
+                    // 記錄會員使用優惠券的記錄
+                    memberCouponSvc.recordCouponUsage(loginMemNo, couponId);
                 }
             }
             
@@ -125,19 +138,19 @@ public class ProductOrderController {
                 productOrder.setContactAddress(contactAddressHotel);
             }
     
-            List<CartVO> cartItems = cartSvc.getMemAllList(loginMemNo);
-            for (CartVO cartItem : cartItems) {
+            List<CartDTO> cartItems = cartSvc.getCartItems(userId);
+            for (CartDTO cartItem : cartItems) {
                 ProductOrderDetail detail = new ProductOrderDetail();
-                Product product = productSvc.getOneProduct(cartItem.getProduct().getProductId());
+                Product product = productSvc.getProductById(cartItem.getProductId());
                 if (product == null) {
-                    throw new RuntimeException("無此商品: " + cartItem.getProduct().getProductId());
+                    throw new RuntimeException("無此商品: " + cartItem.getProductId());
                 }
                 detail.setProduct(product);
-                detail.setProductOrderQuantity(cartItem.getProductQuantity());
+                detail.setProductOrderQuantity(cartItem.getQuantity());
                 detail.setProductOrderPrice(product.getProductPrice());
                 detail.setProductName(product);
                 detail.setProductOrder(productOrder);
-                productOrder.addOrderDetail(detail);
+                productOrderSvc.addOrderDetail(productOrder, detail);
             }
             
             productOrderSvc.addProductOrder(productOrder);
@@ -149,7 +162,7 @@ public class ProductOrderController {
         /*************************** 3.新增完成,準備轉交(Send the Success view) **************/
         model.addAttribute("productOrder", productOrder);
         
-        cartSvc.deleteMemAllCart(loginMemNo);  // 新增訂單時同時刪除購物車內容
+        cartSvc.clearCart(userId);  // 新增訂單時同時清空購物車內容
         return "redirect:/product-order/checkoutResult?orderNo=" + productOrder.getProductOrderId();
     }
 
@@ -197,14 +210,25 @@ public class ProductOrderController {
 
     // 顯示所有訂單
     @GetMapping("listAllProductOrder")
-    public String listAllProductOrder(Model model) {
+    public String listAllProductOrder(
+        @RequestParam(value = "memberId", required = false) Integer memberId,
+        @RequestParam(value = "orderStatus", required = false) Integer orderStatus,
+        Model model) {
+
+        List<ProductOrder> list;
+        if (memberId != null || orderStatus != null) {
+            list = productOrderSvc.findByMemberIdAndStatus(memberId, orderStatus);
+        } else {
+            list = productOrderSvc.getAll();
+        }
+        model.addAttribute("productOrderListData", list);
         return "back-end/product-order/listAllProductOrder";
     }
 
     // 顯示會員訂單
     @GetMapping("memOrders")
     public String listMemAllOrder(HttpSession session, Model model) {
-        MemberVO loggedInMember = (MemberVO) session.getAttribute("loggedInMember");
+        Members loggedInMember = (Members) session.getAttribute("loggedInMember");
         
         if (loggedInMember == null) {
             return "redirect:/member/loginMem";
@@ -229,7 +253,7 @@ public class ProductOrderController {
 
     // 提供下拉選單資料
     @ModelAttribute("memberListData")
-    protected List<Member> referenceMemberListData() {
+    protected List<Members> referenceMemberListData() {
         return memberSvc.getAll();
     }
 
@@ -279,7 +303,7 @@ public class ProductOrderController {
     @GetMapping("checkoutResult")
     public String checkoutResult(@RequestParam("orderNo") Integer orderNo, ModelMap model) {
         ProductOrder order = productOrderSvc.getOneProductOrder(orderNo);
-        List<ProductOrderDetail> orderDetails = orderDetailSvc.findByOrderId(orderNo);
+        List<ProductOrderDetail> orderDetails = orderDetailSvc.findByProductOrderId(orderNo);
         
         model.addAttribute("order", order);
         model.addAttribute("orderDetails", orderDetails);

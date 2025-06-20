@@ -1,5 +1,6 @@
 package com.islevilla.jay.operationLog.model;
 
+import com.islevilla.yin.employee.model.Employee;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;

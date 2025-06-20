@@ -1,10 +1,15 @@
 package com.islevilla.jay.productOrder.model;
 
 import com.islevilla.jay.coupon.model.Coupon;
-import com.islevilla.member.model.Member;
+import com.islevilla.jay.productOrderDetail.model.ProductOrderDetail;
+import com.islevilla.lai.members.model.Members;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "product_order")
@@ -17,7 +22,7 @@ public class ProductOrder {
 
     @ManyToOne
     @JoinColumn(name = "member_id")
-    private Member member;
+    private Members member;
 
     @ManyToOne
     @JoinColumn(name = "coupon_id")
@@ -39,15 +44,15 @@ public class ProductOrder {
     private Byte shippingMethod;
 
     @Column(name = "contact_address", length = 200)
-    @NotNull(message = "聯絡地址不能為空")
+    @NotEmpty(message = "聯絡地址不能為空")
     private String contactAddress;
 
     @Column(name = "contact_name", length = 30)
-    @NotNull(message = "聯絡人姓名不能為空")
+    @NotEmpty(message = "聯絡人姓名不能為空")
     private String contactName;
 
     @Column(name = "contact_phone", length = 20)
-    @NotNull(message = "聯絡人電話不能為空")
+    @NotEmpty(message = "聯絡人電話不能為空")
     private String contactPhone;
 
     @Column(name = "product_order_status", nullable = false)
@@ -55,6 +60,9 @@ public class ProductOrder {
 
     @Column(name = "product_order_time", nullable = false)
     private LocalDateTime orderTime;
+
+    @OneToMany(mappedBy = "productOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductOrderDetail> orderDetails = new ArrayList<>();
 
     // 無參數建構子（JPA 要求）
     public ProductOrder() {
@@ -69,11 +77,11 @@ public class ProductOrder {
         this.productOrderId = productOrderId;
     }
 
-    public Member getMember() {
+    public Members getMember() {
         return member;
     }
 
-    public void setMember(Member member) {
+    public void setMember(Members member) {
         this.member = member;
     }
 
@@ -163,5 +171,13 @@ public class ProductOrder {
 
     public void setOrderTime(LocalDateTime orderTime) {
         this.orderTime = orderTime;
+    }
+
+    public List<ProductOrderDetail> getProductOrderDetails() {
+        return orderDetails;
+    }
+
+    public void setProductOrderDetails(List<ProductOrderDetail> orderDetails) {
+        this.orderDetails = orderDetails;
     }
 }

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>訂單詳情 | 微嶼</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+    <style>
+        body {
+            font-family: "Helvetica Neue", sans-serif;
+            background-color: #fdfdfd;
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .order-info {
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .order-info p {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .order-info span {
+            font-weight: 500;
+            color: #435334;
+        }
+
+        .table {
+            background-color: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .table thead th {
+            background-color: #435334;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-weight: 500;
+        }
+
+        .table tbody td {
+            padding: 15px;
+            vertical-align: middle;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .btn-back {
+            background-color: #9eb384;
+            border-color: #9eb384;
+            color: white;
+            padding: 10px 30px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-back:hover {
+            background-color: #7a8c6a;
+            border-color: #7a8c6a;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .lead {
+            font-size: 17px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== 載入Header ===== -->
+    <div th:replace="~{fragments/fragments :: header}"></div>
+
+    <main class="container py-5">
+        <h1 class="section-title text-center mb-5">訂單詳情</h1>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="order-info">
+                    <p class="lead">訂單編號：<span th:text="${order.productOrderId}"></span></p>
+                    <p class="lead">訂單日期：<span th:text="${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm:ss')}"></span></p>
+                    <p class="lead">訂單金額：<span th:text="${order.productOrderAmount}"></span></p>
+                    <p class="lead">折扣金額：<span th:text="${order.discountAmount}"></span></p>
+                    <p class="lead">實付金額：<span th:text="${order.productPaidAmount}"></span></p>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>商品名稱</th>
+                                <th>數量</th>
+                                <th>單價</th>
+                                <th>小計</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="detail : ${orderDetails}">
+                                <td th:text="${detail.productName.productName}"></td>
+                                <td th:text="${detail.productOrderQuantity}"></td>
+                                <td th:text="${detail.productOrderPrice}"></td>
+                                <td th:text="${detail.productOrderQuantity * detail.productOrderPrice}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button onclick="goBack()" class="btn btn-back">回上一頁</button>
+        </div>
+    </main>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html> 

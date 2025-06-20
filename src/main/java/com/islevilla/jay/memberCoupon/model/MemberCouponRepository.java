@@ -42,7 +42,4 @@ public interface MemberCouponRepository extends JpaRepository<MemberCoupon, Memb
 
     @Query("SELECT mc FROM MemberCoupon mc WHERE mc.member.memberId = :memberId")
     List<MemberCoupon> findMemberCouponsByMemberId(@Param("memberId") Integer memberId);
-
-    // 檢查會員是否已使用過此優惠券
-    boolean existsByMemberIdAndCouponId(Integer memberId, Integer couponId);
 } 
