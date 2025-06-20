@@ -68,4 +68,11 @@ public class CartService {
             jedis.hdel(cartKey, productId.toString());
         }
     }
+
+    public void clearCart(String userId) {
+        try (Jedis jedis = new Jedis("localhost", 6379)) {
+            String cartKey = getCartKey(userId);
+            jedis.del(cartKey);
+        }
+    }
 }
