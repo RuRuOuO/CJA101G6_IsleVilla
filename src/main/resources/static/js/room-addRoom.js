@@ -153,10 +153,21 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // 返回頁面函數（全域函數，供HTML onclick使用）
-function goBack() {
-    window.location.href = '/selectPage.html'
-    }
-
+function goSelectRoomPage() {
+    window.location.href = '/selectRoomPage.html'
+}
+function goAddRoom() {
+    window.location.href = '/addRoom.html'
+}
+function goUpdateRoom() {
+    window.location.href = '/updateRoom.html'
+}
+function goFindRoom() {
+    window.location.href = '/findRoom.html'
+}
+function goListAllRoom() {
+    window.location.href = '/ListAllRoom.html'
+}
 // 重置表單函數（全域函數，供HTML onclick使用）
 function resetForm() {
 	const form = document.getElementById('roomForm');

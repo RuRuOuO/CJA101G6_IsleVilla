@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>微嶼 | 查詢房間</title>
+
+    <!-- 通用樣式 -->
+    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+    <link href="/css/room-addRoom.css" rel="stylesheet">
+  </head>
+  <body>
+    <!-- Header -->
+    <div th:replace="~{fragments/fragments :: header}"></div>
+
+    <main>
+      <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center py-4">
+        <div class="row w-100 justify-content-center">
+          <div class="col-12 col-md-10 col-lg-8 col-xl-6">
+            <div class="card shadow-lg border-0 rounded-4">
+              <div class="card-header bg-primary text-white text-center py-4 rounded-top-4">
+                <h1 class="h3 mb-0"><i class="bi bi-search me-2"></i>房間查詢</h1>
+              </div>
+
+              <div class="card-body p-4">
+                  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="goSelectRoomPage()">
+                       <i class="bi bi-arrow-left me-1"></i>回到查詢頁面
+                   </button>
+                  </div>
+                <tr>
+                    <th>房間ID</th>
+                    <th>房型編號</th>
+                    <th>房型名稱</th>
+                    <th>房間狀態</th>
+                    <th>修改</th>
+                    <th>刪除</th>
+                </tr>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+     <!-- JS -->
+   	 <script src="/js/room-addRoom.js"></script>
+    </main>
+    <!-- Footer -->
+    <div th:replace="~{fragments/fragments :: footer}"></div>
+
+    <script>
+      function resetForm() {
+        const form = document.getElementById('searchForm');
+        form.reset();
+        const inputs = form.querySelectorAll('.form-control, .form-select');
+        inputs.forEach(input => input.classList.remove('is-valid', 'is-invalid'));
+      }
+    </script>
+  </body>
+</html>

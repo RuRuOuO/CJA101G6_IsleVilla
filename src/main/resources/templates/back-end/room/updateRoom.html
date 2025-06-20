@@ -3,41 +3,50 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>微嶼 | 查詢房間</title>
-
-    <!-- 通用樣式 -->
+    <title>微嶼 | Isle Villa房號</title>
+    <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
     <link href="/css/room-addRoom.css" rel="stylesheet">
   </head>
   <body>
-    <!-- Header -->
+    <!-- ===== 載入Header ===== -->
     <div th:replace="~{fragments/fragments :: header}"></div>
-
+    <!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
     <main>
-      <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center py-4">
+    <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center py-4">
         <div class="row w-100 justify-content-center">
-          <div class="col-12 col-md-10 col-lg-8 col-xl-6">
-            <div class="card shadow-lg border-0 rounded-4">
-              <div class="card-header bg-primary text-white text-center py-4 rounded-top-4">
-                <h1 class="h3 mb-0"><i class="bi bi-search me-2"></i>房間查詢</h1>
-              </div>
+            <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-header bg-primary text-white text-center py-4 rounded-top-4">
+                        <h1 class="h3 mb-0">
+                            <i class="bi bi-house-add me-2"></i>新增房間ID
+                        </h1>
+                    </div>
+                    
+                    <div class="card-body p-4">
+                        <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <div>
+                                <strong>提示：</strong>請填寫完整的房間資訊，所有欄位都是必填的。
+                            </div>
+                        </div>
 
-              <div class="card-body p-4">
-            	  <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
-             		  <i class="bi bi-info-circle me-2"></i>
-              			 <div>
-                   			<strong>提示：</strong>可以使用單一條件或組合條件進行查詢，留空的欄位將不作為查詢條件。
-               			</div>
-                 </div>
-                <form id="searchForm" method="get" action="/backend/room/search" class="mb-3">
+                        <div th:if="${successMessage}" class="alert alert-success" id="successMessage" role="alert">
+                            <span th:text="${successMessage}"></span>
+                        </div>
+                        <div th:if="${errorMessage}" class="alert alert-error" id="errorMessage" role="alert">
+                                <ul class="mb-0">
+							        <li th:each="msg : ${errorMessage}" th:text="${msg}"></li>
+							    </ul>
+                        </div>
+
+                        <form id="roomForm" th:action="@{/backend/room/addRoom}" th:object="${room}" method="post" novalidate>
                             <div class="mb-3">
                                 <label for="roomId" class="form-label">
                                     <i class="bi bi-door-open me-1"></i>房間ID *
                                 </label>
                                 <input 
-                                    type="number" 
-                                    id="roomId"  
-                                    name="roomId"  
+                                    type="number"
                                     class="form-control form-control-lg" 
                                     placeholder="請輸入房間ID（例如：501、510）"
                                     required
@@ -54,9 +63,7 @@
                                     <i class="bi bi-grid-3x3-gap me-1"></i>房型ID *
                                 </label>
                                 <input 
-                                    type="number" 
-                                    id="roomTypeId"
-                                    name="roomTypeId"
+                                    type="number"
                                     class="form-control form-control-lg" 
                                     placeholder="請輸入房型ID"
                                     required
@@ -73,8 +80,6 @@
                                     <i class="bi bi-flag me-1"></i>房間狀態 *
                                 </label>
                                 <select 
-                                    id="roomStatus" 
-                                    name="roomStatus"
                                     th:field="*{roomStatus}"  
                                     class="form-select form-select-lg" 
                                     required
@@ -90,38 +95,28 @@
                                 </div>
                             </div>
 
-                  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                    <a href="/backend/room/addRoom" class="btn btn-primary btn-lg px-4">
-                      <i class="bi bi-plus-circle me-1"></i>新增房間
-                    </a>
-                    <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="resetForm()">
-                      <i class="bi bi-arrow-clockwise me-1"></i>重置
-                    </button>
-                    <button type="submit" class="btn btn-success btn-lg px-4">
-                      <i class="bi bi-search me-1"></i>查詢
-                    </button>
-                    <a href="/backend/room/all" class="btn btn-dark btn-lg px-4">
-                      <i class="bi bi-list-ul me-1"></i>查詢全部
-                    </a>
-                  </div>
-                </form>
-              </div>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                 <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="goSelectRoomPage()">
+                                    <i class="bi bi-arrow-left me-1"></i>回到查詢頁面
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="resetForm()">
+                                    <i class="bi bi-arrow-clockwise me-1"></i>重置
+                                </button>
+                                <button type="submit" class="btn btn-primary btn-lg px-4">
+                                    <i class="bi bi-plus-circle me-1"></i>修改房間
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
+    </div>
+    <!-- JS -->
+    <script src="/js/room-addRoom.js"></script>
     </main>
-
-    <!-- Footer -->
+    <!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
+    <!-- ========== 載入Footer及Bootstrap JS ========== -->
     <div th:replace="~{fragments/fragments :: footer}"></div>
-
-    <script>
-      function resetForm() {
-        const form = document.getElementById('searchForm');
-        form.reset();
-        const inputs = form.querySelectorAll('.form-control, .form-select');
-        inputs.forEach(input => input.classList.remove('is-valid', 'is-invalid'));
-      }
-    </script>
   </body>
 </html>
