@@ -1,7 +1,7 @@
 package com.islevilla.jay.memberCoupon.model;
 
 import com.islevilla.jay.coupon.model.Coupon;
-import com.islevilla.member.model.Member;
+import com.islevilla.lai.members.model.Members;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,12 +55,16 @@ public class MemberCouponService {
         return repository.findMemberCouponsByMemberId(memberId);
     }
 
+    public List<MemberCoupon> findByCouponId(Integer couponId) {
+        return repository.findByCouponId(couponId);
+    }
+
     // 檢查會員是否已使用過此優惠券
     public boolean hasUsedCoupon(Integer memberId, Integer couponId) {
         return repository.existsByMemberIdAndCouponId(memberId, couponId);
     }
 
-    // 記錄優惠券使用
+    // 記錄優惠券使用（當會員使用優惠券時呼叫）
     public void recordCouponUsage(Integer memberId, Integer couponId) {
         MemberCoupon memberCoupon = new MemberCoupon();
         MemberCouponId id = new MemberCouponId(memberId, couponId);

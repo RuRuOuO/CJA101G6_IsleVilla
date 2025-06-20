@@ -7,11 +7,18 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h2>會員優惠券查詢</h2>
+        <h2>會員優惠券使用記錄查詢</h2>
         <div class="row mt-4">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-body">
+                        <div class="alert alert-info">
+                            <strong>查詢說明：</strong><br>
+                            • 只選擇會員：顯示該會員使用過的所有優惠券記錄<br>
+                            • 只選擇優惠券：顯示使用過該優惠券的所有會員記錄<br>
+                            • 同時選擇會員和優惠券：顯示該會員是否使用過該優惠券的記錄<br>
+                            • 都不選擇：顯示所有會員優惠券使用記錄
+                        </div>
                         <form action="/member-coupon/listAllMemberCoupon" method="get">
                             <div class="form-group">
                                 <label for="memberId">會員</label>

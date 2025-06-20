@@ -894,46 +894,33 @@ INSERT INTO product_order (
 
 -- 商品訂單明細 product_order_detail （楊捷）（已更新）
 CREATE TABLE product_order_detail (
-    product_order_id        INT NOT NULL,  -- 訂單編號 (PK, FK)
-    product_id              INT NOT NULL,  -- 商品編號 (PK, FK)
-    product_order_price     INT NOT NULL,  -- 商品價格
-    product_order_quantity  INT NOT NULL,  -- 商品訂購數量
-    CONSTRAINT pk_product_order_id_product_id PRIMARY KEY (product_order_id, product_id),
-    -- 外來鍵設定
-	FOREIGN KEY (product_order_id) REFERENCES product_order(product_order_id),
-	FOREIGN KEY (product_id) REFERENCES product(product_id)
+    product_order_id      INT           NOT NULL,                                      -- 訂單編號 (FK)
+    product_id            INT           NOT NULL,                                      -- 商品編號 (FK)
+    product_order_price   INT           NOT NULL,                                      -- 商品訂購價格
+    product_order_quantity INT          NOT NULL,                                      -- 商品訂購數量
+    product_name          VARCHAR(100)  NOT NULL,                                      -- 商品名稱 (FK)
+    PRIMARY KEY (product_order_id, product_id),                                       -- 複合主鍵
+    FOREIGN KEY (product_order_id) REFERENCES product_order(product_order_id),
+    FOREIGN KEY (product_id) REFERENCES product(product_id),
+    FOREIGN KEY (product_name) REFERENCES product(product_name)
 );
 
-/* before
-INSERT INTO product_order_detail (product_order_id, product_id, product_order_price, product_order_quantity)
-VALUES (1, 1, 1990, 1),
-       (2, 2, 350, 4),
-       (3, 3, 150, 1),
-       (4, 9, 999, 1),
-       (5, 10, 1200, 1),
-       (6, 5, 1250, 2),
-       (6, 6, 799, 2),
-       (6, 7, 1380, 2),
-       (7, 10, 1200, 3),
-       (7, 2, 350, 1),
-       (7, 3, 150, 1);
-*/
 /* after */
-INSERT INTO product_order_detail (product_order_id, product_id, product_order_price, product_order_quantity)
-VALUES (1,  1,  1990, 1),
-	   (2,  2,  350,  4),
-       (3,  3,  150,  1),
-       (4,  9,  999,  1),
-       (5,  10, 1200, 1),
-       (6,  5,  1250, 2),
-       (6,  6,  799,  2),
-       (6,  7,  1380, 2),
-       (7,  10, 1200, 3),
-       (7,  2,  350,  1),
-       (7,  3,  150,  1),
-       (8,  3,  150,  30),
-       (9,  3,  150,  2),
-       (10, 2,  350,  1);
+INSERT INTO product_order_detail (product_order_id, product_id, product_order_price, product_order_quantity, product_name)
+VALUES (1,  1,  1990, 1, '咖啡禮盒'),
+       (2,  2,  350,  4, '造型吊飾'),
+       (3,  3,  150,  1, '海島香氛片'),
+       (4,  9,  999,  1, '海島香水'),
+       (5,  10, 1200, 1, '造型擺件'),
+       (6,  5,  1250, 2, '風景拼圖'),
+       (6,  6,  799,  2, '椰子樹項鍊'),
+       (6,  7,  1380, 2, '海島名產禮盒'),
+       (7,  10, 1200, 3, '波浪耳飾'),
+       (7,  2,  350,  1, '造型環保杯'),
+       (7,  3,  150,  1, '海島香水'),
+       (8,  3,  150,  30, '海島名產禮盒'),
+       (9,  3,  150,  2, '海島香水'),
+       (10, 2,  350,  1, '海島名產禮盒');
 
 -- DROP TABLE IF EXISTS product_order_detail;
 

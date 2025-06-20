@@ -7,11 +7,35 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h2>會員優惠券列表</h2>
+        <h2>
+            <span th:if="${selectedMemberId != null and selectedCouponId != null}">
+                會員編號 <span th:text="${selectedMemberId}"></span> 的優惠券編號 <span th:text="${selectedCouponId}"></span> 使用記錄
+            </span>
+            <span th:if="${selectedMemberId != null and selectedCouponId == null}">
+                會員編號 <span th:text="${selectedMemberId}"></span> 的優惠券使用記錄
+            </span>
+            <span th:if="${selectedMemberId == null and selectedCouponId != null}">
+                優惠券編號 <span th:text="${selectedCouponId}"></span> 的使用會員記錄
+            </span>
+            <span th:if="${selectedMemberId == null and selectedCouponId == null}">
+                所有會員優惠券使用記錄
+            </span>
+        </h2>
         <div class="row mt-4">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-body">
+                        <div th:if="${selectedMemberId != null or selectedCouponId != null}" class="alert alert-info">
+                            <span th:if="${selectedMemberId != null and selectedCouponId != null}">
+                                目前顯示會員編號 <strong th:text="${selectedMemberId}"></strong> 的優惠券編號 <strong th:text="${selectedCouponId}"></strong> 使用記錄
+                            </span>
+                            <span th:if="${selectedMemberId != null and selectedCouponId == null}">
+                                目前顯示會員編號 <strong th:text="${selectedMemberId}"></strong> 的優惠券使用記錄
+                            </span>
+                            <span th:if="${selectedMemberId == null and selectedCouponId != null}">
+                                目前顯示優惠券編號 <strong th:text="${selectedCouponId}"></strong> 的使用會員記錄
+                            </span>
+                        </div>
                         <table class="table table-striped">
                             <thead>
                                 <tr>
@@ -39,7 +63,7 @@
                                     <td>
                                         <a th:href="@{/member-coupon/delete(memberId=${memberCoupon.id.memberId}, couponId=${memberCoupon.id.couponId})}" 
                                            class="btn btn-danger btn-sm"
-                                           onclick="return confirm('確定要刪除此會員優惠券嗎？')">刪除</a>
+                                           onclick="return confirm('確定要刪除此優惠券使用記錄嗎？')">刪除</a>
                                     </td>
                                 </tr>
                             </tbody>
