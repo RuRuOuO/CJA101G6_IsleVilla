@@ -30,5 +30,15 @@ public interface ShuttleReservationRepository extends JpaRepository<ShuttleReser
 	@Query("SELECT COALESCE(SUM(sr.shuttleNumber), 0) FROM ShuttleReservation sr "
 			+ "WHERE sr.shuttleScheduleId = :scheduleId AND sr.shuttleDate = :date AND sr.shuttleReservationStatus = 1")
 	Integer getTotalReservedSeats(@Param("scheduleId") Integer scheduleId, @Param("date") LocalDate date);
+	
+	// 查詢特定日期和班次的預約數量
+    @Query("SELECT COUNT(sr) FROM ShuttleReservation sr WHERE sr.shuttleDate = :shuttleDate " +
+           "AND sr.shuttleScheduleId = :scheduleId AND sr.shuttleReservationStatus = 1")
+    Long countReservationsByDateAndSchedule(@Param("shuttleDate") LocalDate shuttleDate, 
+                                          @Param("scheduleId") Integer scheduleId);
+    
+    // 查詢會員在特定日期的預約
+    List<ShuttleReservation> findByMemberIdAndShuttleDateAndShuttleReservationStatus(
+        Integer memberId, LocalDate shuttleDate, Integer status);
 
 }
