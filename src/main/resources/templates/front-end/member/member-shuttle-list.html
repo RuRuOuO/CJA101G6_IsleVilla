@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>微嶼 | Isle Villa</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+</head>
+<body>
+<!-- ===== 載入Header ===== -->
+<div th:replace="~{fragments/fragments :: header}"></div>
+<main>
+    <div class="container py-5">
+        <h2 class="text-center mb-4">會員專區</h2>
+        <div class="row">
+            <!-- ===== 載入側邊欄 ===== -->
+            <div th:replace="~{fragments/fragments :: memberSidebar(activeTab='shuttle')}"></div>
+            <!-- 右側內容區 -->
+            <div class="col-md-9">
+                <!-- //////////////////// 會員頁面內容放這裡 //////////////////// -->
+
+                <!-- //////////////////// 會員頁面內容放這裡 //////////////////// -->
+            </div>
+        </div>
+    </div>
+</main>
+<!-- ========== 載入Footer ========== -->
+<footer th:replace="~{fragments/fragments :: footer}"></footer>
+</body>
+</html>
