@@ -33,7 +33,7 @@
                 <td class="text-end">
                     <!-- 減少數量按鈕 -->
                     <button type="button" class="btn btn-outline-secondary btn-sm"
-                            th:onclick="'decreaseQuantity(' + ${item.productId} + ')'">-
+                            th:data-product-id="${item.productId}" onclick="updateQuantity(event, -1)">-
                     </button>
 
                     <!-- 顯示商品數量 -->
@@ -42,7 +42,7 @@
 
                     <!-- 增加數量按鈕 -->
                     <button type="button" class="btn btn-outline-secondary btn-sm"
-                            th:onclick="'increaseQuantity(' + ${item.productId} + ')'">+
+                            th:data-product-id="${item.productId}" onclick="updateQuantity(event, 1)">+
                     </button>
 
                     <!-- 提交表單更新數量 -->
@@ -77,30 +77,26 @@
     </div>
 </main>
 
+<!-- 佔位元素 -->
+<div style="height: 55px"></div>
 <!-- ========== 載入Footer ========== -->
 <div th:replace="~{fragments/fragments :: footer}"></div>
 
 <script>
-    // 增加數量
-    function increaseQuantity(productId) {
+    // 更新商品數量
+    function updateQuantity(event, change) {
+        var productId = event.target.getAttribute("data-product-id");
         var quantityInput = document.getElementById("quantity-" + productId);
-        quantityInput.value = parseInt(quantityInput.value) + 1;
-        updateCart(productId, quantityInput.value);  // 更新購物車中的數量
-    }
+        var newQuantity = parseInt(quantityInput.value) + change;
 
-    // 減少數量
-    function decreaseQuantity(productId) {
-        var quantityInput = document.getElementById("quantity-" + productId);
-        if (parseInt(quantityInput.value) > 1) {
-            quantityInput.value = parseInt(quantityInput.value) - 1;
-            updateCart(productId, quantityInput.value);  // 更新購物車中的數量
+        // 確保數量不小於1
+        if (newQuantity < 1) {
+            newQuantity = 1;
         }
-    }
 
-    // 更新購物車中的商品數量
-    function updateCart(productId, quantity) {
+        quantityInput.value = newQuantity;
         var form = document.getElementById("updateForm-" + productId);
-        form.quantity.value = quantity;
+        form.quantity.value = newQuantity;  // 更新表單中的數量欄位
         form.submit();  // 提交表單以更新數量
     }
 </script>
