@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
     <title>微嶼 | Isle Villa</title>
     <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
@@ -31,26 +31,6 @@
             font-weight: bold;
             font-size: 2rem;
             margin-bottom: 1rem;
-        }
-
-        /* 方形圖片區塊 */
-        .square-img-wrapper {
-            position: relative;
-            width: 100%;
-            padding-top: 80%; /* 高度 = 寬度，產生正方形 */
-            overflow: hidden;
-            border-radius: 12px;
-            /* box-shadow: 5px 5px 20px rgba(0, 0, 0, 1); */
-        }
-
-        .square-img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* 保持圖片比例並填滿容器 */
-            box-shadow: inset 0 0px 20px rgba(0, 0, 0, 1);
         }
 
         /* about區塊 */
@@ -117,30 +97,21 @@
                 <div class="col-md-4" th:each="news : ${latestNews}">
                     <!-- 新增a標籤讓整個卡片可以點擊，並加上樣式 -->
                     <a class="text-decoration-none" th:href="@{'/news/' + ${news.newsId}}">
-                        <div class="card h-100 shadow-sm">
-                            <!-- 圖片-->
-                            <img
-                                    alt="消息圖片"
-                                    class="card-img-top w-100"
-                                    th:if="${news.newsImage != null}"
-                                    th:src="@{'/news/image/' + ${news.newsId}}"
-                            />
-                            <!-- 預設圖片 -->
-                            <img
-                                    alt="消息圖片"
-                                    class="card-img-top w-100"
-                                    src="https://images.unsplash.com/photo-1624474161796-7685c6919523?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                                    style="height: 200px; object-fit: cover"
-                                    th:unless="${news.newsImage != null}"
-                            />
+                        <div class="card fixed-card shadow-sm">
+                            <img alt="消息圖片"
+                                 class="card-img-top"
+                                 th:if="${news.newsImage != null}"
+                                 th:src="@{'/news/image/' + ${news.newsId}}"/>
+
+                            <img alt="預設圖片"
+                                 class="card-img-top"
+                                 src="https://images.unsplash.com/photo-1624474161796-7685c6919523?q=80&w=1974&auto=format&fit=crop"
+                                 th:unless="${news.newsImage != null}"/>
+
                             <div class="card-body">
                                 <h5 class="card-title" th:text="${news.newsTitle}">標題</h5>
-                                <p
-                                        class="text-muted small"
-                                        th:text="${#temporals.format(news.newsTime, 'yyyy/MM/dd')}"
-                                >
-                                    日期
-                                </p>
+                                <p class="text-muted" th:text="${#temporals.format(news.newsTime, 'yyyy/MM/dd')}">
+                                    日期</p>
                                 <p class="card-text" th:text="${news.newsContent}">內容</p>
                             </div>
                         </div>
@@ -151,8 +122,8 @@
         <!-- 看更多 -->
         <div class="container mt-4 text-center">
             <a
-                    th:href="@{/news/list}"
                     class="btn btn-primary"
+                    th:href="@{/news/list}"
             >
                 看更多 <i class="fa-solid fa-arrow-right"></i>
             </a>
@@ -160,8 +131,8 @@
     </section>
     <!-- about區塊 -->
     <section
-            id="about"
             class="about-section text-white d-flex align-items-center"
+            id="about"
     >
         <div class="container">
             <div class="row">
@@ -176,132 +147,132 @@
                 </div>
             </div>
         </div>
-<!--        <div id="myCarousel" class="carousel slide mb-6" data-bs-ride="carousel">-->
-<!--            <div class="carousel-indicators">-->
-<!--                <button-->
-<!--                        type="button"-->
-<!--                        data-bs-target="#myCarousel"-->
-<!--                        data-bs-slide-to="0"-->
-<!--                        class="active"-->
-<!--                        aria-current="true"-->
-<!--                        aria-label="Slide 1"-->
-<!--                ></button>-->
-<!--                <button-->
-<!--                        type="button"-->
-<!--                        data-bs-target="#myCarousel"-->
-<!--                        data-bs-slide-to="1"-->
-<!--                        aria-label="Slide 2"-->
-<!--                ></button>-->
-<!--                <button-->
-<!--                        type="button"-->
-<!--                        data-bs-target="#myCarousel"-->
-<!--                        data-bs-slide-to="2"-->
-<!--                        aria-label="Slide 3"-->
-<!--                ></button>-->
-<!--            </div>-->
-<!--            <div class="carousel-inner">-->
-<!--                <div class="carousel-item active">-->
-<!--                    <svg-->
-<!--                            class="bd-placeholder-img"-->
-<!--                            width="100%"-->
-<!--                            height="100%"-->
-<!--                            xmlns="http://www.w3.org/2000/svg"-->
-<!--                            aria-hidden="true"-->
-<!--                            preserveAspectRatio="xMidYMid slice"-->
-<!--                    >-->
-<!--                        <rect-->
-<!--                                width="100%"-->
-<!--                                height="100%"-->
-<!--                                fill="var(&#45;&#45;bs-secondary-color)"-->
-<!--                        />-->
-<!--                    </svg>-->
-<!--                    <div class="container">-->
-<!--                        <div class="carousel-caption text-start">-->
-<!--                            <h1>Example headline.</h1>-->
-<!--                            <p class="opacity-75">-->
-<!--                                Some representative placeholder content for the first slide of-->
-<!--                                the carousel.-->
-<!--                            </p>-->
-<!--                            <p>-->
-<!--                                <a class="btn btn-lg btn-primary" href="#">Sign up today</a>-->
-<!--                            </p>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                <div class="carousel-item">-->
-<!--                    <svg-->
-<!--                            class="bd-placeholder-img"-->
-<!--                            width="100%"-->
-<!--                            height="100%"-->
-<!--                            xmlns="http://www.w3.org/2000/svg"-->
-<!--                            aria-hidden="true"-->
-<!--                            preserveAspectRatio="xMidYMid slice"-->
-<!--                    >-->
-<!--                        <rect-->
-<!--                                width="100%"-->
-<!--                                height="100%"-->
-<!--                                fill="var(&#45;&#45;bs-secondary-color)"-->
-<!--                        />-->
-<!--                    </svg>-->
-<!--                    <div class="container">-->
-<!--                        <div class="carousel-caption">-->
-<!--                            <h1>Another example headline.</h1>-->
-<!--                            <p>-->
-<!--                                Some representative placeholder content for the second slide-->
-<!--                                of the carousel.-->
-<!--                            </p>-->
-<!--                            <p><a class="btn btn-lg btn-primary" href="#">Learn more</a></p>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                <div class="carousel-item">-->
-<!--                    <svg-->
-<!--                            class="bd-placeholder-img"-->
-<!--                            width="100%"-->
-<!--                            height="100%"-->
-<!--                            xmlns="http://www.w3.org/2000/svg"-->
-<!--                            aria-hidden="true"-->
-<!--                            preserveAspectRatio="xMidYMid slice"-->
-<!--                    >-->
-<!--                        <rect-->
-<!--                                width="100%"-->
-<!--                                height="100%"-->
-<!--                                fill="var(&#45;&#45;bs-secondary-color)"-->
-<!--                        />-->
-<!--                    </svg>-->
-<!--                    <div class="container">-->
-<!--                        <div class="carousel-caption text-end">-->
-<!--                            <h1>One more for good measure.</h1>-->
-<!--                            <p>-->
-<!--                                Some representative placeholder content for the third slide of-->
-<!--                                this carousel.-->
-<!--                            </p>-->
-<!--                            <p>-->
-<!--                                <a class="btn btn-lg btn-primary" href="#">Browse gallery</a>-->
-<!--                            </p>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--            <button-->
-<!--                    class="carousel-control-prev"-->
-<!--                    type="button"-->
-<!--                    data-bs-target="#myCarousel"-->
-<!--                    data-bs-slide="prev"-->
-<!--            >-->
-<!--                <span class="carousel-control-prev-icon" aria-hidden="true"></span>-->
-<!--                <span class="visually-hidden">Previous</span>-->
-<!--            </button>-->
-<!--            <button-->
-<!--                    class="carousel-control-next"-->
-<!--                    type="button"-->
-<!--                    data-bs-target="#myCarousel"-->
-<!--                    data-bs-slide="next"-->
-<!--            >-->
-<!--                <span class="carousel-control-next-icon" aria-hidden="true"></span>-->
-<!--                <span class="visually-hidden">Next</span>-->
-<!--            </button>-->
-<!--        </div>-->
+        <!--        <div id="myCarousel" class="carousel slide mb-6" data-bs-ride="carousel">-->
+        <!--            <div class="carousel-indicators">-->
+        <!--                <button-->
+        <!--                        type="button"-->
+        <!--                        data-bs-target="#myCarousel"-->
+        <!--                        data-bs-slide-to="0"-->
+        <!--                        class="active"-->
+        <!--                        aria-current="true"-->
+        <!--                        aria-label="Slide 1"-->
+        <!--                ></button>-->
+        <!--                <button-->
+        <!--                        type="button"-->
+        <!--                        data-bs-target="#myCarousel"-->
+        <!--                        data-bs-slide-to="1"-->
+        <!--                        aria-label="Slide 2"-->
+        <!--                ></button>-->
+        <!--                <button-->
+        <!--                        type="button"-->
+        <!--                        data-bs-target="#myCarousel"-->
+        <!--                        data-bs-slide-to="2"-->
+        <!--                        aria-label="Slide 3"-->
+        <!--                ></button>-->
+        <!--            </div>-->
+        <!--            <div class="carousel-inner">-->
+        <!--                <div class="carousel-item active">-->
+        <!--                    <svg-->
+        <!--                            class="bd-placeholder-img"-->
+        <!--                            width="100%"-->
+        <!--                            height="100%"-->
+        <!--                            xmlns="http://www.w3.org/2000/svg"-->
+        <!--                            aria-hidden="true"-->
+        <!--                            preserveAspectRatio="xMidYMid slice"-->
+        <!--                    >-->
+        <!--                        <rect-->
+        <!--                                width="100%"-->
+        <!--                                height="100%"-->
+        <!--                                fill="var(&#45;&#45;bs-secondary-color)"-->
+        <!--                        />-->
+        <!--                    </svg>-->
+        <!--                    <div class="container">-->
+        <!--                        <div class="carousel-caption text-start">-->
+        <!--                            <h1>Example headline.</h1>-->
+        <!--                            <p class="opacity-75">-->
+        <!--                                Some representative placeholder content for the first slide of-->
+        <!--                                the carousel.-->
+        <!--                            </p>-->
+        <!--                            <p>-->
+        <!--                                <a class="btn btn-lg btn-primary" href="#">Sign up today</a>-->
+        <!--                            </p>-->
+        <!--                        </div>-->
+        <!--                    </div>-->
+        <!--                </div>-->
+        <!--                <div class="carousel-item">-->
+        <!--                    <svg-->
+        <!--                            class="bd-placeholder-img"-->
+        <!--                            width="100%"-->
+        <!--                            height="100%"-->
+        <!--                            xmlns="http://www.w3.org/2000/svg"-->
+        <!--                            aria-hidden="true"-->
+        <!--                            preserveAspectRatio="xMidYMid slice"-->
+        <!--                    >-->
+        <!--                        <rect-->
+        <!--                                width="100%"-->
+        <!--                                height="100%"-->
+        <!--                                fill="var(&#45;&#45;bs-secondary-color)"-->
+        <!--                        />-->
+        <!--                    </svg>-->
+        <!--                    <div class="container">-->
+        <!--                        <div class="carousel-caption">-->
+        <!--                            <h1>Another example headline.</h1>-->
+        <!--                            <p>-->
+        <!--                                Some representative placeholder content for the second slide-->
+        <!--                                of the carousel.-->
+        <!--                            </p>-->
+        <!--                            <p><a class="btn btn-lg btn-primary" href="#">Learn more</a></p>-->
+        <!--                        </div>-->
+        <!--                    </div>-->
+        <!--                </div>-->
+        <!--                <div class="carousel-item">-->
+        <!--                    <svg-->
+        <!--                            class="bd-placeholder-img"-->
+        <!--                            width="100%"-->
+        <!--                            height="100%"-->
+        <!--                            xmlns="http://www.w3.org/2000/svg"-->
+        <!--                            aria-hidden="true"-->
+        <!--                            preserveAspectRatio="xMidYMid slice"-->
+        <!--                    >-->
+        <!--                        <rect-->
+        <!--                                width="100%"-->
+        <!--                                height="100%"-->
+        <!--                                fill="var(&#45;&#45;bs-secondary-color)"-->
+        <!--                        />-->
+        <!--                    </svg>-->
+        <!--                    <div class="container">-->
+        <!--                        <div class="carousel-caption text-end">-->
+        <!--                            <h1>One more for good measure.</h1>-->
+        <!--                            <p>-->
+        <!--                                Some representative placeholder content for the third slide of-->
+        <!--                                this carousel.-->
+        <!--                            </p>-->
+        <!--                            <p>-->
+        <!--                                <a class="btn btn-lg btn-primary" href="#">Browse gallery</a>-->
+        <!--                            </p>-->
+        <!--                        </div>-->
+        <!--                    </div>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--            <button-->
+        <!--                    class="carousel-control-prev"-->
+        <!--                    type="button"-->
+        <!--                    data-bs-target="#myCarousel"-->
+        <!--                    data-bs-slide="prev"-->
+        <!--            >-->
+        <!--                <span class="carousel-control-prev-icon" aria-hidden="true"></span>-->
+        <!--                <span class="visually-hidden">Previous</span>-->
+        <!--            </button>-->
+        <!--            <button-->
+        <!--                    class="carousel-control-next"-->
+        <!--                    type="button"-->
+        <!--                    data-bs-target="#myCarousel"-->
+        <!--                    data-bs-slide="next"-->
+        <!--            >-->
+        <!--                <span class="carousel-control-next-icon" aria-hidden="true"></span>-->
+        <!--                <span class="visually-hidden">Next</span>-->
+        <!--            </button>-->
+        <!--        </div>-->
     </section>
 
     <!-- 交錯區塊 with 正方形圖片 -->
@@ -312,9 +283,9 @@
                 <div class="col-md-6">
                     <div class="square-img-wrapper">
                         <img
-                                src="https://images.unsplash.com/photo-1681452816108-d75e2a08f75d?q=80&w=2076&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                                 alt="客房介紹圖片"
                                 class="square-img shadow-sm"
+                                src="https://images.unsplash.com/photo-1681452816108-d75e2a08f75d?q=80&w=2076&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                         />
                     </div>
                 </div>
@@ -330,8 +301,8 @@
                     </p>
                     <!-- 看更多 -->
                     <a
-                            href="/src/main/resources/templates/front-end/news/newsList.html"
                             class="btn btn-primary mt-4"
+                            href="/src/main/resources/templates/front-end/news/newsList.html"
                     >
                         看更多 <i class="fa-solid fa-arrow-right"></i>
                     </a>
@@ -342,9 +313,9 @@
                 <div class="col-md-6">
                     <div class="square-img-wrapper">
                         <img
-                                src="https://images.unsplash.com/photo-1585351923007-bf6a01cb19de?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                                 alt="線上購物圖片"
                                 class="square-img shadow-sm"
+                                src="https://images.unsplash.com/photo-1585351923007-bf6a01cb19de?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                         />
                     </div>
                 </div>
@@ -360,8 +331,8 @@
                     </p>
                     <!-- 看更多 -->
                     <a
-                            th:href="@{/product}"
                             class="btn btn-primary mt-4"
+                            th:href="@{/product}"
                     >
                         看更多 <i class="fa-solid fa-arrow-right"></i>
                     </a>
@@ -372,9 +343,9 @@
                 <div class="col-md-6">
                     <div class="square-img-wrapper">
                         <img
-                                src="https://images.unsplash.com/photo-1497256654106-4a29efafb831?q=80&w=2099&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                                 alt="顧客服務圖片"
                                 class="square-img shadow-sm"
+                                src="https://images.unsplash.com/photo-1497256654106-4a29efafb831?q=80&w=2099&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                         />
                     </div>
                 </div>
@@ -389,8 +360,8 @@
                     </p>
                     <!-- 看更多 -->
                     <a
-                            href="/src/main/resources/templates/front-end/news/newsList.html"
                             class="btn btn-primary mt-4"
+                            href="/src/main/resources/templates/front-end/news/newsList.html"
                     >
                         看更多 <i class="fa-solid fa-arrow-right"></i>
                     </a>
@@ -401,9 +372,9 @@
                 <div class="col-md-6">
                     <div class="square-img-wrapper">
                         <img
-                                src="https://images.unsplash.com/photo-1585351923007-bf6a01cb19de?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                                 alt="會員專區圖片"
                                 class="square-img shadow-sm"
+                                src="https://images.unsplash.com/photo-1585351923007-bf6a01cb19de?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                         />
                     </div>
                 </div>
@@ -418,8 +389,8 @@
                     </p>
                     <!-- 看更多 -->
                     <a
-                            th:href="@{/member}"
                             class="btn btn-primary mt-4"
+                            th:href="@{/member}"
                     >
                         看更多 <i class="fa-solid fa-arrow-right"></i>
                     </a>
