@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>微嶼 | Isle Villa</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+</head>
+<body>
+<!-- ===== 載入Header ===== -->
+<div th:replace="~{fragments/fragments :: header}"></div>
+
+<!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
+<main>
+    <div class="container mt-5">
+        <h2 class="mb-4"> 購物車</h2>
+
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+            <tr>
+                <th>商品名稱</th>
+                <th class="text-end">單價</th>
+                <th class="text-end">數量</th>
+                <th class="text-end">小計</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${cartItems}">
+                <td th:text="${item.productName}"></td>
+                <td class="text-end">NT$ <span th:text="${item.productPrice}"></span></td>
+                <td class="text-end">
+                    <!-- 減少數量按鈕 -->
+                    <button type="button" class="btn btn-outline-secondary btn-sm"
+                            th:data-product-id="${item.productId}" onclick="updateQuantity(event, -1)">-
+                    </button>
+
+                    <!-- 顯示商品數量 -->
+                    <input th:id="'quantity-' + ${item.productId}" type="text" name="quantity"
+                           th:value="${item.quantity}" class="form-control d-inline" style="width: 60px;" readonly/>
+
+                    <!-- 增加數量按鈕 -->
+                    <button type="button" class="btn btn-outline-secondary btn-sm"
+                            th:data-product-id="${item.productId}" onclick="updateQuantity(event, 1)">+
+                    </button>
+
+                    <!-- 提交表單更新數量 -->
+                    <form th:id="'updateForm-' + ${item.productId}" th:action="@{/updateQuantity}" method="post"
+                          class="d-inline">
+                        <input type="hidden" name="productId" th:value="${item.productId}"/>
+                        <input type="hidden" name="quantity" th:value="${item.quantity}"/>
+                    </form>
+                </td>
+                <td class="text-end">NT$ <span th:text="${item.subtotal}"></span></td>
+                <td class="text-end">
+                    <form th:action="@{/removeFromCart}" method="post" class="d-inline">
+                        <input type="hidden" name="productId" th:value="${item.productId}"/>
+                        <button type="submit" class="btn btn-sm btn-danger">刪除</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr class="table-light">
+                <td colspan="3" class="text-end"><strong>總金額：</strong></td>
+                <td class="text-end">
+                    <strong>NT$ <span th:text="${totalAmount}"></span></strong>
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+
+        <!-- 結帳按鈕（目前是空白，稍後可以擴充） -->
+        <a href="#" class="btn btn-success">結帳</a>
+        <a th:href="@{/product}" class="btn btn-secondary ms-2">繼續購物</a>
+    </div>
+</main>
+
+<!-- 佔位元素 -->
+<div style="height: 55px"></div>
+<!-- ========== 載入Footer ========== -->
+<div th:replace="~{fragments/fragments :: footer}"></div>
+
+<script>
+    // 更新商品數量
+    function updateQuantity(event, change) {
+        var productId = event.target.getAttribute("data-product-id");
+        var quantityInput = document.getElementById("quantity-" + productId);
+        var newQuantity = parseInt(quantityInput.value) + change;
+
+        // 確保數量不小於1
+        if (newQuantity < 1) {
+            newQuantity = 1;
+        }
+
+        quantityInput.value = newQuantity;
+        var form = document.getElementById("updateForm-" + productId);
+        form.quantity.value = newQuantity;  // 更新表單中的數量欄位
+        form.submit();  // 提交表單以更新數量
+    }
+</script>
+</body>
+</html>

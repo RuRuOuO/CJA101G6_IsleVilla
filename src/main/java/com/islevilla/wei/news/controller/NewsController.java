@@ -1,7 +1,10 @@
 package com.islevilla.wei.news.controller;
 
+import com.islevilla.wei.PageUtil;
 import com.islevilla.wei.news.model.News;
 import com.islevilla.wei.news.model.NewsService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,21 +32,12 @@ public class NewsController {
             // @RequestParam 從網址參數中取值，defaultValue 設定預設值
             @RequestParam(defaultValue = "0") int page,    // 頁碼從 0 開始
             @RequestParam(defaultValue = "9") int size,    // 每頁 9 筆新聞
-            Model model) {
-
-        // 建立分頁物件，設定頁碼、每頁筆數、排序方式
-        // Sort.by("newsTime").descending() 表示按新聞時間降序排列（最新的在前面）
+            Model model,
+            HttpServletRequest request) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("newsTime").descending());
-
-        // 呼叫 Service 層取得分頁資料
         Page<News> newsPage = newsService.getPublished(pageable);
 
-        // 將資料加入到 Model 中，供前端模板使用
-        model.addAttribute("newsList", newsPage.getContent());        // 當前頁的新聞資料
-        model.addAttribute("currentPage", page);                      // 目前頁碼
-        model.addAttribute("totalPages", newsPage.getTotalPages());   // 總頁數
-        model.addAttribute("totalItems", newsPage.getTotalElements()); // 總筆數
-
+        PageUtil.ModelWithPage(newsPage, model, page, "newsList", request);
         // 返回模板路徑，對應到 src/main/resources/templates/front-end/news/newsList.html
         return "front-end/news/listAllNews";
     }
@@ -53,20 +48,12 @@ public class NewsController {
             // @RequestParam 從網址參數中取值，defaultValue 設定預設值
             @RequestParam(defaultValue = "0") int page,    // 頁碼從 0 開始
             @RequestParam(defaultValue = "9") int size,    // 每頁 9 筆新聞
-            Model model) {
-
-        // 建立分頁物件，設定頁碼、每頁筆數、排序方式
-        // Sort.by("newsTime").descending() 表示按新聞時間降序排列（最新的在前面）
+            Model model,
+            HttpServletRequest request) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("newsTime").descending());
+        Page<News> newsPage = newsService.getPublished(pageable);
 
-        // 呼叫 Service 層取得分頁資料
-        Page<News> newsPage = newsService.getAll(pageable);
-
-        // 將資料加入到 Model 中，供前端模板使用
-        model.addAttribute("newsList", newsPage.getContent());        // 當前頁的新聞資料
-        model.addAttribute("currentPage", page);                      // 目前頁碼
-        model.addAttribute("totalPages", newsPage.getTotalPages());   // 總頁數
-        model.addAttribute("totalItems", newsPage.getTotalElements()); // 總筆數
+        PageUtil.ModelWithPage(newsPage, model, page, "newsList", request);
 
         // 返回模板路徑，對應到 src/main/resources/templates/front-end/news/newsList.html
         return "back-end/news/listAllNews";
@@ -81,7 +68,13 @@ public class NewsController {
 
     // 新增消息
     @PostMapping("/backend/news/add")
-    public String addNews(@ModelAttribute("news") News news) {
+    public String addNews(@Valid @ModelAttribute("news") News news,
+                          BindingResult result,
+                          Model model) {
+        if (result.hasErrors()) {
+            return "back-end/news/addNews";
+        }
+
         newsService.addNews(news);
         return "redirect:/backend/news/list";
     }

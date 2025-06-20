@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>微嶼 | Isle Villa 後台首頁</title>
+  <!-- ===== 載入統一樣式 ===== -->
+  <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+</head>
+<body>
+<!-- ===== 載入sidebar ===== -->
+<!-- 插入手機版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+<!-- 插入桌面版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+
+<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+  <th:block th:fragment="myContent">
+    <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+    <div class="container">
+      <h2 class="card-title">範例標題</h2>
+      <a href="/product/backend/new" class="btn btn-success mb-4">新增商品</a>
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th>#</th>
+          <th>商品名稱</th>
+          <th>價格</th>
+          <th>庫存量</th>
+          <th>狀態</th>
+          <th>類別</th>
+          <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="prod : ${product}">
+          <td th:text="${prod.productId}">1</td>
+          <td th:text="${prod.productName}">商品名稱</td>
+          <td th:text="${prod.productPrice}">100</td>
+          <td th:text="${prod.productQuantity}">50</td>
+          <td th:text="${prod.productStatus == 1 ? '上架' : '下架'}">上架</td>
+          <td th:text="${prod.productCategory.productCategoryName}">類別名稱</td>
+          <td>
+            <!-- 修改按鈕 -->
+            <a href="/product/backend/edit/{id}" th:href="@{/product/backend/edit/{id}(id=${prod.productId})}" class="btn btn-primary btn-sm">修改</a>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+  </th:block>
+
+</main>
+</body>
+</html>

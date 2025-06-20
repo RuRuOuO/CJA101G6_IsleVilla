@@ -20,14 +20,14 @@
                 crossorigin="anonymous"
                 src="https://kit.fontawesome.com/d4a9524440.js"
         ></script>
-        <!-- 覆蓋樣式 -->
-        <link
-                href="https://cdn.jsdelivr.net/gh/RuRuOuO/CJA101G6_IsleVilla@main/src/main/resources/static/css/custom_style.css"
-                rel="stylesheet"
-        />
-        <link rel="stylesheet" href="/static/css/custom_style.css">
         <!-- bootstrap icon -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
+        <!-- 覆蓋樣式 -->
+        <link
+                href="https://cdn.jsdelivr.net/gh/RuRuOuO/CJA101G6_IsleVilla@WeiJing/src/main/resources/static/css/custom_style.css"
+                rel="stylesheet"
+        />
+        <link href="/css/custom_style.css" rel="stylesheet">
     </th:block>
     <!-- ----- 統一載入樣式段落結束 ----- -->
 </head>
@@ -97,14 +97,14 @@
                     <li class="nav-item">
                         <a
                                 class="nav-link"
-                                th:href="@{/member}"
+                                th:href="@{/member/room/list}"
                         >會員專區</a
                         >
                     </li>
                 </ul>
                 <div>
                     <li class="btn btn-dark">
-                        <a class="nav-link" th:href="@{/member-login}"><i class="bi bi-box-arrow-in-right"></i> 會員登入</a>
+                        <a class="nav-link" th:href="@{/member/login}"><i class="bi bi-box-arrow-in-right"></i> 會員登入</a>
                     </li>
                 </div>
             </div>
@@ -114,11 +114,56 @@
     <div style="height: 55px"></div>
 </header>
 <!-- ----- 統一header結束 ----- -->
+<!-- ===== 側邊欄 開始 ===== -->
+<div class="col-md-3 mb-4" th:fragment="memberSidebar">
+    <div class="nav flex-column nav-pills" id="memberTabs" role="tablist" aria-orientation="vertical">
+        <a class="nav-link" th:href="@{/member/room/list}" th:classappend="${activeTab == 'room'} ? ' active'">
+            住宿訂單
+        </a>
+        <a class="nav-link" th:href="@{/member/shuttle/list}" th:classappend="${activeTab == 'shuttle'} ? 'active'">
+            接駁訂單
+        </a>
+        <a class="nav-link" th:href="@{/member/product/list}" th:classappend="${activeTab == 'product'}?'active'">
+            購物訂單
+        </a>
+        <a class="nav-link" th:href="@{/member/info}" th:classappend="${activeTab == 'info'}?'active'">
+            會員資訊
+        </a>
+    </div>
+</div>
+<!-- ----- 側邊欄 結束 ----- -->
+<!-- ===== 分頁按鈕 Fragment 開始 ===== -->
+<nav aria-label="Page navigation" class="mt-5" th:fragment="paginationFragment(currentPage, totalPages, pageURL)">
+    <ul class="pagination justify-content-center">
+        <!-- 上一頁 -->
+        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+            <a aria-label="Previous" class="page-link"
+               th:href="@{${pageURL}(page=${currentPage - 1})}">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+
+        <!-- 頁碼 -->
+        <li class="page-item"
+            th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+            th:classappend="${currentPage == i} ? 'active'">
+            <a class="page-link"
+               th:href="@{${pageURL}(page=${i})}"
+               th:text="${i + 1}">1</a>
+        </li>
+
+        <!-- 下一頁 -->
+        <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+            <a aria-label="Next" class="page-link"
+               th:href="@{${pageURL}(page=${currentPage + 1})}">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+<!-- ===== 分頁按鈕 Fragment 結束 ===== -->
 <!-- ===== 統一Footer開始 ===== -->
-<footer
-        class="footer bg-secondary text-light py-5 justify-content-center"
-        th:fragment="footer"
->
+<footer class="footer bg-secondary text-light py-5 justify-content-center" th:fragment="footer">
     <a class="btn btn-dark booking-fixed-btn" href="#booking"> 立即預訂 </a>
     <div class="container">
         <div class="row">

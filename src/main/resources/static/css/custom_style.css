@@ -1,107 +1,211 @@
+/* ==================== 色系設定 ==================== */
+
 /* 自訂 primary 顏色 */
 .btn-primary,
 .bg-primary,
-.text-primary,
 .border-primary {
-  background-color: rgb(200,210,0) !important;
-  color: rgb(255,255,255) !important;
-  border-color: rgb(200,210,0) !important;
+    background-color: rgb(200, 210, 0) !important;
+    color: rgb(255, 255, 255) !important;
 }
-/* 
+
+/* 自訂 dark 顏色 */
 .btn-dark,
 .bg-dark,
-.text-dark,
-.border-dark {
-  background-color: rgb(0,40,60) !important;
-  color: rgb(255,255,255) !important;
-  border-color: rgb(255,255,255) !important;
-} */
-
-/* 自訂 secondary */
-/* .btn-secondary,
-.bg-secondary,
-.text-secondary,
-.border-secondary {
-  background-color: rgb(130,180,200) !important;
-  color: #fff !important;
-  border-color: lightblue !important;
-} */
+.border-dark,
+.nav-link.active {
+    /*background: linear-gradient(to right, rgb(0, 0, 0) 0%, rgb(81, 127, 164) 100%) !important;*/
+    background: linear-gradient(to right, rgb(0, 0, 0) 0%, rgb(81, 127, 164) 100%) !important;
+    color: rgb(255, 255, 255) !important;
+    border: 1px solid white;
+}
 
 /* Hover 效果 */
-.nav-link:hover {
-  background-color: #e2e6ea;
-  color: #212529;
-}
+/*.nav-link:hover {*/
+/*    background-color: #e2e6ea;*/
+/*    color: #212529;*/
+/*}*/
 
-.btn-dark{
-  border: 1px solid white;
-}
 
-/* 可依照需要加上其他色系 */
+/* ==================== 統一樣式 ==================== */
 
 /* 全站取消圓角 */
 * {
-  border-radius: 0px !important;
+    border-radius: 0px !important;
+    font-family: "Noto Sans TC", sans-serif;
 }
 
-/*  */
-.navbar-nav {
-  display: flex;
-  gap: 1rem;
-}
-.btn{
-  box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.1);
-}
-
-* {
-  font-family: "Noto Sans TC", sans-serif;
-}
-
-p, .btn, .nav-link, li{
-  font-size:15px;
-}
-
-.nav-item.divider {
-  pointer-events: none;
-  user-select: none;
-  opacity: 0.5;
-  font-size: 0.5rem; /* 可調整大小 */
+/* 文字大小統一 */
+p,
+.btn,
+.nav-link,
+li {
+    font-size: 15px;
 }
 
 .footer li {
-  font-size: 14px;
+    font-size: 14px;
 }
 
+
+/* ==================== 元件樣式 ==================== */
+
+/* Navbar 導覽列間距 */
+.navbar-nav {
+    display: flex;
+    gap: 1rem;
+}
+
+/* nav 中的分隔線樣式 */
+.nav-item.divider {
+    pointer-events: none;
+    user-select: none;
+    opacity: 0.5;
+    font-size: 0.5rem; /* 可調整大小 */
+}
+
+/* 按鈕陰影 */
+.btn {
+    border: 1px solid white;
+    box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.1);
+}
+
+.btn:hover {
+    border: 1px solid white;
+}
+
+/* 卡片圖片尺寸設定 */
 .card-img-top {
-  height: 300px; /* 你可以依需要調整高度 */
-  object-fit: cover;
+    height: 300px;
+    object-fit: cover;
 }
 
-/*.container{*/
-/*  padding-left:3em;*/
-/*  padding-right:3em;*/
-/*}*/
-
-/* 固定在畫面上的立即預定按鈕 */
+/* 固定在畫面上的立即預訂按鈕 */
 .booking-fixed-btn {
-  position: fixed;
-  bottom: 48px;
-  right: 60px;
-  padding: 12px 30px;
-  z-index: 1050; /* 確保在其他元素上面 */
-  box-shadow: 0 0px 20px rgba(255, 255, 200, 1);
+    position: fixed;
+    bottom: 48px;
+    right: 60px;
+    padding: 12px 30px;
+    z-index: 1050;
+    box-shadow: 0 0px 20px rgba(255, 255, 255, 1);
 }
+
+
+/* ==================== Layout ==================== */
 
 html, body {
-  height: 100%;
-  margin: 0;
+    height: 100%;
+    margin: 0;
 }
 
 body {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 main {
-  flex: 1;
+    flex: 1;
+}
+
+footer {
+    margin-top: auto;
+}
+
+/* ==================== 表單錯誤訊息 ==================== */
+
+.error {
+    color: #ff0000;
+    font-style: italic;
+    font-weight: lighter;
+}
+
+.errorblock {
+    color: #000;
+    background-color: #ffeeee;
+    border: 3px solid #ff0000;
+    padding: 5px;
+    margin: 5px;
+    width: 500px;
+    font-weight: normal;
+}
+
+
+/* ==================== 圖片區塊 ==================== */
+
+/* 方形圖片容器 */
+.square-img-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 80%; /* 高度 = 寬度 × 0.8 */
+    overflow: hidden;
+    border-radius: 12px;
+    /* box-shadow: 5px 5px 20px rgba(0, 0, 0, 1); */
+}
+
+/* 方形圖片設定 */
+.square-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    box-shadow: inset 0 0px 20px rgba(0, 0, 0, 1);
+}
+
+/*卡片調整*/
+
+/* 卡片總體固定高度，例如 400px */
+.fixed-card {
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 圖片高度固定 */
+.fixed-card .card-img-top {
+    height: 180px;
+    object-fit: cover;
+}
+
+/* 卡片內容填滿剩餘空間 */
+.fixed-card .card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 1rem;
+}
+
+/* 標題截斷（單行省略號） */
+.fixed-card .card-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 內文限制多行、省略號 */
+.fixed-card .card-text {
+    flex-grow: 1;
+    font-size: 0.9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 4; /* 限制顯示 4 行 */
+    -webkit-box-orient: vertical;
+}
+
+/* 日期樣式（可選） */
+.fixed-card .text-muted {
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+}
+
+/* 卡片圖片固定高度，cover 填滿 */
+.card-img-top {
+    height: 240px !important; /* ✅ 固定高度，你可以依需求調整 */
+    object-fit: cover; /* ✅ 讓圖片等比填滿 */
+    width: 100%;
 }

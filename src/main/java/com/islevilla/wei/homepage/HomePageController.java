@@ -22,8 +22,8 @@ public class HomePageController {
         return "front-end/index";
     }
 
-    @GetMapping("/member")
-    public String member() {
-        return "front-end/member/memberInfo";
-    }
+//    @GetMapping("/member")
+//    public String member() {
+//        return "front-end/member/memberInfo";
+//    }
 }
