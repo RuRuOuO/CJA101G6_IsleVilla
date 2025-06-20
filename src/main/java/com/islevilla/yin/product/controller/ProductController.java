@@ -101,20 +101,14 @@ public class ProductController {
         return "front-end/product/listProduct";
     }
 
-    //後台-新增商品頁
-    @GetMapping("/backend/product/new")
-    public String newProduct(Model model) {
-        Product product = new Product();
-        model.addAttribute("product", product);
-        model.addAttribute("category", productCategoryService.getAllProductCategory());
-        return "back-end/product/newProduct";
-    }
 
-    //後台-商品列表頁
+    //後台-商品列表
     @GetMapping("/backend/product/list")
     public String listProduct(Model model) {
-        List<Product> products = productService.getAllProducts();
-        model.addAttribute("product", products);
+        List<Product> productList = productService.getAllProducts();
+        model.addAttribute("productList", productList); // 商品列表
+        model.addAttribute("product", new Product());   // 空的 Product 給 modal 表單用
+        model.addAttribute("category", productCategoryService.getAllProductCategory());
         return "back-end/product/listProduct";
     }
 

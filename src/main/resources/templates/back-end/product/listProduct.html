@@ -28,7 +28,6 @@
                         class="btn btn-success"
                         data-bs-toggle="modal"
                         data-bs-target="#addProductModal"
-                        th:href="@{/backend/product/new}"
                 >
                     <i class="bi bi-plus-circle me-2"></i>新增商品
                 </a>
@@ -75,6 +74,7 @@
                     <tr>
                         <th>編號</th>
                         <th>圖片</th>
+
                         <th>名稱</th>
                         <th>價格</th>
                         <th>庫存量</th>
@@ -84,7 +84,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="prod : ${product}">
+                    <tr th:each="prod : ${productList}">
                         <td th:text="${prod.productId}">商品編號</td>
                         <td>
                             <div class="d-flex align-items-center">
@@ -134,9 +134,111 @@
             </nav>
 
             <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+        </div>
     </th:block>
-
+    </div>
 </main>
+<!-- 新增員工 Modal -->
+<div class="modal fade" id="addProductModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-plus-circle me-2"></i>新增商品
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="card-header bg-transparent border-0 pt-4">
+                <div class="d-flex justify-content-between align-items-center">
 
+
+                </div>
+            </div>
+            <form th:action="@{/backend/product/new}" th:object="${product}" method="post">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="productName" class="form-label">商品名稱</label>
+                        <input type="text" class="form-control" id="productName" th:field="*{productName}" required>
+                        <div class="text-danger" th:if="${#fields.hasErrors('productName')}"
+                             th:errors="*{productName}"></div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="productPrice" class="form-label">價格</label>
+                        <input type="number" class="form-control" id="productPrice" th:field="*{productPrice}" required>
+                        <div class="text-danger" th:if="${#fields.hasErrors('productPrice')}"
+                             th:errors="*{productPrice}"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="productDescription" class="form-label">商品描述</label>
+                    <textarea class="form-control" id="productDescription" th:field="*{productDescription}"
+                              rows="3"></textarea>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="productQuantity" class="form-label">庫存量</label>
+                        <input type="number" class="form-control" id="productQuantity" th:field="*{productQuantity}"
+                               required>
+                        <div class="text-danger" th:if="${#fields.hasErrors('productQuantity')}"
+                             th:errors="*{productQuantity}"></div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="productStatus" class="form-label">狀態</label>
+                        <select class="form-select" id="productStatus" th:field="*{productStatus}">
+                            <option th:value="1" th:selected="*{productStatus == 1}">上架</option>
+                            <option th:value="0" th:selected="*{productStatus == 0}">下架</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="productCategory" class="form-label">商品類別</label>
+                    <select class="form-select" id="productCategory" name="productCategory.productCategoryId" required>
+                        <option value="" disabled th:selected="${product.productCategory == null}">請選擇類別</option>
+                        <option th:each="cat : ${category}"
+                                th:value="${cat.productCategoryId}"
+                                th:text="${cat.productCategoryName}"
+                                th:selected="${product.productCategory != null} ? ${cat.productCategoryId} == ${product.productCategory.productCategoryId} : false">
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-2"></i>儲存
+                </button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    document.querySelector('form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const data = {
+            productName: form.productName.value,
+            productPrice: form.productPrice.value,
+            productDescription: form.productDescription.value,
+            productQuantity: form.productQuantity.value,
+            productStatus: form.productStatus.value,
+            productCategory: {
+                productCategoryId: form['productCategory.productCategoryId'].value
+            }
+        };
+        const response = await fetch('/product/add', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        if (response.ok) {
+            alert('商品已儲存');
+            window.location.href = '/backend/product/list'; // 儲存後導向商品列表
+        } else {
+            alert('儲存失敗');
+        }
+    });
+</script>
 </body>
 </html>

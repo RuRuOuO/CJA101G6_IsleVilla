@@ -1,5 +1,6 @@
 package com.islevilla.yin.employee.model;
 
+import com.islevilla.yin.department.model.Department;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -15,8 +16,9 @@ public class Employee {
     @Column(name = "employee_id")
     private Integer employeeId;
 
-    @Column(name = "department_id")
-    private Integer departmentId;
+    @ManyToOne
+    @JoinColumn(name = "department_id", referencedColumnName = "department_id", nullable = false)
+    private Department department;
 
     @Column(name = "employee_name")
     private String employeeName;

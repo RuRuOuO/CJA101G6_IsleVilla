@@ -21,9 +21,12 @@ public class EmployeeService {
             employeeRepository.deleteById(employeeId);
         }
     }
-    public Employee getOneEmployee(Integer employeeId) {
+    public Employee getEmployeeById(Integer employeeId) {
         return employeeRepository.findById(employeeId)
                 .orElse(null);
+    }
+    public List<Employee> getEmployeeByDepartmentId(Integer departmentId) {
+        return employeeRepository.findByDepartmentDepartmentId(departmentId);
     }
     public List<Employee> getAllEmployees() {
         return employeeRepository.findAll();
