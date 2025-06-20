@@ -56,7 +56,7 @@
 
 	<!-- Main Content -->
 	<main class="container py-5">
-		<h2 class="mb-4" th:text="${formMode == 'add'} ? '新增接駁班次' : '修改接駁班次'"></h2>
+		<h2 class="mb-4" th:text="${formMode == 'add'} ? '✏️ 新增接駁班次' : '✏️ 修改接駁班次'"></h2>
 
 		<form
     th:action="${formMode == 'add'} ? @{/shuttle/add} : @{/shuttle/edit}"

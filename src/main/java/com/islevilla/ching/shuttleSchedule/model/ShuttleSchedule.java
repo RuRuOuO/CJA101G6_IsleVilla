@@ -1,11 +1,18 @@
 package com.islevilla.ching.shuttleSchedule.model;
 
 import java.time.LocalTime;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 
-@Entity
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Data;
+
+@Entity(name = "ShuttleScheduleChing")
 @Table(name = "shuttle_schedule")
+@Data
 public class ShuttleSchedule {
 
     @Id
@@ -23,35 +30,35 @@ public class ShuttleSchedule {
     private LocalTime arrivalTime;
 
 
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public Integer getDirection() {
-		return direction;
-	}
-
-	public void setDirection(Integer direction) {
-		this.direction = direction;
-	}
-
-	public LocalTime getDepartureTime() {
-		return departureTime;
-	}
-
-	public void setDepartureTime(LocalTime departureTime) {
-		this.departureTime = departureTime;
-	}
-
-	public LocalTime getArrivalTime() {
-		return arrivalTime;
-	}
-
-	public void setArrivalTime(LocalTime arrivalTime) {
-		this.arrivalTime = arrivalTime;
-	}
+//	public Integer getId() {
+//		return id;
+//	}
+//
+//	public void setId(Integer id) {
+//		this.id = id;
+//	}
+//
+//	public Integer getDirection() {
+//		return direction;
+//	}
+//
+//	public void setDirection(Integer direction) {
+//		this.direction = direction;
+//	}
+//
+//	public LocalTime getDepartureTime() {
+//		return departureTime;
+//	}
+//
+//	public void setDepartureTime(LocalTime departureTime) {
+//		this.departureTime = departureTime;
+//	}
+//
+//	public LocalTime getArrivalTime() {
+//		return arrivalTime;
+//	}
+//
+//	public void setArrivalTime(LocalTime arrivalTime) {
+//		this.arrivalTime = arrivalTime;
+//	}
 }

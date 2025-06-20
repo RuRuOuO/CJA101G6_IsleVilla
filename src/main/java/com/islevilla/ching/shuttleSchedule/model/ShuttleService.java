@@ -21,14 +21,14 @@ public class ShuttleService {
 		shuttleScheduleRepository.save(shuttleSchedule);
 	}
 
-	public void deleteShuttle(Integer shuttleId) {
-		if (shuttleScheduleRepository.existsById(shuttleId)) {
-			shuttleScheduleRepository.deleteById(shuttleId);
+	public void deleteShuttle(Integer Id) {
+		if (shuttleScheduleRepository.existsById(Id)) {
+			shuttleScheduleRepository.deleteById(Id);
 		}
 	}
 
-	public ShuttleSchedule getShuttleById(Integer shuttleId) {
-		Optional<ShuttleSchedule> optional = shuttleScheduleRepository.findById(shuttleId);
+	public ShuttleSchedule getShuttleById(Integer id) {
+		Optional<ShuttleSchedule> optional = shuttleScheduleRepository.findById(id);
 		return optional.orElse(null);
 		// public T orElse(T other) : 如果值存在就回傳其值，否則回傳other的值
 	}
@@ -38,14 +38,16 @@ public class ShuttleService {
 	}
 
 	// 避免抵達時間早於出發時間
-	public boolean existsSchedule(Integer direction, 
+	public boolean existsSchedule(
+			Integer direction, 
 			java.time.LocalTime departure, 
 			java.time.LocalTime arrival) {
 		return shuttleScheduleRepository.existsByDirectionAndDepartureTimeAndArrivalTime(direction, departure, arrival);
 	}
 
 	// 避免出發與抵達時間重複
-	public boolean existsScheduleExcludingSelf(Integer direction, 
+	public boolean existsScheduleExcludingSelf(
+			Integer direction, 
 			LocalTime departure, 
 			LocalTime arrival, 
 			Integer selfId) {
