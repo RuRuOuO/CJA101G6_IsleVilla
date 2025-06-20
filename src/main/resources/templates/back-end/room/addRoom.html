@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>微嶼 | Isle Villa房號</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+    <link href="/css/room-addRoom.css" rel="stylesheet">
+  </head>
+  <body>
+    <!-- ===== 載入Header ===== -->
+    <div th:replace="~{fragments/fragments :: header}"></div>
+    <!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
+    <main>
+    <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center py-4">
+        <div class="row w-100 justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-header bg-primary text-white text-center py-4 rounded-top-4">
+                        <h1 class="h3 mb-0">
+                            <i class="bi bi-house-add me-2"></i>新增房間ID
+                        </h1>
+                    </div>
+                    
+                    <div class="card-body p-4">
+                        <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <div>
+                                <strong>提示：</strong>請填寫完整的房間資訊，所有欄位都是必填的。
+                            </div>
+                        </div>
+
+                        <div th:if="${successMessage}" class="alert alert-success" id="successMessage" role="alert">
+                            <span th:text="${successMessage}"></span>
+                        </div>
+                        <div th:if="${errorMessage}" class="alert alert-error" id="errorMessage" role="alert">
+                                <ul class="mb-0">
+							        <li th:each="msg : ${errorMessage}" th:text="${msg}"></li>
+							    </ul>
+                        </div>
+
+                        <form id="roomForm" th:action="@{/backend/room/addRoom}" th:object="${room}" method="post" novalidate>
+                            <div class="mb-3">
+                                <label for="roomId" class="form-label">
+                                    <i class="bi bi-door-open me-1"></i>房間ID *
+                                </label>
+                                <input 
+                                    type="number"
+                                    class="form-control form-control-lg" 
+                                    placeholder="請輸入房間ID（例如：501、510）"
+                                    required
+                                    min="1"
+                                    th:field="*{roomId}"
+                                >
+                                <div class="invalid-feedback">
+                                    請輸入有效的房間ID（大於0的數字）
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="roomTypeId" class="form-label">
+                                    <i class="bi bi-grid-3x3-gap me-1"></i>房型ID *
+                                </label>
+                                <input 
+                                    type="number"
+                                    class="form-control form-control-lg" 
+                                    placeholder="請輸入房型ID"
+                                    required
+                                    min="1"
+                                    th:field="*{roomTypeId}" 
+                                >
+                                <div class="invalid-feedback">
+                                    請輸入有效的房型ID（大於0的數字）
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="roomStatus" class="form-label">
+                                    <i class="bi bi-flag me-1"></i>房間狀態 *
+                                </label>
+                                <select 
+                                    th:field="*{roomStatus}"  
+                                    class="form-select form-select-lg" 
+                                    required
+                                >
+                                    <option value="">請選擇房間狀態</option>
+                                    <option value="0">空房</option>
+                                    <option value="1">入住中</option>
+                                    <option value="2">待維修</option>
+                                    <option value="3">待清潔</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    請選擇房間狀態
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                 <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="goBack()">
+                                    <i class="bi bi-arrow-left me-1"></i>回到查詢頁面
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="resetForm()">
+                                    <i class="bi bi-arrow-clockwise me-1"></i>重置
+                                </button>
+                                <button type="submit" class="btn btn-primary btn-lg px-4">
+                                    <i class="bi bi-plus-circle me-1"></i>新增房間
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- JS -->
+    <script src="/js/room-addRoom.js"></script>
+    </main>
+    <!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
+    <!-- ========== 載入Footer及Bootstrap JS ========== -->
+    <div th:replace="~{fragments/fragments :: footer}"></div>
+  </body>
+</html>
