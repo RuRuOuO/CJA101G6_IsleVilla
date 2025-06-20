@@ -5,6 +5,7 @@ import com.islevilla.yin.productcategory.model.ProductCategoryService;
 import com.islevilla.yin.productphoto.ProductPhoto;
 import com.islevilla.yin.productphoto.ProductPhotoService;
 import com.islevilla.yin.productphoto.ProductWithImageDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -14,20 +15,16 @@ import java.util.List;
 
 //頁面渲染
 @Controller
-@RequestMapping("/product")
 public class ProductController {
-    private final ProductService productService;
-    private final ProductCategoryService productCategoryService;
-    private final ProductPhotoService productPhotoService;
-
-    public ProductController(ProductService productService, ProductCategoryService productCategoryService, ProductPhotoService productPhotoService) {
-        this.productService = productService;
-        this.productCategoryService = productCategoryService;
-        this.productPhotoService = productPhotoService;
-    }
+    @Autowired
+    private ProductService productService;
+    @Autowired
+    private ProductCategoryService productCategoryService;
+    @Autowired
+    private ProductPhotoService productPhotoService;
 
     //前台-商品首頁
-    @GetMapping
+    @GetMapping("/product")
     public String homeProduct(Model model) {
         // 獲取所有產品的資料
         List<Product> products = productService.getAllProducts();
@@ -69,7 +66,7 @@ public class ProductController {
     }
 
     //前台-商品分頁
-    @GetMapping("/list")
+    @GetMapping("/product/list")
     public String homeProduct(@RequestParam(value = "productCategoryId", required = false) Integer productCategoryId, Model model) {
         List<Product> products;
         if (productCategoryId != null) {
@@ -105,7 +102,7 @@ public class ProductController {
     }
 
     //後台-新增商品頁
-    @GetMapping("backend/new")
+    @GetMapping("/backend/product/new")
     public String newProduct(Model model) {
         Product product = new Product();
         model.addAttribute("product", product);
@@ -114,7 +111,7 @@ public class ProductController {
     }
 
     //後台-商品列表頁
-    @GetMapping("backend/list")
+    @GetMapping("/backend/product/list")
     public String listProduct(Model model) {
         List<Product> products = productService.getAllProducts();
         model.addAttribute("product", products);
@@ -122,7 +119,7 @@ public class ProductController {
     }
 
     //後台-編輯商品頁
-    @GetMapping("backend/edit/{productId}")
+    @GetMapping("/backend/product/edit/{productId}")
     public String showEditProductPage(@PathVariable Integer productId, Model model) {
         Product product = productService.getProductById(productId);
         model.addAttribute("product", product);

@@ -28,6 +28,9 @@
         ></script>
 
         <style>
+            .card-title {
+                color: #223363;
+            }
             .sidebar {
                 width: 280px;
                 background-color: #223363;
@@ -83,12 +86,15 @@
 <!-- Sidebar（桌機版） -->
 <div th:fragment="sidebar" class="sidebar p-3 position-fixed top-0 start-0 vh-100">
     <a
-            class="d-flex justify-content-center align-items-center pb-3 mb-3 link-body-emphasis text-decoration-none text-white"
-            href="/"
-            style="border-bottom: 1px solid rgba(255, 255, 255, 0.3)"
+            class="d-flex justify-content-center align-items-center mt-3 mb-4 link-body-emphasis text-decoration-none text-white"
+            th:href="@{/backend/dashboard}"
     >
         <span class="fs-5 text-white" style="font-family: Kaisei HarunoUmi">IsleVilla微嶼 後台管理</span>
     </a>
+    <div
+            class="border-bottom mb-4"
+            style="border-bottom: 1px solid rgba(255, 255, 255, 0.3)"
+    ></div>
     <ul class="list-unstyled ps-0">
         <!-- 分類1 -->
         <li class="mb-1">
@@ -106,13 +112,14 @@
                         class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-4 lh-lg"
                 >
                     <li>
-                        <a href="#" class="link-body-emphasis text-white">員工列表</a>
+                        <a th:href="@{/backend/employee/list}"
+                           class="link-body-emphasis text-white">員工列表</a>
                     </li>
                     <li>
-                        <a href="#" class="link-body-emphasis text-white">權限設定</a>
+                        <a th:href="@{/}" class="link-body-emphasis text-white">權限設定</a>
                     </li>
                     <li>
-                        <a href="#" class="link-body-emphasis text-white">部門管理</a>
+                        <a th:href="@{/}" class="link-body-emphasis text-white">部門管理</a>
                     </li>
                 </ul>
             </div>
@@ -134,13 +141,13 @@
                         class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-4 lh-lg"
                 >
                     <li>
-                        <a href="#" class="link-body-emphasis text-white">商品管理</a>
+                        <a th:href="@{/backend/product/list}" class="link-body-emphasis text-white">商品管理</a>
                     </li>
                     <li>
-                        <a href="#" class="link-body-emphasis text-white">商品分類管理</a>
+                        <a th:href="@{/}" class="link-body-emphasis text-white">商品分類管理</a>
                     </li>
                     <li>
-                        <a href="#" class="link-body-emphasis text-white">訂單管理</a>
+                        <a th:href="@{/}" class="link-body-emphasis text-white">訂單管理</a>
                     </li>
                 </ul>
             </div>
@@ -206,10 +213,10 @@
 <th:block th:fragment="mainContent(content)">
     <main>
         <div class="content">
-            <div class="card mb-4">
-                <div class="card-body">
+            <div class="card m-2">
+                <div class="container">
                     <div th:insert="${content}"></div>
-                </div>
+            </div>
             </div>
         </div>
     </main>

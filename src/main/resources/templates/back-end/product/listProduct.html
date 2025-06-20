@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>微嶼 | Isle Villa 後台首頁</title>
-  <!-- ===== 載入統一樣式 ===== -->
-  <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>微嶼 | Isle Villa 後台首頁</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
 </head>
 <body>
 <!-- ===== 載入sidebar ===== -->
@@ -15,43 +15,128 @@
 <div th:replace="~{fragments/backFragments :: sidebar}"></div>
 
 <main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
-  <th:block th:fragment="myContent">
-    <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
-    <div class="container">
-      <h2 class="card-title">範例標題</h2>
-      <a href="/product/backend/new" class="btn btn-success mb-4">新增商品</a>
-      <table class="table table-striped">
-        <thead>
-        <tr>
-          <th>#</th>
-          <th>商品名稱</th>
-          <th>價格</th>
-          <th>庫存量</th>
-          <th>狀態</th>
-          <th>類別</th>
-          <th>操作</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="prod : ${product}">
-          <td th:text="${prod.productId}">1</td>
-          <td th:text="${prod.productName}">商品名稱</td>
-          <td th:text="${prod.productPrice}">100</td>
-          <td th:text="${prod.productQuantity}">50</td>
-          <td th:text="${prod.productStatus == 1 ? '上架' : '下架'}">上架</td>
-          <td th:text="${prod.productCategory.productCategoryName}">類別名稱</td>
-          <td>
-            <!-- 修改按鈕 -->
-            <a href="/product/backend/edit/{id}" th:href="@{/product/backend/edit/{id}(id=${prod.productId})}" class="btn btn-primary btn-sm">修改</a>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
+    <th:block th:fragment="myContent">
+        <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
 
-    <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
-  </th:block>
+        <!-- 卡片標題與新增按鈕 -->
+        <div class="card-header bg-transparent border-0 pt-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0 fw-bold ">
+                    <i class="bi bi-bag me-2"></i>商品管理
+                </h4>
+                <a
+                        class="btn btn-success"
+                        data-bs-toggle="modal"
+                        data-bs-target="#addProductModal"
+                        th:href="@{/backend/product/new}"
+                >
+                    <i class="bi bi-plus-circle me-2"></i>新增商品
+                </a>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <!-- 搜尋與篩選 -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="input-group">
+                  <span class="input-group-text"
+                  ><i class="bi bi-search"></i
+                  ></span>
+                        <input
+                                type="text"
+                                class="form-control"
+                                placeholder="搜尋商品名稱、標號"
+                        />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select">
+                        <option>全部類別</option>
+                        <option>分類1</option>
+                        <option>分類2</option>
+                        <option>分類3</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select">
+                        <option>全部狀態</option>
+                        <option>上架</option>
+                        <option>下架</option>
+                    </select>
+                </div>
+            </div>
+
+
+            <!-- 商品表格 -->
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>編號</th>
+                        <th>圖片</th>
+                        <th>名稱</th>
+                        <th>價格</th>
+                        <th>庫存量</th>
+                        <th>狀態</th>
+                        <th>類別</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="prod : ${product}">
+                        <td th:text="${prod.productId}">商品編號</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img
+                                        src="https://via.placeholder.com/35x35"
+                                        class="rounded-circle me-2"
+                                        alt="商品圖片"
+                                />
+                            </div>
+                        </td>
+                        <td th:text="${prod.productName}">商品名稱</td>
+                        <td th:text="${prod.productPrice}">商品價格</td>
+                        <td th:text="${prod.productQuantity}">商品庫存</td>
+                        <td>
+                            <span th:if="${prod.productStatus == 1}" class="badge bg-success">上架</span>
+                            <span th:if="${prod.productStatus != 1}" class="badge bg-danger">下架</span>
+                        </td>
+                        <td th:text="${prod.productCategory.productCategoryName}">商品類別</td>
+                        <td>
+                            <!-- 修改按鈕 -->
+                            <a href="/product/backend/edit/{id}"
+                               th:href="@{/backend/product/edit/{id}(id=${prod.productId})}"
+                               class="btn btn-sm btn-primary me-1">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- 分頁 -->
+            <nav>
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled">
+                        <span class="page-link">上一頁</span>
+                    </li>
+                    <li class="page-item active">
+                        <span class="page-link">1</span>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">2</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">下一頁</a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+    </th:block>
 
 </main>
+
 </body>
 </html>
