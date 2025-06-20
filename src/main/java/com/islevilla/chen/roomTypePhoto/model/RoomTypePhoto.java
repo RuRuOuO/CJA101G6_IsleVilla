@@ -10,7 +10,7 @@ import lombok.Data;
 @Table(name = "room_type_photo")
 @Data
 @Component
-public class RoomTypePhotoVO {
+public class RoomTypePhoto {
 	private static final long serialVersionUID = 1L;
 	
 	@Id

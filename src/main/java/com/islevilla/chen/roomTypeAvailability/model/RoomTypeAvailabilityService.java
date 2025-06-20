@@ -5,34 +5,36 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.islevilla.chen.roomType.model.RoomTypeRepository;
-import com.islevilla.chen.roomType.model.RoomTypeVO;
+import com.islevilla.chen.roomType.model.RoomType;
 
+@Service
 public class RoomTypeAvailabilityService {
 	
 	@Autowired
 	private RoomTypeAvailabilityRepository roomTypeAvailabilityRepository;
 	
-	public RoomTypeAvailabilityVO addRoom(RoomTypeAvailabilityVO roomTypeAvailabilityVO) {
-		return roomTypeAvailabilityRepository.save(roomTypeAvailabilityVO);
+	public RoomTypeAvailability addRoomTypeAvailability(RoomTypeAvailability roomTypeAvailability) {
+		return roomTypeAvailabilityRepository.save(roomTypeAvailability);
 	}
 	
-	public RoomTypeAvailabilityVO updateRoom(RoomTypeAvailabilityVO roomTypeAvailabilityVO) {
-		return roomTypeAvailabilityRepository.save(roomTypeAvailabilityVO);
+	public RoomTypeAvailability updateRoomTypeAvailability(RoomTypeAvailability roomTypeAvailability) {
+		return roomTypeAvailabilityRepository.save(roomTypeAvailability);
 	}
 	
-//	public void deleteRoom(int roomTypeId,Date roomTypeAvailabilityDate) {
+//	public void deleteRoomTypeAvailability(int roomTypeId,Date roomTypeAvailabilityDate) {
 //		roomTypeAvailabilityRepository.deleteById(int roomTypeId,Date roomTypeAvailabilityDate);
 //	}
 	
-//	public RoomTypeAvailabilityVO findById(int roomTypeId,Date roomTypeAvailabilityDate) {
-//		Optional<RoomTypeVO> optional=roomTypeAvailabilityRepository.findById(int roomTypeId,Date roomTypeAvailabilityDate);
+//	public RoomTypeAvailability findById(int roomTypeId,Date roomTypeAvailabilityDate) {
+//		Optional<RoomType> optional=roomTypeAvailabilityRepository.findById(int roomTypeId,Date roomTypeAvailabilityDate);
 //		roomTypeAvailabilityRepository
 //		return optional.orElse(null);
 //	}
 	
-	public List<RoomTypeAvailabilityVO> findAll() {
+	public List<RoomTypeAvailability> findAll() {
 		return roomTypeAvailabilityRepository.findAll();
 	}
 }

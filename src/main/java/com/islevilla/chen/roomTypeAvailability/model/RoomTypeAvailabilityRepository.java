@@ -6,6 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional
-public interface RoomTypeAvailabilityRepository extends JpaRepository<RoomTypeAvailabilityVO, Integer>{
+public interface RoomTypeAvailabilityRepository extends JpaRepository<RoomTypeAvailability, Integer>{
 
 }

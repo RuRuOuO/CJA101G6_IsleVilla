@@ -12,24 +12,24 @@ public class RoomService {
 	@Autowired
 	private RoomRepository roomRepository;
 	
-	public RoomVO addRoom(RoomVO roomVO) {
-		return roomRepository.save(roomVO);
+	public Room addRoom(Room room) {
+		return roomRepository.save(room);
 	}
 	
-	public RoomVO updateRoom(RoomVO roomVO) {
-		return roomRepository.save(roomVO);
+	public Room updateRoom(Room room) {
+		return roomRepository.save(room);
 	}
 	
-	public void deleteRoom(int roomId) {
+	public void deleteRoom(Integer roomId) {
 		roomRepository.deleteById(roomId);
 	}
 	
-	public RoomVO findById(int roomId) {
-		Optional<RoomVO> optional=roomRepository.findById(roomId);
+	public Room findById(Integer roomId) {
+		Optional<Room> optional=roomRepository.findById(roomId);
 		return optional.orElse(null);
 	}
 	
-	public List<RoomVO> findAll() {
+	public List<Room> findAll() {
 		return roomRepository.findAll();
 	}
 }

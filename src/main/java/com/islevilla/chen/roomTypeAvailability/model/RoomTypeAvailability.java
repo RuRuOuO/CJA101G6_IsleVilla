@@ -13,7 +13,7 @@ import lombok.Data;
 @Table(name="room_type_availability")
 @Data
 @Component
-public class RoomTypeAvailabilityVO {
+public class RoomTypeAvailability {
 	private static final long serialVersionUID = 1L;
 	
 	@Id

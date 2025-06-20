@@ -1,6 +1,5 @@
 package com.islevilla.chen.roomType.model;
 
-import java.io.Serializable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -9,8 +8,7 @@ import lombok.Data;
 @Entity // Hibernate：這是一個資料表對應的 Java 類別
 @Table(name="room_type") // Hibernate：指定資料表名稱
 @Data
-public class RoomTypeVO implements Serializable{
-	private static final long serialVersionUID = 1L;
+public class RoomType {
 	
 	@Id // Hibernate：主鍵
 	@Column(name="room_type_id") // Hibernate：對應欄位名稱

@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.islevilla.chen.room.model.RoomVO;
+import com.islevilla.chen.room.model.Room;
 
 @Service
 public class RoomTypeService {
@@ -14,24 +14,24 @@ public class RoomTypeService {
 	@Autowired
 	private RoomTypeRepository roomTypeRepository;
 	
-	public RoomTypeVO addRoom(RoomTypeVO roomTypeVO) {
-		return roomTypeRepository.save(roomTypeVO);
+	public RoomType addRoomType(RoomType roomType) {
+		return roomTypeRepository.save(roomType);
 	}
 	
-	public RoomTypeVO updateRoom(RoomTypeVO roomTypeVO) {
-		return roomTypeRepository.save(roomTypeVO);
+	public RoomType updateRoomType(RoomType roomType) {
+		return roomTypeRepository.save(roomType);
 	}
 	
-	public void deleteRoom(int roomTypeId) {
+	public void deleteRoomType(int roomTypeId) {
 		roomTypeRepository.deleteById(roomTypeId);
 	}
 	
-	public RoomTypeVO findById(int roomTypeId) {
-		Optional<RoomTypeVO> optional=roomTypeRepository.findById(roomTypeId);
+	public RoomType findById(int roomTypeId) {
+		Optional<RoomType> optional=roomTypeRepository.findById(roomTypeId);
 		return optional.orElse(null);
 	}
 	
-	public List<RoomTypeVO> findAll() {
+	public List<RoomType> findAll() {
 		return roomTypeRepository.findAll();
 	}
 }
