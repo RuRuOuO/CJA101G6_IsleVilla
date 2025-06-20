@@ -1,193 +1,150 @@
 //package com.islevilla.patty.roomreservationorder.controller;
 //
-//import java.io.IOException;
-//import java.util.LinkedHashMap;
-//import java.util.List;
-//import java.util.Map;
-//import java.util.stream.Collectors;
-//
-//import org.springframework.beans.factory.annotation.Autowired;
+//import com.islevilla.patty.roomreservationorder.model.Roomreservationorder;
+//import com.islevilla.patty.roomreservationorder.model.RoomreservationorderService;
+////import com.islevilla.yin.productcategory.model.ProductCategoryService;
+////import com.islevilla.yin.productphoto.ProductPhoto;
+////import com.islevilla.yin.productphoto.ProductPhotoService;
+////import com.islevilla.yin.productphoto.ProductWithImageDTO;
 //import org.springframework.stereotype.Controller;
 //import org.springframework.ui.Model;
-//import org.springframework.ui.ModelMap;
-//import org.springframework.validation.BeanPropertyBindingResult;
-//import org.springframework.validation.BindingResult;
-//import org.springframework.validation.FieldError;
-//import org.springframework.web.bind.annotation.GetMapping;
-//import org.springframework.web.bind.annotation.ModelAttribute;
-//import org.springframework.web.bind.annotation.PostMapping;
-//import org.springframework.web.bind.annotation.RequestMapping;
-//import org.springframework.web.bind.annotation.RequestParam;
-//import org.springframework.web.multipart.MultipartFile;
+//import org.springframework.web.bind.annotation.*;
 //
-//import com.islevilla.patty.roomreservationorder.model.RoomReservationOrder;
-//import com.islevilla.patty.roomreservationorder.model.RoomReservationOrderService;
-//
-//import jakarta.servlet.http.HttpServletRequest;
-//import jakarta.validation.Valid;
-//
+//import java.util.ArrayList;
+//import java.util.Base64;
+//import java.util.List;
 //
 //@Controller
-//@RequestMapping("/roomreservationorder")
+//@RequestMapping("/roomReservationOrder")
 //public class RoomReservationOrderController {
+//    private final RoomReservationOrderService productService;
+////    private final ProductCategoryService productCategoryService;
+////    private final ProductPhotoService productPhotoService;
 //
-//	@Autowired
-//	RoomReservationOrderService roomreservationorderSvc;
+//    public RoomReservationOrderController(RoomReservationOrderService roomReservationOrderService		 
+////    		,ProductCategoryService productCategoryService, ProductPhotoService productPhotoService
+//    		) {
+//        this.roomReservationOrderService = productService;
+////        this.productCategoryService = productCategoryService;
+////        this.productPhotoService = productPhotoService;
+//    }
 //
-//	/*
-//	 * This method will serve as addEmp.html handler.
-//	 */
-//	@GetMapping("addRoomReservationOrder")
-//	public String addRoomReservationOrder(ModelMap model) {
-//		RoomReservationOrder roomreservationorder = new RoomReservationOrder();
-//		model.addAttribute("roomreservationorder", roomreservationorder);
-//		return "back-end/roomreservationorder/addRoomReservationOrder";
-//	}
+//    //商品首頁-產品和產品類別渲染
+//    @GetMapping
+//    public String homeRoomReservationOrder(Model model) {
+//        // 獲取所有產品的資料
+//        List<RoomReservationOrder> RoomReservationOrder = roomReservationOrderService.getAllRoomReservationOrder();
+//        // 創建一個用來封裝產品資料和圖片 URL 的 DTO 列表
+////        List<ProductWithImageDTO> productWithImageDTOs = new ArrayList<>();
+//        // 查詢每個產品的第一張圖片並設置給產品資料
+////        for (Product product : products) {
+////            // 根據 productId 查詢該產品的第一張圖片
+////            ProductPhoto firstProductPhoto = productPhotoService.getFirstProductPhotoByProductId(product.getProductId());
+////            String productImageUrl = "https://dummyimage.com/300x200/";  // 預設圖片 URL
+////            if (firstProductPhoto != null) {
+////                // 將圖片轉換為 Base64 或圖片 URL
+////                productImageUrl = convertImageToBase64(firstProductPhoto.getProductImage());
+////            }
+//            // 封裝為 DTO
+//            ProductWithImageDTO productWithImageDTO = new ProductWithImageDTO(
+//                    product.getProductId(),
+//                    product.getProductName(),
+//                    product.getProductDescription(),
+//                    product.getProductPrice(),
+//                    productImageUrl
+//            );
+//            // 加入到 DTO 列表中
+//            productWithImageDTOs.add(productWithImageDTO);
+//        }
 //
-//	/*
-//	 * This method will be called on addEmp.html form submission, handling POST request It also validates the user input
-//	 */
-//	@PostMapping("insert")
-//	public String insert(@Valid RoomReservationOrder roomreservationorder, BindingResult result, ModelMap model,
-//			@RequestParam("upFiles") MultipartFile[] parts) throws IOException {
+//        // 將產品和產品類別資料添加到模型中
+//        model.addAttribute("product", productWithImageDTOs);
+//        model.addAttribute("category", productCategoryService.getAllProductCategory());
+//        return "front-end/product/homeProduct";
+//    }
 //
-//		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
-//		// 去除BindingResult中upFiles欄位的FieldError紀錄 --> 見第172行
-//		result = removeFieldError(roomreservationorder, result, "upFiles");
+//    private String convertImageToBase64(byte[] imageBytes) {
+//        if (imageBytes == null) {
+//            // 如果圖片是 null，返回預設圖片的 URL
+//            return "https://dummyimage.com/300x200/";
+//        }
+//        // 如果圖片不為 null，將圖片轉換為 Base64 字串
+//        return "data:image/png;base64," + Base64.getEncoder().encodeToString(imageBytes);
+//    }
 //
-//		if (parts[0].isEmpty()) { // 使用者未選擇要上傳的圖片時
-//			model.addAttribute("errorMessage", "員工照片: 請上傳照片");
-//		} else {
-//			for (MultipartFile multipartFile : parts) {
-//				byte[] buf = multipartFile.getBytes();
-//				roomreservationorder.setUpFiles(buf);
-//			}
-//		}
-//		if (result.hasErrors() || parts[0].isEmpty()) {
-//			return "back-end/roomreservationorder/addroomreservationorder";
-//		}
-//		/*************************** 2.開始新增資料 *****************************************/
-//		// EmpService empSvc = new EmpService();
-//		roomreservationorderSvc.addRoomReservationOrder(roomreservationorder);
-//		/*************************** 3.新增完成,準備轉交(Send the Success view) **************/
-//		List<RoomReservationOrder> list = roomreservationorderSvc.getAll();
-//		model.addAttribute("roomreservationorderListData", list); // for listAllEmp.html 第85行用
-//		model.addAttribute("success", "- (新增成功)");
-//		return "redirect:/roomreservationorder/listAllRoomReservationOrder"; // 新增成功後重導至IndexController_inSpringBoot.java的第58行@GetMapping("/emp/listAllEmp")
-//	}
 //
-//	/*
-//	 * This method will be called on listAllEmp.html form submission, handling POST request
-//	 */
-//	@PostMapping("getOne_For_Update")
-//	public String getOne_For_Update(@RequestParam("roomReservationId") String roomReservationId, ModelMap model) {
-//		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
-//		/*************************** 2.開始查詢資料 *****************************************/
-//		// EmpService empSvc = new EmpService();
-//		RoomReservationOrder roomreservationorder = roomreservationorderSvc.getOneRoomReservationOrder(Integer.valueOf(roomReservationId));
+//    @GetMapping("/list")
+//    public String homeProduct(@RequestParam(value = "productCategoryId", required = false) Integer productCategoryId, Model model) {
+//        List<Product> products;
+//        if (productCategoryId != null) {
+//            // 根據商品類別過濾商品
+//            products = productService.getProductByProductCategoryId(productCategoryId);
+//        } else {
+//            // 沒有選擇類別時顯示所有商品
+//            products = productService.getAllProducts();
+//        }
 //
-//		/*************************** 3.查詢完成,準備轉交(Send the Success view) **************/
-//		model.addAttribute("roomreservationorder", roomreservationorder);
-//		return "back-end/roomreservationorder/update_roomreservationorder_input"; // 查詢完成後轉交update_emp_input.html
-//	}
+//        List<ProductWithImageDTO> productWithImageDTOs = new ArrayList<>();
+//        for (Product product : products) {
+//            ProductPhoto firstProductPhoto = productPhotoService.getFirstProductPhotoByProductId(product.getProductId());
+//            String productImageUrl = "https://dummyimage.com/300x200/";  // 預設圖片 URL
+//            if (firstProductPhoto != null) {
+//                productImageUrl = convertImageToBase64(firstProductPhoto.getProductImage());
+//            }
+//            ProductWithImageDTO productWithImageDTO = new ProductWithImageDTO(
+//                    product.getProductId(),
+//                    product.getProductName(),
+//                    product.getProductDescription(),
+//                    product.getProductPrice(),
+//                    productImageUrl
+//            );
+//            productWithImageDTOs.add(productWithImageDTO);
+//        }
 //
-//	/*
-//	 * This method will be called on update_emp_input.html form submission, handling POST request It also validates the user input
-//	 */
-//	@PostMapping("update")
-//	public String update(@Valid RoomReservationOrder roomreservationorder, BindingResult result, ModelMap model,
-//			@RequestParam("upFiles") MultipartFile[] parts) throws IOException {
+//        model.addAttribute("product", productWithImageDTOs);
+//        model.addAttribute("category", productCategoryService.getAllProductCategory());
+//        model.addAttribute("selectedCategoryId", productCategoryId); // 新增這行
 //
-//		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
-//		// 去除BindingResult中upFiles欄位的FieldError紀錄 --> 見第172行
-//		result = removeFieldError(roomreservationorder, result, "upFiles");
+//        return "front-end/product/listProduct";
+//    }
 //
-//		if (parts[0].isEmpty()) { // 使用者未選擇要上傳的新圖片時
-//			// EmpService empSvc = new EmpService();
-//			byte[] upFiles = roomreservationorderSvc.getOneRoomReservationOrder(roomreservationorder.getEmpno()).getUpFiles();
-//			roomreservationorder.setUpFiles(upFiles);
-//		} else {
-//			for (MultipartFile multipartFile : parts) {
-//				byte[] upFiles = multipartFile.getBytes();
-//				roomreservationorder.setUpFiles(upFiles);
-//			}
-//		}
-//		if (result.hasErrors()) {
-//			return "back-end/roomreservationorder/update_roomreservationorder_input";
-//		}
-//		/*************************** 2.開始修改資料 *****************************************/
-//		// EmpService empSvc = new EmpService();
-//		roomreservationorderSvc.updateRoomReservationOrder(roomreservationorder);
+////    //商品列表頁面-產品渲染
+////    @GetMapping("/list")
+////    public String listProduct(@RequestParam(value = "categoryId", required = false) Integer categoryId, Model model) {
+////        if (categoryId != null) {
+////            model.addAttribute("product", productService.getProductByProductCategoryId(categoryId));
+////            model.addAttribute("selectedCategory", productCategoryService.getProductCategoryById(categoryId));
+////        } else {
+////            model.addAttribute("product", productService.getAllProducts());
+////            model.addAttribute("selectedCategory", "全部商品");
+////        }
+////        model.addAttribute("category", productCategoryService.getAllProductCategory());
+////        return "front-end/product/product_list";
+////    }
 //
-//		/*************************** 3.修改完成,準備轉交(Send the Success view) **************/
-//		model.addAttribute("success", "- (修改成功)");
-//		roomreservationorder = roomreservationorderSvc.getOneRoomReservationOrder(Integer.valueOf(roomreservationorder.getRoomReservationId()));
-//		model.addAttribute("roomreservationorder", roomreservationorder);
-//		return "back-end/roomreservationorder/listOneRoomReservationOrder"; // 修改成功後轉交listOneEmp.html
-//	}
 //
-//	/*
-//	 * This method will be called on listAllEmp.html form submission, handling POST request
-//	 */
-//	@PostMapping("delete")
-//	public String delete(@RequestParam("roomReservationId") String roomReservationId, ModelMap model) {
-//		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
-//		/*************************** 2.開始刪除資料 *****************************************/
-//		// EmpService empSvc = new EmpService();
-//		empSvc.deleteEmp(Integer.valueOf(empno));
-//		/*************************** 3.刪除完成,準備轉交(Send the Success view) **************/
-//		List<EmpVO> list = empSvc.getAll();
-//		model.addAttribute("empListData", list); // for listAllEmp.html 第85行用
-//		model.addAttribute("success", "- (刪除成功)");
-//		return "back-end/emp/listAllEmp"; // 刪除完成後轉交listAllEmp.html
-//	}
+//    @GetMapping("backend/new")
+//    public String newProduct(@RequestParam Integer productId, Model model) {
+//        Product product = productService.getProductById(productId);
+//        model.addAttribute("product", product);
+//        model.addAttribute("category", productCategoryService.getAllProductCategory());
+//        return "back-end/product/newProduct"; // 這裡就是你的表單頁面路徑
+//    }
 //
-//	/*
-//	 * 第一種作法 Method used to populate the List Data in view. 如 : 
-//	 * <form:select path="deptno" id="deptno" items="${deptListData}" itemValue="deptno" itemLabel="dname" />
-//	 */
-//	@ModelAttribute("deptListData")
-//	protected List<DeptVO> referenceListData() {
-//		// DeptService deptSvc = new DeptService();
-//		List<DeptVO> list = deptSvc.getAll();
-//		return list;
-//	}
+//    @GetMapping("backend/list")
+//    public String listProduct(Model model) {
+//        List<Product> products = productService.getAllProducts();
+//        model.addAttribute("product", products);
+//        return "back-end/product/listProduct";
+//    }
 //
-//	/*
-//	 * 【 第二種作法 】 Method used to populate the Map Data in view. 如 : 
-//	 * <form:select path="deptno" id="deptno" items="${depMapData}" />
-//	 */
-//	@ModelAttribute("deptMapData") //
-//	protected Map<Integer, String> referenceMapData() {
-//		Map<Integer, String> map = new LinkedHashMap<Integer, String>();
-//		map.put(10, "財務部");
-//		map.put(20, "研發部");
-//		map.put(30, "業務部");
-//		map.put(40, "生管部");
-//		return map;
-//	}
+//    @GetMapping("backend/edit/{productId}")
+//    public String showEditProductPage(@PathVariable Integer productId, Model model) {
+//        Product product = productService.getProductById(productId);
+//        model.addAttribute("product", product);
+//        model.addAttribute("category", productCategoryService.getAllProductCategory());
+//        return "back-end/product/editProduct";
+//    }
 //
-//	// 去除BindingResult中某個欄位的FieldError紀錄
-//	public BindingResult removeFieldError(EmpVO empVO, BindingResult result, String removedFieldname) {
-//		List<FieldError> errorsListToKeep = result.getFieldErrors().stream()
-//				.filter(fieldname -> !fieldname.getField().equals(removedFieldname))
-//				.collect(Collectors.toList());
-//		result = new BeanPropertyBindingResult(empVO, "empVO");
-//		for (FieldError fieldError : errorsListToKeep) {
-//			result.addError(fieldError);
-//		}
-//		return result;
-//	}
-//	
-//	/*
-//	 * This method will be called on select_page.html form submission, handling POST request
-//	 */
-//	@PostMapping("listEmps_ByCompositeQuery")
-//	public String listAllEmp(HttpServletRequest req, Model model) {
-//		Map<String, String[]> map = req.getParameterMap();
-//		List<EmpVO> list = empSvc.getAll(map);
-//		model.addAttribute("empListData", list); // for listAllEmp.html 第85行用
-//		return "back-end/emp/listAllEmp";
-//	}
 //
 //}

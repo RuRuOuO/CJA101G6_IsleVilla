@@ -1,52 +1,41 @@
 //package com.islevilla.patty.roomreservationorder.model;
 //
-//import java.util.List;
-//import java.util.Map;
-//import java.util.Optional;
-//
-//import org.hibernate.Session;
-//import org.hibernate.SessionFactory;
+////import com.islevilla.yin.roomtypephoto.RoomtypePhoto;
+////import com.islevilla.yin.roomtypephoto.RoomtypePhotoRepository;
 //import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Service;
+//import org.springframework.stereotype.Component;
 //
-//import hibernate.util.CompositeQuery.HibernateUtil_CompositeQuery_Emp3;
+//import java.util.ArrayList;
+//import java.util.List;
 //
-//
-//@Service("roomreservationorderService")
+//@Component
 //public class RoomReservationOrderService {
+//    @Autowired
+//    private RoomReservationOrderRepository roomReservationOrderRepository;
+//    @Autowired
+//    private RoomTypePhotoRepository roomTypePhotoRepository;
 //
-//	@Autowired
-//	RoomReservationOrderRepository repository;
-//	
-//	@Autowired
-//    private SessionFactory sessionFactory;
+//    public void addRoomReservationOrder(RoomReservationOrder roomReservationOrder) {
+//    	roomReservationOrderRepository.save(roomReservationOrder);
+//    }
+//    public void updateRoomReservationOrder(RoomReservationOrder roomReservationOrder) {
+//    	roomReservationOrderRepository.save(roomReservationOrder);
+//    }
+//    public void deleteRoomReservationOrder(Integer roomTypeId) {
+//        if(roomReservationOrderRepository.existsById(roomTypeId)){
+//        	roomReservationOrderRepository.deleteById(roomTypeId);
+//        }
+//    }
+//    public RoomReservationOrder getRoomReservationOrderById(Integer roomTypeId) {
+//        return roomReservationOrderRepository.findById(roomTypeId)
+//                .orElse(null);
+//    }
+//    public List<RoomReservationOrder> getAllRoomReservationOrder() {
+//        return roomReservationOrderRepository.findAll();
+//    }
+////    public List<RoomReservationOrder> getRoomReservationOrderByPromotionId(Integer promotionId) {
+////        return roomReservationOrderRepository.findByPromotionPromotionId(promotionId);
+////    }
 //
-//	public void addRoomReservationOrder(RoomReservationOrder roomreservationorder) {
-//		repository.save(roomreservationorder);
-//	}
-//
-//	public void updateRoomReservationOrder(RoomReservationOrder roomreservationorder) {
-//		repository.save(roomreservationorder);
-//	}
-//
-//	public void deleteRoomReservationOrder(Integer roomreservationorder) {
-//		if (repository.existsById(roomreservationorder))
-//			repository.deleteByEmpno(roomreservationorder);
-////		    repository.deleteById(roomreservationorder);
-//	}
-//
-//	public RoomReservationOrder getOneRoomReservationOrder(Integer roomreservationorder) {
-//		Optional<RoomReservationOrder> optional = repository.findById(roomreservationorder);
-////		return optional.get();
-//		return optional.orElse(null);  // public T orElse(T other) : 如果值存在就回傳其值，否則回傳other的值
-//	}
-//
-//	public List<RoomReservationOrder> getAll() {
-//		return repository.findAll();
-//	}
-//
-//	public List<RoomReservationOrder> getAll(Map<String, String[]> map) {
-//		return HibernateUtil_CompositeQuery_Emp3.getAllC(map,sessionFactory.openSession());
-//	}
 //
 //}

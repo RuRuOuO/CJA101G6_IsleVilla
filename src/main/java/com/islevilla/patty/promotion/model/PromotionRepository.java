@@ -12,8 +12,8 @@ public interface PromotionRepository extends JpaRepository<Promotion, Integer> {
 
 	@Transactional
 	@Modifying
-	@Query(value = "delete from emp3 where empno =?1", nativeQuery = true)
-	void deleteByPromotionId(int promotionId);
+	@Query(value = "delete from promotion where roomPromotionId =?1", nativeQuery = true)
+	void deleteByRoomPromotionId(int roomPromotionId);
 
 	//● (自訂)條件查詢
 //	@Query(value = "from Promotion where roomPromotionId=?1 and roomPromotionTitle like?2 and promotionStartDate=?3 and promotionEndDate=?4 order by roomPromotionId")
