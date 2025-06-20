@@ -14,14 +14,14 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "room_reservation_order")
 @Data
-public class RoomReservationOrder {
+public class RoomRVOrder {
     @Column(name = "room_reservation_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Integer roomReservationId;
 
     @ManyToOne
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn(name = "member_id", referencedColumnName = "member_id", nullable = false)
     @NotNull(message = "請輸入會員編號")
     private Members members;
 
@@ -45,8 +45,8 @@ public class RoomReservationOrder {
     @JoinColumn(name = "room_promotion_id")
     private Promotion promotion;
 
-    @Column(name = "rv_remake")
-    private String remake;
+    @Column(name = "rv_remark")
+    private String remark;
 
     @Column(name = "room_total_amount")
     @Min(value = 0, message = "金額不能為負數")

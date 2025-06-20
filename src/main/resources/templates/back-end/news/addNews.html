@@ -1,54 +1,71 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>新增最新消息</title>
     <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
 </head>
 <body>
 <main>
-    <div class="container">
-        <h2>新增最新消息</h2>
-        <a class="btn btn-dark" th:href="@{/backend/news/list}">回到消息列表</a>
-        <form th:action="@{/backend/news/add}" method="post" th:object="${news}" enctype="multipart/form-data">
-            <div>
-                <label>標題</label><input type="text" th:field="*{newsTitle}"
-                                          onclick="hideContent('newsTitle.errors');">
-                <span class="error" th:if="${#fields.hasErrors('newsTitle')}"
-                      th:errors="*{newsTitle}" id="newsTitle.errors"></span>
+    <div class="container py-5">
+        <h2 class="mb-4">新增最新消息</h2>
+        <a class="btn btn-secondary mb-4" th:href="@{/backend/news/list}">← 回到消息列表</a>
+
+        <form enctype="multipart/form-data" method="post" th:action="@{/backend/news/add}" th:object="${news}"
+              class="row g-3">
+
+            <!-- 標題 -->
+            <div class="col-12">
+                <label for="newsTitle" class="form-label">標題</label>
+                <input type="text" id="newsTitle" th:field="*{newsTitle}" onclick="hideContent('newsTitle.errors')"
+                       class="form-control">
+                <span class="text-danger" id="newsTitle.errors" th:if="${#fields.hasErrors('newsTitle')}"
+                      th:errors="*{newsTitle}"></span>
             </div>
-            <div>
-                <label>內容</label><input type="text" th:field="*{newsContent}"
-                                          onclick="hideContent('newsContent.errors')"/>
-                <span class="error" th:if="${#fields.hasErrors('newsContent')}"
-                      th:errors="*{newsContent}" id="newsContent.errors"></span>
+
+            <!-- 內容 -->
+            <div class="col-12">
+                <label for="newsContent" class="form-label">內容</label>
+                <textarea id="newsContent" th:field="*{newsContent}" onclick="hideContent('newsContent.errors')"
+                          class="form-control" rows="4"></textarea>
+                <span class="text-danger" id="newsContent.errors" th:if="${#fields.hasErrors('newsContent')}"
+                      th:errors="*{newsContent}"></span>
             </div>
-            <div>
-                <label>上傳圖片</label><input type="file" th:field="*{upFiles}" id="upFiles" accept="image/*"
-                                              onchange="previewImage()"/>
-                <div id="image-preview">
-                    <img src="preview-image" style="display:none" alt="預覽圖片">
+
+            <!-- 上傳圖片 -->
+            <div class="col-12">
+                <label for="upFiles" class="form-label">上傳圖片</label>
+                <input type="file" id="upFiles" accept="image/*" th:field="*{upFiles}" onchange="previewImage()"
+                       class="form-control">
+                <div id="image-preview" class="mt-3">
+                    <img id="preview-image" alt="預覽圖片" class="img-thumbnail"
+                         style="max-width: 300px; display: none;">
                 </div>
             </div>
-            <div>
-                <label>狀態</label>
-                <select th:field="*{newsStatus}">
+
+            <!-- 狀態 -->
+            <div class="col-12">
+                <label for="newsStatus" class="form-label">狀態</label>
+                <select id="newsStatus" th:field="*{newsStatus}" class="form-select">
                     <option value="1">上架</option>
                     <option value="0">下架</option>
                 </select>
             </div>
-            <div>
-                <button type="submit" class="btn-submit" id="submit">新增消息</button>
-                <button type="reset" class="btn-reset" onclick="resetForm()">重設表單</button>
+
+            <!-- 按鈕 -->
+            <div class="col-12 d-flex gap-3">
+                <button type="submit" id="submit" class="btn btn-primary">新增消息</button>
+                <button type="reset" onclick="resetForm()" class="btn btn-outline-secondary">重設表單</button>
             </div>
         </form>
     </div>
 </main>
+
 <script type="text/javascript">
     // 清除提示信息
     function hideContent(elementId) {
-        var element = document.getElementById(elementId);
+        const element = document.getElementById(elementId);
         if (element) {
             element.style.display = "none";
         }
@@ -58,18 +75,13 @@
     function resetForm() {
         document.getElementById('preview-image').style.display = 'none';
         hideContent('newsTitle.errors');
-        hideContent('newsTime.errors');
         hideContent('newsContent.errors');
         hideContent('upFiles.errors');
     }
 
-    // 照片上傳-預覽功能
-    var filereader_support = typeof FileReader != 'undefined';
-    if (!filereader_support) {
-        alert("您的瀏覽器不支援檔案預覽功能");
-    }
-
-    var acceptedTypes = {
+    // 照片上傳預覽
+    const filereader_support = typeof FileReader !== 'undefined';
+    const acceptedTypes = {
         'image/png': true,
         'image/jpeg': true,
         'image/jpg': true,
@@ -77,14 +89,14 @@
     };
 
     function previewImage() {
-        var fileInput = document.getElementById("upFiles");
-        var previewImg = document.getElementById("preview-image");
+        const fileInput = document.getElementById("upFiles");
+        const previewImg = document.getElementById("preview-image");
 
         if (fileInput.files && fileInput.files[0]) {
-            var file = fileInput.files[0];
+            const file = fileInput.files[0];
 
             if (filereader_support && acceptedTypes[file.type]) {
-                var reader = new FileReader();
+                const reader = new FileReader();
                 reader.onload = function (e) {
                     previewImg.src = e.target.result;
                     previewImg.style.display = 'block';
@@ -99,15 +111,6 @@
             }
         }
     }
-
-    // 設定預設日期為今天
-    document.addEventListener('DOMContentLoaded', function () {
-        var today = new Date().toISOString().split('T')[0];
-        var dateInput = document.querySelector('input[type="date"]');
-        if (dateInput && !dateInput.value) {
-            dateInput.value = today;
-        }
-    });
 </script>
 </body>
 </html>

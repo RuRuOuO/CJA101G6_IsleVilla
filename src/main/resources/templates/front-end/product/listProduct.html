@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>微嶼 | Isle Villa</title>
     <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
@@ -38,14 +38,20 @@
                 <div class="row row-cols-1 row-cols-md-3 g-4">
                     <div class="col" th:each="prod : ${product}">
                         <div class="card h-100">
-                            <img th:src="${prod.productImageUrl}" class="card-img-top" alt="商品圖片" />
+                            <img th:src="${prod.productImageUrl}" class="card-img-top" alt="商品圖片"/>
                             <div class="card-body">
                                 <h5 class="card-title" th:text="${prod.productName}"></h5>
                                 <p class="card-text" th:text="${prod.productDescription}"></p>
                                 <p class="price mt-auto" th:text="'$' + ${prod.productPrice}"></p>
                             </div>
                             <div class="card-footer">
-                                <a href="#" class="btn btn-primary">加入購物車</a>                            </div>
+                                <!-- 加入購物車按鈕 -->
+                                <form th:action="@{/addToCart}" method="post" class="d-inline">
+                                    <input type="hidden" name="productId" th:value="${prod.productId}" />
+                                    <input type="hidden" name="quantity" value="1" /> <!-- 預設數量為 1 -->
+                                    <button type="submit" class="btn btn-primary btn-sm ms-2">加入購物車</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -56,6 +62,8 @@
 
 </main>
 <!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
+<!-- 佔位元素 -->
+<div style="height: 55px"></div>
 <!-- ========== 載入Footer ========== -->
 <div th:replace="~{fragments/fragments :: footer}"></div>
 </body>
