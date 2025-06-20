@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>微嶼 | Isle Villa 優惠專案清單</title>
 <!--     ===== 載入統一樣式 ===== -->
-<!--     <th:block th:replace="~{fragments/backFragments :: styles}"></th:block> -->
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
 
 <head th:insert="~{/back-end/promotion/included-fragment}"></head>
 <script src="https://code.jquery.com/jquery-3.5.1.js"></script>                                    <!-- ●●js  for jquery datatables 用 -->
@@ -53,19 +53,19 @@ body {
 </head>
 <body>
 
-<!-- <nav class="navbar navbar-expand-md navbar-dark bg-success fixed-top justify-content-center"> -->
-		 <div align="center"> <h2>所有優惠專案 - listAllPromotion.html</h2>
-<!-- 		 <h3><a class="navbar-brand" th:href="@{/promotion/select_page}"><img th:src="@{/images/back1.gif}">回查詢頁<label th:text="${success}"></label></a></h3></div> -->
-<!-- </nav> -->
+<!--  <nav class="navbar navbar-expand-md navbar-dark bg-success fixed-top justify-content-center">  -->
+		 <div align="center"> <h2>優惠專案清單 | 微嶼 Isle Villa </h2>
+<!--  		 <h3><a class="navbar-brand" th:href="@{/promotion/select_page}"><img th:src="@{/images/back1.gif}">回查詢頁<label th:text="${success}"></label></a></h3></div>  -->
+<!--  </nav>  -->
 
-<!-- <!-- ===== 載入sidebar ===== --> -->
-<!-- <!-- 插入手機版側邊欄 --> -->
-<!-- <div th:replace="~{fragments/backFragments :: mobileSidebar}"></div> -->
-<!-- <!-- 插入桌面版側邊欄 --> -->
-<!-- <div th:replace="~{fragments/backFragments :: sidebar}"></div> -->
+<!-- ===== 載入sidebar ===== -->
+<!-- 插入手機版側邊欄 
+<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+<!-- 插入桌面版側邊欄 
+<div th:replace="~{fragments/backFragments :: sidebar}"></div>
 
-<!-- <main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}"> -->
-<!--     <th:block th:fragment="myContent"> -->
+<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+    <th:block th:fragment="myContent">
 <!--         //////////////////// 頁面內容放在這個card裡面(外框已經有加card和container，直接放入table和標題即可)//////////////////// -->
 
 <table id="example" class="display" style="width: 100%">
@@ -77,14 +77,13 @@ body {
 		<th>專案結束日期</th>
 		<th>備註</th>
 		<th>修改</th>
-<!-- 		<th>刪除</th> -->
+		<th>刪除</th>
 	</tr>
   </thead>
 	
   <tbody>
 		<th:block th:each="promotion : ${promotionListData}">
 			<tr>
-<!-- 				<td th:text="${promotionStat.count}"></td> -->
 				<td th:text="${promotion.roomPromotionId}"></td>
 				<td th:text="${promotion.roomPromotionTitle}"></td>
 				<td th:text="${promotion.promotionStartDate}"></td>
@@ -96,19 +95,19 @@ body {
 			     <input type="hidden" name="roomPromotionId" th:value="${promotion.roomPromotionId}"></form>
 			
 			</td>
-	<!--	<td>
+			<td>
 			  <form method="post" th:action="@{/promotion/delete}" style="margin-bottom: 0px;">
 			     <input type="submit" value="刪除">
-			     <input type="hidden" name="empno" th:value="${empVO.empno}"></form>
+			     <input type="hidden" name="roomPromotionId" th:value="${promotion.roomPromotionId}"></form>
 			
 			</td>
-	 -->
+	 
 			</tr>
 		</th:block>
   </tbody>
 </table>
-<!-- <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// --> -->
-<!--     </th:block> -->
+<!-- <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// --> 
+     </th:block> 
 </main>
 </body>
 </html>

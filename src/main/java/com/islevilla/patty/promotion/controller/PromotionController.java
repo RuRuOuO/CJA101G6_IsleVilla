@@ -56,9 +56,9 @@ public class PromotionController {
         return "back-end/promotion/listAllPromotion";
     }
 
-//    @PostMapping("/delete")
-//    public String delete(@RequestParam("roomPromotionId") Integer id, ModelMap model) {
-//        promotionSvc.deletePromotion(id);
-//        return "redirect:/promotion/listAll";
-//    }
+    @PostMapping("/delete")
+    public String delete(@RequestParam("roomPromotionId") Integer id, ModelMap model) {
+        promotionSvc.deletePromotion(id);
+        return "redirect:/promotion/listAll";
+    }
 }
