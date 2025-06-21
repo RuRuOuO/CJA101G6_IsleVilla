@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>商品訂單列表</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body th:attr="data-error=${updateErrorMsg != null}">
+    <div class="container mt-5">
+        <h2>商品訂單列表</h2>
+        <div th:if="${updateErrorMsg}" class="alert alert-danger" th:text="${updateErrorMsg}"></div>
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>訂單編號</th>
+                                    <th>會員名稱</th>
+                                    <th>訂單金額</th>
+                                    <th>折扣金額</th>
+                                    <th>實付金額</th>
+                                    <th>付款方式</th>
+                                    <th>取貨方式</th>
+                                    <th>聯絡人姓名</th>
+                                    <th>聯絡人電話</th>
+                                    <th>聯絡人地址</th>
+                                    <th>備註</th>
+                                    <th>訂單狀態</th>
+                                    <th>訂單時間</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="order : ${productOrderListData}">
+                                    <td th:text="${order.productOrderId}"></td>
+                                    <td th:text="${order.member.memberName}"></td>
+                                    <td th:text="${order.productOrderAmount}"></td>
+                                    <td th:text="${order.discountAmount}"></td>
+                                    <td th:text="${order.productPaidAmount}"></td>
+                                    <td th:text="${order.paymentMethod == 0 ? '信用卡' : '現金付款'}"></td>
+                                    <td th:text="${order.shippingMethod == 0 ? '宅配' : '飯店自取'}"></td>
+                                    <td th:text="${order.contactName}"></td>
+                                    <td th:text="${order.contactPhone}"></td>
+                                    <td th:text="${order.contactAddress}"></td>
+                                    <td th:text="${order.note != null ? order.note : '-'}"></td>
+                                    <td th:text="${order.orderStatus == 0 ? '訂單成立' : (order.orderStatus == 1 ? '配送中' : '已完成')}"></td>
+                                    <td th:text="${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                                    <td>
+                                        <button type="button" class="btn btn-primary btn-sm" onclick="openEditModal(this)"
+                                            th:attr="data-id=${order.productOrderId},data-name=${order.contactName},data-phone=${order.contactPhone},data-address=${order.contactAddress},data-note=${order.note},data-status=${order.orderStatus}">
+                                            修改
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="mt-3">
+                            <a href="/product-order/select_page" class="btn btn-secondary">返回查詢</a>
+                            <a href="/" class="btn btn-secondary">返回首頁</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="editOrderModal" tabindex="-1" role="dialog" aria-labelledby="editOrderModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <form id="editOrderForm" method="post" th:action="@{/product-order/update}">
+            <div class="modal-header">
+              <h5 class="modal-title" id="editOrderModalLabel">編輯訂單</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div th:if="${updateErrorMsg}" class="alert alert-danger" th:text="${updateErrorMsg}"></div>
+              <input type="hidden" name="productOrderId" id="modalOrderId">
+              <div class="form-group">
+                <label for="modalContactName">聯絡人姓名</label>
+                <input type="text" class="form-control" name="contactName" id="modalContactName" required>
+              </div>
+              <div class="form-group">
+                <label for="modalContactPhone">聯絡人電話</label>
+                <input type="text" class="form-control" name="contactPhone" id="modalContactPhone" required oninput="validatePhone()">
+                <div id="phoneError" class="text-danger" style="display:none;">電話只能輸入數字</div>
+              </div>
+              <div class="form-group">
+                <label for="modalContactAddress">聯絡人地址</label>
+                <input type="text" class="form-control" name="contactAddress" id="modalContactAddress" required>
+              </div>
+              <div class="form-group">
+                <label for="modalNote">備註</label>
+                <textarea class="form-control" name="note" id="modalNote" rows="2" maxlength="50" placeholder="如有特殊需求請在此說明"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="modalOrderStatus">訂單狀態</label>
+                <select class="form-control" name="orderStatus" id="modalOrderStatus" required>
+                  <option value="0">訂單成立</option>
+                  <option value="1">配送中</option>
+                  <option value="2">已完成</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+              <button type="submit" class="btn btn-primary">儲存</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script>
+    function openEditModal(btn) {
+        var id = btn.getAttribute('data-id');
+        var name = btn.getAttribute('data-name');
+        var phone = btn.getAttribute('data-phone');
+        var address = btn.getAttribute('data-address');
+        var note = btn.getAttribute('data-note');
+        var status = btn.getAttribute('data-status');
+        document.getElementById('modalOrderId').value = id;
+        document.getElementById('modalContactName').value = name;
+        document.getElementById('modalContactPhone').value = phone;
+        document.getElementById('modalContactAddress').value = address;
+        document.getElementById('modalNote').value = note;
+        document.getElementById('modalOrderStatus').value = status;
+        $('#editOrderModal').modal('show');
+        validatePhone();
+    }
+    function validatePhone() {
+        var phone = document.getElementById('modalContactPhone').value;
+        var errorDiv = document.getElementById('phoneError');
+        var saveBtn = document.querySelector('#editOrderModal button[type="submit"]');
+        if (!/^\d+$/.test(phone)) {
+            errorDiv.style.display = 'block';
+            saveBtn.disabled = true;
+        } else {
+            errorDiv.style.display = 'none';
+            saveBtn.disabled = false;
+        }
+    }
+    window.onload = function() {
+        var hasError = document.body.getAttribute('data-error');
+        var modalOrderId = /*[[${modalOrderId}]]*/ '';
+        var modalContactName = /*[['${modalContactName}']]*/ '';
+        var modalContactPhone = /*[['${modalContactPhone}']]*/ '';
+        var modalContactAddress = /*[['${modalContactAddress}']]*/ '';
+        var modalNote = /*[['${modalNote}']]*/ '';
+        var modalOrderStatus = /*[[${modalOrderStatus}]]*/ '';
+        if (hasError === 'true') {
+            if (modalOrderId) document.getElementById('modalOrderId').value = modalOrderId;
+            if (modalContactName) document.getElementById('modalContactName').value = modalContactName;
+            if (modalContactPhone) document.getElementById('modalContactPhone').value = modalContactPhone;
+            if (modalContactAddress) document.getElementById('modalContactAddress').value = modalContactAddress;
+            if (modalNote) document.getElementById('modalNote').value = modalNote;
+            if (modalOrderStatus !== '') document.getElementById('modalOrderStatus').value = modalOrderStatus;
+            $('#editOrderModal').modal('show');
+            validatePhone();
+        }
+    }
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html> 
