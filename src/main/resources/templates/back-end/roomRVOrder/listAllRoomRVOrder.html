@@ -20,8 +20,8 @@
         <div class="d-flex justify-content-center align-items-center">
             <div class="py-5 container">
                 <h2 class="section-title text-center mb-5">訂單一覽</h2>
-                <table class="table table-striped-columns shadow-sm">
-                    <thead class="table-primary">
+                <table class="table shadow-sm">
+                    <thead class="table-secondary">
                     <tr>
                         <th>訂房編號</th>
                         <th>會員編號</th>
@@ -29,54 +29,90 @@
                         <th>訂單狀態</th>
                         <th>入住日期</th>
                         <th>退房日期</th>
-                        <th>優惠專案編號</th>
-                        <th>訂房備註</th>
-                        <th>訂房總金額</th>
+                        <th>優惠專案</th>
+                        <th>備註</th>
+                        <th>總金額</th>
                         <th>折扣金額</th>
-                        <th>實際付款金額</th>
+                        <th>實付金額</th>
                         <th>明細</th>
-                        <th>取消申請</th>
+                        <th>取消</th>
                     </tr>
                     </thead>
                     <tbody>
                     <th:block th:each="order:${orderList}">
                         <tr>
-                            <td th:text="${order.roomReservationId}"></td>
-                            <td th:text="${order.members.memberId}"></td>
-                            <td th:text="${order.roomOrderDate}"></td>
-                            <td th:switch="${order.roomOrderStatus}">
-                                <span th:case="'0'">訂單成立</span>
-                                <span th:case="'1'">已付款</span>
-                                <span th:case="'2'">已完成</span>
-                                <span th:case="'3'">取消確認中</span>
-                                <span th:case="'4'">已取消</span>
-                                <span th:case="'*'">未知</span> <!-- 預設情況 -->
-                            </td>
-                            <td th:text="${#temporals.format(order.checkInDate, 'yyyy-MM-dd')}"></td>
-                            <td th:text="${#temporals.format(order.checkOutDate, 'yyy-MM-dd')}"></td>
                             <td>
-                            <span th:if="${order.promotion != null}"
-                                  th:text="${order.promotion.roomPromotionId}"></span>
-                                <span th:unless="${order.promotion != null}">無</span>
+                                <span class="order-id" th:text="${order.roomReservationId}"></span>
                             </td>
-                            <td th:text="${order.remark}"></td>
-                            <td th:text="${order.roomTotalAmount}"></td>
-                            <td th:text="${order.rvDiscountAmount}"></td>
-                            <td th:text="${order.rvPaidAmount}"></td>
+                            <td>
+                                <span class="member-id" th:text="${order.members.memberId}"></span>
+                            </td>
+                            <td>
+                                <span class="date-text"
+                                      th:text="${#temporals.format(order.roomOrderDate, 'yyyy-MM-dd')}"></span>
+                            </td>
+                            <td>
+                                        <span th:switch="${order.roomOrderStatus}" class="status-badge">
+                                            <span th:case="'0'" class="status-badge status-0">訂單成立</span>
+                                            <span th:case="'1'" class="status-badge status-1">已付款</span>
+                                            <span th:case="'2'" class="status-badge status-2">已完成</span>
+                                            <span th:case="'3'" class="status-badge status-3">取消確認中</span>
+                                            <span th:case="'4'" class="status-badge status-4">已取消</span>
+                                            <span th:case="'*'" class="status-badge status-0">未知</span>
+                                        </span>
+                            </td>
+                            <td>
+                                <span class="date-text"
+                                      th:text="${#temporals.format(order.checkInDate, 'yyyy-MM-dd')}"></span>
+                            </td>
+                            <td>
+                                <span class="date-text"
+                                      th:text="${#temporals.format(order.checkOutDate, 'yyyy-MM-dd')}"></span>
+                            </td>
+                            <td>
+                                        <span th:if="${order.promotion != null}"
+                                              class="promotion-tag"
+                                              th:text="${order.promotion.roomPromotionId}"></span>
+                                <span th:unless="${order.promotion != null}"
+                                      class="no-promotion">無</span>
+                            </td>
+                            <td>
+                                <span class="remark-text" th:text="${order.remark}" th:title="${order.remark}"></span>
+                            </td>
+                            <td>
+                                <span class="amount-text"
+                                      th:text="${#numbers.formatDecimal(order.roomTotalAmount, 0, 'COMMA', 0, 'POINT')} + ' 元'"></span>
+                            </td>
+                            <td>
+                                <span class="text-danger fw-bold"
+                                      th:text="${#numbers.formatDecimal(order.rvDiscountAmount, 0, 'COMMA', 0, 'POINT')} + ' 元'"></span>
+                            </td>
+                            <td>
+                                <span class="amount-text fs-6"
+                                      th:text="${#numbers.formatDecimal(order.rvPaidAmount, 0, 'COMMA', 0, 'POINT')} + ' 元'"></span>
+                            </td>
                             <td>
                                 <a class="btn btn-dark"
-                                   th:href="@{'/backend/room/reservation/order/' + ${order.roomReservationId}}">明細</a>
+                                   th:href="@{'/backend/room/reservation/order/' + ${order.roomReservationId}}">
+                                    <!--                                        <i class="fas fa-eye me-1"></i>-->
+                                    明細
+                                </a>
                             </td>
                             <td>
                                 <form th:action="@{'/backend/room/reservation/order/'+${order.roomReservationId} +'/cancel'}"
                                       method="post"
-                                      th:if="${order.roomOrderStatus=='3'}">
+                                      th:if="${order.roomOrderStatus=='3'}"
+                                      class="d-inline">
                                     <button type="submit" class="btn btn-danger"
-                                            onclick="return confirm('確定取消訂單？')">取消訂單
+                                            onclick="return confirm('確定取消訂單？')">
+<!--                                        <i class="fas fa-times me-1"></i>-->
+                                        取消
                                     </button>
                                 </form>
                             </td>
                         </tr>
+                    </th:block>
+                    </tbody>
                 </table>
                 <!-- ========== 載入分頁 ========== -->
                 <th:block

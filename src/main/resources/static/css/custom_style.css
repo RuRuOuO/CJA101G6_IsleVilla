@@ -29,11 +29,16 @@
 
 /* ==================== 統一樣式 ==================== */
 
-/* 全站取消圓角 */
+/* 字型 */
 * {
-    border-radius: 0px !important;
+    border-radius: 0 !important;
     font-family: "Noto Sans TC", sans-serif;
 }
+
+/* 除了card相關元素外全站調整圓角 */
+/**:not(.card):not(.card *){*/
+/*    border-radius: 0 !important;*/
+/*}*/
 
 /* 文字大小統一 */
 p,
@@ -139,7 +144,7 @@ footer {
     width: 100%;
     padding-top: 80%; /* 高度 = 寬度 × 0.8 */
     overflow: hidden;
-    border-radius: 12px;
+    /*border-radius: 12px;*/
     /* box-shadow: 5px 5px 20px rgba(0, 0, 0, 1); */
 }
 
