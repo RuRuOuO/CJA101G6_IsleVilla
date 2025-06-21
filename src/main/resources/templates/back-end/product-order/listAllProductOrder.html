@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>商品訂單列表</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>商品訂單列表</h2>
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>訂單編號</th>
+                                    <th>會員名稱</th>
+                                    <th>訂單金額</th>
+                                    <th>折扣金額</th>
+                                    <th>實付金額</th>
+                                    <th>付款方式</th>
+                                    <th>取貨方式</th>
+                                    <th>訂單狀態</th>
+                                    <th>訂單時間</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="order : ${productOrderListData}">
+                                    <td th:text="${order.productOrderId}"></td>
+                                    <td th:text="${order.member.memberName}"></td>
+                                    <td th:text="${order.productOrderAmount}"></td>
+                                    <td th:text="${order.discountAmount}"></td>
+                                    <td th:text="${order.productPaidAmount}"></td>
+                                    <td th:text="${order.paymentMethod == 0 ? '信用卡' : '現金付款'}"></td>
+                                    <td th:text="${order.shippingMethod == 0 ? '宅配' : '飯店自取'}"></td>
+                                    <td th:text="${order.orderStatus == 0 ? '成立' : (order.orderStatus == 1 ? '配送中' : '已取貨')}"></td>
+                                    <td th:text="${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                                    <td>
+                                        <a th:href="@{/product-order/getOneForUpdate(productOrderId=${order.productOrderId})}" 
+                                           class="btn btn-primary btn-sm">修改</a>
+                                        <a th:href="@{/product-order/delete(productOrderId=${order.productOrderId})}" 
+                                           class="btn btn-danger btn-sm"
+                                           onclick="return confirm('確定要刪除此訂單嗎？')">刪除</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="mt-3">
+                            <a href="/product-order/select_page" class="btn btn-secondary">返回查詢</a>
+                            <a href="/" class="btn btn-secondary">返回首頁</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html> 
