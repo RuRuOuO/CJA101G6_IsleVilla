@@ -45,9 +45,7 @@
                                     <th>優惠券代碼</th>
                                     <th>折扣金額</th>
                                     <th>最低消費金額</th>
-                                    <th>啟用日期</th>
-                                    <th>結束日期</th>
-                                    <th>操作</th>
+                                    <th>使用日期</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -58,13 +56,7 @@
                                     <td th:text="${memberCoupon.coupon.couponCode}"></td>
                                     <td th:text="${memberCoupon.coupon.discountValue}"></td>
                                     <td th:text="${memberCoupon.coupon.minSpend}"></td>
-                                    <td th:text="${#temporals.format(memberCoupon.coupon.startDate, 'yyyy-MM-dd')}"></td>
-                                    <td th:text="${#temporals.format(memberCoupon.coupon.endDate, 'yyyy-MM-dd')}"></td>
-                                    <td>
-                                        <a th:href="@{/member-coupon/delete(memberId=${memberCoupon.id.memberId}, couponId=${memberCoupon.id.couponId})}" 
-                                           class="btn btn-danger btn-sm"
-                                           onclick="return confirm('確定要刪除此優惠券使用記錄嗎？')">刪除</a>
-                                    </td>
+                                    <td th:text="${#temporals.format(memberCoupon.usedDate, 'yyyy-MM-dd')}"></td>
                                 </tr>
                             </tbody>
                         </table>

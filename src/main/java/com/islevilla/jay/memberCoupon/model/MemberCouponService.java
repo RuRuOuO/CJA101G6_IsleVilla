@@ -48,15 +48,19 @@ public class MemberCouponService {
     }
 
     public List<MemberCoupon> getAll() {
-        return repository.findAll();
+        return repository.findAllByOrderByUsedDateDesc();
     }
 
     public List<MemberCoupon> findByMemberId(Integer memberId) {
-        return repository.findMemberCouponsByMemberId(memberId);
+        return repository.findByMemberId(memberId);
     }
 
     public List<MemberCoupon> findByCouponId(Integer couponId) {
         return repository.findByCouponId(couponId);
+    }
+
+    public List<MemberCoupon> findMemberCouponsByMemberId(Integer memberId) {
+        return repository.findMemberCouponsByMemberId(memberId);
     }
 
     // 檢查會員是否已使用過此優惠券
@@ -91,5 +95,10 @@ public class MemberCouponService {
             return 0;
         }
         return memberCoupon.getCoupon().getDiscountValue();
+    }
+
+    // 查詢會員可用的優惠券（未過期且符合使用條件）
+    public List<MemberCoupon> findValidCouponsByMemberId(Integer memberId, Integer orderAmount) {
+        return repository.findValidCouponsByMemberId(memberId, orderAmount);
     }
 } 
