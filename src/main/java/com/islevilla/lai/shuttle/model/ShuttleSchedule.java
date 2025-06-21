@@ -1,9 +1,9 @@
 package com.islevilla.lai.shuttle.model;
 
 import java.time.LocalTime;
+import java.util.List;
 
 import jakarta.persistence.*;
-import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -27,4 +27,10 @@ public class ShuttleSchedule {
 	@Column(name = "shuttle_arrival_time", nullable = false)
 	@NotNull(message = "請輸入抵達時間")
 	private LocalTime shuttleArrivalTime;
+	
+	@OneToMany(mappedBy = "shuttleSchedule")
+    private List<ShuttleReservation> shuttleReservation;
+	
+	@OneToMany(mappedBy = "shuttleSchedule")
+	private List<ShuttleSeatAvailability> shuttleSeatAvailability;
 }
