@@ -1,5 +1,7 @@
 package com.islevilla.lai.shuttle.model;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -23,4 +25,8 @@ public class Seat {
 	@Column(name = "seat_status", nullable = false)
 	@NotNull(message = "請選擇座位狀態")
 	private Integer seatStatus; // 0:故障 1:正常
+	
+	// 一對多
+	@OneToMany(mappedBy = "seat")
+    private List<ShuttleReservationSeat> shuttleReservationSeat;
 }

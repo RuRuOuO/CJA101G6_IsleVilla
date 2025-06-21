@@ -12,26 +12,26 @@ public interface ShuttleReservationSeatRepository
 		extends JpaRepository<ShuttleReservationSeat, ShuttleReservationSeat.ShuttleReservationSeatId> {
 
 	// 根據預約ID查詢所有座位
-	List<ShuttleReservationSeat> findByShuttleReservationId(Integer shuttleReservationId);
+//	List<ShuttleReservationSeat> findByShuttleReservationId(Integer shuttleReservationId);
 
 	// 根據座位ID查詢所有預約
-	List<ShuttleReservationSeat> findBySeatId(Integer seatId);
+//	List<ShuttleReservationSeat> findBySeatId(Integer seatId);
 
 	// 檢查特定預約和座位的組合是否存在
-	boolean existsByShuttleReservationIdAndSeatId(Integer shuttleReservationId, Integer seatId);
+//	boolean existsByShuttleReservationIdAndSeatId(Integer shuttleReservationId, Integer seatId);
 
 	// 刪除特定預約的所有座位
-	void deleteByShuttleReservationId(Integer shuttleReservationId);
+//	void deleteByShuttleReservationId(Integer shuttleReservationId);
 
 	// 刪除特定座位的所有預約
-	void deleteBySeatId(Integer seatId);
+//	void deleteBySeatId(Integer seatId);
 
 	// 計算特定預約的座位數量
-	@Query("SELECT COUNT(s) FROM ShuttleReservationSeat s WHERE s.shuttleReservationId = :shuttleReservationId")
-	Long countSeatsByReservationId(@Param("shuttleReservationId") Integer shuttleReservationId);
+//	@Query("SELECT COUNT(s) FROM ShuttleReservationSeat s WHERE s.shuttleReservationId = :shuttleReservationId")
+//	Long countSeatsByReservationId(@Param("shuttleReservationId") Integer shuttleReservationId);
 
-	// 計算特定座位的預約數量
-	@Query("SELECT COUNT(s) FROM ShuttleReservationSeat s WHERE s.seatId = :seatId")
-	Long countReservationsBySeatId(@Param("seatId") Integer seatId);
+	// 計算特定座位的預約數量 (出錯)
+//	@Query("SELECT COUNT(s) FROM ShuttleReservationSeat s WHERE s.seatId = :seatId")
+//	Long countReservationsBySeatId(@Param("seatId") Integer seatId);
 
 }

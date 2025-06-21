@@ -23,57 +23,57 @@ public class ShuttleSeatAvailabilityService {
 		return shuttleSeatAvailabilityRepository.findById(id);
 	}
 
-	public List<ShuttleSeatAvailability> getSeatAvailabilityByScheduleId(Integer scheduleId) {
-		return shuttleSeatAvailabilityRepository.findByShuttleScheduleId(scheduleId);
-	}
+//	public List<ShuttleSeatAvailability> getSeatAvailabilityByScheduleId(Integer scheduleId) {
+//		return shuttleSeatAvailabilityRepository.findByShuttleScheduleId(scheduleId);
+//	}
 
-	public List<ShuttleSeatAvailability> getSeatAvailabilityByDate(LocalDate date) {
-		return shuttleSeatAvailabilityRepository.findByShuttleDate(date);
-	}
+//	public List<ShuttleSeatAvailability> getSeatAvailabilityByDate(LocalDate date) {
+//		return shuttleSeatAvailabilityRepository.findByShuttleDate(date);
+//	}
 
-	public Optional<ShuttleSeatAvailability> getSeatAvailabilityByScheduleAndDate(Integer scheduleId, LocalDate date) {
-		return shuttleSeatAvailabilityRepository.findByShuttleScheduleIdAndShuttleDate(scheduleId, date);
-	}
+//	public Optional<ShuttleSeatAvailability> getSeatAvailabilityByScheduleAndDate(Integer scheduleId, LocalDate date) {
+//		return shuttleSeatAvailabilityRepository.findByShuttleScheduleIdAndShuttleDate(scheduleId, date);
+//	}
 
 	@Transactional
 	public ShuttleSeatAvailability saveSeatAvailability(ShuttleSeatAvailability seatAvailability) {
 		return shuttleSeatAvailabilityRepository.save(seatAvailability);
 	}
 
+//	@Transactional
+//	public ShuttleSeatAvailability updateSeatQuantity(Integer scheduleId, LocalDate date, Integer quantity) {
+//		Optional<ShuttleSeatAvailability> availabilityOpt = shuttleSeatAvailabilityRepository
+//				.findByShuttleScheduleIdAndShuttleDate(scheduleId, date);
+//
+//		if (availabilityOpt.isPresent()) {
+//			ShuttleSeatAvailability availability = availabilityOpt.get();
+//			availability.setSeatQuantity(quantity);
+//			return shuttleSeatAvailabilityRepository.save(availability);
+//		} else {
+//			// 如果不存在，創建新記錄
+//			ShuttleSeatAvailability newAvailability = new ShuttleSeatAvailability();
+//			newAvailability.setShuttleScheduleId(scheduleId);
+//			newAvailability.setShuttleDate(date);
+//			newAvailability.setSeatQuantity(quantity);
+//			return shuttleSeatAvailabilityRepository.save(newAvailability);
+//		}
+//	}
+
 	@Transactional
-	public ShuttleSeatAvailability updateSeatQuantity(Integer scheduleId, LocalDate date, Integer quantity) {
-		Optional<ShuttleSeatAvailability> availabilityOpt = shuttleSeatAvailabilityRepository
-				.findByShuttleScheduleIdAndShuttleDate(scheduleId, date);
-
-		if (availabilityOpt.isPresent()) {
-			ShuttleSeatAvailability availability = availabilityOpt.get();
-			availability.setSeatQuantity(quantity);
-			return shuttleSeatAvailabilityRepository.save(availability);
-		} else {
-			// 如果不存在，創建新記錄
-			ShuttleSeatAvailability newAvailability = new ShuttleSeatAvailability();
-			newAvailability.setShuttleScheduleId(scheduleId);
-			newAvailability.setShuttleDate(date);
-			newAvailability.setSeatQuantity(quantity);
-			return shuttleSeatAvailabilityRepository.save(newAvailability);
-		}
-	}
-
-	@Transactional
-	public boolean reserveSeats(Integer scheduleId, LocalDate date, Integer seatCount) {
-		Optional<ShuttleSeatAvailability> availabilityOpt = shuttleSeatAvailabilityRepository
-				.findByShuttleScheduleIdAndShuttleDate(scheduleId, date);
-
-		if (availabilityOpt.isPresent()) {
-			ShuttleSeatAvailability availability = availabilityOpt.get();
-			if (availability.getSeatQuantity() >= seatCount) {
-				availability.setSeatQuantity(availability.getSeatQuantity() - seatCount);
-				shuttleSeatAvailabilityRepository.save(availability);
-				return true;
-			}
-		}
-		return false;
-	}
+//	public boolean reserveSeats(Integer scheduleId, LocalDate date, Integer seatCount) {
+//		Optional<ShuttleSeatAvailability> availabilityOpt = shuttleSeatAvailabilityRepository
+//				.findByShuttleScheduleIdAndShuttleDate(scheduleId, date);
+//
+//		if (availabilityOpt.isPresent()) {
+//			ShuttleSeatAvailability availability = availabilityOpt.get();
+//			if (availability.getSeatQuantity() >= seatCount) {
+//				availability.setSeatQuantity(availability.getSeatQuantity() - seatCount);
+//				shuttleSeatAvailabilityRepository.save(availability);
+//				return true;
+//			}
+//		}
+//		return false;
+//	}
 
 	public void deleteSeatAvailability(ShuttleSeatAvailability.ShuttleSeatAvailabilityId id) {
 		shuttleSeatAvailabilityRepository.deleteById(id);
