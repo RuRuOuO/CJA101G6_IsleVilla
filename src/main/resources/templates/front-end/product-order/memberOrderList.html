@@ -113,7 +113,7 @@
                                     <td th:text="${order.shippingMethod}" class="shippingMethod"></td>
                                     <td th:text="${order.orderStatus}" class="orderStatus"></td>
                                     <td>
-                                        <form th:action="@{/product-order/checkoutResult}" method="get">
+                                        <form th:action="@{/product-order/memberOrderDetail}" method="get">
                                             <input type="hidden" name="orderNo" th:value="${order.productOrderId}">
                                             <button class="btn btn-primary">查看詳情</button>
                                         </form>
@@ -185,7 +185,7 @@
                 e.textContent = '配送中';
                 break;
             case '2':
-                e.textContent = '已取貨';
+                e.textContent = '已完成';
                 break;
         }
     });

@@ -148,7 +148,6 @@ public class ProductOrderController {
                 detail.setProduct(product);
                 detail.setProductOrderQuantity(cartItem.getQuantity());
                 detail.setProductOrderPrice(product.getProductPrice());
-                detail.setProductName(product);
                 detail.setProductOrder(productOrder);
                 productOrderSvc.addOrderDetail(productOrder, detail);
             }
@@ -181,19 +180,45 @@ public class ProductOrderController {
      * It also validates the user input
      */
     @PostMapping("update")
-    public String update(@Valid ProductOrder productOrder, BindingResult result, ModelMap model) throws IOException {
-        /*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
-        if (result.hasErrors()) {
-            return "back-end/product-order/update_productOrder_input";
+    public String update(@ModelAttribute ProductOrder productOrder, BindingResult result, ModelMap model) {
+        // 驗證聯絡人姓名、電話、地址
+        StringBuilder errorMsg = new StringBuilder();
+        if (productOrder.getContactName() == null || productOrder.getContactName().trim().isEmpty()) {
+            errorMsg.append("聯絡人姓名不能為空\n");
         }
-        /*************************** 2.開始修改資料 *****************************************/
-        productOrderSvc.updateProductOrder(productOrder);
-        
-        /*************************** 3.修改完成,準備轉交(Send the Success view) **************/
-        productOrder = productOrderSvc.getOneProductOrder(productOrder.getProductOrderId());
-        model.addAttribute("productOrder", productOrder);
-        model.addAttribute("productOrderDetails", productOrder.getProductOrderDetails());
-        return "back-end/product-order/listOneProductOrder";
+        if (productOrder.getContactPhone() == null || productOrder.getContactPhone().trim().isEmpty()) {
+            errorMsg.append("聯絡人電話不能為空\n");
+        }
+        if (productOrder.getContactAddress() == null || productOrder.getContactAddress().trim().isEmpty()) {
+            errorMsg.append("聯絡人地址不能為空\n");
+        }
+        if (errorMsg.length() > 0) {
+            // 重新查詢訂單列表並顯示錯誤
+            List<ProductOrder> list = productOrderSvc.getAll();
+            model.addAttribute("productOrderListData", list);
+            model.addAttribute("updateErrorMsg", errorMsg.toString());
+            model.addAttribute("modalOrderId", productOrder.getProductOrderId());
+            model.addAttribute("modalContactName", productOrder.getContactName());
+            model.addAttribute("modalContactPhone", productOrder.getContactPhone());
+            model.addAttribute("modalContactAddress", productOrder.getContactAddress());
+            model.addAttribute("modalNote", productOrder.getNote());
+            model.addAttribute("modalOrderStatus", productOrder.getOrderStatus());
+            return "back-end/product-order/listAllProductOrder";
+        }
+        // 先查出原本的訂單
+        ProductOrder dbOrder = productOrderSvc.getOneProductOrder(productOrder.getProductOrderId());
+        if (dbOrder == null) {
+            return "redirect:/product-order/listAllProductOrder";
+        }
+        // 只更新允許的欄位
+        dbOrder.setContactName(productOrder.getContactName());
+        dbOrder.setContactPhone(productOrder.getContactPhone());
+        dbOrder.setContactAddress(productOrder.getContactAddress());
+        dbOrder.setNote(productOrder.getNote());
+        dbOrder.setOrderStatus(productOrder.getOrderStatus());
+        // 其他欄位保留原值
+        productOrderSvc.updateProductOrder(dbOrder);
+        return "redirect:/product-order/listAllProductOrder";
     }
 
     /*
@@ -228,10 +253,10 @@ public class ProductOrderController {
     // 顯示會員訂單
     @GetMapping("memOrders")
     public String listMemAllOrder(HttpSession session, Model model) {
-        Members loggedInMember = (Members) session.getAttribute("loggedInMember");
+        Members loggedInMember = (Members) session.getAttribute("member");
         
         if (loggedInMember == null) {
-            return "redirect:/member/loginMem";
+            return "redirect:/member/login";
         }
         
         Integer loginMemNo = loggedInMember.getMemberId();
@@ -239,7 +264,7 @@ public class ProductOrderController {
         List<ProductOrder> memOrderList = productOrderSvc.getMemAllOrder(loginMemNo);
         model.addAttribute("loginMemNo", loginMemNo);
         model.addAttribute("memOrderList", memOrderList);
-        return "front-end/product-order/memOrderList";
+        return "front-end/product-order/memberOrderList";
     }
 
     // 複合查詢
@@ -281,9 +306,9 @@ public class ProductOrderController {
     @ModelAttribute("orderStatusMapData")
     protected Map<Byte, String> referenceOrderStatusMapData() {
         Map<Byte, String> map = new LinkedHashMap<>();
-        map.put((byte)0, "成立");
+        map.put((byte)0, "訂單成立");
         map.put((byte)1, "配送中");
-        map.put((byte)2, "已取貨");
+        map.put((byte)2, "已完成");
         return map;
     }
 
@@ -308,6 +333,34 @@ public class ProductOrderController {
         model.addAttribute("order", order);
         model.addAttribute("orderDetails", orderDetails);
         return "front-end/product-order/checkoutResult";
+    }
+
+    // 會員訂單詳情頁面
+    @GetMapping("memberOrderDetail")
+    public String memberOrderDetail(@RequestParam("orderNo") Integer orderNo, HttpSession session, Model model) {
+        // 檢查會員是否已登入
+        Members loggedInMember = (Members) session.getAttribute("member");
+        if (loggedInMember == null) {
+            return "redirect:/member/login";
+        }
+        
+        // 查詢訂單
+        ProductOrder order = productOrderSvc.getOneProductOrder(orderNo);
+        if (order == null) {
+            return "redirect:/product-order/memOrders";
+        }
+        
+        // 檢查訂單是否屬於當前登入會員
+        if (!order.getMember().getMemberId().equals(loggedInMember.getMemberId())) {
+            return "redirect:/product-order/memOrders";
+        }
+        
+        // 查詢訂單明細
+        List<ProductOrderDetail> orderDetails = orderDetailSvc.findByProductOrderId(orderNo);
+        
+        model.addAttribute("order", order);
+        model.addAttribute("orderDetails", orderDetails);
+        return "front-end/product-order/memberOrderDetail";
     }
 
     @GetMapping("select_page")

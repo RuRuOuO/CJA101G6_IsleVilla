@@ -23,9 +23,6 @@ public class MemberCoupon {
     @JoinColumn(name = "coupon_id", nullable = false)
     private Coupon coupon;
 
-    @Column(name = "is_used", nullable = false)
-    private Integer isUsed = 0; // 0=未使用, 1=已使用
-
     @Column(name = "used_date")
     private LocalDate usedDate; // 使用日期
 
@@ -57,14 +54,6 @@ public class MemberCoupon {
 
     public void setCoupon(Coupon coupon) {
         this.coupon = coupon;
-    }
-
-    public Integer getIsUsed() {
-        return isUsed;
-    }
-
-    public void setIsUsed(Integer isUsed) {
-        this.isUsed = isUsed;
     }
 
     public LocalDate getUsedDate() {
