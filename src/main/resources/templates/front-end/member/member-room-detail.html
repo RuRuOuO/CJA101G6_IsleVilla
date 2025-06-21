@@ -23,7 +23,7 @@
                 <!--                   th:href="@{/member/room/list}"><i class="fa-solid fa-arrow-left"></i></a>-->
                 <div class="col-12" th:each="order : ${orderList}">
                     <div class="card shadow-sm p-3">
-                        <h5 class="card-title mb-3">訂單編號：<span th:text="${order.getRoomReservationId()}"></span>
+                        <h5 class="card-title mb-3">訂單編號：<span th:text="${order.roomReservationId}"></span>
                         </h5>
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item">訂購日期：<span
@@ -62,18 +62,18 @@
                 <div th:each="detail : ${detailList}">
                     <div class="card shadow-sm p-3">
                         <h5 class="card-title mb-3">明細編號：<span
-                                th:text="${detail.getRoomReservationDetailId()}"></span></h5>
+                                th:text="${detail.roomReservationDetailId}"></span></h5>
                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item">房號：<span th:text="${detail.room.getRoomId()}"></span></li>
+                            <li class="list-group-item">房號：<span th:text="${detail.room.roomId}"></span></li>
                             <li class="list-group-item">房型：<span
-                                    th:text="${detail.roomType.getRoomTypeName()}"></span></li>
-                            <li class="list-group-item">人數：<span th:text="${detail.getGuestCount()}"></span></li>
+                                    th:text="${detail.roomType.roomTypeName}"></span></li>
+                            <li class="list-group-item">人數：<span th:text="${detail.gestCount}"></span></li>
                             <!-- 有折價的話顯示折扣價錢與原價-->
-                            <li class="list-group-item" th:if="${detail.getRvDiscountAmount()>0}">原價：<span
+                            <li class="list-group-item" th:if="${detail.rvDiscountAmount>0}">原價：<span
                                     th:text="${detail.getRoomPrice()}"></span></li>
-                            <li class="list-group-item" th:if="${detail.getRvDiscountAmount()>0}">折扣金額：<span
-                                    th:text="${detail.getRvDiscountAmount()}"></span></li>
-                            <li class="list-group-item">總額：<span th:text="${detail.getRvPaidAmount()}"></span>
+                            <li class="list-group-item" th:if="${detail.rvDiscountAmount>0}">折扣金額：<span
+                                    th:text="${detail.rvDiscountAmount}"></span></li>
+                            <li class="list-group-item">總額：<span th:text="${detail.rvPaidAmount}"></span>
                             </li>
                         </ul>
                     </div>

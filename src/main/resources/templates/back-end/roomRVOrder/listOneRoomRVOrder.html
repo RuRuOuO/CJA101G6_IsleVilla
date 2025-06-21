@@ -2,100 +2,108 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <meta content="width=device-width, initial-scale=1" name="viewport"/>
-    <title>後台 | 所有訂單一覽</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>微嶼 | Isle Villa 後台首頁</title>
     <!-- ===== 載入統一樣式 ===== -->
-    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
 </head>
 <body>
-<!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
-<main>
-    <div class="d-flex justify-content-center align-items-center">
-        <div class="py-5 container">
-            <h2 class="section-title text-center mb-5">訂單明細</h2>
-            <table class="table table-striped-columns shadow-sm">
-                <thead class="table-primary">
-                <tr>
-                    <th>訂房編號</th>
-                    <th>會員編號</th>
-                    <th>訂單日期</th>
-                    <th>訂單狀態</th>
-                    <th>入住日期</th>
-                    <th>退房日期</th>
-                    <th>優惠專案編號</th>
-                    <th>訂房備註</th>
-                    <th>訂房總金額</th>
-                    <th>折扣金額</th>
-                    <th>實際付款金額</th>
-                </tr>
-                </thead>
-                <tbody>
-                <th:block th:each="order:${orderList}">
+<!-- ===== 載入sidebar ===== -->
+<!-- 插入手機版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+<!-- 插入桌面版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+
+<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+    <th:block th:fragment="myContent">
+        <!-- //////////////////// 頁面內容放在這個card裡面(外框已經有加card和container，直接放入table和標題即可)//////////////////// -->
+        <div class="d-flex justify-content-center align-items-center">
+            <div class="py-5 container">
+                <h2 class="section-title text-center mb-5">訂單明細</h2>
+                <table class="table table-striped-columns shadow-sm">
+                    <thead class="table-primary">
                     <tr>
-                        <td th:text="${order.roomReservationId}"></td>
-                        <td th:text="${order.members.memberId}"></td>
-                        <td th:text="${order.roomOrderDate}"></td>
-                        <td th:switch="${order.roomOrderStatus}">
-                            <span th:case="'0'">成立</span>
-                            <span th:case="'1'">付款中</span>
-                            <span th:case="'2'">完成</span>
-                            <span th:case="'3'">退款</span>
-                            <span th:case="'4'">取消</span>
-                            <span th:case="*">未知</span> <!-- 預設情況 -->
-                        </td>
-                        <td th:text="${#temporals.format(order.checkInDate,'yyyy-MM-dd')}"></td>
-                        <td th:text="${#temporals.format(order.checkOutDate,'yyy-MM-dd')}"></td>
-                        <td>
-                            <span th:if="${order.promotion != null}" th:text="${order.promotion.roomPromotionId}"></span>
-                            <span th:unless="${order.promotion != null}">無</span>
-                        </td>
-                        <td th:text="${order.remark}"></td>
-                        <td th:text="${order.roomTotalAmount}"></td>
-                        <td th:text="${order.rvDiscountAmount}"></td>
-                        <td th:text="${order.rvPaidAmount}"></td>
+                        <th>訂房編號</th>
+                        <th>會員編號</th>
+                        <th>訂單日期</th>
+                        <th>訂單狀態</th>
+                        <th>入住日期</th>
+                        <th>退房日期</th>
+                        <th>優惠專案編號</th>
+                        <th>訂房備註</th>
+                        <th>訂房總金額</th>
+                        <th>折扣金額</th>
+                        <th>實際付款金額</th>
                     </tr>
-                </th:block>
-                </tbody>
-            </table>
-            <table class="table table-striped-columns shadow-sm">
-                <thead class="table-primary">
-                <tr>
-                    <th>訂單明細編號</th>
-                    <th>訂房編號</th>
-                    <th>房號</th>
-                    <th>房型編號</th>
-                    <th>入住人數</th>
-                    <th>購買時單價</th>
-                    <th>折扣金額</th>
-                    <th>實際付款金額</th>
-                </tr>
-                </thead>
-                <tbody>
-                <th:block th:each="detail:${detailList}">
+                    </thead>
+                    <tbody>
+                    <th:block th:each="order:${orderList}">
+                        <tr>
+                            <td th:text="${order.roomReservationId}"></td>
+                            <td th:text="${order.members.memberId}"></td>
+                            <td th:text="${order.roomOrderDate}"></td>
+                            <td th:switch="${order.roomOrderStatus}">
+                                <span th:case="'0'">訂單成立</span>
+                                <span th:case="'1'">已付款</span>
+                                <span th:case="'2'">已完成</span>
+                                <span th:case="'3'">取消確認中</span>
+                                <span th:case="'4'">已取消</span>
+                                <span th:case="'*'">未知</span> <!-- 預設情況 -->
+                            </td>
+                            <td th:text="${#temporals.format(order.checkInDate,'yyyy-MM-dd')}"></td>
+                            <td th:text="${#temporals.format(order.checkOutDate,'yyy-MM-dd')}"></td>
+                            <td>
+                            <span th:if="${order.promotion != null}"
+                                  th:text="${order.promotion.roomPromotionId}"></span>
+                                <span th:unless="${order.promotion != null}">無</span>
+                            </td>
+                            <td th:text="${order.remark}"></td>
+                            <td th:text="${order.roomTotalAmount}"></td>
+                            <td th:text="${order.rvDiscountAmount}"></td>
+                            <td th:text="${order.rvPaidAmount}"></td>
+                        </tr>
+                    </th:block>
+                    </tbody>
+                </table>
+                <table class="table table-striped-columns shadow-sm">
+                    <thead class="table-primary">
                     <tr>
-                        <td th:text="${detail.roomReservationDetailId}"></td>
-                        <td th:text="${detail.roomRVOrder.roomReservationId}"></td>
-                        <td th:text="${detail.room.roomId}"></td>
-                        <td th:text="${detail.roomType.roomTypeId}"></td>
-                        <td th:text="${detail.guestCount}"></td>
-                        <td th:text="${detail.roomPrice}"></td>
-                        <td th:text="${detail.rvDiscountAmount}"></td>
-                        <td th:text="${detail.rvPaidAmount}"></td>
+                        <th>訂單明細編號</th>
+                        <th>訂房編號</th>
+                        <th>房號</th>
+                        <th>房型編號</th>
+                        <th>入住人數</th>
+                        <th>購買時單價</th>
+                        <th>折扣金額</th>
+                        <th>實際付款金額</th>
                     </tr>
-                </th:block>
-                </tbody>
-            </table>
-            <div>
-                <label></label>
-                <span>
-            <a class="btn btn-dark" th:href="@{/backend/room/reservation/order/list}">
-              返回上頁
-            </a>
-          </span>
+                    </thead>
+                    <tbody>
+                    <th:block th:each="detail:${detailList}">
+                        <tr>
+                            <td th:text="${detail.roomReservationDetailId}"></td>
+                            <td th:text="${detail.roomRVOrder.roomReservationId}"></td>
+                            <td th:text="${detail.room.roomId}"></td>
+                            <td th:text="${detail.roomType.roomTypeId}"></td>
+                            <td th:text="${detail.guestCount}"></td>
+                            <td th:text="${detail.roomPrice}"></td>
+                            <td th:text="${detail.rvDiscountAmount}"></td>
+                            <td th:text="${detail.rvPaidAmount}"></td>
+                        </tr>
+                    </th:block>
+                    </tbody>
+                </table>
+                <div>
+                    <label></label>
+                    <span>
+                    <a class="btn btn-dark" th:href="@{/backend/room/reservation/order/list}">
+                        返回上頁
+                    </a>
+            </span>
+                </div>
             </div>
-        </div>
-    </div>
+            <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+    </th:block>
 </main>
-<!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
 </body>
 </html>

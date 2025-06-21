@@ -28,19 +28,8 @@ public class RoomRVOrderService {
         return roomRVOrder.orElse(null);
     }
 
-    //
-    public List<RoomRVOrder> getRoomRVOrderByMember(Members member) {
-        return roomRVOrderRepository.findByMembers(member);
-    }
-
     // 用會員id查詢該會員所有訂單
-    public List<RoomRVOrder> getRoomRVOrderByMemberId(Integer memberId) {
-        // 先取得 Members 物件
-        Optional<Members> optionalMember = membersRepository.findById(memberId);
-        if (optionalMember.isEmpty()) {
-            return List.of(); // 回傳空清單避免 NullPointerException
-        }
-        Members member = optionalMember.get();
+    public List<RoomRVOrder> getRoomRVOrderByMember(Members member) {
         return roomRVOrderRepository.findByMembers(member);
     }
 
@@ -54,6 +43,15 @@ public class RoomRVOrderService {
         RoomRVOrder order = getById(orderId);
         if (order != null) {
             order.setRoomOrderStatus("3");
+            updateRoomRVOrder(order);
+        }
+    }
+
+    // 取消訂單
+    public void cancelOrderBack(Integer orderId) {
+        RoomRVOrder order = getById(orderId);
+        if (order != null) {
+            order.setRoomOrderStatus("4");
             updateRoomRVOrder(order);
         }
     }

@@ -22,7 +22,7 @@
                 <div th:if="${!orderList.isEmpty()}">
                     <div class="col-12" th:each="order : ${orderList}">
                         <div class="card shadow-sm p-3">
-                            <h5 class="card-title mb-3">訂單編號：<span th:text="${order.getRoomReservationId()}"></span>
+                            <h5 class="card-title mb-3">訂單編號：<span th:text="${order.roomReservationId}"></span>
                             </h5>
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item">訂購日期：<span
@@ -47,7 +47,7 @@
                                 </li>
                             </ul>
                             <a class="btn btn-dark"
-                               th:href="@{'/member/room/'+${order.getRoomReservationId()}}">明細</a>
+                               th:href="@{'/member/room/'+${order.roomReservationId}}">明細</a>
                         </div>
                     </div>
                 </div>

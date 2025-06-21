@@ -35,27 +35,14 @@ public class RoomRVController {
     @Autowired
     private RoomRVDetailService roomRVDetailService;
 
-//    // 前台渲染會員訂單
-//    @GetMapping("/member/room/list")
-//    public String getRoomRVOrdersFromMember(Model model, HttpSession session) {
-//        // 從session抓出登入的會員物件
-//         Members loginMember = (Members) session.getAttribute("member");
-//        if (loginMember == null) {
-//            return "redirect:/member/login";
-//        }
-//
-//        // 查詢訂單
-//        List<RoomRVOrder> orderList = roomRVOrderService.getRoomRVOrderByMember(loginMember);
-//        model.addAttribute("orderList", orderList);
-//
-//        return "front-end/member/member-room-list";
-//    }
-
     // 前台渲染會員訂單
     @GetMapping("/member/room/list")
-    public String getRoomRVOrdersFromMember(Model model) {
-        Members loginMember = membersService.getOneMember(8);
-// Members loginMember = membersRepository.findById(3);
+    public String getRoomRVOrdersFromMember(Model model, HttpSession session) {
+//  public String getRoomRVOrdersFromMember(Model model) {
+        // // 從session抓出登入的會員物件
+        Members loginMember = (Members) session.getAttribute("member");
+        // 先寫死跳過登入步驟
+        // Members loginMember = membersService.getOneMember(8);
         if (loginMember == null) {
             return "redirect:/member/login";
         }
@@ -80,10 +67,18 @@ public class RoomRVController {
         return "front-end/member/member-room-detail";
     }
 
+    // 前台取消訂單
     @PostMapping("/member/room/{id}/cancel")
-    public String cancelOrder(@PathVariable Integer id) {
+    public String cancelOrderFront(@PathVariable Integer id) {
         roomRVOrderService.cancelOrderFront(id);
         return "redirect:/member/room/list";
+    }
+
+    // 後台取消訂單
+    @PostMapping("/backend/room/reservation/order/{id}/cancel")
+    public String cancelOrderBack(@PathVariable Integer id) {
+        roomRVOrderService.cancelOrderBack(id);
+        return "redirect:/backend/room/reservation/order/list";
     }
 
     // 後台顯示全部訂單
@@ -104,6 +99,7 @@ public class RoomRVController {
         return "back-end/roomRVOrder/listAllRoomRVOrder";
     }
 
+    // 後台顯示訂單明細
     @GetMapping("/backend/room/reservation/order/{id}")
     public String getOneRoomRVOrder(@PathVariable("id") Integer id, Model model) {
         // 訂單

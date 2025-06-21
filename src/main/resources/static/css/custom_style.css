@@ -71,6 +71,7 @@ li {
 
 .btn:hover {
     border: 1px solid white;
+    filter: brightness(1.1);
 }
 
 /* 卡片圖片尺寸設定 */
