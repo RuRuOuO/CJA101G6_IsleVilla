@@ -1,7 +1,8 @@
 package com.islevilla.wei.room.model;
 
-import com.islevilla.wei.room.model.temp.Room1;
-import com.islevilla.wei.room.model.temp.RoomType1;
+
+import com.islevilla.chen.room.model.Room;
+import com.islevilla.chen.roomType.model.RoomType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -21,11 +22,11 @@ public class RoomRVDetail {
 
     @ManyToOne
     @JoinColumn(name = "room_id")
-    private Room1 room;
+    private Room room;
 
     @ManyToOne
     @JoinColumn(name = "room_type_id")
-    private RoomType1 roomType;
+    private RoomType roomType;
 
     @Column(name = "guest_count")
     @NotNull(message = "請輸入入住人數")

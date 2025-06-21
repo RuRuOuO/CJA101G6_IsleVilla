@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import java.util.List;
 
 import java.time.LocalDateTime;
 
@@ -62,4 +63,8 @@ public class RoomRVOrder {
     @Min(value = 0, message = "金額不能為負數")
     @NotNull(message = "請輸入實際付款金額")
     private Integer rvPaidAmount;
+
+    // @OntToMamy
+    @OneToMany(mappedBy = "roomRVOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RoomRVDetail> roomRVDetails;
 }
