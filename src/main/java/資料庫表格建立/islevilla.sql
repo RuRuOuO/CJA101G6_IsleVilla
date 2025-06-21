@@ -706,7 +706,7 @@ CREATE TABLE product_order_detail (
 	FOREIGN KEY (product_id) REFERENCES product(product_id)
 );
 
-INSERT INTO product_order_detail (product_order_id, product_id, product_order_name, product_price, product_order_quantity)
+INSERT INTO product_order_detail (product_order_id, product_id, product_order_name, product_order_price, product_order_quantity)
 VALUES (1,  1, '咖啡禮盒',    1990, 1),
        (2,  2, '造型吊飾',    350,  4),
        (3,  3, '海島香氛片',  150,  1),
