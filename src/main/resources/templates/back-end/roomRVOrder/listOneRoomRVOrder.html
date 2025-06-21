@@ -30,12 +30,12 @@
                 </tr>
                 </thead>
                 <tbody>
-                <th:block th:each="rv:${roomRVOrder}">
+                <th:block th:each="order:${orderList}">
                     <tr>
-                        <td th:text="${rv.roomReservationId}"></td>
-                        <td th:text="${rv.members.memberId}"></td>
-                        <td th:text="${rv.roomOrderDate}"></td>
-                        <td th:switch="${rv.roomOrderStatus}">
+                        <td th:text="${order.roomReservationId}"></td>
+                        <td th:text="${order.members.memberId}"></td>
+                        <td th:text="${order.roomOrderDate}"></td>
+                        <td th:switch="${order.roomOrderStatus}">
                             <span th:case="'0'">成立</span>
                             <span th:case="'1'">付款中</span>
                             <span th:case="'2'">完成</span>
@@ -43,16 +43,16 @@
                             <span th:case="'4'">取消</span>
                             <span th:case="*">未知</span> <!-- 預設情況 -->
                         </td>
-                        <td th:text="${rv.checkInDate}"></td>
-                        <td th:text="${rv.checkOutDate}"></td>
+                        <td th:text="${#temporals.format(order.checkInDate,'yyyy-MM-dd')}"></td>
+                        <td th:text="${#temporals.format(order.checkOutDate,'yyy-MM-dd')}"></td>
                         <td>
-                            <span th:if="${rv.promotion != null}" th:text="${rv.promotion.promotionId}"></span>
-                            <span th:unless="${rv.promotion != null}">無</span>
+                            <span th:if="${order.promotion != null}" th:text="${order.promotion.roomPromotionId}"></span>
+                            <span th:unless="${order.promotion != null}">無</span>
                         </td>
-                        <td th:text="${rv.remark}"></td>
-                        <td th:text="${rv.roomTotalAmount}"></td>
-                        <td th:text="${rv.rvDiscountAmount}"></td>
-                        <td th:text="${rv.rvPaidAmount}"></td>
+                        <td th:text="${order.remark}"></td>
+                        <td th:text="${order.roomTotalAmount}"></td>
+                        <td th:text="${order.rvDiscountAmount}"></td>
+                        <td th:text="${order.rvPaidAmount}"></td>
                     </tr>
                 </th:block>
                 </tbody>
@@ -71,7 +71,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <th:block th:each="detail:${details}">
+                <th:block th:each="detail:${detailList}">
                     <tr>
                         <td th:text="${detail.roomReservationDetailId}"></td>
                         <td th:text="${detail.roomRVOrder.roomReservationId}"></td>

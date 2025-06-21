@@ -6,6 +6,7 @@
 .border-primary {
     background-color: rgb(200, 210, 0) !important;
     color: rgb(255, 255, 255) !important;
+    border: 1px solid white;
 }
 
 /* 自訂 dark 顏色 */
@@ -65,7 +66,6 @@ li {
 
 /* 按鈕陰影 */
 .btn {
-    border: 1px solid white;
     box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.1);
 }
 
@@ -89,7 +89,6 @@ li {
     box-shadow: 0 0px 20px rgba(255, 255, 255, 1);
 }
 
-
 /* ==================== Layout ==================== */
 
 html, body {
@@ -109,6 +108,7 @@ main {
 
 footer {
     margin-top: auto;
+    flex-shrink: 0;
 }
 
 /* ==================== 表單錯誤訊息 ==================== */

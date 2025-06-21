@@ -43,4 +43,18 @@ public class RoomRVOrderService {
         Members member = optionalMember.get();
         return roomRVOrderRepository.findByMembers(member);
     }
+
+    // 更新訂單
+    public void updateRoomRVOrder(RoomRVOrder roomRVOrder) {
+        roomRVOrderRepository.save(roomRVOrder);
+    }
+
+    // 取消訂單
+    public void cancelOrderFront(Integer orderId) {
+        RoomRVOrder order = getById(orderId);
+        if (order != null) {
+            order.setRoomOrderStatus("3");
+            updateRoomRVOrder(order);
+        }
+    }
 }
