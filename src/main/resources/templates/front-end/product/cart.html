@@ -72,7 +72,7 @@
         </table>
 
         <!-- 結帳按鈕（目前是空白，稍後可以擴充） -->
-        <a href="#" class="btn btn-success">結帳</a>
+        <a th:href="@{/checkout(redirect='/cart')}" class="btn btn-success">結帳</a>
         <a th:href="@{/product}" class="btn btn-secondary ms-2">繼續購物</a>
     </div>
 </main>

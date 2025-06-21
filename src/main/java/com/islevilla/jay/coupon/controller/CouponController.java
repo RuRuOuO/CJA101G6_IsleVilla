@@ -67,20 +67,18 @@ public class CouponController {
         java.util.List<String> errorMessages = new java.util.ArrayList<>();
 
         // 1. 檢查優惠券代碼是否重複（排除自己）
-        java.util.List<Coupon> sameCodeList = couponService.findByCouponCode(coupon.getCouponCode());
-        boolean codeExists = sameCodeList.stream()
-            .anyMatch(c -> !c.getCouponId().equals(coupon.getCouponId()));
-        if (codeExists) {
-            errorMessages.add("優惠券代碼已存在，請重新輸入。");
-        }
+        // 已不可修改 couponCode，這段驗證可移除
+        // java.util.List<Coupon> sameCodeList = couponService.findByCouponCode(coupon.getCouponCode());
+        // boolean codeExists = sameCodeList.stream()
+        //     .anyMatch(c -> !c.getCouponId().equals(coupon.getCouponId()));
+        // if (codeExists) {
+        //     errorMessages.add("優惠券代碼已存在，請重新輸入。");
+        // }
         // 2. 檢查日期邏輯
         java.time.LocalDate today = java.time.LocalDate.now();
         if (coupon.getStartDate() == null || coupon.getEndDate() == null) {
             errorMessages.add("請輸入完整的啟用日期與結束日期。");
         } else {
-            if (coupon.getStartDate().isBefore(today)) {
-                errorMessages.add("啟用日期不能小於今日日期。");
-            }
             if (coupon.getEndDate().isBefore(coupon.getStartDate())) {
                 errorMessages.add("結束日期不能小於啟用日期。");
             }
@@ -155,9 +153,6 @@ public class CouponController {
         if (coupon.getStartDate() == null || coupon.getEndDate() == null) {
             errorMessages.add("請輸入完整的啟用日期與結束日期。");
         } else {
-            if (coupon.getStartDate().isBefore(today)) {
-                errorMessages.add("啟用日期不能小於今日日期。");
-            }
             if (coupon.getEndDate().isBefore(coupon.getStartDate())) {
                 errorMessages.add("結束日期不能小於啟用日期。");
             }

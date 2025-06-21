@@ -55,6 +55,9 @@ public class ProductOrder {
     @NotEmpty(message = "聯絡人電話不能為空")
     private String contactPhone;
 
+    @Column(name = "note", length = 50)
+    private String note;
+
     @Column(name = "product_order_status", nullable = false)
     private Byte orderStatus;
 
@@ -155,6 +158,14 @@ public class ProductOrder {
 
     public void setContactPhone(String contactPhone) {
         this.contactPhone = contactPhone;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 
     public Byte getOrderStatus() {

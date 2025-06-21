@@ -33,21 +33,29 @@ public class MembersController {
 
 	// 顯示登入頁面
 	@GetMapping("/member/login")
-	public String showLoginPage(HttpSession session) {
+	public String showLoginPage(@RequestParam(value = "redirect", required = false) String redirect, 
+	                           HttpSession session, Model model) {
 		// 如果用戶已經登入，重定向到首頁
 		if (session.getAttribute("member") != null) {
 			System.out.println("目前已經登入！\n目前登入中的會員：" + ((Members) session.getAttribute("member")).getMemberName());
 			return "redirect:/";
 		}
 		System.out.println("進入登入頁面");
+		
+		// 將redirect參數傳遞給登入頁面
+		if (redirect != null && !redirect.isEmpty()) {
+			model.addAttribute("redirect", redirect);
+		}
+		
 		return "front-end/member/member-login";
 	}
 
 	// 處理登入請求
 	@PostMapping("/member/login")
 	public String login(@RequestParam("memberEmail") String email, @RequestParam("memberPassword") String password,
-			@RequestParam(value = "rememberMe", required = false) boolean rememberMe, HttpSession session,
-			RedirectAttributes redirectAttributes) {
+			@RequestParam(value = "rememberMe", required = false) boolean rememberMe,
+			@RequestParam(value = "redirect", required = false) String redirect,
+			HttpSession session, RedirectAttributes redirectAttributes) {
 
 		try {
 			// 驗證電子信箱格式
@@ -71,19 +79,17 @@ public class MembersController {
 				session.setAttribute("member", member);
 				System.out.println("session.getAttribute: " + session.getAttribute("member"));
 
-				// 如果選擇記住我，設定較長的session timeout（可選）
-//                if (rememberMe) {
-//                    session.setMaxInactiveInterval(30 * 24 * 60 * 60); // 30天
-//                } else {
-//                    session.setMaxInactiveInterval(8 * 60 * 60); // 8小時
-//                }
-
 				// 更新最後登入時間
 				membersService.updateMemberLastLoginTime(member.getMemberId(), LocalDateTime.now());
 
 				redirectAttributes.addFlashAttribute("success", "登入成功！歡迎回來");
 
-				return "redirect:/";
+				// 檢查是否有redirect參數，如果有就重定向到指定頁面
+				if (redirect != null && !redirect.isEmpty()) {
+					return "redirect:" + redirect;
+				} else {
+					return "redirect:/";
+				}
 
 			} else {
 				redirectAttributes.addFlashAttribute("error", "電子信箱或密碼錯誤");
