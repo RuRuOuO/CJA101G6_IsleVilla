@@ -78,6 +78,13 @@ public class MembersController {
 				// 登入成功，將會員資訊存入session
 				session.setAttribute("member", member);
 				System.out.println("session.getAttribute: " + session.getAttribute("member"));
+				
+				// 如果選擇記住我，設定較長的session timeout（可選）
+//		                if (rememberMe) {
+//              		      session.setMaxInactiveInterval(30 * 24 * 60 * 60); // 30天
+//                		} else {
+//		                    session.setMaxInactiveInterval(8 * 60 * 60); // 8小時
+//		                }
 
 				// 更新最後登入時間
 				membersService.updateMemberLastLoginTime(member.getMemberId(), LocalDateTime.now());
