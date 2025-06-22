@@ -198,19 +198,19 @@
                         <div class="mb-4" th:if="${!availableCoupons.isEmpty()}">
                             <label class="form-label"><strong>選擇優惠券</strong></label>
                             <div class="coupon-list">
-                                <div th:each="memberCoupon : ${availableCoupons}" class="coupon-item">
+                                <div th:each="coupon : ${availableCoupons}" class="coupon-item">
                                     <input type="radio" name="selectedCouponId" 
-                                           th:value="${memberCoupon.coupon.couponId}" 
-                                           th:id="'coupon-' + ${memberCoupon.coupon.couponId}"
+                                           th:value="${coupon.couponId}" 
+                                           th:id="'coupon-' + ${coupon.couponId}"
                                            class="coupon-radio">
-                                    <label th:for="'coupon-' + ${memberCoupon.coupon.couponId}" class="coupon-label">
+                                    <label th:for="'coupon-' + ${coupon.couponId}" class="coupon-label">
                                         <div class="coupon-info">
-                                            <div class="coupon-code" th:text="${memberCoupon.coupon.couponCode}"></div>
+                                            <div class="coupon-code" th:text="${coupon.couponCode}"></div>
                                             <div class="coupon-desc">
-                                                折扣 NT$ <span th:text="${memberCoupon.coupon.discountValue}"></span>
+                                                折扣 NT$ <span th:text="${coupon.discountValue}"></span>
                                                 <br>
                                                 <small class="text-muted">
-                                                    最低消費 NT$ <span th:text="${memberCoupon.coupon.minSpend}"></span>
+                                                    最低消費 NT$ <span th:text="${coupon.minSpend}"></span>
                                                 </small>
                                             </div>
                                         </div>

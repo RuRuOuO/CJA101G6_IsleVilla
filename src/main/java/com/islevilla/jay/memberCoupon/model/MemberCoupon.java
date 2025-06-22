@@ -13,14 +13,12 @@ public class MemberCoupon {
     @EmbeddedId
     private MemberCouponId id;
 
-    @ManyToOne
-    @MapsId("memberId") // 對應複合主鍵裡的 memberId
-    @JoinColumn(name = "member_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", insertable = false, updatable = false)
     private Members member;
 
-    @ManyToOne
-    @MapsId("couponId") // 對應複合主鍵裡的 couponId
-    @JoinColumn(name = "coupon_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "coupon_id", insertable = false, updatable = false)
     private Coupon coupon;
 
     @Column(name = "used_date")
