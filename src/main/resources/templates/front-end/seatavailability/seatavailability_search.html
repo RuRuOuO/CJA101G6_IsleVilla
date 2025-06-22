@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>查詢座位可用情況</title>
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+	rel="stylesheet" />
+</head>
+<body>
+	<div class="container mt-5">
+		<h2 class="mb-4">🔍 查詢座位可用情況</h2>
+
+
+
+		<form th:action="@{/seatavailability/search}" method="post"
+			th:object="${searchCriteria}">
+			<!-- 日期 -->
+			<div class="mb-3">
+				<label for="date" class="form-label">日期</label> <input type="date"
+					id="date" name="date" class="form-control" th:field="*{date}"
+					required />
+			</div>
+
+			<!-- 班車選單-->
+			<div class="mb-3">
+				<label for="scheduleId" class="form-label">班車時段</label> <select
+					id="scheduleId" name="scheduleId" class="form-select" required>
+					<option value="" disabled selected>請選擇班車</option>
+					<option th:each="schedule : ${scheduleList}"
+						th:value="${schedule.id}"
+						th:text="'方向 ' + ${schedule.direction} + '｜出發 ' + ${schedule.departureTime} + ' → 抵達 ' + ${schedule.arrivalTime}"
+						th:selected="${searchCriteria.scheduleId} == ${schedule.id}">
+					</option>
+				</select>
+			</div>
+
+			<!-- 查詢按鈕 -->
+			<div class="d-flex justify-content-start mt-4">
+				<button type="submit" class="btn btn-primary">查詢</button>
+				<a th:href="@{/seatavailability/list}"
+					class="btn btn-secondary ms-3">返回列表</a>
+			</div>
+		</form>
+
+		<!-- 顯示錯誤訊息 -->
+		<div th:if="${errorMessage}" class="alert alert-danger mt-4"
+			role="alert">
+			<p th:text="${errorMessage}"></p>
+		</div>
+
+		<!-- 顯示查無資料 -->
+		<div th:if="${notFound}" class="alert alert-warning mt-4" role="alert">
+			查無資料，請確認輸入條件是否正確。</div>
+
+		<!-- 顯示查詢結果 -->
+		<div th:if="${result}" class="card mt-4">
+			<div class="card-body">
+				<h5 class="card-title">查詢結果</h5>
+				<p class="card-text">
+					<strong>班車時段：</strong><span th:text="${result.scheduleId}"></span><br />
+					<strong>日期：</strong><span th:text="${result.date}"></span><br /> <strong>可用座位數：</strong><span
+						th:text="${result.seatQuantity}"></span>
+				</p>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

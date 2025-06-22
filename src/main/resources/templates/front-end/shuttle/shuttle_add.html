@@ -1,135 +1,87 @@
 <!DOCTYPE html>
-<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>微嶼 | Isle Villa</title>
-<link
-	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-	rel="stylesheet" />
-<link rel="stylesheet" th:href="@{/css/custom_style.css}" />
-<link rel="stylesheet" href="/css/product_index.css" />
-<link
-	href="https://fonts.googleapis.com/css2?family=Kaisei+HarunoUmi&family=Noto+Sans+TC:wght@100..900&display=swap"
-	rel="stylesheet" />
-<script src="https://kit.fontawesome.com/d4a9524440.js"
-	crossorigin="anonymous"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>微嶼 | Isle Villa 後台首頁</title>
+<!-- ===== 載入統一樣式 ===== -->
+<th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
 </head>
 <body>
-	<!-- Header -->
-	<header data-bs-theme="light">
-		<nav
-			class="navbar navbar-expand-lg navbar-light fixed-top bg-light shadow-sm">
-			<div class="container">
-				<a class="navbar-brand" href="/"
-					style="font-family: Kaisei HarunoUmi">微嶼 Isle Villa</a>
-				<button class="navbar-toggler" type="button"
-					data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-					<span class="navbar-toggler-icon"></span>
-				</button>
-				<div class="collapse navbar-collapse justify-content-center"
-					id="navbarCollapse">
-					<ul class="navbar-nav mx-auto mb-md-0">
-						<li class="nav-item"><a class="nav-link" href="#">最新消息</a></li>
-						<li class="nav-item divider align-self-center px-1">|</li>
-						<li class="nav-item"><a class="nav-link" href="#">關於微嶼</a></li>
-						<li class="nav-item divider align-self-center px-1">|</li>
-						<li class="nav-item"><a class="nav-link" href="#">客房介紹</a></li>
-						<li class="nav-item divider align-self-center px-1">|</li>
-						<li class="nav-item"><a class="nav-link" href="#">線上購物</a></li>
-						<li class="nav-item divider align-self-center px-1">|</li>
-						<li class="nav-item dropdown"><a
-							class="nav-link dropdown-toggle" href="#" role="button"
-							data-bs-toggle="dropdown">顧客服務</a>
-							<ul class="dropdown-menu">
-								<li><a class="dropdown-item" href="#">交通資訊</a></li>
-								<li><a class="dropdown-item" href="#">天氣資訊</a></li>
-							</ul></li>
-						<li class="nav-item divider align-self-center px-1">|</li>
-						<li class="nav-item"><a class="nav-link" href="#">會員專區</a></li>
-					</ul>
-				</div>
-			</div>
-		</nav>
-		<div style="height: 55px"></div>
-	</header>
+	<!-- ===== 載入sidebar ===== -->
+	<!-- 插入手機版側邊欄 -->
+	<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+	<!-- 插入桌面版側邊欄 -->
+	<div th:replace="~{fragments/backFragments :: sidebar}"></div>
 
-	<!-- Main Content -->
-	<main class="container py-5">
-		<h2 class="mb-4" th:text="${formMode == 'add'} ? '✏️ 新增接駁班次' : '✏️ 修改接駁班次'"></h2>
+	<main
+		th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+		<th:block th:fragment="myContent">
+			<!-- //////////////////// 頁面內容放在這個card裡面(外框已經有加card和container，直接放入table和標題即可)//////////////////// -->
+				<h2 class="mb-4"
+					th:text="${formMode == 'add'} ? '✏️ 新增接駁時段' : '🛠️ 修改接駁時段'"></h2>
 
-		<form
-    th:action="${formMode == 'add'} ? @{/shuttle/add} : @{/shuttle/edit}"
-    th:object="${shuttleSchedule}" method="post" class="needs-validation"
-    novalidate>
+				<form
+					th:action="${formMode == 'add'} ? @{/shuttle/add} : @{/shuttle/edit}"
+					th:object="${shuttleSchedule}" method="post"
+					class="needs-validation" novalidate>
+					
+					<input type="hidden" th:field="*{id}" />
+					
 
-    <!-- ✅ 全域錯誤提示（只顯示第一筆） -->
-    <div class="text-danger mb-3"
-         th:if="${#fields.hasGlobalErrors()}"
-         th:text="${#fields.globalErrors()[0]}">
-    </div>
+					<!-- ✅ 全域錯誤提示（只顯示第一筆） -->
+					<div class="text-danger mb-3" th:if="${#fields.hasGlobalErrors()}"
+						th:text="${#fields.globalErrors()[0]}"></div>
 
-    <!-- 方向 -->
-    <div class="mb-3">
-        <label for="direction" class="form-label">選擇方向 (去程 / 回程)</label>
-        <select th:field="*{direction}" class="form-select" id="direction" required>
-            <option value="0">去程</option>
-            <option value="1">回程</option>
+					<!-- 方向 -->
+      <div class="mb-3">
+        <label for="direction" class="form-label">方向</label>
+        <select th:field="*{direction}" class="form-select" id="direction"
+                th:disabled="${formMode == 'edit'}" required>
+          <option value="0" th:selected="${shuttleSchedule.direction == 0}">去程</option>
+          <option value="1" th:selected="${shuttleSchedule.direction == 1}">回程</option>
         </select>
-        <div class="text-danger" th:if="${#fields.hasErrors('direction')}" th:errors="*{direction}"></div>
-    </div>
 
-    <!-- 出發時間 -->
-    <div class="mb-3">
-        <label for="departureHour" class="form-label">出發時間（時）</label>
-        <select th:field="*{departureTime}" class="form-control" id="departureHour" required>
-            <option th:each="hour : ${#numbers.sequence(0,23)}"
-                    th:value="${hour < 10 ? '0' + hour + ':00' : hour + ':00'}"
-                    th:text="${hour < 10 ? '0' + hour : hour} + ':00'">
-            </option>
-        </select>
-        <div class="text-danger" th:if="${#fields.hasErrors('departureTime')}" th:errors="*{departureTime}"></div>
-    </div>
+        <!-- 補上 hidden input，確保 disabled select 的值能送出 -->
+        <input type="hidden" name="direction" th:value="${shuttleSchedule.direction}" 
+               th:if="${formMode == 'edit'}"/>
 
-    <!-- 抵達時間 -->
-    <div class="mb-3">
-        <label for="arrivalTime" class="form-label">抵達時間（時）</label>
-        <select th:field="*{arrivalTime}" class="form-control" id="arrivalTime" required>
-            <option th:each="hour : ${#numbers.sequence(0,23)}"
-                    th:value="${hour < 10 ? '0' + hour + ':00' : hour + ':00'}"
-                    th:text="${hour < 10 ? '0' + hour : hour} + ':00'">
-            </option>
-        </select>
-    </div>
+        <div class="text-danger" th:if="${#fields.hasErrors('direction')}"
+             th:errors="*{direction}"></div>
+      </div>
 
-    <!-- 送出/取消 -->
-    <button type="submit" class="btn btn-primary me-2">送出</button>
-    <a th:href="@{/shuttle/list}" class="btn btn-secondary">取消</a>
-</form>
+					<!-- 出發時間 -->
+					<div class="mb-3">
+						<label for="departureHour" class="form-label">出發時間（時）</label> <select
+							th:field="*{departureTime}" class="form-control"
+							id="departureHour" required>
+							<option th:each="hour : ${#numbers.sequence(0,23)}"
+								th:value="${hour < 10 ? '0' + hour + ':00' : hour + ':00'}"
+								th:text="${hour < 10 ? '0' + hour : hour} + ':00'"></option>
+						</select>
+						<div class="text-danger"
+							th:if="${#fields.hasErrors('departureTime')}"
+							th:errors="*{departureTime}"></div>
+					</div>
+
+					<!-- 抵達時間 -->
+					<div class="mb-3">
+						<label for="arrivalTime" class="form-label">抵達時間（時）</label> <select
+							th:field="*{arrivalTime}" class="form-control" id="arrivalTime"
+							required>
+							<option th:each="hour : ${#numbers.sequence(0,23)}"
+								th:value="${hour < 10 ? '0' + hour + ':00' : hour + ':00'}"
+								th:text="${hour < 10 ? '0' + hour : hour} + ':00'"></option>
+						</select>
+					</div>
+
+					<!-- 送出/取消 -->
+					<button type="submit" class="btn btn-primary me-2">送出</button>
+					<a th:href="@{/shuttle/list}" class="btn btn-secondary">取消</a>
+				</form>
+			</main>
+			<!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+		</th:block>
 	</main>
-
-	<!-- Footer -->
-	<footer class="footer bg-secondary text-light py-5">
-		<div class="container">
-			<div class="row">
-				<div class="col-md-6 mb-3">
-					<h3 style="font-family: Kaisei HarunoUmi">微嶼 Isle Villa</h3>
-					<p>讓人在片刻停留中，找回生活的溫度。</p>
-				</div>
-				<div class="col-md-6 mb-3">
-					<h5>聯絡我們</h5>
-					<ul class="list-unstyled mt-3">
-						<li class="mt-1">地址：台灣台北市信義區123號</li>
-						<li class="mt-1">電話：02-1234-5678</li>
-						<li class="mt-1">信箱：info@islevilla.com</li>
-					</ul>
-				</div>
-			</div>
-		</div>
-	</footer>
-
-	<!-- Bootstrap JS -->
-	<script
-		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

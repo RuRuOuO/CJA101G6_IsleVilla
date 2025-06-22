@@ -23,8 +23,7 @@ public class SeatAvailabilityController {
 	private final SeatAvailabilityService seatAvailabilityService;
 	private final ShuttleService shuttleService;
 
-	public SeatAvailabilityController(SeatAvailabilityService seatAvailabilityService,
-									  ShuttleService shuttleService) {
+	public SeatAvailabilityController(SeatAvailabilityService seatAvailabilityService, ShuttleService shuttleService) {
 		this.seatAvailabilityService = seatAvailabilityService;
 		this.shuttleService = shuttleService;
 	}
@@ -45,50 +44,90 @@ public class SeatAvailabilityController {
 		return "front-end/seatavailability/seatavailability_add";
 	}
 
-	//處理提交新增
+	// 處理提交新增
 	@PostMapping("/add")
 	public String addSetAvailability(@ModelAttribute("seatavailability") SeatAvailability seatAvailability) {
 		seatAvailabilityService.addSeatAvailability(seatAvailability);
 		return "redirect:/seatavailability/list";
 	}
-	
-	
+
 	// 處理複合主鍵刪除（必須同時接收兩個路徑變數）
-		@GetMapping("/delete/{scheduleId}/{date}")
-		public String deleteSeatAvailability(
-				@PathVariable("scheduleId") Integer scheduleId,
-				@PathVariable("date") String dateStr) {
+	@GetMapping("/delete/{scheduleId}/{date}")
+	public String deleteSeatAvailability(@PathVariable("scheduleId") Integer scheduleId,
+			@PathVariable("date") String dateStr) {
 
-			LocalDate date = LocalDate.parse(dateStr);
-			SeatAvailabilityId id = new SeatAvailabilityId(scheduleId, date);
-			seatAvailabilityService.deleteSeatAvailability(id);
+		LocalDate date = LocalDate.parse(dateStr);
+		SeatAvailabilityId id = new SeatAvailabilityId(scheduleId, date);
+		seatAvailabilityService.deleteSeatAvailability(id);
 
+		return "redirect:/seatavailability/list";
+	}
+
+	// 顯示編輯表單
+	@GetMapping("/edit/{scheduleId}/{date}")
+	public String showEditForm(@PathVariable("scheduleId") Integer scheduleId,
+	                           @PathVariable("date") String dateStr,
+	                           Model model) {
+		LocalDate date = LocalDate.parse(dateStr);
+		SeatAvailabilityId id = new SeatAvailabilityId(scheduleId, date);
+		SeatAvailability seatAvailability = seatAvailabilityService.getSeatById(id);
+
+		if (seatAvailability != null) {
+			model.addAttribute("seatavailability", seatAvailability);
+			model.addAttribute("scheduleList", shuttleService.getAllShuttle()); // 雖然這裡用不到但也可保留
+			return "front-end/seatavailability/seatavailability_edit";
+		} else {
 			return "redirect:/seatavailability/list";
 		}
+	}
+
+	// 提交編輯表單
+	@PostMapping("/edit")
+	public String updateSeatAvailability(@ModelAttribute("seatavailability") SeatAvailability formInput) {
+	    SeatAvailabilityId id = new SeatAvailabilityId(formInput.getScheduleId(), formInput.getDate());
+	    SeatAvailability existing = seatAvailabilityService.getSeatById(id);
+
+	    if (existing != null) {
+	        existing.setSeatQuantity(formInput.getSeatQuantity());
+	        seatAvailabilityService.updateSeatAvailability(existing);
+	    }
+
+	    return "redirect:/seatavailability/list";
+	}
+	
+	// 單筆查詢功能
+	@GetMapping("/search")
+	public String showSearchForm(Model model) {
+		model.addAttribute("searchCriteria", new SeatAvailability());      // 綁定空的查詢表單資料物件
+		model.addAttribute("scheduleList",shuttleService.getAllShuttle()); //班車時段下拉選單
 		
-		// 顯示編輯表單
-		@GetMapping("/edit/{scheduleId}/{date}")
-		public String showEditForm(@PathVariable("scheduleId") Integer scheduleId,
-								   @PathVariable("date") String dateStr,
-								   Model model){
-			LocalDate date = LocalDate.parse(dateStr);
-			SeatAvailabilityId id = new SeatAvailabilityId(scheduleId , date);
-			SeatAvailability seatAvailability = seatAvailabilityService.getSeatById(id);
-			
-			if (seatAvailability != null) {
-		        model.addAttribute("seatavailability", seatAvailability);
-		        model.addAttribute("scheduleList", shuttleService.getAllShuttle());
-		        return "front-end/seatavailability/seatavailability_edit";
-		    } else {
-		        return "redirect:/seatavailability/list"; // 找不到資料導回列表
-		    }
+		return "front-end/seatavailability/seatavailability_search";
+	}
+
+	// 處理單筆查詢請求
+	@PostMapping("/search")
+	public String searchSeatAvailability(@ModelAttribute("searchCriteria") SeatAvailability criteria, Model model) {
+		Integer scheduleId = criteria.getScheduleId();
+		LocalDate date = criteria.getDate();
+
+		model.addAttribute("scheduleList", shuttleService.getAllShuttle()); // 繼續提供下拉選單
+
+		// 判斷是否輸入完整查詢條件
+		if (scheduleId == null || date == null) {
+			model.addAttribute("errorMessage", "請選擇班車時段並輸入日期");
+			return "front-end/seatavailability/seatavailability_search";
 		}
-		
-		// 提交編輯表單
-		@PostMapping("/edit")
-		public String updateSeatAvailability(@ModelAttribute("seatavailability") SeatAvailability seatAvailability) {
-			seatAvailabilityService.updateSeatAvailability(seatAvailability);
-			return "redirect:/seatavailability/list";
+
+		// 查詢資料
+		SeatAvailabilityId id = new SeatAvailabilityId(scheduleId, date);
+		SeatAvailability result = seatAvailabilityService.getSeatById(id);
+
+		if (result != null) {
+			model.addAttribute("result", result); // 將查詢結果傳到 view
+		} else {
+			model.addAttribute("notFound", true); // 查無資料
 		}
-		
+
+		return "front-end/seatavailability/seatavailability_search";
+	}
 }
