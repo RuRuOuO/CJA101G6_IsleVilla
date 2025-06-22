@@ -31,4 +31,7 @@ public class EmployeeService {
     public List<Employee> getAllEmployees() {
         return employeeRepository.findAll();
     }
+    public Employee findByEmail(String email) {
+        return employeeRepository.findByEmployeeEmail(email);
+    }
 }

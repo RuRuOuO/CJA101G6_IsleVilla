@@ -32,6 +32,9 @@ public class Employee {
     @Column(name = "employee_mobile")
     private String employeeMobile;
 
+    @Column(name = "employee_password_hash")
+    private String employeePassword;
+
     @Column(name = "employee_gender")
     private byte employeeGender; // 0:女, 1:男
 

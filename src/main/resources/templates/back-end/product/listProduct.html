@@ -69,7 +69,7 @@
 
             <!-- 商品表格 -->
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table id="productTable" class="table table-hover">
                     <thead>
                     <tr>
                         <th>編號</th>
@@ -105,9 +105,18 @@
                         <td th:text="${prod.productCategory.productCategoryName}">商品類別</td>
                         <td>
                             <!-- 修改按鈕 -->
-                            <a href="/product/backend/edit/{id}"
-                               th:href="@{/backend/product/edit/{id}(id=${prod.productId})}"
-                               class="btn btn-sm btn-primary me-1">
+                            <a data-bs-toggle="modal"
+                               data-bs-target="#editProductModal"
+                               class="btn btn-sm btn-primary me-1"
+                               th:attr="
+                                 data-id=${prod.productId},
+                                 data-name=${prod.productName},
+                                 data-price=${prod.productPrice},
+                                 data-desc=${prod.productDescription},
+                                 data-qty=${prod.productQuantity},
+                                 data-status=${prod.productStatus},
+                                 data-cat=${prod.productCategory.productCategoryId}
+                               ">
                                 <i class="bi bi-pencil"></i>
                             </a>
                         </td>
@@ -115,23 +124,6 @@
                     </tbody>
                 </table>
             </div>
-            <!-- 分頁 -->
-            <nav>
-                <ul class="pagination justify-content-center">
-                    <li class="page-item disabled">
-                        <span class="page-link">上一頁</span>
-                    </li>
-                    <li class="page-item active">
-                        <span class="page-link">1</span>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">2</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">下一頁</a>
-                    </li>
-                </ul>
-            </nav>
 
             <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
         </div>
@@ -154,7 +146,7 @@
 
                 </div>
             </div>
-            <form th:action="@{/backend/product/new}" th:object="${product}" method="post">
+            <form th:action="@{/product/new}" th:object="${product}" method="post">
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -213,32 +205,182 @@
         </div>
     </div>
 </div>
+
+<!-- 修改員工 Modal -->
+<div class="modal fade" id="editProductModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-plus-circle me-2"></i>修改商品
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="card-header bg-transparent border-0 pt-4">
+                <div class="d-flex justify-content-between align-items-center">
+
+
+                </div>
+            </div>
+            <form th:action="@{/product/edit}" th:object="${product}" method="post">
+                <input type="hidden" th:field="*{productId}">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="productName" class="form-label">商品名稱</label>
+                            <input type="text" class="form-control" id="editProductName" th:field="*{productName}" required>
+                            <div class="text-danger" th:if="${#fields.hasErrors('productName')}"
+                                 th:errors="*{productName}"></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="productPrice" class="form-label">價格</label>
+                            <input type="number" class="form-control" id="editProductPrice" th:field="*{productPrice}" required>
+                            <div class="text-danger" th:if="${#fields.hasErrors('productPrice')}"
+                                 th:errors="*{productPrice}"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="productDescription" class="form-label">商品描述</label>
+                        <textarea class="form-control" id="editProductDescription" th:field="*{productDescription}"
+                                  rows="3"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="productQuantity" class="form-label">庫存量</label>
+                            <input type="number" class="form-control" id="editProductQuantity" th:field="*{productQuantity}"
+                                   required>
+                            <div class="text-danger" th:if="${#fields.hasErrors('productQuantity')}"
+                                 th:errors="*{productQuantity}"></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="productStatus" class="form-label">狀態</label>
+                            <select class="form-select" id="editProductStatus" th:field="*{productStatus}">
+                                <option th:value="1" th:selected="*{productStatus == 1}">上架</option>
+                                <option th:value="0" th:selected="*{productStatus == 0}">下架</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="productCategory" class="form-label">商品類別</label>
+                        <select class="form-select" id="editProductCategory" name="productCategory.productCategoryId" required>
+                            <option value="" disabled th:selected="${product.productCategory == null}">請選擇類別</option>
+                            <option th:each="cat : ${category}"
+                                    th:value="${cat.productCategoryId}"
+                                    th:text="${cat.productCategoryName}"
+                                    th:selected="${product.productCategory != null} ? ${cat.productCategoryId} == ${product.productCategory.productCategoryId} : false">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle me-2"></i>儲存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 <script>
-    document.querySelector('form').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const form = e.target;
-        const data = {
-            productName: form.productName.value,
-            productPrice: form.productPrice.value,
-            productDescription: form.productDescription.value,
-            productQuantity: form.productQuantity.value,
-            productStatus: form.productStatus.value,
-            productCategory: {
-                productCategoryId: form['productCategory.productCategoryId'].value
-            }
-        };
-        const response = await fetch('/product/add', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(data)
+    // 綁定「新增商品」與「修改商品」兩個 Modal 底下的 form submit
+    document.querySelectorAll('#addProductModal form, #editProductModal form')
+        .forEach(form => {
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const f = e.target;
+
+                // 判斷目前是新增還是編輯
+                const isEdit = f.productId && f.productId.value.trim() !== '';
+
+                // 收集要送出的資料
+                const data = {
+                    // 編輯模式才需帶入 productId
+                    ...(isEdit && { productId: f.productId.value }),
+                    productName:        f.productName.value,
+                    productPrice:       f.productPrice.value,
+                    productDescription: f.productDescription.value,
+                    productQuantity:    f.productQuantity.value,
+                    productStatus:      f.productStatus.value,
+                    productCategory: {
+                        productCategoryId: f['productCategory.productCategoryId'].value
+                    }
+                };
+
+                // 決定要呼叫的 API 路徑
+                const url = isEdit ? '/product/edit' : '/product/add';
+
+                try {
+                    const resp = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+
+                    if (resp.ok) {
+                        alert(`商品${isEdit ? '修改' : '新增'}成功！`);  // 先弹窗
+                        window.location.href = '/backend/product/list'; // 再跳转
+                    } else {
+                        alert('儲存失敗');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('儲存失敗，請稍後再試');
+                }
+            });
         });
-        if (response.ok) {
-            alert('商品已儲存');
-            window.location.href = '/backend/product/list'; // 儲存後導向商品列表
-        } else {
-            alert('儲存失敗');
-        }
+
+    // 編輯 Modal 打開時，自動把按鈕上的 data-* 值帶入表單欄位
+    const editModal = document.getElementById('editProductModal');
+    editModal.addEventListener('show.bs.modal', function (evt) {
+        const btn   = evt.relatedTarget;
+        const id    = btn.getAttribute('data-id');
+        const name  = btn.getAttribute('data-name');
+        const price = btn.getAttribute('data-price');
+        const desc  = btn.getAttribute('data-desc');
+        const qty   = btn.getAttribute('data-qty');
+        const stat  = btn.getAttribute('data-status');
+        const cat   = btn.getAttribute('data-cat');
+
+        editModal.querySelector('input[name="productId"]').value                 = id;
+        editModal.querySelector('#editProductName').value                        = name;
+        editModal.querySelector('#editProductPrice').value                       = price;
+        editModal.querySelector('#editProductDescription').value                 = desc;
+        editModal.querySelector('#editProductQuantity').value                    = qty;
+        editModal.querySelector('#editProductStatus').value                      = stat;
+        editModal.querySelector('#editProductCategory').value                    = cat;
     });
+
+
+    $(function(){
+        $('#productTable').DataTable({
+            dom: "t<'d-flex justify-content-center my-3'p>",
+            pagingType: 'simple_numbers',  // 上一頁 | 1 2 3 | 下一頁
+            lengthChange: false,           // 隐藏「每頁幾筆」下拉
+            info: false,                   // 隐藏 table info
+            language: {
+                paginate: {
+                    previous: '上一頁',
+                    next:     '下一頁'
+                }
+            },
+            drawCallback: function(){
+                var $pg = $('#productTable_wrapper .pagination');
+                $pg.find('li.disabled a, li.active a')
+                    .each(function(){
+                        var txt = $(this).text();
+                        $(this).replaceWith(
+                            $('<span/>').addClass('page-link').text(txt)
+                        );
+                    });
+            }
+        });
+    });
+
 </script>
+
+
 </body>
 </html>
