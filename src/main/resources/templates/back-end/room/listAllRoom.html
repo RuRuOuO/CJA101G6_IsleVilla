@@ -7,7 +7,7 @@
 
     <!-- 通用樣式 -->
     <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
-    <link href="/css/room-addRoom.css" rel="stylesheet">
+    <link href="/css/room.css" rel="stylesheet">
   </head>
   <body>
     <!-- Header -->
@@ -16,33 +16,54 @@
     <main>
       <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center py-4">
         <div class="row w-100 justify-content-center">
-          <div class="col-12 col-md-10 col-lg-8 col-xl-6">
+          <div class="col-auto">
             <div class="card shadow-lg border-0 rounded-4">
               <div class="card-header bg-primary text-white text-center py-4 rounded-top-4">
-                <h1 class="h3 mb-0"><i class="bi bi-search me-2"></i>房間查詢</h1>
+                <h1 class="h3 mb-0"><i class="bi bi-search me-2"></i>房間總覽</h1>
               </div>
 
               <div class="card-body p-4">
                   <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                     <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="goSelectRoomPage()">
-                       <i class="bi bi-arrow-left me-1"></i>回到查詢頁面
+                       <i class="bi bi-arrow-left me-1" onclick="goSelectRoomPage()"></i>回到查詢頁面
                    </button>
                   </div>
-                <tr>
-                    <th>房間ID</th>
-                    <th>房型編號</th>
-                    <th>房型名稱</th>
-                    <th>房間狀態</th>
-                    <th>修改</th>
-                    <th>刪除</th>
-                </tr>
-              </div>
+                  <div class="table-responsive">
+                  <table class="table table-striped table-hover">
+	                  <thead class="table-dark">
+		                  <tr>
+			                  <th>房間ID</th>
+			                  <th>房型ID</th>
+			                  <th>房型名稱</th>
+			                  <th>房間狀態</th>
+			                  <th>修改</th>
+		                  </tr>
+	                  </thead>
+	              	  <tbody> 
+	                    <tr th:each="room : ${roomList}">
+					      <td th:text="${room.roomId}">房間ID</td>
+					      <td th:text="${room.roomTypeId}">房型ID</td>
+					      <td th:text="${roomTypeNameMap[room.roomTypeId]}">房型名稱</td>
+					      <td th:text="${roomStatusMap[room.roomStatus]}">房間狀態</td>
+	                      <td>
+                      		<a th:href="@{/backend/room/updateRoom/{roomId}(roomId=${room.roomId})}" class="btn btn-primary btn-sm">
+							    <i class="bi bi-pencil"></i> 修改
+							</a>
+	                      </td>
+					    </tr>
+				    </tbody>
+				  </table>
+              	</div>
+              	 <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="goSelectRoomPage()">
+                       <i class="bi bi-arrow-left me-1" onclick="goSelectRoomPage()"></i>回到查詢頁面
+                   </button>
+              	</div>
             </div>
           </div>
         </div>
       </div>
      <!-- JS -->
-   	 <script src="/js/room-addRoom.js"></script>
+   	 <script src="/js/room.js"></script>
     </main>
     <!-- Footer -->
     <div th:replace="~{fragments/fragments :: footer}"></div>

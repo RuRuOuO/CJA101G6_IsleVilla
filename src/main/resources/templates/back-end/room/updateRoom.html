@@ -6,7 +6,7 @@
     <title>微嶼 | Isle Villa房號</title>
     <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
-    <link href="/css/room-addRoom.css" rel="stylesheet">
+    <link href="/css/room.css" rel="stylesheet">
   </head>
   <body>
     <!-- ===== 載入Header ===== -->
@@ -15,11 +15,11 @@
     <main>
     <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center py-4">
         <div class="row w-100 justify-content-center">
-            <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+            <div class="col-auto">
                 <div class="card shadow-lg border-0 rounded-4">
                     <div class="card-header bg-primary text-white text-center py-4 rounded-top-4">
                         <h1 class="h3 mb-0">
-                            <i class="bi bi-house-add me-2"></i>新增房間ID
+                            <i class="bi bi-house-add me-2"></i>更新房間資料
                         </h1>
                     </div>
                     
@@ -27,7 +27,7 @@
                         <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
                             <i class="bi bi-info-circle me-2"></i>
                             <div>
-                                <strong>提示：</strong>請填寫完整的房間資訊，所有欄位都是必填的。
+                                <strong>提示：</strong>請修改房間資訊，所有欄位都是必填的。
                             </div>
                         </div>
 
@@ -40,22 +40,13 @@
 							    </ul>
                         </div>
 
-                        <form id="roomForm" th:action="@{/backend/room/addRoom}" th:object="${room}" method="post" novalidate>
+                        <form id="roomForm" th:action="@{/backend/room/updateRoom}" th:object="${room}" method="post" novalidate data-validate-mode="strict">
                             <div class="mb-3">
+                            	<input type="hidden" th:field="*{roomId}" />
                                 <label for="roomId" class="form-label">
-                                    <i class="bi bi-door-open me-1"></i>房間ID *
+                                    <i class="bi bi-door-open me-1"></i>房間ID：
+                                    <span th:text="*{roomId}">房間ID</span>
                                 </label>
-                                <input 
-                                    type="number"
-                                    class="form-control form-control-lg" 
-                                    placeholder="請輸入房間ID（例如：501、510）"
-                                    required
-                                    min="1"
-                                    th:field="*{roomId}"
-                                >
-                                <div class="invalid-feedback">
-                                    請輸入有效的房間ID（大於0的數字）
-                                </div>
                             </div>
 
                             <div class="mb-3">
@@ -89,6 +80,7 @@
                                     <option value="1">入住中</option>
                                     <option value="2">待維修</option>
                                     <option value="3">待清潔</option>
+                                    <option value="4">停用</option>
                                 </select>
                                 <div class="invalid-feedback">
                                     請選擇房間狀態
@@ -96,11 +88,8 @@
                             </div>
 
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                 <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="goSelectRoomPage()">
-                                    <i class="bi bi-arrow-left me-1"></i>回到查詢頁面
-                                </button>
-                                <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="resetForm()">
-                                    <i class="bi bi-arrow-clockwise me-1"></i>重置
+                                 <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="goListAllRoom()">
+                                    <i class="bi bi-arrow-left me-1"></i>回到總覽頁面
                                 </button>
                                 <button type="submit" class="btn btn-primary btn-lg px-4">
                                     <i class="bi bi-plus-circle me-1"></i>修改房間
@@ -113,7 +102,7 @@
         </div>
     </div>
     <!-- JS -->
-    <script src="/js/room-addRoom.js"></script>
+    <script src="/js/room.js"></script>
     </main>
     <!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
     <!-- ========== 載入Footer及Bootstrap JS ========== -->

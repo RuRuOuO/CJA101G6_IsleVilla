@@ -7,7 +7,7 @@
 
     <!-- 通用樣式 -->
     <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
-    <link href="/css/room-addRoom.css" rel="stylesheet">
+    <link href="/css/room.css" rel="stylesheet">
   </head>
   <body>
     <!-- Header -->
@@ -16,7 +16,7 @@
     <main>
       <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center py-4">
         <div class="row w-100 justify-content-center">
-          <div class="col-12 col-md-10 col-lg-8 col-xl-6">
+          <div class="col-auto">
             <div class="card shadow-lg border-0 rounded-4">
               <div class="card-header bg-primary text-white text-center py-4 rounded-top-4">
                 <h1 class="h3 mb-0"><i class="bi bi-search me-2"></i>房間查詢</h1>
@@ -29,16 +29,13 @@
                    			<strong>提示：</strong>可以使用單一條件或組合條件進行查詢，留空的欄位將不作為查詢條件。
                			</div>
                  </div>
-                 <div th:if="${successMessage}" class="alert alert-success" id="successMessage" role="alert">
-                     <span th:text="${successMessage}"></span>
-                 </div>
                  <div th:if="${errorMessage}" class="alert alert-error" id="errorMessage" role="alert">
                    <ul class="mb-0">
 			       	<li th:each="msg : ${errorMessage}" th:text="${msg}"></li>
 				   </ul>
                  </div>
 
-                 <form id="roomForm" th:action="@{/backend/room/selectRoomPage}" th:object="${room}" method="post" novalidate>
+                 <form id="roomForm" th:action="@{/backend/room/selectRoomPage}" method="post" novalidate data-validate-mode="loose">
                             <div class="mb-3">
                                 <label for="roomId" class="form-label">
                                     <i class="bi bi-door-open me-1"></i>房間ID *
@@ -47,29 +44,25 @@
                                    type="number"
                                     class="form-control form-control-lg" 
                                     placeholder="請輸入房間ID（例如：501、510）"
-                                    required
-                                    min="1"
-                                    th:field="*{roomId}"
+                                    name = "roomId"
+                                    id = "roomId"
                                 >
-                                <div class="invalid-feedback">
-                                    請輸入有效的房間ID（大於0的數字）
-                                </div>
                             </div>
                             <div class="mb-3">
-                                <label for="roomTypeId" class="form-label">
-                                    <i class="bi bi-grid-3x3-gap me-1"></i>房型ID *
+                                <label for="roomType" class="form-label">
+                                    <i class="bi bi-flag me-1"></i>房型 *
                                 </label>
-                                <input 
-									type="number"
-                                    class="form-control form-control-lg" 
-                                    placeholder="請輸入房型ID"
-                                    required
-                                    min="1"
-                                    th:field="*{roomTypeId}" 
+                                <select 
+                                    name = "roomTypeId"  
+                                    id = "roomTypeId"  
+                                    class="form-select form-select-lg" 
                                 >
-                                <div class="invalid-feedback">
-                                    請輸入有效的房型ID（大於0的數字）
-                                </div>
+                                    <option value="">請選擇房型</option>
+                                    <option 
+                                    th:each="roomTypeList : ${roomTypeList}" 
+                                    th:value="${roomTypeList.roomTypeId}" 
+                                    th:text="${roomTypeList.roomTypeName}"></option>
+                                </select>
                             </div>
 
                             <div class="mb-4">
@@ -77,34 +70,32 @@
                                     <i class="bi bi-flag me-1"></i>房間狀態 *
                                 </label>
                                 <select 
-                                     th:field="*{roomStatus}"  
+                                     name= "roomStatus"  
+                                     id= "roomStatus"  
                                     class="form-select form-select-lg" 
-                                    required
                                 >
-                                    <option value="">請選擇房間狀態</option>
-                                    <option value="0">空房</option>
-                                    <option value="1">入住中</option>
-                                    <option value="2">待維修</option>
-                                    <option value="3">待清潔</option>
+                                <option value="">請選擇房間狀態</option>
+								<option 
+								    th:each="roomStatus : ${roomStatusMap}"
+								    th:value="${roomStatus.key}"
+								    th:text="${roomStatus.value}">
+								</option>
                                 </select>
-                                <div class="invalid-feedback">
-                                    請選擇房間狀態
-                                </div>
                             </div>
 
                   <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                    <a href="/backend/room/addRoom" class="btn btn-primary btn-lg px-4" onclick="goUpdateRoom()">
+                    <button type="button" class="btn btn-primary btn-lg px-4" onclick="goAddRoom()">
                       <i class="bi bi-plus-circle me-1"></i>新增房間
-                    </a>
+                    </button>
                     <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="resetForm()">
                       <i class="bi bi-arrow-clockwise me-1"></i>重置
                     </button>
-                    <button type="submit" class="btn btn-success btn-lg px-4" onclick="goFindRoom()">
+                    <button type="submit" class="btn btn-success btn-lg px-4">
                       <i class="bi bi-search me-1"></i>查詢
                     </button>
-                    <a href="/backend/room/all" class="btn btn-dark btn-lg px-4" onclick="goListAllRoom()">
+                    <button type="button" class="btn btn-dark btn-lg px-4" onclick="goListAllRoom()">
                       <i class="bi bi-list-ul me-1"></i>查詢全部
-                    </a>
+                    </button>
                   </div>
                 </form>
               </div>
@@ -113,18 +104,9 @@
         </div>
       </div>
      <!-- JS -->
-   	 <script src="/js/room-addRoom.js"></script>
+   	 <script src="/js/room.js"></script>
     </main>
     <!-- Footer -->
     <div th:replace="~{fragments/fragments :: footer}"></div>
-
-    <script>
-      function resetForm() {
-        const form = document.getElementById('searchForm');
-        form.reset();
-        const inputs = form.querySelectorAll('.form-control, .form-select');
-        inputs.forEach(input => input.classList.remove('is-valid', 'is-invalid'));
-      }
-    </script>
   </body>
 </html>
