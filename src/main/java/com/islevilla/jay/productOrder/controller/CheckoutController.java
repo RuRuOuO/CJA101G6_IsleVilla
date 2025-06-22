@@ -11,7 +11,7 @@ import com.islevilla.yin.product.model.ProductService;
 import com.islevilla.lai.members.model.Members;
 import com.islevilla.lai.members.model.MembersService;
 import com.islevilla.jay.productOrderDetail.model.ProductOrderDetailService;
-import com.islevilla.jay.memberCoupon.model.MemberCoupon;
+import com.islevilla.jay.coupon.model.Coupon;
 import com.islevilla.jay.memberCoupon.model.MemberCouponService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -69,7 +69,7 @@ public class CheckoutController {
         int totalAmount = cartItems.stream().mapToInt(CartDTO::getSubtotal).sum();
 
         // 查詢會員可用的優惠券
-        List<MemberCoupon> availableCoupons = memberCouponService.findValidCouponsByMemberId(loggedInMember.getMemberId(), totalAmount);
+        List<Coupon> availableCoupons = memberCouponService.findValidCouponsByMemberId(loggedInMember.getMemberId(), totalAmount);
 
         // 使用實際登入的會員資訊
         model.addAttribute("cartItems", cartItems);
@@ -116,11 +116,12 @@ public class CheckoutController {
             
             // 處理優惠券
             Integer discountAmount = 0;
+            Coupon selectedCoupon = null;
             if (selectedCouponId != null) {
                 // 查詢選中的優惠券
-                List<MemberCoupon> availableCoupons = memberCouponService.findValidCouponsByMemberId(member.getMemberId(), totalAmount);
-                MemberCoupon selectedCoupon = availableCoupons.stream()
-                    .filter(mc -> mc.getCoupon().getCouponId().equals(selectedCouponId))
+                List<Coupon> availableCoupons = memberCouponService.findValidCouponsByMemberId(member.getMemberId(), totalAmount);
+                selectedCoupon = availableCoupons.stream()
+                    .filter(c -> c.getCouponId().equals(selectedCouponId))
                     .findFirst()
                     .orElse(null);
                 
@@ -141,6 +142,7 @@ public class CheckoutController {
             // 創建訂單
             ProductOrder order = new ProductOrder();
             order.setMember(member);
+            order.setCoupon(selectedCoupon); // 設置優惠券關聯
             order.setProductOrderAmount(totalAmount);
             order.setDiscountAmount(discountAmount);
             order.setProductPaidAmount(finalAmount);
@@ -155,12 +157,6 @@ public class CheckoutController {
             
             // 先保存訂單以獲得ID
             productOrderService.addProductOrder(order);
-            
-            // 如果有使用優惠券，設置優惠券關聯
-            if (selectedCouponId != null) {
-                // 這裡需要注入CouponService來獲取優惠券
-                // 暫時先不設置，等後面再完善
-            }
             
             // 創建訂單明細
             for (CartDTO cartItem : cartItems) {
@@ -179,6 +175,11 @@ public class CheckoutController {
                     
                     productOrderDetailService.addOrderDetail(detail);
                 }
+            }
+            
+            // 如果有使用優惠券，標記為已使用
+            if (selectedCouponId != null && discountAmount > 0) {
+                memberCouponService.markCouponAsUsed(member.getMemberId(), selectedCouponId);
             }
             
             // 清空購物車
