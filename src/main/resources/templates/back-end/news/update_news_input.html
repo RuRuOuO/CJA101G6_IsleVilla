@@ -1,14 +1,22 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>修改消息</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>微嶼 | Isle Villa 後台首頁</title>
     <!-- ===== 載入統一樣式 ===== -->
-    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
 </head>
 <body>
-<main>
-    <div class="container py-5">
+<!-- ===== 載入sidebar ===== -->
+<!-- 插入手機版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+<!-- 插入桌面版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+
+<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+    <th:block th:fragment="myContent">
+        <!-- //////////////////// 頁面內容放在這個card裡面(外框已經有加card和container，直接放入table和標題即可)//////////////////// -->
         <h1 class="mb-4">修改消息</h1>
 
         <a class="btn btn-secondary mb-4" th:href="@{/backend/news/list}">← 回到消息列表</a>
@@ -62,7 +70,8 @@
                 <button type="submit" class="btn btn-primary">送出</button>
             </div>
         </form>
-    </div>
+        <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+    </th:block>
 </main>
 </body>
 </html>
