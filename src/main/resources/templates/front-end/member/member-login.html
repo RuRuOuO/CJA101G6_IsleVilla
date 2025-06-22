@@ -32,6 +32,9 @@
                         </div>
                         
                         <form th:action="@{/member/login}" method="post" id="loginForm">
+                            <!-- 隱藏的redirect欄位 -->
+                            <input type="hidden" name="redirect" th:value="${redirect}">
+                            
                             <div class="mb-3">
                                 <label for="memberEmail" class="form-label">電子信箱</label>
                                 <div class="input-group">

@@ -1,7 +1,8 @@
 package com.islevilla.wei.room.model;
 
-import com.islevilla.wei.room.model.temp.Room;
-import com.islevilla.wei.room.model.temp.RoomType;
+
+import com.islevilla.chen.room.model.Room;
+import com.islevilla.chen.roomType.model.RoomType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

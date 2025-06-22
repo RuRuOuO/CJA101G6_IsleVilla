@@ -19,26 +19,41 @@
             <!-- 右側內容區 -->
             <div class="col-md-9">
                 <!-- //////////////////// 會員頁面內容放這裡 //////////////////// -->
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th>訂單編號</th>
-                            <th>訂購日期</th>
-                            <th>入住日期</th>
-                            <th>退房日期</th>
-                            <th>總金額</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="order : ${orderList}">
-                            <td th:text="${order.roomReservationId}"></td>
-                            <td th:text="${#temporals.format(order.roomOrderDate, 'yyyy-MM-dd')}"></td>
-                            <td th:text="${#temporals.format(order.checkInDate, 'yyyy-MM-dd')}"></td>
-                            <td th:text="${#temporals.format(order.checkOutDate, 'yyyy-MM-dd')}"></td>
-                            <td th:text="${order.roomTotalAmount}"></td>
-                        </tr>
-                        </tbody>
-                    </table>
+                <div th:if="${!orderList.isEmpty()}">
+                    <div class="col-12" th:each="order : ${orderList}">
+                        <div class="card shadow-sm p-3">
+                            <h5 class="card-title mb-3">訂單編號：<span th:text="${order.roomReservationId}"></span>
+                            </h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">訂購日期：<span
+                                        th:text="${#temporals.format(order.roomOrderDate, 'yyyy-MM-dd')}"></span></li>
+                                <li class="list-group-item">訂單狀態：<span th:switch="${order.roomOrderStatus}">
+                                    <span th:case="'0'">訂單成立</span>
+                                    <span th:case="'1'">已付款</span>
+                                    <span th:case="'2'">已完成</span>
+                                    <span th:case="'3'">取消確認中</span>
+                                    <span th:case="'4'">已取消</span>
+                                    <span th:case="'*'">未知</span>
+                                </span></li>
+                                <li class="list-group-item">入住日期：<span
+                                        th:text="${#temporals.format(order.checkInDate, 'yyyy-MM-dd')}"></span></li>
+                                <li class="list-group-item">退房日期：<span
+                                        th:text="${#temporals.format(order.checkOutDate, 'yyyy-MM-dd')}"></span></li>
+                                <li class="list-group-item" th:if="${order.remark != null}">備註：<span
+                                        th:text="${order.remark}"></span></li>
+                                <li class="list-group-item" th:if="${order.promotion != null}">優惠專案：<span
+                                        th:text="${order.promotion.roomPromotionTitle}"></span></li>
+                                <li class="list-group-item">總金額：NT$ <span th:text="${order.roomTotalAmount}"></span>
+                                </li>
+                            </ul>
+                            <a class="btn btn-dark"
+                               th:href="@{'/member/room/'+${order.roomReservationId}}">明細</a>
+                        </div>
+                    </div>
+                </div>
+                <div th:unless="${!orderList.isEmpty()}">
+                    <p>尚無訂單建立</p>
+                </div>
                 <!-- //////////////////// 會員頁面內容放這裡 //////////////////// -->
             </div>
         </div>
