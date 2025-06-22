@@ -2,62 +2,64 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <meta content="width=device-width, initial-scale=1" name="viewport"/>
-    <title>微嶼 | Isle Villa</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>微嶼 | Isle Villa 後台首頁</title>
     <!-- ===== 載入統一樣式 ===== -->
-    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
 </head>
 <body>
-<!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
-<main>
-    <!-- 最新消息 -->
-    <section class="py-5 bg-light shadow-sm" id="news">
-        <div class="d-flex justify-content-center align-items-center">
-            <div class="container">
-                <h2 class="section-title text-center mb-5">最新消息一覽</h2>
-                <!--新增最新消息-->
-                <a class="btn btn-dark" th:href="@{/backend/news/add}">新增最新消息</a>
-                <table class="table table-striped-columns shadow-sm">
-                    <thead>
-                    <tr>
-                        <th>編號</th>
-                        <th>標題</th>
-                        <th>內文</th>
-                        <th>時間</th>
-                        <th>圖片</th>
-                        <th>狀態</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <th:block th:each="news : ${newsList}">
-                        <tr>
-                            <td th:text="${news.newsId}"></td>
-                            <td th:text="${news.newsTitle}"></td>
-                            <td th:text="${news.newsContent}"></td>
-                            <td th:text="${news.newsTime}"></td>
-                            <td>
-                                <img alt="消息圖片"
-                                     style="max-height:40px; width: 80px; object-fit: cover;"
-                                     th:if="${news.newsImage != null}" th:src="@{'/news/image/' + ${news.newsId}}"/>
-                                <!-- 沒有圖片時顯示文字 -->
-                                <span th:unless="${news.newsImage != null}">無圖片</span>
-                            </td>
-                            <td th:text="${news.newsStatus == 1 ? '上架' : '下架'}"></td>
-                            <td>
-                                <a class="btn btn-dark" th:href="@{'/backend/news/edit/' + ${news.newsId}}">修改</a>
-                            </td>
-                        </tr>
-                    </th:block>
-                    </tbody>
-                </table>
-                <!-- ========== 載入分頁 ========== -->
-                <th:block
-                        th:replace="~{fragments/fragments :: paginationFragment(currentPage=${currentPage}, totalPages=${totalPages}, pageURL=${pageURL})}"/>
+<!-- ===== 載入sidebar ===== -->
+<!-- 插入手機版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+<!-- 插入桌面版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: sidebar}"></div>
 
-            </div>
-        </div>
-    </section>
+<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+    <th:block th:fragment="myContent">
+        <!-- //////////////////// 頁面內容放在這個card裡面(外框已經有加card和container，直接放入table和標題即可)//////////////////// -->
+        <h2 class="section-title text-center mb-5">最新消息一覽</h2>
+        <!--新增最新消息-->
+        <a class="btn btn-dark" th:href="@{/backend/news/add}">新增最新消息</a>
+        <table class="table table-striped-columns shadow-sm">
+            <thead>
+            <tr>
+                <th>編號</th>
+                <th>標題</th>
+                <th>內文</th>
+                <th>時間</th>
+                <th>圖片</th>
+                <th>狀態</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:each="news : ${newsList}">
+                <tr>
+                    <td th:text="${news.newsId}"></td>
+                    <td th:text="${news.newsTitle}"></td>
+                    <td th:text="${news.newsContent}"></td>
+                    <td th:text="${news.newsTime}"></td>
+                    <td>
+                        <img alt="消息圖片"
+                             style="max-height:40px; width: 80px; object-fit: cover;"
+                             th:if="${news.newsImage != null}" th:src="@{'/news/image/' + ${news.newsId}}"/>
+                        <!-- 沒有圖片時顯示文字 -->
+                        <span th:unless="${news.newsImage != null}">無圖片</span>
+                    </td>
+                    <td th:text="${news.newsStatus == 1 ? '上架' : '下架'}"></td>
+                    <td>
+                        <a class="btn btn-dark" th:href="@{'/backend/news/edit/' + ${news.newsId}}">修改</a>
+                    </td>
+                </tr>
+            </th:block>
+            </tbody>
+        </table>
+        <!-- ========== 載入分頁 ========== -->
+        <th:block
+                th:replace="~{fragments/fragments :: paginationFragment(currentPage=${currentPage}, totalPages=${totalPages}, pageURL=${pageURL})}"/>
+
+
+        <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+    </th:block>
 </main>
-<!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
 </body>
 </html>
