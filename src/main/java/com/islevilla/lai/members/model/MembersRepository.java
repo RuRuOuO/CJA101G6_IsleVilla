@@ -19,10 +19,10 @@ public interface MembersRepository extends JpaRepository<Members, Integer> {
 	void deleteByMemberId(@Param("memberId") Integer memberId);
 
 	// 根據電子信箱查找會員
-	@Transactional
-	@Modifying
-	@Query(value = "SELECT memberEmail FROM members WHERE memberEmail =?1", nativeQuery = true)
-	Members findByEmail(String memberEmail);
+//	@Transactional
+//	@Modifying
+//	@Query(value = "SELECT memberEmail FROM members WHERE memberEmail =?1", nativeQuery = true)
+//	Members findByEmail(String memberEmail);
 
 	// 根據電子信箱查找會員
 	@Query("SELECT m FROM Members m WHERE m.memberEmail = :memberEmail")

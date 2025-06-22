@@ -89,8 +89,8 @@
                             <tr>
                                 <th>訂單編號</th>
                                 <th>訂單日期</th>
-                                <th>優惠券</th>
                                 <th>訂單金額</th>
+                                <th>優惠券</th>
                                 <th>折扣金額</th>
                                 <th>實付金額</th>
                                 <th>付款方式</th>
@@ -105,15 +105,15 @@
                                 <tr>
                                     <td th:text="${order.productOrderId}"></td>
                                     <td th:text="${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm')}"></td>
-                                    <td th:text="${order.coupon != null ? order.coupon.couponCode : '無'}"></td>
                                     <td th:text="${order.productOrderAmount}"></td>
+                                    <td th:text="${order.coupon != null ? order.coupon.couponCode : '無'}"></td>
                                     <td th:text="${order.discountAmount}"></td>
                                     <td th:text="${order.productPaidAmount}"></td>
                                     <td th:text="${order.paymentMethod}" class="paymentMethod"></td>
                                     <td th:text="${order.shippingMethod}" class="shippingMethod"></td>
                                     <td th:text="${order.orderStatus}" class="orderStatus"></td>
                                     <td>
-                                        <form th:action="@{/product-order/checkoutResult}" method="get">
+                                        <form th:action="@{/product-order/memberOrderDetail}" method="get">
                                             <input type="hidden" name="orderNo" th:value="${order.productOrderId}">
                                             <button class="btn btn-primary">查看詳情</button>
                                         </form>
@@ -126,7 +126,8 @@
                 </div>
 
                 <div class="text-center mt-4">
-                    <button onclick="goBack()" class="btn btn-success">回上一頁</button>
+                    <a href="/product" class="btn btn-success me-2">繼續購物</a>
+                    <a href="/" class="btn btn-primary">回首頁</a>
                 </div>
                 <!-- //////////////////// 會員頁面內容放這裡 //////////////////// -->
             </div>
@@ -145,6 +146,7 @@
             "searching": false,
             "paging": true,
             "ordering": true,
+            "order": [[1, "desc"]],
             "language": {
                 "processing": "處理中...",
                 "loadingRecords": "載入中...",
@@ -185,7 +187,7 @@
                 e.textContent = '配送中';
                 break;
             case '2':
-                e.textContent = '已取貨';
+                e.textContent = '已完成';
                 break;
         }
     });

@@ -6,6 +6,7 @@
 .border-primary {
     background-color: rgb(200, 210, 0) !important;
     color: rgb(255, 255, 255) !important;
+    border: 1px solid white;
 }
 
 /* 自訂 dark 顏色 */
@@ -28,11 +29,16 @@
 
 /* ==================== 統一樣式 ==================== */
 
-/* 全站取消圓角 */
+/* 字型 */
 * {
-    border-radius: 0px !important;
+    border-radius: 0 !important;
     font-family: "Noto Sans TC", sans-serif;
 }
+
+/* 除了card相關元素外全站調整圓角 */
+/**:not(.card):not(.card *){*/
+/*    border-radius: 0 !important;*/
+/*}*/
 
 /* 文字大小統一 */
 p,
@@ -65,12 +71,12 @@ li {
 
 /* 按鈕陰影 */
 .btn {
-    border: 1px solid white;
     box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.1);
 }
 
 .btn:hover {
     border: 1px solid white;
+    filter: brightness(1.1);
 }
 
 /* 卡片圖片尺寸設定 */
@@ -88,7 +94,6 @@ li {
     z-index: 1050;
     box-shadow: 0 0px 20px rgba(255, 255, 255, 1);
 }
-
 
 /* ==================== Layout ==================== */
 
@@ -109,6 +114,7 @@ main {
 
 footer {
     margin-top: auto;
+    flex-shrink: 0;
 }
 
 /* ==================== 表單錯誤訊息 ==================== */
@@ -138,7 +144,7 @@ footer {
     width: 100%;
     padding-top: 80%; /* 高度 = 寬度 × 0.8 */
     overflow: hidden;
-    border-radius: 12px;
+    /*border-radius: 12px;*/
     /* box-shadow: 5px 5px 20px rgba(0, 0, 0, 1); */
 }
 

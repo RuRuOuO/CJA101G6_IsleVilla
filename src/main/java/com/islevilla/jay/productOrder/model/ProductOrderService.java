@@ -43,7 +43,7 @@ public class ProductOrderService {
     }
 
     public List<ProductOrder> getAll() {
-        return repository.findAll();
+        return repository.findAllByOrderByOrderTimeDesc();
     }
 
     public List<ProductOrder> getAll(Map<String, String[]> map) {
@@ -81,18 +81,18 @@ public class ProductOrderService {
     }
 
     public List<ProductOrder> getMemAllOrder(Integer memberId) {
-        return repository.findByMember_MemberId(memberId);
+        return repository.findByMember_MemberIdOrderByOrderTimeDesc(memberId);
     }
 
     public List<ProductOrder> findByMemberIdAndStatus(Integer memberId, Integer orderStatus) {
         if (memberId != null && orderStatus != null) {
-            return repository.findByOrderStatusAndMember_MemberId(orderStatus.byteValue(), memberId);
+            return repository.findByOrderStatusAndMember_MemberIdOrderByOrderTimeDesc(orderStatus.byteValue(), memberId);
         } else if (memberId != null) {
-            return repository.findByMember_MemberId(memberId);
+            return repository.findByMember_MemberIdOrderByOrderTimeDesc(memberId);
         } else if (orderStatus != null) {
-            return repository.findByOrderStatus(orderStatus.byteValue());
+            return repository.findByOrderStatusOrderByOrderTimeDesc(orderStatus.byteValue());
         } else {
-            return repository.findAll();
+            return repository.findAllByOrderByOrderTimeDesc();
         }
     }
 }

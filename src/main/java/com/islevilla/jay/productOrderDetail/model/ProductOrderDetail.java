@@ -17,9 +17,8 @@ public class ProductOrderDetail {
     @Column(name = "product_order_quantity", nullable = false)
     private Integer productOrderQuantity;
 
-    @ManyToOne
-    @JoinColumn(name = "product_name", referencedColumnName = "product_name", nullable = false)
-    private Product productName;
+    @Column(name = "product_order_name")
+    private String productOrderName;
 
     // 訂單主表關聯
     @ManyToOne
@@ -62,12 +61,12 @@ public class ProductOrderDetail {
         this.productOrderQuantity = productOrderQuantity;
     }
 
-    public Product getProductName() {
-        return productName;
+    public String getProductOrderName() {
+        return productOrderName;
     }
 
-    public void setProductName(Product productName) {
-        this.productName = productName;
+    public void setProductOrderName(String productOrderName) {
+        this.productOrderName = productOrderName;
     }
 
     public ProductOrder getProductOrder() {
