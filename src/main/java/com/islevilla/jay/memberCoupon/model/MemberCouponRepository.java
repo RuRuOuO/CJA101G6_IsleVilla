@@ -1,5 +1,6 @@
 package com.islevilla.jay.memberCoupon.model;
 
+import com.islevilla.jay.coupon.model.Coupon;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -28,12 +29,13 @@ public interface MemberCouponRepository extends JpaRepository<MemberCoupon, Memb
     @Query("SELECT COUNT(mc) > 0 FROM MemberCoupon mc WHERE mc.id.memberId = :memberId AND mc.id.couponId = :couponId")
     boolean existsByMemberIdAndCouponId(@Param("memberId") Integer memberId, @Param("couponId") Integer couponId);
     
-    // 查詢會員可用的優惠券（未過期且符合使用條件）
-    @Query("SELECT mc FROM MemberCoupon mc WHERE mc.id.memberId = :memberId " +
-           "AND mc.coupon.startDate <= CURRENT_DATE " +
-           "AND mc.coupon.endDate >= CURRENT_DATE " +
-           "AND mc.coupon.minSpend <= :orderAmount")
-    List<MemberCoupon> findValidCouponsByMemberId(@Param("memberId") Integer memberId, @Param("orderAmount") Integer orderAmount);
+    // 查詢會員可用的優惠券（未過期且符合使用條件，且未使用過）
+    @Query(value = "SELECT * FROM coupon c WHERE c.start_date <= CURDATE() " +
+           "AND c.end_date >= CURDATE() " +
+           "AND c.min_spend <= :orderAmount " +
+           "AND NOT EXISTS (SELECT 1 FROM member_coupon mc WHERE mc.member_id = :memberId " +
+           "AND mc.coupon_id = c.coupon_id)", nativeQuery = true)
+    List<Coupon> findValidCouponsByMemberId(@Param("memberId") Integer memberId, @Param("orderAmount") Integer orderAmount);
 
     @Transactional
     @Modifying

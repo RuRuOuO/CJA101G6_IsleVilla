@@ -3,6 +3,7 @@ package com.islevilla.jay.productOrder.model;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,11 +22,21 @@ public interface ProductOrderRepository extends JpaRepository<ProductOrder, Inte
 
     List<ProductOrder> findByMember_MemberId(Integer memberId);
 
-    
+    // 查詢所有訂單，按訂單時間降序排列（最新的在前），並加載優惠券關聯
+    @Query("SELECT po FROM ProductOrder po LEFT JOIN FETCH po.coupon ORDER BY po.orderTime DESC")
+    List<ProductOrder> findAllByOrderByOrderTimeDesc();
 
+    // 根據會員ID查詢訂單，按訂單時間降序排列，並加載優惠券關聯
+    @Query("SELECT po FROM ProductOrder po LEFT JOIN FETCH po.coupon WHERE po.member.memberId = :memberId ORDER BY po.orderTime DESC")
+    List<ProductOrder> findByMember_MemberIdOrderByOrderTimeDesc(@Param("memberId") Integer memberId);
 
-    // 根據訂單狀態查詢
-    List<ProductOrder> findByOrderStatus(Byte orderStatus);
+    // 根據訂單狀態查詢，按訂單時間降序排列，並加載優惠券關聯
+    @Query("SELECT po FROM ProductOrder po LEFT JOIN FETCH po.coupon WHERE po.orderStatus = :orderStatus ORDER BY po.orderTime DESC")
+    List<ProductOrder> findByOrderStatusOrderByOrderTimeDesc(@Param("orderStatus") Byte orderStatus);
+
+    // 根據訂單狀態和會員ID查詢，按訂單時間降序排列，並加載優惠券關聯
+    @Query("SELECT po FROM ProductOrder po LEFT JOIN FETCH po.coupon WHERE po.orderStatus = :orderStatus AND po.member.memberId = :memberId ORDER BY po.orderTime DESC")
+    List<ProductOrder> findByOrderStatusAndMember_MemberIdOrderByOrderTimeDesc(@Param("orderStatus") Byte orderStatus, @Param("memberId") Integer memberId);
 
     // 根據付款方式查詢
     List<ProductOrder> findByPaymentMethod(Byte paymentMethod);
