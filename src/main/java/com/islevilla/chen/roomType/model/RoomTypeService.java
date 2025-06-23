@@ -22,11 +22,11 @@ public class RoomTypeService {
 		return roomTypeRepository.save(roomType);
 	}
 	
-	public void deleteRoomType(int roomTypeId) {
+	public void deleteRoomType(Integer roomTypeId) {
 		roomTypeRepository.deleteById(roomTypeId);
 	}
 	
-	public RoomType findById(int roomTypeId) {
+	public RoomType findById(Integer roomTypeId) {
 		Optional<RoomType> optional=roomTypeRepository.findById(roomTypeId);
 		return optional.orElse(null);
 	}

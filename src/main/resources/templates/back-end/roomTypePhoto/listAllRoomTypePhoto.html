@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>微嶼 | Isle Villa 後台首頁</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+</head>
+<body>
+<!-- ===== 載入sidebar ===== -->
+<!-- 插入手機版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+<!-- 插入桌面版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+
+<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+    <th:block th:fragment="myContent">
+        <!-- //////////////////// 頁面內容放在這個card裡面(外框已經有加card和container，直接放入table和標題即可)//////////////////// -->
+        
+        <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+    </th:block>
+</main>
+</body>
+</html>

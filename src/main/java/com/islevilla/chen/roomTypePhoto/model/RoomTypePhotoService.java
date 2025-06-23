@@ -9,20 +9,22 @@ import org.springframework.stereotype.Service;
 public class RoomTypePhotoService {
 	@Autowired
 	private RoomTypePhotoRepository roomTypePhotoRepository;
+	@Autowired
+	RoomTypePhoto roomTypephoto = new RoomTypePhoto();
 	
-	public RoomTypePhoto addRoomTypePhoto(RoomTypePhoto roomTypePhoto) {
-		return roomTypePhotoRepository.save(roomTypePhoto);
+	public RoomTypePhoto addRoomTypePhoto(Integer roomTypeId, Byte[] roomTypePhoto) {
+        return roomTypePhotoRepository.save(roomTypephoto);
 	}
 	
 	public RoomTypePhoto updateRoomTypePhoto(RoomTypePhoto roomTypePhoto) {
 		return roomTypePhotoRepository.save(roomTypePhoto);
 	}
 	
-	public void deleteRoomTypePhoto(int roomTypePhotoId) {
+	public void deleteRoomTypePhoto(Integer roomTypePhotoId) {
 		roomTypePhotoRepository.deleteById(roomTypePhotoId);
 	}
 	
-	public RoomTypePhoto findById(int roomTypePhotoId) {
+	public RoomTypePhoto findById(Integer roomTypePhotoId) {
 		Optional<RoomTypePhoto> optional=roomTypePhotoRepository.findById(roomTypePhotoId);
 		return optional.orElse(null);
 	}

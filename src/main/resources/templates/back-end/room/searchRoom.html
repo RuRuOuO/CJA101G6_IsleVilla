@@ -1,29 +1,29 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>微嶼 | Isle Villa房號</title>
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>微嶼 | Isle Villa 後台首頁</title>
     <!-- ===== 載入統一樣式 ===== -->
-    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
     <link href="/css/room.css" rel="stylesheet">
-  </head>
-  <body>
-    <!-- ===== 載入Header ===== -->
-    <div th:replace="~{fragments/fragments :: header}"></div>
-    <!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
-    <main>
-    <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center py-4">
-        <div class="row w-100 justify-content-center">
-            <div class="col-auto">
-                <div class="card shadow-lg border-0 rounded-4">
-                    <div class="card-header bg-primary text-white text-center py-4 rounded-top-4">
+</head>
+<body>
+<!-- ===== 載入sidebar ===== -->
+<!-- 插入手機版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+<!-- 插入桌面版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+    <th:block th:fragment="myContent">
+    
+                    <div class=" text-center py-4 ">
                         <h1 class="h3 mb-0">
                             <i class="bi bi-house-add me-2"></i>查詢結果
                         </h1>
                     </div>
                     
-                    <div class="card-body p-4">
+
                     <div class="table-responsive">
                         <table class="table table-striped table-hover">
 	                  <thead class="table-dark">
@@ -33,6 +33,7 @@
 			                  <th>房型名稱</th>
 			                  <th>房間狀態</th>
 			                  <th>修改</th>
+			                  <th>刪除</th>
 		                  </tr>
 	                  </thead>
 	              	  <tbody> 
@@ -46,6 +47,11 @@
 							    <i class="bi bi-pencil"></i> 修改
 							</a>
 	                      </td>
+	                      <td>
+                      		<a th:href="@{/backend/room/deleteRoom/{roomId}(roomId=${room.roomId})}" class="btn btn-primary btn-sm">
+							    <i class="bi bi-pencil"></i> 刪除
+							</a>
+	                      </td>
 					    </tr>
 				    </tbody>
 				  </table>
@@ -56,16 +62,10 @@
                            </button>
                        </div>
                     </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+
     <!-- JS -->
     <script src="/js/room.js"></script>
+    </th:block>
     </main>
-    <!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
-    <!-- ========== 載入Footer及Bootstrap JS ========== -->
-    <div th:replace="~{fragments/fragments :: footer}"></div>
   </body>
 </html>

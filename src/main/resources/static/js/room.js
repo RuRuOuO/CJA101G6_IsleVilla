@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', function() {
 	const form = document.getElementById('roomForm');
 	const roomIdInput = document.getElementById('roomId');
-	const roomTypeIdInput = document.getElementById('roomTypeId');
+	const roomTypeIdSelect = document.getElementById('roomTypeId');
 	const roomStatusSelect = document.getElementById('roomStatus');
 	const successMessage = document.getElementById('successMessage');
 
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				}
 			}
 	
-			// 顯示Bootstrap驗證樣式
+			// 顯示Bootstrap驗證樣式 會讓已經存在的 .invalid-feedback 區塊顯示出來。加上 .is-invalid 類別(CSS)
 			form.classList.add('was-validated');
 		});
 		
@@ -41,9 +41,9 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 
 		// 即時驗證 - 房型ID
-		if(roomTypeIdInput) {
-			roomTypeIdInput.addEventListener('input', function() {
-				validateNumberInput(this);
+		if(roomTypeIdSelect) {
+			roomTypeIdSelect.addEventListener('change', function() {
+				validateSelectInput(this);
 			});
 		}
 
@@ -93,19 +93,19 @@ document.addEventListener('DOMContentLoaded', function() {
 			        showErrorAlert('房間ID必須是大於0的整數！');
 			        return false;
 			    }
-			    if (!roomTypeId || isNaN(roomTypeId) || roomTypeId <= 0) {
-			        showErrorAlert('房型ID必須是大於0的整數！');
+			    if (isNaN(roomTypeId) || roomTypeId < 0) {
+			        showErrorAlert('請選擇房型！');
 			        return false;
 			    }
 			    if (isNaN(roomStatus) || roomStatus < 0) {
-			        showErrorAlert('請選擇正確的房間狀態！');
+			        showErrorAlert('請選擇房間狀態！');
 			        return false;
 			    }
 			    return true;
 			} else {
 			    // loose 模式：只需填一個條件
 			    const hasRoomId = roomId && !isNaN(roomId) && roomId > 0;
-			    const hasRoomTypeId = roomTypeId && !isNaN(roomTypeId) && roomTypeId > 0;
+			    const hasRoomTypeId = !isNaN(roomTypeId) && roomTypeId > 0;
 			    const hasRoomStatus = !isNaN(roomStatus) && roomStatus >= 0;
 			    
 			    if (!hasRoomId && !hasRoomTypeId && !hasRoomStatus) {
@@ -115,34 +115,6 @@ document.addEventListener('DOMContentLoaded', function() {
 			    return true;
 			}
 		}
-	
-
-	// 顯示載入狀態
-	function showLoadingState(isLoading) {
-		const submitBtn = form.querySelector('button[type="submit"]');
-		const resetBtn = form.querySelector('button[type="button"]');
-
-		if (isLoading) {
-			submitBtn.disabled = true;
-			resetBtn.disabled = true;
-			submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>新增中...';
-		} else {
-			submitBtn.disabled = false;
-			resetBtn.disabled = false;
-			submitBtn.innerHTML = '<i class="bi bi-plus-circle me-1"></i>新增房間';
-		}
-	}
-
-	// 顯示成功訊息
-	function showSuccessMessage() {
-		successMessage.classList.remove('d-none');
-		successMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
-		// 5秒後隱藏訊息
-		setTimeout(() => {
-			successMessage.classList.add('d-none');
-		}, 5000);
-	}
 
 	// 顯示錯誤警告
 	function showErrorAlert(message) {
@@ -191,7 +163,7 @@ function goListAllRoom() {
 // 重置表單函數（全域函數，供HTML onclick使用）
 function resetForm() {
 	const form = document.getElementById('roomForm');
-	console.log("重製表單");
+	console.log("重置表單");
 
 	// 直接清空欄位值
 	document.getElementById('roomId').value = '';

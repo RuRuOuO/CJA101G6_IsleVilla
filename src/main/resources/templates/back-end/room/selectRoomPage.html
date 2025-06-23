@@ -1,28 +1,26 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>微嶼 | 查詢房間</title>
-
-    <!-- 通用樣式 -->
-    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>微嶼 | Isle Villa 後台首頁</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
     <link href="/css/room.css" rel="stylesheet">
-  </head>
-  <body>
-    <!-- Header -->
-    <div th:replace="~{fragments/fragments :: header}"></div>
-
-    <main>
-      <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center py-4">
-        <div class="row w-100 justify-content-center">
-          <div class="col-auto">
-            <div class="card shadow-lg border-0 rounded-4">
-              <div class="card-header bg-primary text-white text-center py-4 rounded-top-4">
+</head>
+<body>
+<!-- ===== 載入sidebar ===== -->
+<!-- 插入手機版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+<!-- 插入桌面版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+    <th:block th:fragment="myContent">
+    
+              <div class="text-center py-4 ">
                 <h1 class="h3 mb-0"><i class="bi bi-search me-2"></i>房間查詢</h1>
               </div>
 
-              <div class="card-body p-4">
             	  <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
              		  <i class="bi bi-info-circle me-2"></i>
               			 <div>
@@ -98,15 +96,10 @@
                     </button>
                   </div>
                 </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-     <!-- JS -->
-   	 <script src="/js/room.js"></script>
+
+    <!-- JS -->
+    <script src="/js/room.js"></script>
+    </th:block>
     </main>
-    <!-- Footer -->
-    <div th:replace="~{fragments/fragments :: footer}"></div>
   </body>
 </html>

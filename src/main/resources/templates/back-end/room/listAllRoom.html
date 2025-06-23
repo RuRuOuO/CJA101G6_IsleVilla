@@ -1,28 +1,26 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>微嶼 | 查詢房間</title>
-
-    <!-- 通用樣式 -->
-    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>微嶼 | Isle Villa 後台首頁</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
     <link href="/css/room.css" rel="stylesheet">
-  </head>
-  <body>
-    <!-- Header -->
-    <div th:replace="~{fragments/fragments :: header}"></div>
-
-    <main>
-      <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center py-4">
-        <div class="row w-100 justify-content-center">
-          <div class="col-auto">
-            <div class="card shadow-lg border-0 rounded-4">
-              <div class="card-header bg-primary text-white text-center py-4 rounded-top-4">
+</head>
+<body>
+<!-- ===== 載入sidebar ===== -->
+<!-- 插入手機版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+<!-- 插入桌面版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+    <th:block th:fragment="myContent">
+    
+              <div class="text-center py-4 ">
                 <h1 class="h3 mb-0"><i class="bi bi-search me-2"></i>房間總覽</h1>
               </div>
 
-              <div class="card-body p-4">
                   <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                     <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="goSelectRoomPage()">
                        <i class="bi bi-arrow-left me-1" onclick="goSelectRoomPage()"></i>回到查詢頁面
@@ -37,6 +35,7 @@
 			                  <th>房型名稱</th>
 			                  <th>房間狀態</th>
 			                  <th>修改</th>
+			                  <th>刪除</th>
 		                  </tr>
 	                  </thead>
 	              	  <tbody> 
@@ -50,6 +49,11 @@
 							    <i class="bi bi-pencil"></i> 修改
 							</a>
 	                      </td>
+	                      <td>
+                      		<a th:href="@{/backend/room/deleteRoom/{roomId}(roomId=${room.roomId})}" class="btn btn-primary btn-sm">
+							    <i class="bi bi-pencil"></i> 刪除
+							</a>
+	                      </td>
 					    </tr>
 				    </tbody>
 				  </table>
@@ -57,24 +61,10 @@
               	 <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="goSelectRoomPage()">
                        <i class="bi bi-arrow-left me-1" onclick="goSelectRoomPage()"></i>回到查詢頁面
                    </button>
-              	</div>
-            </div>
-          </div>
-        </div>
-      </div>
-     <!-- JS -->
-   	 <script src="/js/room.js"></script>
-    </main>
-    <!-- Footer -->
-    <div th:replace="~{fragments/fragments :: footer}"></div>
 
-    <script>
-      function resetForm() {
-        const form = document.getElementById('searchForm');
-        form.reset();
-        const inputs = form.querySelectorAll('.form-control, .form-select');
-        inputs.forEach(input => input.classList.remove('is-valid', 'is-invalid'));
-      }
-    </script>
+    <!-- JS -->
+    <script src="/js/room.js"></script>
+    </th:block>
+    </main>
   </body>
 </html>

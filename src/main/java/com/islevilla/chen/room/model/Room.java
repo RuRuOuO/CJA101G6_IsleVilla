@@ -4,12 +4,16 @@ import org.springframework.stereotype.Component;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name="room")
 @Component
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Room {
 	private static final long serialVersionUID = 1L;
 	

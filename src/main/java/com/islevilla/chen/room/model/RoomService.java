@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,7 +23,11 @@ public class RoomService {
 	}
 	
 	public void deleteRoom(Integer roomId) {
-		roomRepository.deleteById(roomId);
+		 try {
+	        roomRepository.deleteById(roomId);
+	    } catch (DataIntegrityViolationException e) {
+	        throw new IllegalStateException("此房間尚有訂單資料，無法刪除");
+	    }
 	}
 	
 	public Room findById(Integer roomId) {
@@ -34,34 +39,7 @@ public class RoomService {
 		return roomRepository.findAll();
 	}
 	
-	// 根據房型ID查詢房間
-	public List<Room> findByRoomTypeId(Integer roomTypeId) {
-	    return roomRepository.findByRoomTypeId(roomTypeId);
-	}
-
-	// 根據房間狀態查詢房間
-	public List<Room> findByRoomStatus(Byte roomStatus) {
-	    return roomRepository.findByRoomStatus(roomStatus);
-	}
-
-	// 複合查詢方法（可選）
-	public List<Room> findByMultipleConditions(Integer roomId, Integer roomTypeId, Byte roomStatus) {
-	    if (roomId != null && roomId > 0) {
-	        Room room = findById(roomId);
-	        return room != null ? List.of(room) : new ArrayList<>();
-	    }
-	    
-	    if (roomTypeId != null && roomTypeId > 0 && roomStatus != null) {
-	        return roomRepository.findByRoomTypeIdAndRoomStatus(roomTypeId, roomStatus);
-	    }
-	    
-	    if (roomTypeId != null && roomTypeId > 0) {
-	        return findByRoomTypeId(roomTypeId);
-	    }
-	    
-	    if (roomStatus != null) {
-	        return findByRoomStatus(roomStatus);
-	    }
-	    return null;
+	public List<Room> compoundQuery(Integer roomId, Integer roomTypeId, Byte roomStatus){
+	    return roomRepository.searchRooms(roomId,roomTypeId, roomStatus);
 	}
 }
