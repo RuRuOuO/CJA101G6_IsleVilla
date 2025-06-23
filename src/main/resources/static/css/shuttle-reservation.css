@@ -2,16 +2,32 @@
     font-weight: bold;
 }
 
+/* 步驟指示器 */
 .step-indicator {
     display: flex;
     justify-content: center;
+    align-items: center;
     margin: 30px 0;
+    position: relative;
+}
+
+.step-indicator::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 25%;
+    right: 25%;
+    height: 2px;
+    background-color: #dee2e6;
+    z-index: -1;
 }
 
 .step {
     display: flex;
+    flex-direction: column;
     align-items: center;
     margin: 0 15px;
+    min-width: 80px;
 }
 
 .step-circle {
@@ -22,13 +38,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 10px;
+    margin-bottom: 8px;
     font-weight: bold;
+    transition: all 0.3s ease;
 }
 
 .step.active .step-circle {
     background-color: #007bff;
     color: white;
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.2);
 }
 
 .step.completed .step-circle {
@@ -36,21 +54,29 @@
     color: white;
 }
 
+/* 班次選擇卡片 */
 .schedule-card {
     cursor: pointer;
     transition: all 0.3s ease;
+    border: 2px solid transparent;
 }
 
 .schedule-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    border-color: #007bff;
 }
 
 .schedule-card.selected {
     border: 2px solid #007bff;
     background-color: #e7f3ff;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
 }
 
+.schedule-card .form-check-input {
+    display: none;
+    /* 隱藏radio按鈕，使用卡片點擊 */
+}
 
 /* 座位配置 */
 .seat-grid {
@@ -76,24 +102,26 @@
     font-weight: bold;
     font-size: 0.8rem;
     transition: all 0.2s ease;
-    position: relative;
+    background-color: #f8f9fa;
 }
 
 .seat.available {
-    background-color: #f8f9fa;
+    background-color: #e8f5e8;
     border-color: #28a745;
+    color: #155724;
 }
 
-/* 座位hover效果 */
 .seat.available:hover {
     transform: scale(1.05);
     border-color: #007bff;
-    box-shadow: 0 2px 4px rgba(0,123,255,0.3);
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.4);
+    background-color: #e3f2fd;
 }
 
 .seat.occupied {
-    background-color: #dc3545;
-    color: white;
+    background-color: #f8d7da;
+    border-color: #dc3545;
+    color: #721c24;
     cursor: not-allowed;
 }
 
@@ -101,6 +129,7 @@
     background-color: #007bff;
     color: white;
     border-color: #0056b3;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 
 .seat.disabled {
@@ -109,6 +138,7 @@
     cursor: not-allowed;
 }
 
+/* 預約摘要 */
 .reservation-summary {
     background-color: #f8f9fa;
     border-radius: 10px;
@@ -116,73 +146,51 @@
     margin: 20px 0;
 }
 
-/* 訂房狀態相關樣式 */
-.room-status-badge {
-    font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
+/* 表單樣式改進 */
+.form-control:focus,
+.form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
-.room-status-0 { background-color: #17a2b8; } /* 成立 */
-.room-status-1 { background-color: #ffc107; } /* 付款中 */
-.room-status-2 { background-color: #28a745; } /* 完成 */
-.room-status-3 { background-color: #fd7e14; } /* 退款 */
-.room-status-4 { background-color: #dc3545; } /* 取消 */
-
-/* 接駁預約狀態樣式 */
-.shuttle-status-badge {
-    font-size: 0.75rem;
+.form-check-input:checked {
+    background-color: #007bff;
+    border-color: #007bff;
 }
 
-.shuttle-status-0 { background-color: #dc3545; } /* 取消 */
-.shuttle-status-1 { background-color: #28a745; } /* 正常 */
-
-/* 會員狀態樣式 */
-.member-status-0 { color: #ffc107; } /* 未驗證 */
-.member-status-1 { color: #28a745; } /* 已驗證 */
-.member-status-2 { color: #dc3545; } /* 停用 */
-
-/* 會員狀態樣式 */
-.member-status-0 { color: #ffc107; } /* 未驗證 */
-.member-status-1 { color: #28a745; } /* 已驗證 */
-.member-status-2 { color: #dc3545; } /* 停用 */
-
-/* 座位狀態對應資料庫 */
-.seat.fault {
-    background-color: #6c757d;
-    color: white;
-    cursor: not-allowed;
+/* 警告和成功訊息 */
+.alert {
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.seat.normal {
-    background-color: #f8f9fa;
-    border-color: #28a745;
+.alert-success {
+    background-color: #d1edff;
+    color: #0c5460;
 }
 
-/* 接駁方向指示器 */
-.direction-indicator {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
 }
 
-.direction-indicator::before {
-    font-family: "Font Awesome 6 Free";
-    font-weight: 900;
+.alert-info {
+    background-color: #cce7ff;
+    color: #055160;
 }
 
-.direction-0::before { content: "\f061"; } /* 去程箭頭 */
-.direction-1::before { content: "\f060"; } /* 回程箭頭 */
+/* 響應式座位網格 */
+@media (max-width: 768px) {
+    .seat-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+        max-width: 240px;
+    }
 
-/* 數據驗證提示 */
-.validation-info {
-    background-color: #e3f2fd;
-    border: 1px solid #2196f3;
-    border-radius: 5px;
-    padding: 1rem;
-    margin: 1rem 0;
+    .seat {
+        width: 35px;
+        height: 35px;
+        font-size: 0.7rem;
+    }
 }
-
-
-
-
-

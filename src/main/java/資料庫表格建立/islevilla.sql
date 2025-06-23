@@ -31,6 +31,7 @@ DROP TABLE IF EXISTS member_coupon;              -- 會員優惠券對應
 DROP TABLE IF EXISTS coupon;                     -- 優惠券
 DROP TABLE IF EXISTS product_category;           -- 商品種類
 -- 接駁
+DROP TABLE IF EXISTS temp_shuttle_reservation_request; -- 臨時接駁預約請求表
 DROP TABLE IF EXISTS shuttle_reservation_seat;   -- 接駁預約座位
 DROP TABLE IF EXISTS shuttle_reservation;        -- 接駁預約
 DROP TABLE IF EXISTS shuttle_seat_availability;  -- 各接駁班次座位剩餘量
@@ -132,17 +133,17 @@ VALUES ('春假專案',     '2025-03-10', '2025-03-20', '適合學生出遊'),
 
 -- 訂房訂單 room_reservation_order （陳薇淨）
 CREATE TABLE room_reservation_order (
-	room_reservation_id  INT           AUTO_INCREMENT,                                                       -- 訂房編號 (PK) (AI)
-    member_id            INT           NOT NULL,                                                             -- 會員編號 (FK)
-    room_order_date      DATETIME      NOT NULL,                                                             -- 訂單日期
-    room_order_status    TINYINT       NOT NULL  DEFAULT 0  COMMENT '0:成立 1:付款中 2:完成 3:退款 4:取消',  -- 訂單狀態
-    check_in_date        DATE          NOT NULL,                                                             -- 入住日期
-    check_out_date       DATE          NOT NULL,                                                             -- 退房日期
-    room_promotion_id    INT,                                                                                -- 優惠專案編號 (FK)
-    rv_remark            VARCHAR(100),                                                                       -- 訂房備註
-    room_total_amount    INT           NOT NULL,                                                             -- 訂房總金額
-    rv_discount_amount   INT           NOT NULL,                                                             -- 折扣金額
-    rv_paid_amount       INT           NOT NULL,                                                             -- 實際付款金額
+	room_reservation_id  INT           AUTO_INCREMENT,                                                       		-- 訂房編號 (PK) (AI)
+    member_id            INT           NOT NULL,                                                             		-- 會員編號 (FK)
+    room_order_date      DATETIME      NOT NULL,                                                             		-- 訂單日期
+    room_order_status    TINYINT       NOT NULL  DEFAULT 0  COMMENT '0:成立 1:已付款 2:已完成 3:申請取消 4:確認取消',	-- 訂單狀態
+    check_in_date        DATE          NOT NULL,                                                             		-- 入住日期
+    check_out_date       DATE          NOT NULL,                                                             		-- 退房日期
+    room_promotion_id    INT,                                                                                		-- 優惠專案編號 (FK)
+    rv_remark            VARCHAR(100),                                                                       		-- 訂房備註
+    room_total_amount    INT           NOT NULL,                                                             		-- 訂房總金額
+    rv_discount_amount   INT           NOT NULL,                                                             		-- 折扣金額
+    rv_paid_amount       INT           NOT NULL,                                                             		-- 實際付款金額
     CONSTRAINT pk_room_reservation_id PRIMARY KEY(room_reservation_id),
     CONSTRAINT fk_rro_member_id FOREIGN KEY(member_id) REFERENCES members(member_id),
     CONSTRAINT fk_rro_room_promotion_id FOREIGN KEY(room_promotion_id) REFERENCES promotion(room_promotion_id)
@@ -585,6 +586,22 @@ VALUES (1, '2024-03-10', 98, '2024-03-10 07:30:00'),
 
 -- DROP TABLE IF EXISTS shuttle_seat_availability;
 
+-- 臨時接駁預約請求表（用於多步驟預約流程）（賴彥儒）
+CREATE TABLE temp_shuttle_reservation_request (
+    id                    INT AUTO_INCREMENT PRIMARY KEY,
+    member_id             INT NOT NULL,
+    room_reservation_id   INT NOT NULL,
+    shuttle_date          DATE NOT NULL,
+    shuttle_number        INT NOT NULL,
+    shuttle_direction     INT NOT NULL COMMENT '0:去程 1:回程',
+    selected_schedule_id  INT,
+    selected_seat_ids     VARCHAR(255) COMMENT '座位ID列表，以逗號分隔',
+    created_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_member_date (member_id, shuttle_date),
+    INDEX idx_created_at (created_at)
+);
+
+-- DROP TABLE IF EXISTS temp_shuttle_reservation_request;
 
 /***************************************************************************************************
 ********************************************* 購物相關 *********************************************
