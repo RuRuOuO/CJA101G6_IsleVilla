@@ -1,6 +1,6 @@
 package com.islevilla.jay.coupon.controller;
 
-import com.islevilla.jay.memberCoupon.model.MemberCoupon;
+import com.islevilla.jay.coupon.model.Coupon;
 import com.islevilla.jay.memberCoupon.model.MemberCouponService;
 import com.islevilla.lai.members.model.Members;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class CouponApiController {
 
     // 查詢會員可用優惠券
     @GetMapping("/available")
-    public List<MemberCoupon> getAvailableCoupons(HttpSession session, @RequestParam Integer orderAmount) {
+    public List<Coupon> getAvailableCoupons(HttpSession session, @RequestParam Integer orderAmount) {
         Members member = (Members) session.getAttribute("member");
         if (member == null) {
             return Collections.emptyList();
