@@ -1,16 +1,24 @@
 package com.islevilla.wei.room.model;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import com.islevilla.lai.members.model.Members;
 import com.islevilla.patty.promotion.model.Promotion;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import java.util.List;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "room_reservation_order")
@@ -36,11 +44,11 @@ public class RoomRVOrder {
 
     @Column(name = "check_in_date")
     @NotNull(message = "請選擇住宿開始日期")
-    private LocalDateTime checkInDate;
+    private LocalDate checkInDate;
 
     @Column(name = "check_out_date")
     @NotNull(message = "請選擇住宿結束日期")
-    private LocalDateTime checkOutDate;
+    private LocalDate checkOutDate;
 
     @ManyToOne
     @JoinColumn(name = "room_promotion_id")
