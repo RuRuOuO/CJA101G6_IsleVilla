@@ -55,5 +55,9 @@ public class ShuttleService {
 			Integer selfId) {
 	    return shuttleScheduleRepository.existsByDirectionAndDepartureTimeAndArrivalTimeAndIdNot(direction, departure, arrival, selfId);
 	}
+	
+	public List<ShuttleSchedule> getShuttlesByIds(List<Integer> ids) {
+	    return shuttleScheduleRepository.findAllById(ids);
+	}
 
 }

@@ -129,6 +129,7 @@ public class ShuttleScheduleController {
 	// 顯示查詢頁面
 	@GetMapping("/getshuttle")
 	public String showGetOneForm(Model model) {
+		model.addAttribute("allShuttleSchedules", shuttleService.getAllShuttle());
 		model.addAttribute("shuttle", null); // 第一次載入沒有資料
 		return "front-end/shuttle/shuttle_getshuttle";
 	}
@@ -136,11 +137,11 @@ public class ShuttleScheduleController {
 	// 處裡查詢頁面
 	@GetMapping("/get/{id}")
 	public String getShuttleById(@PathVariable("id") Integer id, Model model) {
+		//加入所有班次給下拉式選單
+		model.addAttribute("allShuttleSchedules",shuttleService.getAllShuttle());
+		//查詢指定班次
 		ShuttleSchedule shuttle = shuttleService.getShuttleById(id);
-		if (shuttle == null) {
-			model.addAttribute("errorMsg", "查無此班次資料");
-			return "front-end/shuttle/shuttle_getshuttle";
-		}
+		
 		model.addAttribute("shuttle", shuttle);
 		return "front-end/shuttle/shuttle_getshuttle";
 	}

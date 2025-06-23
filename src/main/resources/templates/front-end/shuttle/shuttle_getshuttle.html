@@ -28,12 +28,19 @@
 		th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
 		<th:block th:fragment="myContent">
 			<!-- //////////////////// 頁面內容放在這個card裡面(外框已經有加card和container，直接放入table和標題即可)//////////////////// -->
-			<h2>🔍接駁時段查詢</h2>
+			<h2 class="mb-4" >🔍 接駁時段查詢</h2>
 			<div class="mb-3">
-				<label for="shuttleId" class="form-label">輸入時段編號：</label> <input
-					type="number" id="shuttleId" name="shuttleId" class="form-control"
-					placeholder="例如：1">
-			</div>
+    <label for="shuttleId" class="form-label">選擇時段：</label>
+    <select id="shuttleId" name="shuttleId" class="form-select">
+        <option value="" disabled th:if="${shuttle == null}" selected>請選擇班次</option>
+        <option th:each="s : ${allShuttleSchedules}"
+                th:value="${s.id}"
+                th:text="${s.id} + ' | ' + (${s.direction} == 0 ? '去程' : '回程') + ' - ' + ${s.departureTime} + ' → ' + ${s.arrivalTime}"
+                th:selected="${shuttle != null} ? ${s.id} == ${shuttle.id} : false">
+        </option>
+    </select>
+</div>
+
 			<button class="btn btn-primary" onclick="submitForm()">查詢</button>
 			<a href="/shuttle/list" class="btn btn-secondary">返回列表</a>
 

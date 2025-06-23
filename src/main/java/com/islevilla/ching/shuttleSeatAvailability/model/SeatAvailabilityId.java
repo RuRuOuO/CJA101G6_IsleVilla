@@ -3,7 +3,7 @@ package com.islevilla.ching.shuttleSeatAvailability.model;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
-
+//複合主鍵用
 public class SeatAvailabilityId implements Serializable {
 	
 	private Integer scheduleId;

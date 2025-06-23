@@ -3,6 +3,7 @@ package com.islevilla.ching.shuttleSeatAvailability.controller;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.islevilla.ching.shuttleSchedule.model.ShuttleService;
 import com.islevilla.ching.shuttleSeatAvailability.model.SeatAvailability;
@@ -95,39 +97,54 @@ public class SeatAvailabilityController {
 	    return "redirect:/seatavailability/list";
 	}
 	
-	// 單筆查詢功能
-	@GetMapping("/search")
-	public String showSearchForm(Model model) {
-		model.addAttribute("searchCriteria", new SeatAvailability());      // 綁定空的查詢表單資料物件
-		model.addAttribute("scheduleList",shuttleService.getAllShuttle()); //班車時段下拉選單
+	//顯示查詢頁面
+	@GetMapping("/getseat")
+	public String showGetOneForm(@RequestParam(value = "date",required = false )
+								 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)LocalDate date,
+								 Model model){
+		List<LocalDate> dates = seatAvailabilityService.getAllAvailableDates();
+		model.addAttribute("availableDates",dates);
 		
-		return "front-end/seatavailability/seatavailability_search";
-	}
-
-	// 處理單筆查詢請求
-	@PostMapping("/search")
-	public String searchSeatAvailability(@ModelAttribute("searchCriteria") SeatAvailability criteria, Model model) {
-		Integer scheduleId = criteria.getScheduleId();
-		LocalDate date = criteria.getDate();
-
-		model.addAttribute("scheduleList", shuttleService.getAllShuttle()); // 繼續提供下拉選單
-
-		// 判斷是否輸入完整查詢條件
-		if (scheduleId == null || date == null) {
-			model.addAttribute("errorMessage", "請選擇班車時段並輸入日期");
-			return "front-end/seatavailability/seatavailability_search";
+		if(date != null) {
+			List<SeatAvailability> schedules = seatAvailabilityService.getAllSeatAvailability()
+					.stream()
+					.filter(sa -> sa.getDate().equals(date))
+					.toList();
+		model.addAttribute("availableDates", dates);
+		model.addAttribute("scheduleForSelectedDate",schedules);
+		model.addAttribute("selectedDate",date);
 		}
-
-		// 查詢資料
-		SeatAvailabilityId id = new SeatAvailabilityId(scheduleId, date);
-		SeatAvailability result = seatAvailabilityService.getSeatById(id);
-
-		if (result != null) {
-			model.addAttribute("result", result); // 將查詢結果傳到 view
-		} else {
-			model.addAttribute("notFound", true); // 查無資料
-		}
-
-		return "front-end/seatavailability/seatavailability_search";
+		model.addAttribute("seat",null);
+		return "front-end/seatavailability/seatavailability_getseat";
 	}
-}
+	
+	//處裡查詢頁面
+	@GetMapping("/get/{scheduleId}/{date}")
+	public String getSeatById(@PathVariable("scheduleId") Integer scheduleId,
+							  @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,Model model) {
+		//查詢seat的資料
+		SeatAvailabilityId id = new SeatAvailabilityId(scheduleId,date);
+		SeatAvailability seat = seatAvailabilityService.getSeatById(id);
+
+		// 重新取得所有可選日期
+		List<LocalDate> dates = seatAvailabilityService.getAllAvailableDates();
+	    model.addAttribute("availableDates", dates);
+	    
+		//帶入該選擇日期的所有班次(選單顯示)
+		List<SeatAvailability> schedules = seatAvailabilityService.getAllSeatAvailability()
+	            .stream()
+	            .filter(sa -> sa.getDate().equals(date))
+	            .toList();
+	    model.addAttribute("scheduleForSelectedDate", schedules);
+		
+	    // 傳回原本選擇的日期 顯示在getseat下拉選單上
+	    model.addAttribute("selectedDate", date);
+	    // 傳回原本選擇的班次 顯示在getseat下拉選單上
+	    model.addAttribute("selectedScheduleId", scheduleId);
+	    
+	    //帶入查詢結果
+	    model.addAttribute("seat", seat);
+	    
+		return "front-end/seatavailability/seatavailability_getseat";
+		}
+	}

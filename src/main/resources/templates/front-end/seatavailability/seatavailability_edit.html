@@ -1,141 +1,71 @@
 <!DOCTYPE html>
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>微嶼 | 編輯接駁座位</title>
-<link
-	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-	rel="stylesheet" />
-<link rel="stylesheet" th:href="@{/css/custom_style.css}" />
-<link rel="stylesheet" href="/css/product_index.css" />
-<link
-	href="https://fonts.googleapis.com/css2?family=Kaisei+HarunoUmi&family=Noto+Sans+TC:wght@100..900&display=swap"
-	rel="stylesheet" />
-<script src="https://kit.fontawesome.com/d4a9524440.js"
-	crossorigin="anonymous"></script>
+  <meta charset="UTF-8" />
+  <title>微嶼 | 編輯接駁座位</title>
+
+  <!-- 載入後台共用樣式 -->
+  <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
 </head>
 <body>
-	<!-- Header -->
-	<header data-bs-theme="light">
-		<nav
-			class="navbar navbar-expand-lg navbar-light fixed-top bg-light shadow-sm">
-			<div class="container">
-				<a class="navbar-brand" href="/"
-					style="font-family: Kaisei HarunoUmi">微嶼 Isle Villa</a>
-				<button class="navbar-toggler" type="button"
-					data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-					<span class="navbar-toggler-icon"></span>
-				</button>
-				<div class="collapse navbar-collapse justify-content-center"
-					id="navbarCollapse">
-					<ul class="navbar-nav mx-auto mb-md-0">
-						<li class="nav-item"><a class="nav-link" href="#">最新消息</a></li>
-						<li class="nav-item divider align-self-center px-1">|</li>
-						<li class="nav-item"><a class="nav-link" href="#">關於微嶼</a></li>
-						<li class="nav-item divider align-self-center px-1">|</li>
-						<li class="nav-item"><a class="nav-link" href="#">客房介紹</a></li>
-						<li class="nav-item divider align-self-center px-1">|</li>
-						<li class="nav-item"><a class="nav-link" href="#">線上購物</a></li>
-						<li class="nav-item divider align-self-center px-1">|</li>
-						<li class="nav-item dropdown"><a
-							class="nav-link dropdown-toggle" href="#" role="button"
-							data-bs-toggle="dropdown">顧客服務</a>
-							<ul class="dropdown-menu">
-								<li><a class="dropdown-item" href="#">交通資訊</a></li>
-								<li><a class="dropdown-item" href="#">天氣資訊</a></li>
-							</ul></li>
-						<li class="nav-item divider align-self-center px-1">|</li>
-						<li class="nav-item"><a class="nav-link" href="#">會員專區</a></li>
-					</ul>
-				</div>
-			</div>
-		</nav>
-		<div style="height: 55px"></div>
-	</header>
+  <!-- 載入側邊欄 -->
+  <div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+  <div th:replace="~{fragments/backFragments :: sidebar}"></div>
 
-	<!-- Main -->
-	<main class="container mt-5">
-		<h2 class="mb-4 fw-bold">🛠 編輯座位可用情況</h2>
+  <!-- 主內容區塊 -->
+  <main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+    <th:block th:fragment="myContent">
+      <h2 class="mb-4 fw-bold">🛠 編輯座位可用情況</h2>
 
-		<div class="card shadow-sm border-1">
-			<div class="card-body">
-				<form th:action="@{/seatavailability/edit}"
-					th:object="${seatavailability}" method="post"
-					class="needs-validation" novalidate>
+      <form th:action="@{/seatavailability/edit}" th:object="${seatavailability}" method="post" class="needs-validation" novalidate>
+        <!-- 隱藏主鍵欄位 -->
+        <input type="hidden" th:field="*{scheduleId}" />
+        <input type="hidden" th:field="*{date}" />
 
-					<!-- 隱藏主鍵欄位 -->
-					<input type="hidden" th:field="*{scheduleId}" /> <input
-						type="hidden" th:field="*{date}" />
+        <!-- 顯示班次資訊（只讀） -->
+        <div class="mb-3">
+          <label class="form-label">班次</label>
+          <input type="text" class="form-control" readonly
+                 th:value="|${#temporals.format(seatavailability.schedule.departureTime, 'HH:mm')} ~ ${#temporals.format(seatavailability.schedule.arrivalTime, 'HH:mm')} (${seatavailability.schedule.direction == 0 ? '去程' : '回程'})|">
+        </div>
 
-					<!-- 顯示班次資訊（只讀） -->
-					<div class="mb-3">
-						<label class="form-label">班次</label> <input type="text"
-							class="form-control"
-							th:value="|${#temporals.format(seatavailability.schedule.departureTime, 'HH:mm')} ~ ${#temporals.format(seatavailability.schedule.arrivalTime, 'HH:mm')} (${seatavailability.schedule.direction == 0 ? '去程' : '回程'})|"
-							readonly>
-					</div>
+        <!-- 顯示日期（只讀） -->
+        <div class="mb-3">
+          <label class="form-label">接駁日期</label>
+          <input type="text" class="form-control" readonly th:value="${seatavailability.date}" />
+        </div>
 
-					<!-- 顯示日期（只讀） -->
-					<div class="mb-3">
-						<label class="form-label">接駁日期</label> <input type="text"
-							class="form-control" th:value="${seatavailability.date}" readonly>
-					</div>
+        <!-- 可用座位數 -->
+        <div class="mb-3">
+          <label for="seatQuantity" class="form-label">可用座位數</label>
+          <input type="number" class="form-control" id="seatQuantity" min="0" required th:field="*{seatQuantity}" />
+          <div class="invalid-feedback">請輸入可用座位數（不可為負數）</div>
+        </div>
 
-					<!-- 可用座位數 -->
-					<div class="mb-3">
-						<label for="seatQuantity" class="form-label">可用座位數</label> <input
-							type="number" th:field="*{seatQuantity}" class="form-control"
-							id="seatQuantity" min="0" required>
-						<div class="invalid-feedback">請輸入可用座位數（不可為負數）</div>
-					</div>
+        <!-- 按鈕區塊 -->
+        <div class="d-flex justify-content-start mt-4">
+          <button type="submit" class="btn btn-primary">更新</button>
+          <a th:href="@{/seatavailability/list}" class="btn btn-secondary ms-3">取消</a>
+        </div>
+      </form>
+    </th:block>
+  </main>
 
-					<!-- 按鈕 -->
-					<div class="d-flex justify-content-start mt-4">
-						<button type="submit" class="btn btn-primary">更新</button>
-						<a th:href="@{/seatavailability/list}"
-							class="btn btn-secondary ms-3">取消</a>
-					</div>
-				</form>
-			</div>
-		</div>
-	</main>
-	<!-- Footer -->
-	<footer class="footer bg-secondary text-light py-5 mt-5">
-		<div class="container">
-			<div class="row">
-				<div class="col-md-6 mb-3">
-					<h3 style="font-family: Kaisei HarunoUmi">微嶼 Isle Villa</h3>
-					<p>讓人在片刻停留中，找回生活的溫度。</p>
-				</div>
-				<div class="col-md-6 mb-3">
-					<h5>聯絡我們</h5>
-					<ul class="list-unstyled mt-3">
-						<li class="mt-1">地址：台灣台北市信義區123號</li>
-						<li class="mt-1">電話：02-1234-5678</li>
-						<li class="mt-1">信箱：info@islevilla.com</li>
-					</ul>
-				</div>
-			</div>
-		</div>
-	</footer>
-
-	<script
-		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-	<script>
-(() => {
-	'use strict';
-	const forms = document.querySelectorAll('.needs-validation');
-	Array.from(forms).forEach(form => {
-		form.addEventListener('submit', event => {
-			if (!form.checkValidity()) {
-				event.preventDefault();
-				event.stopPropagation();
-			}
-			form.classList.add('was-validated');
-		}, false);
-	});
-})();
-</script>
+  <!-- 驗證 JS -->
+  <script>
+    (() => {
+      'use strict';
+      const forms = document.querySelectorAll('.needs-validation');
+      Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          form.classList.add('was-validated');
+        }, false);
+      });
+    })();
+  </script>
 </body>
 </html>

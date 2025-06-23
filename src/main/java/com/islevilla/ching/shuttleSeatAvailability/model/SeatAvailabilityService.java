@@ -1,5 +1,6 @@
 package com.islevilla.ching.shuttleSeatAvailability.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -37,8 +38,8 @@ public class SeatAvailabilityService {
 	}
 
 	// 用複合主鍵查詢
-	public SeatAvailability getSeatById(SeatAvailabilityId id) {
-		Optional<SeatAvailability> optional = seatAvailabilityRepository.findById(id);
+	public SeatAvailability getSeatById(SeatAvailabilityId scheduleId) {
+		Optional<SeatAvailability> optional = seatAvailabilityRepository.findById(scheduleId);
 		return optional.orElse(null);
 	}
 
@@ -46,6 +47,15 @@ public class SeatAvailabilityService {
 	public void updateSeatAvailability(SeatAvailability seatAvailability) {
 		seatAvailability.setSeatUpdateAt(LocalDateTime.now()); // ⏰ 寫入當下時間
 		seatAvailabilityRepository.save(seatAvailability);
+	}
+
+	public List<LocalDate> getAllAvailableDates() {
+		return seatAvailabilityRepository.findAll()
+				.stream()
+				.map(SeatAvailability::getDate)
+				.distinct()
+				.sorted()
+				.toList();
 	}
 
 }
