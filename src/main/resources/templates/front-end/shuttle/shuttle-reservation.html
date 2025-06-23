@@ -5,19 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>接駁船預約系統</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- ===== 載入統一樣式 ===== -->
+	<th:block th:replace="~{fragments/fragments :: styles}"></th:block>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-<!--     <link href="./shuttle-reservation.css" rel="stylesheet"> -->
-    <link th:href="@{/css/shuttle-reservation.css}" rel="stylesheet">
+    <link href="/css/shuttle-reservation.css" rel="stylesheet">
 </head>
 
 <body>
+	<!-- ===== 載入Header ===== -->
+	<div th:replace="~{fragments/fragments :: header}"></div>
     <!-- 導航列 -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
             <a class="navbar-brand" th:href="@{/}"><i class="fas fa-ship me-2"></i>接駁船預約系統</a>
             <div class="navbar-nav ms-auto">
-                <a class="btn btn-outline-light" th:href="@{/shuttle/reservation}">會員預約</a>
+                <a class="btn btn-outline-light" th:href="@{/reservation}">會員預約</a>
             </div>
         </div>
     </nav>
@@ -39,15 +41,21 @@
         <div th:fragment="userInterface" id="userInterface">
             <!-- 步驟指示器 -->
             <div class="step-indicator">
-                <div class="step" th:classappend="${currentStep == 1} ? 'active' : (${currentStep > 1} ? 'completed' : '')" id="step1">
+                <div class="step"
+                    th:classappend="${currentStep == 1} ? 'active' : (${currentStep > 1} ? 'completed' : '')"
+                    id="step1">
                     <div class="step-circle">1</div>
                     <span>申請預約</span>
                 </div>
-                <div class="step" th:classappend="${currentStep == 2} ? 'active' : (${currentStep > 2} ? 'completed' : '')" id="step2">
+                <div class="step"
+                    th:classappend="${currentStep == 2} ? 'active' : (${currentStep > 2} ? 'completed' : '')"
+                    id="step2">
                     <div class="step-circle">2</div>
                     <span>選擇班次</span>
                 </div>
-                <div class="step" th:classappend="${currentStep == 3} ? 'active' : (${currentStep > 3} ? 'completed' : '')" id="step3">
+                <div class="step"
+                    th:classappend="${currentStep == 3} ? 'active' : (${currentStep > 3} ? 'completed' : '')"
+                    id="step3">
                     <div class="step-circle">3</div>
                     <span>選擇座位</span>
                 </div>
@@ -61,7 +69,7 @@
             <div class="alert alert-info mb-4">
                 <h6><i class="fas fa-info-circle me-2"></i>預約須知</h6>
                 <ul class="mb-0">
-                    <li>請確保會員編號與訂房編號正確且匹配</li>
+                    <li>請選擇您已完成付款的訂房記錄</li>
                     <li>接駁日期必須在您的住宿期間內</li>
                     <li>系統將自動驗證訂房狀態，已取消的訂房無法預約接駁</li>
                 </ul>
@@ -73,126 +81,144 @@
                     <h4><i class="fas fa-calendar-plus me-2"></i>申請預約接駁</h4>
                 </div>
                 <div class="card-body">
-                    <form th:action="@{/reservation/validate}" th:object="${reservationRequest}" method="post">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="memberId" class="form-label">會員編號 <span class="text-danger">*</span></label>
-                                    <input type="number" class="form-control" th:field="*{memberId}" 
-                                           th:classappend="${#fields.hasErrors('memberId')} ? 'is-invalid' : ''"
-                                           placeholder="請輸入會員編號（例：1）" required>
-                                    <div th:if="${#fields.hasErrors('memberId')}" class="invalid-feedback" th:errors="*{memberId}"></div>
-                                    <div class="form-text">請輸入您的數字會員編號</div>
-                                </div>
+                    <!-- 顯示會員訂房記錄 -->
+                    <div th:if="${memberRoomReservations != null and !memberRoomReservations.empty}" class="mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6><i class="fas fa-list me-2"></i>您的訂房記錄</h6>
                             </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="roomReservationId" class="form-label">訂房編號 <span class="text-danger">*</span></label>
-                                    <input type="number" class="form-control" th:field="*{roomReservationId}"
-                                           th:classappend="${#fields.hasErrors('roomReservationId')} ? 'is-invalid' : ''"
-                                           placeholder="請輸入訂房編號（例：1）" required>
-                                    <div th:if="${#fields.hasErrors('roomReservationId')}" class="invalid-feedback" th:errors="*{roomReservationId}"></div>
-                                    <div class="form-text">請輸入有效的數字訂房編號</div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>訂房編號</th>
+                                                <th>入住日期</th>
+                                                <th>退房日期</th>
+                                                <!-- <th>房型</th> -->
+                                                <th>狀態</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="room : ${memberRoomReservations}">
+                                                <td th:text="${room.roomReservationId}"></td>
+                                                <td th:text="${#temporals.format(room.checkInDate, 'yyyy-MM-dd')}"></td>
+                                                <td th:text="${#temporals.format(room.checkOutDate, 'yyyy-MM-dd')}"></td>
+                                                <!-- <td th:text="${room.roomType != null ? room.roomType : '標準房'}"></td> -->
+                                                <td>
+                                                    <span class="badge bg-success">已完成付款</span>
+                                                </td>
+                                                <td>
+                                                	<!-- 把資料放到 data-* 屬性 -->
+													<button type="button" class="btn btn-primary btn-sm"
+													        th:attr="data-room-reservation-id=${room.roomReservationId},
+													                 data-check-in-date=${#temporals.format(room.checkInDate, 'yyyy-MM-dd')}, 
+													                 data-check-out-date=${#temporals.format(room.checkOutDate, 'yyyy-MM-dd')}">
+													    選擇此訂房
+													</button>
+<!--                                                     <button type="button" class="btn btn-primary btn-sm" -->
+<!--                                                         th:onclick="'selectRoomReservation(' + ${room.roomReservationId} + ', \'' + ${#temporals.format(room.checkInDate, 'yyyy-MM-dd')} + '\', \'' + ${#temporals.format(room.checkOutDate, 'yyyy-MM-dd')} + '\')'"> -->
+<!--                                                         選擇此訂房 -->
+<!--                                                     </button> -->
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- 沒有訂房記錄時顯示 -->
+                    <div th:if="${memberRoomReservations == null or memberRoomReservations.empty}"
+                        class="alert alert-warning">
+                        <h6><i class="fas fa-exclamation-triangle me-2"></i>找不到訂房記錄</h6>
+                        <p class="mb-2">您目前沒有已完成付款的訂房記錄。</p>
+                        <p class="mb-0">
+                            請先完成訂房：
+                            <!-- <a href="/room/booking" class="btn btn-outline-primary btn-sm ms-2">
+                                <i class="fas fa-bed me-1"></i>前往訂房
+                            </a> -->
+                            <a href="#" class="btn btn-outline-primary btn-sm ms-2">
+                                <i class="fas fa-bed me-1"></i>前往訂房
+                            </a>
+                        </p>
+                    </div>
+
+                    <!-- 預約表單 -->
+                    <form th:if="${memberRoomReservations != null and !memberRoomReservations.empty}"
+                        th:action="@{/shuttle/reservation/validate}" th:object="${reservationRequest}" method="post">
+<!--                         <div class="row"> -->
+<!--                             <div class="col-md-6"> -->
+<!--                                 <div class="mb-3"> -->
+<!--                                     <label for="roomReservationId" class="form-label">選擇訂房 <span -->
+<!--                                             class="text-danger">*</span></label> -->
+<!--                                     <select class="form-select" th:field="*{roomReservationId}" -->
+<!--                                         th:classappend="${#fields.hasErrors('roomReservationId')} ? 'is-invalid' : ''" -->
+<!--                                         required onchange="updateDateRange()"> -->
+<!--                                         <option value="">請選擇訂房記錄</option> -->
+<!--                                         <option th:each="room : ${memberRoomReservations}" -->
+<!--                                             th:value="${room.roomReservationId}" -->
+<!--                                             th:data-checkin="${#dates.format(room.checkInDate, 'yyyy-MM-dd')}" -->
+<!--                                             th:data-checkout="${#dates.format(room.checkOutDate, 'yyyy-MM-dd')}" -->
+<!--                                             th:text="'訂房編號 ' + ${room.roomReservationId} + ' (' + ${#dates.format(room.checkInDate, 'yyyy-MM-dd')} + ' ~ ' + ${#dates.format(room.checkOutDate, 'yyyy-MM-dd')} + ')'"> -->
+<!--                                         </option> -->
+<!--                                     </select> -->
+<!--                                     <div th:if="${#fields.hasErrors('roomReservationId')}" class="invalid-feedback" -->
+<!--                                         th:errors="*{roomReservationId}"></div> -->
+<!--                                 </div> -->
+<!--                             </div> -->
+<!--                             <div class="col-md-6"> -->
+<!--                                 <div class="mb-3"> -->
+<!--                                     <label for="shuttleDate" class="form-label">接駁日期 <span -->
+<!--                                             class="text-danger">*</span></label> -->
+<!--                                     <input type="date" class="form-control" th:field="*{shuttleDate}" -->
+<!--                                         th:classappend="${#fields.hasErrors('shuttleDate')} ? 'is-invalid' : ''" -->
+<!--                                         required disabled> -->
+<!--                                     <div th:if="${#fields.hasErrors('shuttleDate')}" class="invalid-feedback" -->
+<!--                                         th:errors="*{shuttleDate}"></div> -->
+<!--                                     <div class="form-text">請先選擇訂房記錄</div> -->
+<!--                                 </div> -->
+<!--                             </div> -->
+<!--                         </div> -->
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="shuttleDate" class="form-label">接駁日期 <span class="text-danger">*</span></label>
-                                    <input type="date" class="form-control" th:field="*{shuttleDate}"
-                                           th:classappend="${#fields.hasErrors('shuttleDate')} ? 'is-invalid' : ''"
-                                           th:min="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" required>
-                                    <div th:if="${#fields.hasErrors('shuttleDate')}" class="invalid-feedback" th:errors="*{shuttleDate}"></div>
-                                    <div class="form-text">接駁日期必須在住宿期間內</div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="shuttleNumber" class="form-label">接駁人數 <span class="text-danger">*</span></label>
+                                    <label for="shuttleNumber" class="form-label">接駁人數 <span
+                                            class="text-danger">*</span></label>
                                     <select class="form-select" th:field="*{shuttleNumber}"
-                                            th:classappend="${#fields.hasErrors('shuttleNumber')} ? 'is-invalid' : ''" required>
+                                        th:classappend="${#fields.hasErrors('shuttleNumber')} ? 'is-invalid' : ''"
+                                        required>
                                         <option value="">請選擇人數</option>
-                                        <option th:each="i : ${#numbers.sequence(1, 6)}" th:value="${i}" th:text="${i + '人'}"></option>
+                                        <option th:each="i : ${#numbers.sequence(1, 6)}" th:value="${i}"
+                                            th:text="${i + '人'}"></option>
                                     </select>
-                                    <div th:if="${#fields.hasErrors('shuttleNumber')}" class="invalid-feedback" th:errors="*{shuttleNumber}"></div>
+                                    <div th:if="${#fields.hasErrors('shuttleNumber')}" class="invalid-feedback"
+                                        th:errors="*{shuttleNumber}"></div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">接駁方向 <span class="text-danger">*</span></label>
-                            <div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" th:field="*{shuttleDirection}" value="0" required>
-                                    <label class="form-check-label">去程</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" th:field="*{shuttleDirection}" value="1" required>
-                                    <label class="form-check-label">回程</label>
-                                </div>
-                            </div>
-                            <div th:if="${#fields.hasErrors('shuttleDirection')}" class="text-danger" th:errors="*{shuttleDirection}"></div>
-                        </div>
-                        
-                        <!-- 測試資料表格 (開發環境顯示) -->
-                        <div th:if="${@environment.getActiveProfiles()[0] == 'dev'}" class="row">
-                            <div class="col-md-8">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h6>測試用訂房資料</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-sm">
-                                                <thead>
-                                                    <tr>
-                                                        <th>訂房編號</th>
-                                                        <th>會員編號</th>
-                                                        <th>入住日期</th>
-                                                        <th>退房日期</th>
-                                                        <th>狀態</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr th:each="room : ${testRoomData}">
-                                                        <td th:text="${room.roomReservationId}"></td>
-                                                        <td th:text="${room.memberId}"></td>
-                                                        <td th:text="${#dates.format(room.checkInDate, 'yyyy-MM-dd')}"></td>
-                                                        <td th:text="${#dates.format(room.checkOutDate, 'yyyy-MM-dd')}"></td>
-                                                        <td>
-                                                            <span th:class="${room.roomOrderStatus == 2} ? 'badge bg-success' : 'badge bg-danger'"
-                                                                  th:text="${room.roomOrderStatus == 2} ? '已完成' : '已取消'"></span>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">接駁方向 <span class="text-danger">*</span></label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" th:field="*{shuttleDirection}"
+                                                value="0" required>
+                                            <label class="form-check-label">去程</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" th:field="*{shuttleDirection}"
+                                                value="1" required>
+                                            <label class="form-check-label">回程</label>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h6>快速填入</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <button type="button" class="btn btn-outline-primary btn-sm mb-2 w-100"
-                                                onclick="fillTestData(1, 1)">
-                                            會員1 - 訂房1
-                                        </button>
-                                        <button type="button" class="btn btn-outline-primary btn-sm mb-2 w-100"
-                                                onclick="fillTestData(2, 2)">
-                                            會員2 - 訂房2
-                                        </button>
-                                        <button type="button" class="btn btn-outline-danger btn-sm mb-2 w-100"
-                                                onclick="fillTestData(3, 4)">
-                                            會員3 - 訂房4 (已取消)
-                                        </button>
-                                    </div>
+                                    <div th:if="${#fields.hasErrors('shuttleDirection')}" class="text-danger"
+                                        th:errors="*{shuttleDirection}"></div>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="mt-3">
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-search me-2"></i>驗證資料並查詢班次
@@ -215,15 +241,21 @@
                                 <div class="card schedule-card">
                                     <div class="card-body text-center">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="selectedScheduleId" 
-                                                   th:value="${schedule.shuttleScheduleId}" th:id="'schedule' + ${schedule.shuttleScheduleId}" required>
-                                            <label class="form-check-label" th:for="'schedule' + ${schedule.shuttleScheduleId}">
+                                            <input class="form-check-input" type="radio" name="selectedScheduleId"
+                                                th:value="${schedule.shuttleScheduleId}"
+                                                th:id="'schedule' + ${schedule.shuttleScheduleId}" required>
+                                            <label class="form-check-label"
+                                                th:for="'schedule' + ${schedule.shuttleScheduleId}">
                                                 <h5 th:text="${schedule.shuttleDirection == 0} ? '去程' : '回程'"></h5>
                                                 <p class="card-text">
                                                     <i class="fas fa-clock me-2"></i>
-                                                    <span th:text="${#dates.format(schedule.shuttleDepartureTime, 'HH:mm')}"></span> - 
-                                                    <span th:text="${#dates.format(schedule.shuttleArrivalTime, 'HH:mm')}"></span><br>
-                                                    <small class="text-muted">剩餘座位：<span th:text="${schedule.availableSeats}"></span>個</small>
+                                                    <span
+                                                        th:text="${#dates.format(schedule.shuttleDepartureTime, 'HH:mm')}"></span>
+                                                    -
+                                                    <span
+                                                        th:text="${#dates.format(schedule.shuttleArrivalTime, 'HH:mm')}"></span><br>
+                                                    <small class="text-muted">剩餘座位：<span
+                                                            th:text="${schedule.availableSeats}"></span>個</small>
                                                 </p>
                                             </label>
                                         </div>
@@ -254,18 +286,18 @@
                                 <div class="text-center mb-4">
                                     <h5>座位配置圖</h5>
                                     <div class="seat-grid" id="seatGrid">
-                                        <div th:each="seat : ${seats}" class="seat" 
-                                             th:data-seat-status="${seat.seatStatus}"
-                                             th:data-seat-id="${seat.seatId}"
-                                             th:classappend="${seat.seatStatus == 0} ? 'disabled' : (${seat.occupied} ? 'occupied' : 'available')"
-                                             th:data-seat-id="${seat.seatId}">
-                                            <input th:if="${seat.seatStatus == 1 and !seat.occupied}" 
-                                                   type="checkbox" name="selectedSeatIds" th:value="${seat.seatId}" 
-                                                   style="display: none;" th:id="'seat' + ${seat.seatId}">
-                                            <label th:if="${seat.seatStatus == 1 and !seat.occupied}" 
-                                                   th:for="'seat' + ${seat.seatId}" th:text="${seat.seatNumber}" 
-                                                   style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; margin: 0; cursor: pointer;"></label>
-                                            <span th:if="${seat.seatStatus == 0 or seat.occupied}" th:text="${seat.seatNumber}"></span>
+                                        <div th:each="seat : ${seats}" class="seat"
+                                            th:data-seat-status="${seat.seatStatus}"
+                                            th:classappend="${seat.seatStatus == 0} ? 'disabled' : (${seat.occupied} ? 'occupied' : 'available')"
+                                            th:data-seat-id="${seat.seatId}">
+                                            <input th:if="${seat.seatStatus == 1 and !seat.occupied}" type="checkbox"
+                                                name="selectedSeatIds" th:value="${seat.seatId}" style="display: none;"
+                                                th:id="'seat' + ${seat.seatId}">
+                                            <label th:if="${seat.seatStatus == 1 and !seat.occupied}"
+                                                th:for="'seat' + ${seat.seatId}" th:text="${seat.seatNumber}"
+                                                style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; margin: 0; cursor: pointer;"></label>
+                                            <span th:if="${seat.seatStatus == 0 or seat.occupied}"
+                                                th:text="${seat.seatNumber}"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -298,14 +330,16 @@
                                             <p class="text-muted">尚未選擇座位</p>
                                         </div>
                                         <div class="mt-2">
-                                            <small class="text-muted">需選擇 <span th:text="${requiredSeats}"></span> 個座位</small>
+                                            <small class="text-muted">需選擇 <span th:text="${requiredSeats}"></span>
+                                                個座位</small>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="mt-3">
-                            <a th:href="@{/reservation/step2(id=${reservationRequestId})}" class="btn btn-secondary me-2">上一步</a>
+                            <a th:href="@{/reservation/step2(id=${reservationRequestId})}"
+                                class="btn btn-secondary me-2">上一步</a>
                             <button type="submit" class="btn btn-primary" id="confirmSeatBtn" disabled>
                                 <i class="fas fa-arrow-right me-2"></i>確認預約
                             </button>
@@ -325,26 +359,36 @@
                             <div class="col-md-6">
                                 <h6><i class="fas fa-user me-2"></i>會員資訊</h6>
                                 <p><strong>會員編號：</strong><span th:text="${reservationSummary.memberId}"></span></p>
-                                <p><strong>訂房編號：</strong><span th:text="${reservationSummary.roomReservationId}"></span></p>
+                                <p><strong>訂房編號：</strong><span th:text="${reservationSummary.roomReservationId}"></span>
+                                </p>
                             </div>
                             <div class="col-md-6">
                                 <h6><i class="fas fa-calendar me-2"></i>接駁資訊</h6>
-                                <p><strong>接駁日期：</strong><span th:text="${#dates.format(reservationSummary.shuttleDate, 'yyyy-MM-dd')}"></span></p>
-                                <p><strong>接駁方向：</strong><span th:text="${reservationSummary.shuttleDirection == 0} ? '去程' : '回程'"></span></p>
-                                <p><strong>接駁人數：</strong><span th:text="${reservationSummary.shuttleNumber}"></span>人</p>
+                                <p><strong>接駁日期：</strong><span
+                                        th:text="${#dates.format(reservationSummary.shuttleDate, 'yyyy-MM-dd')}"></span>
+                                </p>
+                                <p><strong>接駁方向：</strong><span
+                                        th:text="${reservationSummary.shuttleDirection == 0} ? '去程' : '回程'"></span></p>
+                                <p><strong>接駁人數：</strong><span th:text="${reservationSummary.shuttleNumber}"></span>人
+                                </p>
                             </div>
                         </div>
                         <div class="row mt-3">
                             <div class="col-md-6">
                                 <h6><i class="fas fa-clock me-2"></i>班次時間</h6>
-                                <p><strong>出發時間：</strong><span th:text="${#dates.format(reservationSummary.schedule.shuttleDepartureTime, 'HH:mm')}"></span></p>
-                                <p><strong>抵達時間：</strong><span th:text="${#dates.format(reservationSummary.schedule.shuttleArrivalTime, 'HH:mm')}"></span></p>
+                                <p><strong>出發時間：</strong><span
+                                        th:text="${#dates.format(reservationSummary.schedule.shuttleDepartureTime, 'HH:mm')}"></span>
+                                </p>
+                                <p><strong>抵達時間：</strong><span
+                                        th:text="${#dates.format(reservationSummary.schedule.shuttleArrivalTime, 'HH:mm')}"></span>
+                                </p>
                             </div>
                             <div class="col-md-6">
                                 <h6><i class="fas fa-chair me-2"></i>選擇座位</h6>
                                 <p>
                                     <span th:each="seat, iterStat : ${reservationSummary.selectedSeats}">
-                                        <span th:text="${seat.seatNumber}"></span><span th:if="${!iterStat.last}">, </span>
+                                        <span th:text="${seat.seatNumber}"></span><span th:if="${!iterStat.last}">,
+                                        </span>
                                     </span>
                                 </p>
                             </div>
@@ -357,7 +401,8 @@
                     <form th:action="@{/reservation/submit}" method="post">
                         <input type="hidden" th:name="reservationRequestId" th:value="${reservationRequestId}">
                         <div class="mt-3">
-                            <a th:href="@{/reservation/step3(id=${reservationRequestId})}" class="btn btn-secondary me-2">上一步</a>
+                            <a th:href="@{/reservation/step3(id=${reservationRequestId})}"
+                                class="btn btn-secondary me-2">上一步</a>
                             <button type="submit" class="btn btn-success">
                                 <i class="fas fa-paper-plane me-2"></i>送出接駁申請
                             </button>
@@ -377,9 +422,9 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="./shuttle-reservation.js"></script>
-    <!-- <script th:src="@{/js/shuttle-reservation.js}"></script> -->
+    <!-- ========== 載入Footer及Bootstrap JS ========== -->
+	<div th:replace="~{fragments/fragments :: footer}"></div>
+    <script src="/js/shuttle-reservation.js"></script>
 </body>
 
 </html>
