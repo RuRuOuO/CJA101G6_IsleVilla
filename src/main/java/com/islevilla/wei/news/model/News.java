@@ -1,7 +1,9 @@
 package com.islevilla.wei.news.model;
 
+import com.islevilla.patty.promotion.model.Promotion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +24,7 @@ public class News {
 
     @Column(name = "news_content")
     @NotEmpty(message = "請輸入內文")
+    @Size(max = 1000, message = "內容長度不可超過1000字")
     private String newsContent;
 
     @Column(name = "news_image")
@@ -33,8 +36,11 @@ public class News {
     @Column(name = "news_status")
     private Integer newsStatus; // 0=下架, 1=上架
 
+    @ManyToOne
+    @JoinColumn(name = "room_promotion_id")
+    private Promotion promotion;
+
     // ✅ 不要存進資料庫的欄位，加上 @Transient
     @Transient
     private MultipartFile upFiles; // ✅ 一定要有這行！
-
 }

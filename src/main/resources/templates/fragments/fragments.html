@@ -117,16 +117,20 @@
 <!-- ===== 側邊欄 開始 ===== -->
 <div class="col-md-3 mb-4" th:fragment="memberSidebar">
     <div class="nav flex-column nav-pills" id="memberTabs" role="tablist" aria-orientation="vertical">
-        <a class="nav-link" th:href="@{/member/room/list}" th:classappend="${activeTab == 'room'} ? ' active'">
+        <a class="nav-link text-reset text-decoration-none" th:href="@{/member/room/list}"
+           th:classappend="${activeTab == 'room'} ? ' active'">
             住宿訂單
         </a>
-        <a class="nav-link" th:href="@{/member/shuttle/list}" th:classappend="${activeTab == 'shuttle'} ? 'active'">
+        <a class="nav-link text-reset text-decoration-none" th:href="@{/member/shuttle/list}"
+           th:classappend="${activeTab == 'shuttle'} ? 'active'">
             接駁訂單
         </a>
-        <a class="nav-link" th:href="@{/member/product/list}" th:classappend="${activeTab == 'product'}?'active'">
+        <a class="nav-link text-reset text-decoration-none" th:href="@{/product-order/memOrders}"
+           th:classappend="${activeTab == 'product'}?'active'">
             購物訂單
         </a>
-        <a class="nav-link" th:href="@{/member/info}" th:classappend="${activeTab == 'info'}?'active'">
+        <a class="nav-link text-reset text-decoration-none" th:href="@{/member/info}"
+           th:classappend="${activeTab == 'info'}?'active'">
             會員資訊
         </a>
     </div>
@@ -163,7 +167,7 @@
 </nav>
 <!-- ===== 分頁按鈕 Fragment 結束 ===== -->
 <!-- ===== 統一Footer開始 ===== -->
-<footer class="footer bg-secondary text-light py-5 justify-content-center" th:fragment="footer">
+<footer class="footer bg-light py-5 justify-content-center shadow-sm" th:fragment="footer">
     <a class="btn btn-dark booking-fixed-btn" href="#booking"> 立即預訂 </a>
     <div class="container">
         <div class="row">
