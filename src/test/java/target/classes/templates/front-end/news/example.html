@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <title>微嶼 | Isle Villa</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+</head>
+<body>
+<!-- ===== 載入Header ===== -->
+<div th:replace="~{fragments/fragments :: header}"></div>
+<!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
+<main>
+    <!-- 最新消息 -->
+    <section class="py-5 bg-light shadow-sm" id="news">
+        <div class="container">
+            <h2 class="section-title text-center mb-5">最新消息一覽</h2>
+            <div class="row g-4">
+                <!-- 使用 Thymeleaf 迴圈產生消息卡片 -->
+                <div class="col-md-4" th:each="news : ${newsList}">
+                    <div class="card h-100 shadow-sm">
+                        <!-- 如果有圖片則顯示，沒有則顯示預設圖片 -->
+                        <img
+                                alt="消息圖片"
+                                class="card-img-top w-100"
+                                style="height: 200px; object-fit: cover;"
+                                th:if="${news.newsImage != null}"
+                                th:src="@{'/news/image/' + ${news.newsId}}"
+                        />
+                        <!-- 預設圖片 -->
+                        <img
+                                alt="消息圖片"
+                                class="card-img-top w-100"
+                                src="https://images.unsplash.com/photo-1681452816108-d75e2a08f75d?q=80&w=2076&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                style="height: 200px; object-fit: cover;"
+                                th:unless="${news.newsImage != null}"
+                        />
+                        <div class="card-body">
+                            <!-- 動態顯示新聞標題 -->
+                            <h5 class="card-title" th:text="${news.newsTitle}">新聞標題</h5>
+                            <!-- 動態顯示新聞時間，格式化日期 -->
+                            <p class="text-muted small" th:text="${#temporals.format(news.newsTime, 'yyyy/MM/dd')}">
+                                2025/06/01</p>
+                            <!-- 動態顯示新聞內容，限制字數 -->
+                            <p class="card-text" th:text="${#strings.abbreviate(news.newsContent, 50)}">
+                                新聞內容摘要...
+                            </p>
+                            <!-- 可選：添加查看詳情按鈕 -->
+                            <a class="btn btn-primary btn-sm" th:href="@{'/front-end/news/detail/' + ${news.newsId}}">查看詳情</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 如果沒有新聞資料時顯示 -->
+                <div class="col-12 text-center" th:if="${#lists.isEmpty(newsList)}">
+                    <p class="text-muted">目前沒有最新消息</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+<!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
+<!-- ========== 載入Footer ========== -->
+<div th:replace="~{fragments/fragments :: footer}"></div>
+</body>
+</html>

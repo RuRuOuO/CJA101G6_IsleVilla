@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>商品訂單查詢</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>商品訂單查詢</h2>
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form action="/product-order/listAllProductOrder" method="get">
+                            <div class="form-group">
+                                <label for="memberId">會員編號</label>
+                                <select class="form-control" id="memberId" name="memberId">
+                                    <option value="">請選擇會員</option>
+                                    <option th:each="member : ${memberListData}" 
+                                            th:value="${member.memberId}" 
+                                            th:text="${member.memberName}">
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="orderStatus">訂單狀態</label>
+                                <select class="form-control" id="orderStatus" name="orderStatus">
+                                    <option value="">請選擇狀態</option>
+                                    <option value="0">訂單成立</option>
+                                    <option value="1">配送中</option>
+                                    <option value="2">已完成</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">查詢</button>
+                            <a href="/" class="btn btn-secondary">返回首頁</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html> 

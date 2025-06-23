@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>會員優惠券查詢</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>會員優惠券使用記錄查詢</h2>
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <strong>查詢說明：</strong><br>
+                            • 只選擇會員：顯示該會員使用過的所有優惠券記錄<br>
+                            • 只選擇優惠券：顯示使用過該優惠券的所有會員記錄<br>
+                            • 同時選擇會員和優惠券：顯示該會員是否使用過該優惠券的記錄<br>
+                            • 都不選擇：顯示所有會員優惠券使用記錄
+                        </div>
+                        <form action="/member-coupon/listAllMemberCoupon" method="get">
+                            <div class="form-group">
+                                <label for="memberId">會員</label>
+                                <select class="form-control" id="memberId" name="memberId">
+                                    <option value="">請選擇會員</option>
+                                    <option th:each="member : ${memberListData}" 
+                                            th:value="${member.memberId}" 
+                                            th:text="${member.memberName}">
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="couponId">優惠券</label>
+                                <select class="form-control" id="couponId" name="couponId">
+                                    <option value="">請選擇優惠券</option>
+                                    <option th:each="coupon : ${couponListData}" 
+                                            th:value="${coupon.couponId}" 
+                                            th:text="${coupon.couponCode}">
+                                    </option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">查詢</button>
+                            <a href="/" class="btn btn-secondary">返回首頁</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html> 
