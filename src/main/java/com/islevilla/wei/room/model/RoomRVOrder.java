@@ -1,5 +1,8 @@
 package com.islevilla.wei.room.model;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import com.islevilla.lai.members.model.Members;
 import com.islevilla.patty.promotion.model.Promotion;
 
@@ -9,8 +12,6 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import java.util.List;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "room_reservation_order")
@@ -36,11 +37,11 @@ public class RoomRVOrder {
 
     @Column(name = "check_in_date")
     @NotNull(message = "請選擇住宿開始日期")
-    private LocalDateTime checkInDate;
+    private LocalDate checkInDate;
 
     @Column(name = "check_out_date")
     @NotNull(message = "請選擇住宿結束日期")
-    private LocalDateTime checkOutDate;
+    private LocalDate checkOutDate;
 
     @ManyToOne
     @JoinColumn(name = "room_promotion_id")
@@ -64,7 +65,7 @@ public class RoomRVOrder {
     @NotNull(message = "請輸入實際付款金額")
     private Integer rvPaidAmount;
 
-    // @OntToMamy
+    // @OneToMamy
     @OneToMany(mappedBy = "roomRVOrder", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RoomRVDetail> roomRVDetails;
 }
