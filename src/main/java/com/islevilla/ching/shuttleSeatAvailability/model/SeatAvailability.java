@@ -27,7 +27,7 @@ public class SeatAvailability {
 	@Column(name= "seat_updated_at")
 	private LocalDateTime seatUpdateAt;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "shuttle_schedule_id", referencedColumnName = "shuttle_schedule_id", insertable = false, updatable = false)
 	private ShuttleSchedule schedule;
 
