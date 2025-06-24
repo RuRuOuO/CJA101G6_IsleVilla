@@ -29,4 +29,8 @@ public class CouponApiController {
         }
         return memberCouponService.findValidCouponsByMemberId(member.getMemberId(), orderAmount);
     }
+
+    // 結帳頁面: 當會員進入結帳頁面時，前端可以調用此API獲取可用的優惠券
+    // 動態優惠券顯示: 根據訂單金額動態顯示可用的優惠券選項
+    // 優惠券篩選: 只顯示符合最低消費門檻的優惠券
 } 

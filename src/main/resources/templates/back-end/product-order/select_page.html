@@ -1,9 +1,20 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>商品訂單查詢</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* 隱藏number input的上下箭頭 */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-5">
@@ -12,16 +23,18 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-body">
-                        <form action="/product-order/listAllProductOrder" method="get">
+                        <form action="/product-order/listProductOrders_ByCompositeQuery" method="post">
                             <div class="form-group">
                                 <label for="memberId">會員編號</label>
-                                <select class="form-control" id="memberId" name="memberId">
-                                    <option value="">請選擇會員</option>
-                                    <option th:each="member : ${memberListData}" 
-                                            th:value="${member.memberId}" 
-                                            th:text="${member.memberName}">
-                                    </option>
-                                </select>
+                                <input type="number" class="form-control" id="memberId" name="memberId" placeholder="請輸入會員編號">
+                            </div>
+                            <div class="form-group">
+                                <label for="productOrderId">訂單編號</label>
+                                <input type="number" class="form-control" id="productOrderId" name="productOrderId" placeholder="請輸入訂單編號">
+                            </div>
+                            <div class="form-group">
+                                <label for="orderTime">訂單時間</label>
+                                <input type="date" class="form-control" id="orderTime" name="orderTime">
                             </div>
                             <div class="form-group">
                                 <label for="orderStatus">訂單狀態</label>
@@ -45,4 +58,4 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
-</html> 
+</html>  -->
