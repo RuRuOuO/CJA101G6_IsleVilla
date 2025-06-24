@@ -94,25 +94,63 @@
             <h2 class="section-title text-center mb-5">最新消息</h2>
             <div class="row g-4">
                 <!-- 使用 Thymeleaf 遍歷新聞列表 -->
-                <div class="col-md-4" th:each="news : ${latestNews}">
-                    <!-- 新增a標籤讓整個卡片可以點擊，並加上樣式 -->
+                <div class="col-lg-4 col-md-6" th:each="news : ${latestNews}">
                     <a class="text-decoration-none" th:href="@{'/news/' + ${news.newsId}}">
-                        <div class="card fixed-card shadow-sm">
-                            <img alt="消息圖片"
-                                 class="card-img-top"
-                                 th:if="${news.newsImage != null}"
-                                 th:src="@{'/news/image/' + ${news.newsId}}"/>
+                        <div class="card news-card shadow-sm h-100">
+                            <!-- 圖片區域 -->
+                            <div class="position-relative overflow-hidden">
+                                <img alt="消息圖片"
+                                     class="card-img-top news-card-img"
+                                     th:if="${news.newsImage != null}"
+                                     th:src="@{'/news/image/' + ${news.newsId}}"/>
 
-                            <img alt="預設圖片"
-                                 class="card-img-top"
-                                 src="https://images.unsplash.com/photo-1624474161796-7685c6919523?q=80&w=1974&auto=format&fit=crop"
-                                 th:unless="${news.newsImage != null}"/>
+                                <img alt="預設圖片"
+                                     class="card-img-top news-card-img"
+                                     src="https://images.unsplash.com/photo-1624474161796-7685c6919523?q=80&w=1974&auto=format&fit=crop"
+                                     th:unless="${news.newsImage != null}"/>
 
-                            <div class="card-body">
-                                <h5 class="card-title" th:text="${news.newsTitle}">標題</h5>
-                                <p class="text-muted" th:text="${#temporals.format(news.newsTime, 'yyyy/MM/dd')}">
-                                    日期</p>
-                                <p class="card-text" th:text="${news.newsContent}">內容</p>
+<!--                                &lt;!&ndash; 新消息標籤 &ndash;&gt;-->
+<!--                                <div class="position-absolute top-0 end-0 m-3">-->
+<!--                                    <span class="badge news-date-badge text-white px-2 py-1 rounded-pill">-->
+<!--                                        <i class="fas fa-calendar-alt me-1"></i>-->
+<!--                                        <span th:text="${#temporals.format(news.newsTime, 'MM/dd')}">01/01</span>-->
+<!--                                    </span>-->
+<!--                                </div>-->
+                            </div>
+
+                            <!-- 內容區域 -->
+                            <div class="card-body news-card-body p-4">
+                                <!-- 標題 -->
+                                <h5 class="card-title fw-bold text-dark"
+                                    th:text="${news.newsTitle}">標題</h5>
+
+                                <!-- 發布日期 -->
+                                <div th:if="${news.promotion != null}"
+                                     class="d-flex align-items-center text-muted mb-3">
+                                    <i class="fas fa-clock fa-xs me-2"></i>
+                                    <small th:text="${#dates.format(news.promotion.promotionStartDate, 'yyyy.MM.dd')}">
+                                        2025.01.01
+                                    </small>
+                                    <small>&nbsp;~&nbsp;</small>
+                                    <small th:text="${#dates.format(news.promotion.promotionEndDate, 'yyyy.MM.dd')}">
+                                        2025.01.01
+                                    </small>
+                                </div>
+
+                                <!-- 內容預覽 -->
+                                <p class="card-text text-muted truncate-multiline" th:text="${news.newsContent}">
+                                    內容預覽文字...
+                                </p>
+
+                                <!-- 閱讀更多按鈕 -->
+                                <div class="mt-auto">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>
+                                            <i class="fas fa-arrow-right me-1"></i>
+                                            閱讀全文
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </a>

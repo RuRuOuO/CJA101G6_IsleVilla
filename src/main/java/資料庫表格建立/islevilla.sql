@@ -843,32 +843,34 @@ VALUES ('營運部'),
 
 -- 員工 employee （陳吟瑄）
 CREATE TABLE employee (
-    employee_id         INT           AUTO_INCREMENT  PRIMARY KEY,               -- 員工編號 (PK) (AI)
-    department_id       INT           NOT NULL,                                  -- 部門編號 (FK)
-    employee_name       VARCHAR(30)   NOT NULL,                                  -- 員工姓名
-    employee_email      VARCHAR(100)  NOT NULL,                                  -- 員工信箱
-    employee_address    VARCHAR(200)  NOT NULL,                                  -- 員工地址
-    employee_mobile     VARCHAR(20)   NOT NULL,                                  -- 員工手機
-    employee_gender     TINYINT       NOT NULL  COMMENT '0:男 1:女 2:其它',      -- 員工性別
-    employee_birthdate  DATE          NOT NULL,                                  -- 員工生日
-    employee_photo      LONGBLOB,                                                -- 員工照片
-    employee_hiredate   DATE          NOT NULL,                                  -- 員工到職日
-    employee_leavedate  DATE,                                                    -- 員工離職日
-    employee_status     TINYINT       NOT NULL  COMMENT '0:離職 1:在職 2:停職',  -- 員工狀態
+    employee_id				INT				AUTO_INCREMENT	PRIMARY KEY,				-- 員工編號 (PK) (AI)
+    department_id			INT				NOT NULL,									-- 部門編號 (FK)
+    employee_name			VARCHAR(30)		NOT NULL,									-- 員工姓名
+    employee_email			VARCHAR(100)	NOT NULL	UNIQUE,							-- 員工信箱
+    employee_address		VARCHAR(200)	NOT NULL,									-- 員工地址
+    employee_mobile			VARCHAR(20)		NOT NULL,									-- 員工手機
+	employee_password_hash	VARCHAR(100)	NOT NULL,									-- 員工密碼
+    employee_gender			TINYINT			NOT NULL	COMMENT '0:男 1:女 2:其它',		-- 員工性別
+    employee_birthdate		DATE			NOT NULL,									-- 員工生日
+    employee_photo			LONGBLOB,													-- 員工照片
+    employee_hiredate		DATE			NOT NULL,									-- 員工到職日
+    employee_leavedate		DATE,														-- 員工離職日
+    employee_status			TINYINT			NOT NULL	COMMENT '0:離職 1:在職 2:停職',	-- 員工狀態
     FOREIGN KEY (department_id) REFERENCES department(department_id)
 );
 
-INSERT INTO employee (department_id, employee_name, employee_email, employee_address, employee_mobile, employee_gender, employee_birthdate, employee_hiredate, employee_leavedate, employee_status)
-VALUES (1, '潘筱涵', 'xiuying17@yan.tw',      '60413 新營士林路4號9樓',      '0912345678', 0, '1990-12-30', '2023-01-01', NULL,         1),
-	   (1, '黎俊宏', 'houjing@feng.tw',       '20869 彰化市育英街12號之0',   '0916345792', 2, '1978-03-20', '2023-01-15', NULL,         1),
-	   (2, '顧思穎', 'yangqiang@hotmail.com', '57698 中壢縣龍山寺巷61號8樓', '0923456789', 0, '1985-06-28', '2023-02-01', NULL,         1),
-	   (2, '段志宏', 'yanma@guo.net',         '769 白沙民富巷8號4樓',        '0967890123', 0, '1998-01-11', '2023-02-15', NULL,         1),
-	   (3, '王郁雯', 'fuchao@qiu.tw',         '23008 屏東大橋頭街8號之1',    '0978901234', 2, '1983-04-27', '2023-03-01', NULL,         1),
-	   (3, '王嘉玲', 'xiulan09@hotmail.com',  '965 臺東自由街3號之5',        '0927364758', 1, '1988-12-07', '2023-03-15', NULL,         1),
-	   (4, '陳詩涵', 'longjing@wen.com',      '754 桃園天母街8號7樓',        '0904522961', 2, '1968-11-08', '2023-04-01', NULL,         1),
-	   (5, '崔志豪', 'duanna@hotmail.com',    '479 雲林縣中山巷63號1樓',     '0958731762', 1, '1978-06-23', '2023-04-15', NULL,         1),
-	   (4, '韓承翰', 'xqian@xiang.com',       '729 古坑縣頂福州巷193號之5',  '0977082492', 0, '2004-01-17', '2023-05-01', NULL,         2),
-	   (5, '王志宏', 'jiangjie@cheng.org',    '352 永康縣忠義路2段563號之7', '0959930022', 2, '1998-11-13', '2023-05-15', '2023-12-31', 0);
+INSERT INTO employee (department_id, employee_name, employee_email, employee_address, employee_mobile, employee_password_hash, employee_gender, employee_birthdate, employee_hiredate, employee_leavedate, employee_status)
+VALUES (1, '管理員',		'admin@tibame.com',			'60413 新營士林路4號9樓',		'0900000101',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 0, '1990-12-30', '2023-01-01', NULL, 1), -- 密碼：asd123456
+	   (5, '楊捷',		'jay@tibame.com',			'20869 彰化市育英街12號之0',	'0900000102',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 2, '1978-03-20', '2023-01-15', NULL, 1),
+	   (4, '陳薇淨',		'vivian@tibame.com',		'57698 中壢縣龍山寺巷61號8樓',	'0900000103',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 0, '1985-06-28', '2023-02-01', NULL, 1),
+	   (5, '陳吟瑄',		'blaire@tibame.com',		'769 白沙民富巷8號4樓',		'0900000104',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 0, '1998-01-11', '2023-02-15', NULL, 1),
+	   (4, '詹力臻',		'patty@tibame.com',			'23008 屏東大橋頭街8號之1',	'0900000105',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 2, '1983-04-27', '2023-03-01', NULL, 1),
+	   (4, '曾宸瑩',		'sandy@tibame.com',			'965 臺東自由街3號之5',		'0900000106',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 1, '1988-12-07', '2023-03-15', NULL, 1),
+	   (3, '賴彥儒',		'lai@tibame.com',			'754 桃園天母街8號7樓',		'0900000107',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 2, '1968-11-08', '2023-04-01', NULL, 1),
+	   (3, '王人慶',		'nick@tibame.com',			'479 雲林縣中山巷63號1樓',	'0900000108',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 1, '1978-06-23', '2023-04-15', NULL, 1),
+	   (2, '客服員工',	'service@tibame.com',		'729 古坑縣頂福州巷193號之5', 	'0900000109',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 0, '2004-01-17', '2023-05-01', NULL, 1),
+	   (2, '停職員工',	'suspension@xiang.com',		'729 古坑縣頂福州巷193號之5',	'0900000110',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 0, '2004-01-17', '2023-05-01', NULL, 2),
+	   (2, '離職員工',	'resignation@xiang.com',	'729 古坑縣頂福州巷193號之5',	'0900000111',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 0, '2004-01-17', '2023-05-01', NULL, 0);
 
 -- DROP TABLE IF EXISTS employee;
 
@@ -881,16 +883,11 @@ CREATE TABLE permission (
 );
 
 INSERT INTO permission (permission_name, permission_description)
-VALUES ('op_r',   '營運瀏覽功能。'),
-	   ('op_cud', '營運新增、編輯及刪除功能。'),
-	   ('cs_r',   '客服瀏覽功能。'),
-	   ('cs_cud', '客服新增、編輯及刪除功能。'),
-	   ('ss_r',   '接駁瀏覽功能。'),
-	   ('ss_cud', '接駁新增、編輯及刪除功能。'),
-	   ('hk_r',   '房務瀏覽功能。'),
-	   ('hk_cud', '房務新增、編輯及刪除功能。'),
-	   ('po_r',   '產品瀏覽功能。'),
-	   ('po_cud', '產品新增、編輯及刪除功能。');
+VALUES ('operation',	'營運部門權限'),
+	   ('service',		'客服部門權限'),
+	   ('shuttle',		'接駁部門權限'),
+	   ('room',			'房務部門權限'),
+	   ('product',		'產品部門權限');
    
 -- DROP TABLE IF EXISTS permission;
 
@@ -904,23 +901,30 @@ CREATE TABLE employee_permission (
     FOREIGN KEY (employee_id) REFERENCES employee(employee_id)
 );
 
+-- 根據員工的部門自動分配對應權限
 INSERT INTO employee_permission (permission_id, employee_id)
-VALUES (1, 1),
-	   (2, 1),
-	   (1, 2),
-	   (3, 3),
-	   (4, 3),
-	   (3, 4),
-	   (5, 5),
-	   (6, 5),
-	   (5, 6),
-	   (7, 7),
-	   (8, 7),
-	   (9, 8),
-       (10, 8);
+SELECT p.permission_id, e.employee_id
+FROM employee e
+JOIN permission p ON p.permission_name = 
+    CASE e.department_id
+        WHEN 1 THEN 'operation'
+        WHEN 2 THEN 'service'
+        WHEN 3 THEN 'shuttle'
+        WHEN 4 THEN 'room'
+        WHEN 5 THEN 'product'
+    END
+WHERE e.employee_status = 1;
+
+-- 為員工編號01（管理員）添加全部權限
+-- 先清除該員工現有的權限
+DELETE FROM employee_permission WHERE employee_id = 1;
+
+-- 為員工編號01添加所有權限
+INSERT INTO employee_permission (permission_id, employee_id)
+SELECT p.permission_id, 1
+FROM permission p;
 
 -- DROP TABLE IF EXISTS employee_permission;
-
 
 -- 操作日誌 operation_log （楊捷）
 CREATE TABLE operation_log (
@@ -988,31 +992,34 @@ VALUES (8, '2025-01-31 10:00:00', '非常不滿意', '房間有味道', '服務�
 
 -- 最新消息 news （陳薇淨）
 CREATE TABLE news(
-    news_id       INT           AUTO_INCREMENT,                      -- 最新消息編號 (PK) (AI)
-    news_title    VARCHAR(20)   NOT NULL,                            -- 最新消息標題
-    news_content  VARCHAR(100)  NOT NULL,                            -- 最新消息內容
-    news_image    LONGBLOB,                                          -- 最新消息圖片
-    news_time     DATETIME      NOT NULL,                            -- 最新消息上傳時間
-    news_status TINYINT NOT NULL DEFAULT 1 COMMENT '0:下架, 1:上架', -- 最新消息狀態
-    CONSTRAINT pk_news_id PRIMARY KEY(news_id)
+    news_id				INT				AUTO_INCREMENT,											-- 最新消息編號 (PK) (AI)
+    news_title			VARCHAR(20)		NOT NULL,												-- 最新消息標題
+    news_content		VARCHAR(1000)	NOT NULL,												-- 最新消息內容
+    news_image			LONGBLOB,																-- 最新消息圖片
+    news_time			DATETIME		NOT NULL,												-- 最新消息上傳時間
+    news_status			TINYINT			NOT NULL		DEFAULT 1	COMMENT '0:下架, 1:上架',	-- 最新消息狀態
+    room_promotion_id	INT,            														-- 對應優惠專案
+    CONSTRAINT pk_news_id PRIMARY KEY(news_id),
+    CONSTRAINT fk_n_room_promotion_id FOREIGN KEY(room_promotion_id) REFERENCES promotion(room_promotion_id)
 );
 
-INSERT INTO news (news_title, news_content, news_time, news_status)
-VALUES ('春假出遊推薦', '適合學生與家庭出遊的春假專案，2025/03/10 至 2025/03/20。',              '2025-03-03 09:00:00', 1),
-	   ('房客評價破千', '感謝支持，我們已累積超過1000則五星好評！',                              '2025-04-01 18:00:00', 1),
-       ('免費早餐延長至10點', '應顧客建議，即日起早餐供應時間延長至上午10點。',                  '2025-04-05 07:00:00', 1),
-       ('兒童遊樂區升級完成', '兒童遊樂區已完成升級，歡迎親子同遊！',                            '2025-04-15 12:00:00', 1),
-       ('泳池維修公告', '5/10~5/15泳池進行維修，造成不便敬請見諒。',                             '2025-04-25 11:00:00', 1),
-       ('網站改版通知', '全新官方網站上線，提供更便捷的訂房體驗！',                              '2025-05-10 10:30:00', 1),
-       ('暑期優惠開跑', '指定房型享 85 折優惠，活動期間為 2025/07/01 至 2025/08/31。',           '2025-06-25 00:00:00', 1),
-	   ('秋季旅行計畫推薦', '歡慶中秋佳節，景房限時優惠中，2025/10/03 至 2025/10/10。',          '2025-09-26 00:00:00', 1),
-       ('週末快閃特惠', '僅限週末訂房，2025/09/06 至 2025/09/08 優惠開跑！',                     '2025-09-05 00:00:00', 1),
-       ('限時快閃活動！', '限時兩天，先搶先贏！優惠期間：2025/09/15 至 2025/09/17。',            '2025-09-14 00:00:00', 1),
-       ('早鳥優惠開跑', '提前預訂享雙人房 75 折折扣，優惠至 2025/10/01。',                       '2025-09-24 00:00:00', 1),
-       ('中秋促銷限定', '歡慶中秋佳節，景房型優惠中，快來預訂！',                                '2025-10-03 00:00:00', 1),
-       ('週年慶活動', '慶祝開館週年，推出多項感恩回饋，活動期間：2025/11/01 至 2025/11/03。',    '2025-11-01 00:00:00', 1),
-       ('聖誕禮物大放送', '聖誕節首夜位房型回饋價！優惠期間：2025/12/24 至 2025/12/26。',        '2025-12-17 00:00:00', 1),
-       ('元旦住宿優惠開跑', '2026 開年住房折扣，優惠期間：2026/01/01 至 2026/01/07，快來搶訂！', '2025-12-24 00:00:00', 1);
+INSERT INTO news (news_title, news_content, news_time, news_status, room_promotion_id)
+VALUES 
+('春假出遊推薦', '適合學生與家庭出遊的春假專案', '2025-03-03 09:00:00', 1, 1),
+('房客評價破千', '感謝支持，我們已累積超過1000則五星好評！', '2025-04-01 18:00:00', 1, NULL),
+('免費早餐延長至10點', '應顧客建議，即日起早餐供應時間延長至上午10點。', '2025-04-05 07:00:00', 1, NULL),
+('兒童遊樂區升級完成', '兒童遊樂區已完成升級，歡迎親子同遊！', '2025-04-15 12:00:00', 1, NULL),
+('泳池維修公告', '5/10~5/15泳池進行維修，造成不便敬請見諒。', '2025-04-25 11:00:00', 1, NULL),
+('網站改版通知', '全新官方網站上線，提供更便捷的訂房體驗！', '2025-05-10 10:30:00', 1, NULL),
+('暑期優惠開跑', '指定房型享 85 折優惠', '2025-06-25 00:00:00', 1, 2),
+('秋季旅行計畫推薦', '歡慶中秋佳節，景房限時優惠中', '2025-09-26 00:00:00', 1, 7),
+('週末快閃特惠', '僅限週末訂房，2025/09/06 至 2025/09/08 優惠開跑！', '2025-09-05 00:00:00', 1, 3),
+('限時快閃活動！', '限時兩天，先搶先贏！', '2025-09-14 00:00:00', 1, 4),
+('早鳥優惠開跑', '提前預訂享雙人房 75 折折扣，優惠至 2025/10/01。', '2025-09-24 00:00:00', 1, 5),
+('中秋促銷限定', '歡慶中秋佳節，景房型優惠中，快來預訂！', '2025-10-03 00:00:00', 1, 6),
+('週年慶活動', '慶祝開館週年，推出多項感恩回饋', '2025-11-01 00:00:00', 1, 8),
+('聖誕禮物大放送', '聖誕節首夜位房型回饋價！', '2025-12-17 00:00:00', 1, 9),
+('元旦住宿優惠開跑', '2026 開年住房折扣，優惠期間：2026/01/01 至 2026/01/07，快來搶訂！', '2025-12-24 00:00:00', 1, 10);
 
 -- DROP TABLE IF EXISTS news;
 

@@ -1,4 +1,181 @@
 package com.islevilla.yin.employee.controller;
 
+import com.islevilla.yin.department.model.DepartmentService;
+import com.islevilla.yin.employee.model.Employee;
+import com.islevilla.yin.employee.model.EmployeeService;
+import com.islevilla.yin.permission.model.Permission;
+import com.islevilla.yin.permission.model.PermissionService;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.PathVariable;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import java.util.List;
+
+@Controller
+@RequestMapping("/backend/employee")
 public class EmployeeController {
+
+    @Autowired
+    private EmployeeService employeeService;
+    @Autowired
+    private DepartmentService departmentService;
+    @Autowired
+    private PermissionService permissionService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+//    @GetMapping("/list")
+//    public String listEmployee(Model model) {
+//
+//        return "back-end/employee/listEmployee";
+//    }
+    //渲染員工列表
+    @GetMapping("/list")
+    public String listEmployee(@RequestParam(value = "departmentId", required = false) Integer departmentId,
+                              @RequestParam(value = "status", required = false) Byte status, 
+                              Model model) {
+        List<Employee> employees;
+        
+        if (departmentId != null && status != null) {
+            // 根據部門和狀態過濾員工
+            employees = employeeService.getEmployeeByDepartmentIdAndStatus(departmentId, status);
+        } else if (departmentId != null) {
+            // 根據部門過濾員工
+            employees = employeeService.getEmployeeByDepartmentId(departmentId);
+        } else if (status != null) {
+            // 根據狀態過濾員工
+            employees = employeeService.getEmployeeByStatus(status);
+        } else {
+            // 沒有選擇篩選條件時顯示所有員工
+            employees = employeeService.getAllEmployees();
+        }
+        
+        model.addAttribute("employees", employees);
+        model.addAttribute("departments", departmentService.getAllDepartments());
+        model.addAttribute("selectedDepartmentId", departmentId);
+        model.addAttribute("selectedStatus", status);
+        model.addAttribute("permissions", permissionService.getAllPermissions());
+        return "back-end/employee/listEmployee";
+    }
+
+    // 取得員工資料 API
+    @GetMapping("/get/{employeeId}")
+    @ResponseBody
+    public Employee getEmployee(@PathVariable Integer employeeId) {
+        return employeeService.getEmployeeById(employeeId);
+    }
+    
+    // 新增員工 API
+    @PostMapping("/add")
+    @ResponseBody
+    public String addEmployee(@RequestParam String employeeName,
+                            @RequestParam String employeeEmail,
+                            @RequestParam String employeePassword,
+                            @RequestParam Integer departmentId,
+                            @RequestParam String employeeMobile,
+                            @RequestParam Byte employeeGender,
+                            @RequestParam String employeeBirthdate,
+                            @RequestParam String employeeHiredate,
+                            @RequestParam Byte employeeStatus,
+                            @RequestParam String employeeAddress,
+                            @RequestParam String permissions) {
+        try {
+            // 建立新員工
+            Employee employee = new Employee();
+            employee.setEmployeeName(employeeName);
+            employee.setEmployeeEmail(employeeEmail);
+            
+            // 加密密碼
+            String hashedPassword = passwordEncoder.encode(employeePassword);
+            employee.setEmployeePassword(hashedPassword);
+            
+            employee.setEmployeeMobile(employeeMobile);
+            employee.setEmployeeGender(employeeGender);
+            employee.setEmployeeBirthdate(java.time.LocalDate.parse(employeeBirthdate));
+            employee.setEmployeeHiredate(java.time.LocalDate.parse(employeeHiredate));
+            employee.setEmployeeStatus(employeeStatus);
+            employee.setEmployeeAddress(employeeAddress);
+            
+            // 設定部門
+            employee.setDepartment(departmentService.getDepartmentById(departmentId));
+            
+            // 解析權限 JSON
+            ObjectMapper mapper = new ObjectMapper();
+            List<String> permissionNames = mapper.readValue(permissions, new TypeReference<List<String>>() {});
+            
+            // 新增選中的權限
+            for (String permissionName : permissionNames) {
+                List<Permission> permissionsList = permissionService.getPermissionsByName(permissionName);
+                if (!permissionsList.isEmpty()) {
+                    employee.getPermissions().add(permissionsList.get(0));
+                }
+            }
+            
+            // 儲存員工
+            employeeService.addEmployee(employee);
+            
+            return "success";
+        } catch (Exception e) {
+            return "error: " + e.getMessage();
+        }
+    }
+    
+    // 更新員工資料 API
+    @PostMapping("/update")
+    @ResponseBody
+    public String updateEmployee(@RequestParam Integer employeeId,
+                               @RequestParam String employeeName,
+                               @RequestParam String employeeEmail,
+                               @RequestParam Integer departmentId,
+                               @RequestParam Byte employeeStatus,
+                               @RequestParam String permissions) {
+        try {
+            // 取得員工資料
+            Employee employee = employeeService.getEmployeeById(employeeId);
+            if (employee == null) {
+                return "員工不存在";
+            }
+            
+            // 更新基本資料
+            employee.setEmployeeName(employeeName);
+            employee.setEmployeeEmail(employeeEmail);
+            employee.setEmployeeStatus(employeeStatus);
+            
+            // 更新部門
+            employee.setDepartment(departmentService.getDepartmentById(departmentId));
+            
+            // 更新權限
+            employee.getPermissions().clear(); // 清除現有權限
+            
+            // 解析權限 JSON
+            ObjectMapper mapper = new ObjectMapper();
+            List<String> permissionNames = mapper.readValue(permissions, new TypeReference<List<String>>() {});
+            
+            // 新增選中的權限
+            for (String permissionName : permissionNames) {
+                List<Permission> permissionsList = permissionService.getPermissionsByName(permissionName);
+                if (!permissionsList.isEmpty()) {
+                    employee.getPermissions().add(permissionsList.get(0));
+                }
+            }
+            
+            // 儲存更新
+            employeeService.updateEmployee(employee);
+            
+            return "success";
+        } catch (Exception e) {
+            return "error: " + e.getMessage();
+        }
+    }
 }
