@@ -8,10 +8,17 @@ import lombok.Data;
 
 @Entity
 @Table(name = "shuttle_reservation_seat")
+@IdClass(ShuttleReservationSeat.ShuttleReservationSeatId.class)
 @Data
 public class ShuttleReservationSeat {
-	@EmbeddedId
-	private ShuttleReservationSeatId id;
+	
+	@Id
+	@Column(name = "shuttle_reservation_id")
+	private Integer shuttleReservationId;
+	
+	@Id
+	@Column(name = "seat_id")
+	private Integer seatId;
 	
 	@ManyToOne
     @JoinColumn(name = "shuttle_reservation_id", insertable = false, updatable = false)
@@ -21,16 +28,38 @@ public class ShuttleReservationSeat {
     @JoinColumn(name = "seat_id", insertable = false, updatable = false)
     private Seat seat;
 	
-	@Embeddable
-    @Data
-    public static class ShuttleReservationSeatId implements Serializable {
+	// IdClass 需要是獨立的類別，不能是內部類別
+	public static class ShuttleReservationSeatId implements Serializable {
         private static final long serialVersionUID = 1L;
 
-        @Column(name = "shuttle_reservation_id")
         private Integer shuttleReservationId;
-        
-        @Column(name = "seat_id")
         private Integer seatId;
+        
+        // 預設建構子
+        public ShuttleReservationSeatId() {}
+        
+        // 帶參數建構子
+        public ShuttleReservationSeatId(Integer shuttleReservationId, Integer seatId) {
+            this.shuttleReservationId = shuttleReservationId;
+            this.seatId = seatId;
+        }
+        
+        // Getter 和 Setter
+        public Integer getShuttleReservationId() {
+            return shuttleReservationId;
+        }
+        
+        public void setShuttleReservationId(Integer shuttleReservationId) {
+            this.shuttleReservationId = shuttleReservationId;
+        }
+        
+        public Integer getSeatId() {
+            return seatId;
+        }
+        
+        public void setSeatId(Integer seatId) {
+            this.seatId = seatId;
+        }
         
         // 必須實作 equals 和 hashCode
         @Override

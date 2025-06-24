@@ -213,7 +213,7 @@
                     <h4><i class="fas fa-clock me-2"></i>選擇日期與時段</h4>
                 </div>
                 <div class="card-body">
-                    <form th:action="@{/reservation/select-schedule}" method="post">
+                    <form th:action="@{/shuttle/reservation/select-schedule}" method="post">
                         <input type="hidden" th:name="reservationRequestId" th:value="${reservationRequestId}">
                         <div class="row" id="scheduleList">
                             <div th:each="schedule : ${availableSchedules}" class="col-md-4 mb-3">
@@ -258,7 +258,7 @@
                     <h4><i class="fas fa-chair me-2"></i>選擇座位</h4>
                 </div>
                 <div class="card-body">
-                    <form th:action="@{/reservation/select-seats}" method="post" id="seatForm">
+                    <form th:action="@{/shuttle/reservation/select-seats}" method="post" id="seatForm">
                         <input type="hidden" th:name="reservationRequestId" th:value="${reservationRequestId}">
                         <div class="row">
                             <div class="col-md-8">
@@ -317,7 +317,7 @@
                             </div>
                         </div>
                         <div class="mt-3">
-                            <a th:href="@{/reservation/step2(id=${reservationRequestId})}"
+                            <a th:href="@{/shuttle/reservation/validate}"
                                 class="btn btn-secondary me-2">上一步</a>
                             <button type="submit" class="btn btn-primary" id="confirmSeatBtn" disabled>
                                 <i class="fas fa-arrow-right me-2"></i>確認預約
@@ -380,7 +380,7 @@
                     <form th:action="@{/reservation/submit}" method="post">
                         <input type="hidden" th:name="reservationRequestId" th:value="${reservationRequestId}">
                         <div class="mt-3">
-                            <a th:href="@{/reservation/step3(id=${reservationRequestId})}"
+                            <a th:href="@{/shuttle/reservation/select-schedule"
                                 class="btn btn-secondary me-2">上一步</a>
                             <button type="submit" class="btn btn-success">
                                 <i class="fas fa-paper-plane me-2"></i>送出接駁申請
