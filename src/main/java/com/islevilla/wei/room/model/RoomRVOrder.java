@@ -11,6 +11,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.ToString;
+
 import java.util.List;
 
 @Entity
@@ -67,5 +69,6 @@ public class RoomRVOrder {
 
     // @OneToMamy
     @OneToMany(mappedBy = "roomRVOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude // 排除此屬性避免循環引用
     private List<RoomRVDetail> roomRVDetails;
 }

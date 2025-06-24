@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>微嶼 | Isle Villa 後台首頁</title>
-  <!-- ===== 載入統一樣式 ===== -->
-  <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>微嶼 | Isle Villa 後台首頁</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
 </head>
 <body>
 <!-- ===== 載入sidebar ===== -->
@@ -15,43 +15,714 @@
 <div th:replace="~{fragments/backFragments :: sidebar}"></div>
 
 <main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
-  <th:block th:fragment="myContent">
-    <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
-    <div class="container">
-      <h2 class="card-title">範例標題</h2>
-      <a href="/product/backend/new" class="btn btn-success mb-4">新增商品</a>
-      <table class="table table-striped">
-        <thead>
-        <tr>
-          <th>#</th>
-          <th>商品名稱</th>
-          <th>價格</th>
-          <th>庫存量</th>
-          <th>狀態</th>
-          <th>類別</th>
-          <th>操作</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="prod : ${product}">
-          <td th:text="${prod.productId}">1</td>
-          <td th:text="${prod.productName}">商品名稱</td>
-          <td th:text="${prod.productPrice}">100</td>
-          <td th:text="${prod.productQuantity}">50</td>
-          <td th:text="${prod.productStatus == 1 ? '上架' : '下架'}">上架</td>
-          <td th:text="${prod.productCategory.productCategoryName}">類別名稱</td>
-          <td>
-            <!-- 修改按鈕 -->
-            <a href="/product/backend/edit/{id}" th:href="@{/product/backend/edit/{id}(id=${prod.productId})}" class="btn btn-primary btn-sm">修改</a>
-          </td>
-        </tr>
-        </tbody>
-      </table>
+    <th:block th:fragment="myContent">
+        <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+
+        <!-- 卡片標題與新增按鈕 -->
+        <div class="card-header bg-transparent border-0 pt-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0 fw-bold ">
+                    <i class="bi bi-bag me-2"></i>商品管理
+                </h4>
+                <a
+                        class="btn btn-success"
+                        data-bs-toggle="modal"
+                        data-bs-target="#addProductModal"
+                >
+                    <i class="bi bi-plus-circle me-2"></i>新增商品
+                </a>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <!-- 搜尋與篩選 -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="searchInput" placeholder="搜尋商品名稱、編號" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="categoryFilter">
+                        <option value="">全部類別</option>
+                        <option th:each="cat : ${category}" 
+                                th:value="${cat.productCategoryId}" 
+                                th:text="${cat.productCategoryName}"
+                                th:selected="${cat.productCategoryId != null and cat.productCategoryId == selectedCategoryId}">
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="statusFilter">
+                        <option value="">全部狀態</option>
+                        <option value="1" th:selected="${selectedStatus != null and selectedStatus == 1}">上架</option>
+                        <option value="0" th:selected="${selectedStatus != null and selectedStatus == 0}">下架</option>
+                    </select>
+                </div>
+            </div>
+
+
+            <!-- 商品表格 -->
+            <div class="table-responsive">
+                <table id="productTable" class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>編號</th>
+                        <th>名稱</th>
+                        <th>價格</th>
+                        <th>庫存量</th>
+                        <th>狀態</th>
+                        <th>類別</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="prod : ${productList}">
+                        <td th:text="${prod.productId}">商品編號</td>
+                        <td th:text="${prod.productName}">商品名稱</td>
+                        <td th:text="${prod.productPrice}">商品價格</td>
+                        <td th:text="${prod.productQuantity}">商品庫存</td>
+                        <td>
+                            <span th:if="${prod.productStatus == 1}" class="badge bg-success">上架</span>
+                            <span th:if="${prod.productStatus != 1}" class="badge bg-danger">下架</span>
+                        </td>
+                        <td th:text="${prod.productCategory.productCategoryName}">商品類別</td>
+                        <td>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <a data-bs-toggle="modal"
+                                   data-bs-target="#editProductModal"
+                                   class="btn btn-sm btn-primary"
+                                   th:attr="
+                                     data-id=${prod.productId},
+                                     data-name=${prod.productName},
+                                     data-price=${prod.productPrice},
+                                     data-desc=${prod.productDescription},
+                                     data-qty=${prod.productQuantity},
+                                     data-status=${prod.productStatus},
+                                     data-cat=${prod.productCategory.productCategoryId}
+                                   ">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+        </div>
+    </th:block>
     </div>
-
-    <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
-  </th:block>
-
 </main>
+<!-- 新增員工 Modal -->
+<div class="modal fade" id="addProductModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-plus-circle me-2"></i>新增商品
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="card-header bg-transparent border-0 pt-4">
+                <div class="d-flex justify-content-between align-items-center">
+
+
+                </div>
+            </div>
+            <form th:object="${product}" method="post" id="addProductForm" novalidate enctype="multipart/form-data">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="productName" class="form-label">商品名稱 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="productName" th:field="*{productName}" required>
+                        <div class="invalid-feedback">請輸入商品名稱</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="productPrice" class="form-label">價格 <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="productPrice" th:field="*{productPrice}" required min="1">
+                        <div class="invalid-feedback">請輸入有效的價格（必須大於0）</div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="productDescription" class="form-label">商品描述 <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="productDescription" th:field="*{productDescription}" rows="3" required></textarea>
+                    <div class="invalid-feedback">請輸入商品描述</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="productQuantity" class="form-label">庫存量 <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="productQuantity" th:field="*{productQuantity}" required min="0">
+                        <div class="invalid-feedback">請輸入有效的庫存量（必須大於等於0）</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="productStatus" class="form-label">狀態 <span class="text-danger">*</span></label>
+                        <select class="form-select" id="productStatus" th:field="*{productStatus}" required>
+                            <option value="">請選擇狀態</option>
+                            <option th:value="1" th:selected="*{productStatus == 1}">上架</option>
+                            <option th:value="0" th:selected="*{productStatus == 0}">下架</option>
+                        </select>
+                        <div class="invalid-feedback">請選擇商品狀態</div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="productCategory" class="form-label">商品類別 <span class="text-danger">*</span></label>
+                    <select class="form-select" id="productCategory" name="productCategory.productCategoryId" required>
+                        <option value="">請選擇類別</option>
+                        <option th:each="cat : ${category}"
+                                th:value="${cat.productCategoryId}"
+                                th:text="${cat.productCategoryName}"
+                                th:selected="${product.productCategory != null} ? ${cat.productCategoryId} == ${product.productCategory.productCategoryId} : false">
+                        </option>
+                    </select>
+                    <div class="invalid-feedback">請選擇商品類別</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">商品圖片（可拖曳）</label>
+                    <input type="file" class="form-control" id="addProductPhotoInput" accept="image/*" multiple style="max-width:300px;" onchange="addNewProductPhotos_add(this)">
+                    <div class="mt-2 d-flex flex-wrap gap-2" id="addProductPhotoPreview"></div>
+                    <small class="text-muted">可分批上傳、可拖曳排序，右上角可刪除</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-2"></i>儲存
+                </button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 修改員工 Modal -->
+<div class="modal fade" id="editProductModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-plus-circle me-2"></i>修改商品
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="card-header bg-transparent border-0 pt-4">
+                <div class="d-flex justify-content-between align-items-center">
+
+
+                </div>
+            </div>
+            <form th:object="${product}" method="post" id="editProductForm" novalidate enctype="multipart/form-data">
+            <div class="modal-body">
+                <input type="hidden" name="productId" />
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="editProductName" class="form-label">商品名稱 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="editProductName" th:field="*{productName}" required>
+                        <div class="invalid-feedback">請輸入商品名稱</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="editProductPrice" class="form-label">價格 <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="editProductPrice" th:field="*{productPrice}" required min="1">
+                        <div class="invalid-feedback">請輸入有效的價格（必須大於0）</div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="editProductDescription" class="form-label">商品描述 <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="editProductDescription" th:field="*{productDescription}" rows="3" required></textarea>
+                    <div class="invalid-feedback">請輸入商品描述</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="editProductQuantity" class="form-label">庫存量 <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="editProductQuantity" th:field="*{productQuantity}" required min="0">
+                        <div class="invalid-feedback">請輸入有效的庫存量（必須大於等於0）</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="editProductStatus" class="form-label">狀態 <span class="text-danger">*</span></label>
+                        <select class="form-select" id="editProductStatus" th:field="*{productStatus}" required>
+                            <option value="">請選擇狀態</option>
+                            <option th:value="1" th:selected="*{productStatus == 1}">上架</option>
+                            <option th:value="0" th:selected="*{productStatus == 0}">下架</option>
+                        </select>
+                        <div class="invalid-feedback">請選擇商品狀態</div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="editProductCategory" class="form-label">商品類別 <span class="text-danger">*</span></label>
+                    <select class="form-select" id="editProductCategory" name="productCategory.productCategoryId" required>
+                        <option value="">請選擇類別</option>
+                        <option th:each="cat : ${category}"
+                                th:value="${cat.productCategoryId}"
+                                th:text="${cat.productCategoryName}"
+                                th:selected="${product.productCategory != null} ? ${cat.productCategoryId} == ${product.productCategory.productCategoryId} : false">
+                        </option>
+                    </select>
+                    <div class="invalid-feedback">請選擇商品類別</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">商品圖片（可拖曳）</label>
+                    <div id="productPhotoSortArea" class="d-flex flex-wrap gap-2"></div>
+                    <input type="file" class="form-control mt-2" id="editProductPhotoInput" accept="image/*" multiple style="max-width:300px;" onchange="addNewProductPhotos(this)">
+                    <small class="text-muted">可拖曳排序，右上角可刪除，點選可新增圖片</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-2"></i>儲存
+                </button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+<script>
+    // 商品搜尋功能
+    document.getElementById('searchInput').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const table = $('#productTable').DataTable();
+        
+        // 自定義搜尋函數，只搜尋編號（第0欄）和名字（第2欄）
+        $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+            const productId = data[0].toLowerCase(); // 編號欄位
+            const productName = data[2].toLowerCase(); // 名字欄位
+            
+            return productId.includes(searchTerm) || productName.includes(searchTerm);
+        });
+        
+        // 清除之前的搜尋結果
+        table.draw();
+        
+        // 移除自定義搜尋函數
+        $.fn.dataTable.ext.search.pop();
+    });
+
+    // 商品類別篩選功能
+    document.getElementById('categoryFilter').addEventListener('change', function() {
+        const categoryId = this.value;
+        const statusFilter = document.getElementById('statusFilter').value;
+        const url = new URL(window.location);
+        
+        if (categoryId) {
+            url.searchParams.set('categoryId', categoryId);
+        } else {
+            url.searchParams.delete('categoryId');
+        }
+        
+        if (statusFilter) {
+            url.searchParams.set('status', statusFilter);
+        } else {
+            url.searchParams.delete('status');
+        }
+        
+        window.location.href = url.toString();
+    });
+
+    // 商品狀態篩選功能
+    document.getElementById('statusFilter').addEventListener('change', function() {
+        const status = this.value;
+        const categoryFilter = document.getElementById('categoryFilter').value;
+        const url = new URL(window.location);
+        
+        if (status) {
+            url.searchParams.set('status', status);
+        } else {
+            url.searchParams.delete('status');
+        }
+        
+        if (categoryFilter) {
+            url.searchParams.set('categoryId', categoryFilter);
+        } else {
+            url.searchParams.delete('categoryId');
+        }
+        
+        window.location.href = url.toString();
+    });
+
+    // 綁定「新增商品」與「修改商品」兩個 Modal 底下的 form submit
+    const editForm = document.getElementById('editProductForm');
+    if (editForm) {
+        editForm.onsubmit = submitEditProductForm;
+    }
+    const addForm = document.getElementById('addProductForm');
+    if (addForm) {
+        addForm.onsubmit = submitAddProductForm;
+    }
+
+    // 新增商品用的圖片狀態
+    let addProductPhotoList = [];
+    let sortableAddPhotoArea;
+
+    function addNewProductPhotos_add(input) {
+        if (input.files) {
+            Array.from(input.files).forEach(file => {
+                if (!file.type.startsWith('image/')) return;
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('圖片大小不可超過 5MB！');
+                    return;
+                }
+                const url = URL.createObjectURL(file);
+                addProductPhotoList.push({ file, url });
+            });
+            renderAddProductPhotoPreview();
+            input.value = '';
+        }
+    }
+    function removeAddProductPhoto(idx) {
+        addProductPhotoList.splice(idx, 1);
+        renderAddProductPhotoPreview();
+    }
+    function renderAddProductPhotoPreview() {
+        const area = document.getElementById('addProductPhotoPreview');
+        area.innerHTML = '';
+        addProductPhotoList.forEach((photo, idx) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'position-relative';
+            wrapper.style.width = '100px';
+            wrapper.style.height = '100px';
+            wrapper.setAttribute('data-idx', idx);
+            wrapper.innerHTML = `
+                <img src="${photo.url}" class="img-thumbnail w-100 h-100" style="object-fit:cover;" onerror="this.src='https://via.placeholder.com/100x100?text=No+Image';"/>
+                <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0" style="z-index:2;" onclick="removeAddProductPhoto(${idx})">&times;</button>
+            `;
+            area.appendChild(wrapper);
+        });
+        if (sortableAddPhotoArea) sortableAddPhotoArea.destroy();
+        sortableAddPhotoArea = new Sortable(area, {
+            animation: 150,
+            onEnd: function() {
+                const newList = [];
+                area.querySelectorAll('[data-idx]').forEach(el => {
+                    newList.push(addProductPhotoList[parseInt(el.getAttribute('data-idx'))]);
+                });
+                addProductPhotoList = newList;
+                renderAddProductPhotoPreview();
+            }
+        });
+    }
+    // 攔截新增商品送出，依排序 append 檔案
+    async function submitAddProductForm(e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+        addProductPhotoList.forEach(obj => {
+            formData.append('productPhotos', obj.file);
+        });
+        const resp = await fetch('/backend/product/add', {
+            method: 'POST',
+            body: formData
+        });
+        if (resp.ok) {
+            alert('商品新增成功！');
+            window.location.href = '/backend/product/list';
+        } else {
+            alert('新增失敗');
+        }
+    }
+
+    // 顯示欄位錯誤的函數
+    function showFieldError(field, message) {
+        field.classList.add('is-invalid');
+        const feedback = field.parentNode.querySelector('.invalid-feedback');
+        if (feedback) {
+            feedback.textContent = message;
+        }
+    }
+
+    // 清除欄位錯誤的函數
+    function clearFieldError(field) {
+        field.classList.remove('is-invalid');
+        field.classList.remove('is-valid');
+    }
+
+    // 即時驗證功能
+    document.addEventListener('DOMContentLoaded', function() {
+        // 商品名稱驗證
+        document.querySelectorAll('#productName, #editProductName').forEach(field => {
+            field.addEventListener('input', function() {
+                if (this.value.trim().length > 0) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                }
+            });
+        });
+
+        // 價格驗證
+        document.querySelectorAll('#productPrice, #editProductPrice').forEach(field => {
+            field.addEventListener('input', function() {
+                const value = parseInt(this.value);
+                if (value > 0) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                }
+            });
+        });
+
+        // 商品描述驗證
+        document.querySelectorAll('#productDescription, #editProductDescription').forEach(field => {
+            field.addEventListener('input', function() {
+                if (this.value.trim().length > 0) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                }
+            });
+        });
+
+        // 庫存量驗證
+        document.querySelectorAll('#productQuantity, #editProductQuantity').forEach(field => {
+            field.addEventListener('input', function() {
+                const value = parseInt(this.value);
+                if (value >= 0) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                }
+            });
+        });
+
+        // 狀態驗證
+        document.querySelectorAll('#productStatus, #editProductStatus').forEach(field => {
+            field.addEventListener('change', function() {
+                if (this.value !== '') {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                }
+            });
+        });
+
+        // 類別驗證
+        document.querySelectorAll('#productCategory, #editProductCategory').forEach(field => {
+            field.addEventListener('change', function() {
+                if (this.value !== '') {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                }
+            });
+        });
+    });
+
+    // 編輯 Modal 打開時，自動把按鈕上的 data-* 值帶入表單欄位，並載入圖片
+    const editModal = document.getElementById('editProductModal');
+    editModal.addEventListener('show.bs.modal', function (evt) {
+        const btn   = evt.relatedTarget;
+        const id    = btn.getAttribute('data-id');
+        const name  = btn.getAttribute('data-name');
+        const price = btn.getAttribute('data-price');
+        const desc  = btn.getAttribute('data-desc');
+        const qty   = btn.getAttribute('data-qty');
+        const stat  = btn.getAttribute('data-status');
+        const cat   = btn.getAttribute('data-cat');
+
+        editModal.querySelector('input[name="productId"]').value                 = id;
+        editModal.querySelector('#editProductName').value                        = name;
+        editModal.querySelector('#editProductPrice').value                       = price;
+        editModal.querySelector('#editProductDescription').value                 = desc;
+        editModal.querySelector('#editProductQuantity').value                    = qty;
+        editModal.querySelector('#editProductStatus').value                      = stat;
+        editModal.querySelector('#editProductCategory').value                    = cat;
+        // 每次都重設圖片狀態並載入舊圖
+        productPhotoList = [];
+        deletedPhotoIds = [];
+        loadProductPhotos(id);
+    });
+
+    let productPhotoList = [];
+    let deletedPhotoIds = [];
+    let sortablePhotoArea;
+
+    // 載入舊有圖片
+    function loadProductPhotos(productId) {
+        fetch(`/backend/product/photos/${productId}`)
+            .then(res => res.json())
+            .then(photos => {
+                productPhotoList = photos.map(photo => ({
+                    id: photo.productPhotoId,
+                    url: `/backend/product/photo/id/${photo.productPhotoId}`,
+                    isNew: false
+                }));
+                deletedPhotoIds = [];
+                renderProductPhotoSortArea();
+            });
+    }
+    // 新增新圖片
+    function addNewProductPhotos(input) {
+        if (input.files) {
+            Array.from(input.files).forEach(file => {
+                if (!file.type.startsWith('image/')) return;
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('圖片大小不可超過 5MB！');
+                    return;
+                }
+                const url = URL.createObjectURL(file);
+                productPhotoList.push({ id: null, file, url, isNew: true });
+            });
+            renderProductPhotoSortArea();
+            input.value = '';
+        }
+    }
+    // 刪除圖片
+    function removeProductPhoto(idx) {
+        const photo = productPhotoList[idx];
+        if (!photo.isNew && photo.id) deletedPhotoIds.push(photo.id);
+        productPhotoList.splice(idx, 1);
+        renderProductPhotoSortArea();
+    }
+    // 渲染排序區塊
+    function renderProductPhotoSortArea() {
+        const area = document.getElementById('productPhotoSortArea');
+        area.innerHTML = '';
+        productPhotoList.forEach((photo, idx) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'position-relative';
+            wrapper.style.width = '100px';
+            wrapper.style.height = '100px';
+            wrapper.setAttribute('data-idx', idx);
+            wrapper.innerHTML = `
+                <img src="${photo.url}" class="img-thumbnail w-100 h-100" style="object-fit:cover;" onerror="this.src='https://via.placeholder.com/100x100?text=No+Image';"/>
+                <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0" style="z-index:2;" onclick="removeProductPhoto(${idx})">&times;</button>
+            `;
+            area.appendChild(wrapper);
+        });
+        if (sortablePhotoArea) sortablePhotoArea.destroy();
+        sortablePhotoArea = new Sortable(area, {
+            animation: 150,
+            onEnd: function() {
+                // 依照 DOM 順序重排 productPhotoList
+                const newList = [];
+                area.querySelectorAll('[data-idx]').forEach(el => {
+                    newList.push(productPhotoList[parseInt(el.getAttribute('data-idx'))]);
+                });
+                productPhotoList = newList;
+                renderProductPhotoSortArea();
+            }
+        });
+    }
+    // 送出表單時組合正確順序與刪除資訊
+    async function submitEditProductForm(e) {
+        e.preventDefault();
+        const form = e.target;
+        // ...原有欄位驗證...
+        const formData = new FormData(form);
+        // 送出排序後的舊圖ID陣列
+        const oldPhotoOrder = productPhotoList.filter(p => !p.isNew && p.id).map(p => p.id);
+        formData.append('oldPhotoOrder', JSON.stringify(oldPhotoOrder));
+        // 送出要刪除的舊圖ID陣列
+        formData.append('deletedPhotoIds', JSON.stringify(deletedPhotoIds));
+        // 送出新圖檔案，依排序append
+        productPhotoList.filter(p => p.isNew).forEach(fileObj => {
+            formData.append('newPhotos', fileObj.file);
+        });
+        // ...其他欄位append...
+        // fetch送出
+        const resp = await fetch('/backend/product/edit', {
+            method: 'POST',
+            body: formData
+        });
+        if (resp.ok) {
+            alert('商品修改成功！');
+            window.location.href = '/backend/product/list';
+        } else {
+            alert('儲存失敗');
+        }
+    }
+
+    function showProductPhotos(productId) {
+        fetch(`/backend/product/photos/${productId}`)
+            .then(res => res.json())
+            .then(photos => {
+                const carouselInner = document.getElementById('productPhotosCarouselInner');
+                carouselInner.innerHTML = '';
+                if (photos.length === 0) {
+                    carouselInner.innerHTML = '<div class="text-center">無圖片</div>';
+                } else {
+                    photos.forEach((photo, idx) => {
+                        const active = idx === 0 ? 'active' : '';
+                        carouselInner.innerHTML += `<div class="carousel-item ${active}">
+                            <img src="/backend/product/photo/id/${photo.productPhotoId}" class="d-block w-100" style="max-height:400px;object-fit:contain;" alt="商品圖片">
+                        </div>`;
+                    });
+                }
+                const modal = new bootstrap.Modal(document.getElementById('productPhotosModal'));
+                modal.show();
+            });
+    }
+
+    // 商品圖片多圖預覽
+    function previewProductPhotos(input, previewId) {
+        const preview = document.getElementById(previewId);
+        preview.innerHTML = '';
+        if (input.files) {
+            Array.from(input.files).forEach(file => {
+                if (!file.type.startsWith('image/')) return;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.width = '100px';
+                    img.style.height = '100px';
+                    img.style.objectFit = 'cover';
+                    img.className = 'img-thumbnail';
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+    }
+
+    $(function(){
+        $('#productTable').DataTable({
+            dom: "t<'d-flex justify-content-center my-3'p>",
+            pagingType: 'simple_numbers',  // 上一頁 | 1 2 3 | 下一頁
+            lengthChange: false,           // 隐藏「每頁幾筆」下拉
+            info: false,                   // 隐藏 table info
+            language: {
+                paginate: {
+                    previous: '上一頁',
+                    next:     '下一頁'
+                }
+            },
+            drawCallback: function(){
+                var $pg = $('#productTable_wrapper .pagination');
+                $pg.find('li.disabled a, li.active a')
+                    .each(function(){
+                        var txt = $(this).text();
+                        $(this).replaceWith(
+                            $('<span/>').addClass('page-link').text(txt)
+                        );
+                    });
+            }
+        });
+    });
+
+</script>
+
+<!-- ===== 載入統一腳本 ===== -->
+<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
+
 </body>
 </html>
