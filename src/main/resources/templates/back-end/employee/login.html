@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>員工後台登入</title>
+</head>
+<body>
+<h2>員工後台登入</h2>
+<form th:action="@{/backend/employee/login}" method="post">
+    <div>
+        <label>Email:</label>
+        <input type="text" name="email" placeholder="請輸入 Email" required>
+    </div>
+    <div>
+        <label>密碼:</label>
+        <input type="password" name="password" placeholder="請輸入密碼" required>
+    </div>
+    <button type="submit">登入</button>
+</form>
+<div th:if="${param.error}">
+    登入失敗：帳號或密碼錯誤
+</div>
+<div th:if="${param.logout}">
+    成功登出
+</div>
+</body>
+</html>
