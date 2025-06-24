@@ -3,77 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <title>商品訂單列表</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
 </head>
 <body th:attr="data-error=${updateErrorMsg != null}">
-    <div class="container mt-5">
-        <h2>商品訂單列表</h2>
-        <div th:if="${updateErrorMsg}" class="alert alert-danger" th:text="${updateErrorMsg}"></div>
-        <div class="row mt-4">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-body">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>訂單編號</th>
-                                    <th>會員名稱</th>
-                                    <th>訂單金額</th>
-                                    <th>折扣金額</th>
-                                    <th>實付金額</th>
-                                    <th>付款方式</th>
-                                    <th>取貨方式</th>
-                                    <th>聯絡人姓名</th>
-                                    <th>聯絡人電話</th>
-                                    <th>聯絡人地址</th>
-                                    <th>備註</th>
-                                    <th>訂單狀態</th>
-                                    <th>訂單時間</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="order : ${productOrderListData}">
-                                    <td th:text="${order.productOrderId}"></td>
-                                    <td th:text="${order.member.memberName}"></td>
-                                    <td th:text="${order.productOrderAmount}"></td>
-                                    <td th:text="${order.discountAmount}"></td>
-                                    <td th:text="${order.productPaidAmount}"></td>
-                                    <td th:text="${order.paymentMethod == 0 ? '信用卡' : '現金付款'}"></td>
-                                    <td th:text="${order.shippingMethod == 0 ? '宅配' : '飯店自取'}"></td>
-                                    <td th:text="${order.contactName}"></td>
-                                    <td th:text="${order.contactPhone}"></td>
-                                    <td th:text="${order.contactAddress}"></td>
-                                    <td th:text="${order.note != null ? order.note : '-'}"></td>
-                                    <td th:text="${order.orderStatus == 0 ? '訂單成立' : (order.orderStatus == 1 ? '配送中' : '已完成')}"></td>
-                                    <td th:text="${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
-                                    <td>
-                                        <button type="button" class="btn btn-primary btn-sm" onclick="openEditModal(this)"
-                                            th:attr="data-id=${order.productOrderId},data-name=${order.contactName},data-phone=${order.contactPhone},data-address=${order.contactAddress},data-note=${order.note},data-status=${order.orderStatus}">
-                                            修改
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div class="mt-3">
-                            <a href="/product-order/select_page" class="btn btn-secondary">返回查詢</a>
-                            <a href="/" class="btn btn-secondary">返回首頁</a>
-                        </div>
+    <!-- ===== 載入Sidebar ===== -->
+    <div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+    <div th:replace="~{fragments/backFragments :: sidebar}"></div>
+    <main th:replace="~{fragments/backFragments :: mainContent(~{::contentBlock})}">
+        <th:block th:fragment="contentBlock">
+            <div th:if="${updateErrorMsg}" class="alert alert-danger" th:text="${updateErrorMsg}"></div>
+            <div class="card-header bg-transparent border-0 pt-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0 fw-bold">
+                        <i class="bi bi-list-ul me-2"></i>商品訂單管理
+                    </h4>
+                </div>
+                <!-- 複合查詢表單 -->
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <form action="/product-order/listProductOrders_ByCompositeQuery" method="post" class="row g-3">
+                            <div class="col-md-2">
+                                <label for="memberId" class="form-label">會員編號</label>
+                                <input type="number" class="form-control" id="memberId" name="memberId" placeholder="請輸入會員編號">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="productOrderId" class="form-label">訂單編號</label>
+                                <input type="number" class="form-control" id="productOrderId" name="productOrderId" placeholder="請輸入訂單編號">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="orderTime" class="form-label">訂單時間</label>
+                                <input type="date" class="form-control" id="orderTime" name="orderTime">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="orderStatus" class="form-label">訂單狀態</label>
+                                <select class="form-control" id="orderStatus" name="orderStatus">
+                                    <option value="">請選擇狀態</option>
+                                    <option value="0">訂單成立</option>
+                                    <option value="1">配送中</option>
+                                    <option value="2">已完成</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="fas fa-search"></i> 查詢
+                                </button>
+                                <a href="/product-order/listAllProductOrder" class="btn btn-secondary">重置</a>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="productOrderTable" class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>訂單編號</th>
+                                <th>會員名稱</th>
+                                <th>訂單金額</th>
+                                <th>折扣金額</th>
+                                <th>實付金額</th>
+                                <th>訂單狀態</th>
+                                <th>訂單時間</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="order : ${productOrderListData}">
+                                <td th:text="${order.productOrderId}"></td>
+                                <td th:text="${order.member.memberName}"></td>
+                                <td th:text="${order.productOrderAmount}"></td>
+                                <td th:text="${order.discountAmount}"></td>
+                                <td th:text="${order.productPaidAmount}"></td>
+                                <td th:text="${order.orderStatus == 0 ? '訂單成立' : (order.orderStatus == 1 ? '配送中' : '已完成')}"></td>
+                                <td th:text="${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                                <td>
+                                    <a type="button" class="btn btn-sm btn-primary" onclick="openEditModal(this)"
+                                        th:attr="data-id=${order.productOrderId},data-name=${order.contactName},data-phone=${order.contactPhone},data-address=${order.contactAddress},data-note=${order.note},data-status=${order.orderStatus}">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a type="button" class="btn btn-sm btn-info ms-1" onclick="openDetailModal(this)"
+                                        th:attr="data-id=${order.productOrderId},data-member=${order.member.memberName},data-amount=${order.productOrderAmount},data-discount=${order.discountAmount},data-paid=${order.productPaidAmount},data-payment=${order.paymentMethod == 0 ? '信用卡' : '現金付款'},data-shipping=${order.shippingMethod == 0 ? '宅配' : '飯店自取'},data-name=${order.contactName},data-phone=${order.contactPhone},data-address=${order.contactAddress},data-note=${order.note},data-status=${order.orderStatus == 0 ? '訂單成立' : (order.orderStatus == 1 ? '配送中' : '已完成')},data-time=${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm:ss')}">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </th:block>
+    </main>
+    <th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
+    <script>
+    $(function(){
+        $('#productOrderTable').DataTable({
+            dom: "t<'d-flex justify-content-center my-3'p>",
+            pagingType: 'simple_numbers',
+            lengthChange: false,
+            info: false,
+            order: [],
+            language: {
+                paginate: {
+                    previous: '上一頁',
+                    next:     '下一頁'
+                }
+            },
+            drawCallback: function(){
+                var $pg = $('#productOrderTable_wrapper .pagination');
+                $pg.find('li.disabled a, li.active a')
+                    .each(function(){
+                        var txt = $(this).text();
+                        $(this).replaceWith(
+                            $('<span/>').addClass('page-link').text(txt)
+                        );
+                    });
+            }
+        });
+    });
+    </script>
 
     <!-- Modal -->
     <div class="modal fade" id="editOrderModal" tabindex="-1" role="dialog" aria-labelledby="editOrderModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
-          <form id="editOrderForm" method="post" th:action="@{/product-order/update}">
+          <form id="editOrderForm" method="post" th:action="@{/backend/product-order/update}">
             <div class="modal-header">
               <h5 class="modal-title" id="editOrderModalLabel">編輯訂單</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
@@ -107,7 +164,7 @@
               </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
               <button type="submit" class="btn btn-primary">儲存</button>
             </div>
           </form>
@@ -164,8 +221,55 @@
     }
     </script>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- 詳細資訊 Modal -->
+    <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-labelledby="orderDetailModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="orderDetailModalLabel">訂單詳細資訊</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <ul class="list-group">
+              <li class="list-group-item"><b>訂單編號：</b><span id="detailOrderId"></span></li>
+              <li class="list-group-item"><b>會員名稱：</b><span id="detailMember"></span></li>
+              <li class="list-group-item"><b>訂單金額：</b><span id="detailAmount"></span></li>
+              <li class="list-group-item"><b>折扣金額：</b><span id="detailDiscount"></span></li>
+              <li class="list-group-item"><b>實付金額：</b><span id="detailPaid"></span></li>
+              <li class="list-group-item"><b>付款方式：</b><span id="detailPayment"></span></li>
+              <li class="list-group-item"><b>取貨方式：</b><span id="detailShipping"></span></li>
+              <li class="list-group-item"><b>聯絡人姓名：</b><span id="detailName"></span></li>
+              <li class="list-group-item"><b>聯絡人電話：</b><span id="detailPhone"></span></li>
+              <li class="list-group-item"><b>聯絡人地址：</b><span id="detailAddress"></span></li>
+              <li class="list-group-item"><b>備註：</b><span id="detailNote"></span></li>
+              <li class="list-group-item"><b>訂單狀態：</b><span id="detailStatus"></span></li>
+              <li class="list-group-item"><b>訂單時間：</b><span id="detailTime"></span></li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+    function openDetailModal(btn) {
+        document.getElementById('detailOrderId').textContent = btn.getAttribute('data-id');
+        document.getElementById('detailMember').textContent = btn.getAttribute('data-member');
+        document.getElementById('detailAmount').textContent = btn.getAttribute('data-amount');
+        document.getElementById('detailDiscount').textContent = btn.getAttribute('data-discount');
+        document.getElementById('detailPaid').textContent = btn.getAttribute('data-paid');
+        document.getElementById('detailPayment').textContent = btn.getAttribute('data-payment');
+        document.getElementById('detailShipping').textContent = btn.getAttribute('data-shipping');
+        document.getElementById('detailName').textContent = btn.getAttribute('data-name');
+        document.getElementById('detailPhone').textContent = btn.getAttribute('data-phone');
+        document.getElementById('detailAddress').textContent = btn.getAttribute('data-address');
+        document.getElementById('detailNote').textContent = btn.getAttribute('data-note');
+        document.getElementById('detailStatus').textContent = btn.getAttribute('data-status');
+        document.getElementById('detailTime').textContent = btn.getAttribute('data-time');
+        var modal = new bootstrap.Modal(document.getElementById('orderDetailModal'));
+        modal.show();
+    }
+    </script>
 </body>
 </html> 

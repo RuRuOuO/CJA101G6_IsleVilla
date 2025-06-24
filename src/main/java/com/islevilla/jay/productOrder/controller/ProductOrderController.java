@@ -35,7 +35,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/product-order")
+@RequestMapping("/backend/product-order")
 public class ProductOrderController {
 
     @Autowired
@@ -162,7 +162,7 @@ public class ProductOrderController {
         model.addAttribute("productOrder", productOrder);
         
         cartSvc.clearCart(userId);  // 新增訂單時同時清空購物車內容
-        return "redirect:/product-order/checkoutResult?orderNo=" + productOrder.getProductOrderId();
+        return "redirect:/backend/product-order/checkoutResult?orderNo=" + productOrder.getProductOrderId();
     }
 
     /*
@@ -208,7 +208,7 @@ public class ProductOrderController {
         // 先查出原本的訂單
         ProductOrder dbOrder = productOrderSvc.getOneProductOrder(productOrder.getProductOrderId());
         if (dbOrder == null) {
-            return "redirect:/product-order/listAllProductOrder";
+            return "redirect:/backend/product-order/listAllProductOrder";
         }
         // 只更新允許的欄位
         dbOrder.setContactName(productOrder.getContactName());
@@ -218,7 +218,7 @@ public class ProductOrderController {
         dbOrder.setOrderStatus(productOrder.getOrderStatus());
         // 其他欄位保留原值
         productOrderSvc.updateProductOrder(dbOrder);
-        return "redirect:/product-order/listAllProductOrder";
+        return "redirect:/backend/product-order/listAllProductOrder";
     }
 
     /*
@@ -364,12 +364,12 @@ public class ProductOrderController {
         // 查詢訂單
         ProductOrder order = productOrderSvc.getOneProductOrder(orderNo);
         if (order == null) {
-            return "redirect:/product-order/memOrders";
+            return "redirect:/backend/product-order/memOrders";
         }
         
         // 檢查訂單是否屬於當前登入會員
         if (!order.getMember().getMemberId().equals(loggedInMember.getMemberId())) {
-            return "redirect:/product-order/memOrders";
+            return "redirect:/backend/product-order/memOrders";
         }
         
         // 查詢訂單明細
