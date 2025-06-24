@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 //資料傳輸API
 @RestController
@@ -18,6 +19,7 @@ public class ProductApiController {
 
     // 送出新增產品
     @PostMapping("/add")
+    @PreAuthorize("hasAuthority('product')")
     public ResponseEntity<String> addProduct(@RequestBody Product product) {
         try {
         productService.addProduct(product);
@@ -28,6 +30,7 @@ public class ProductApiController {
     }
     // 送出修改商品
     @PostMapping("/edit")
+    @PreAuthorize("hasAuthority('product')")
     public ResponseEntity<String> updateProduct(@Valid @RequestBody Product product) {
         try {
         productService.updateProduct(product);

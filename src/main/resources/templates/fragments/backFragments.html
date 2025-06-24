@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.springframework.org/security/tags">
 <head>
 
     <!-- ===== 統一載入樣式段落開始 ===== -->
@@ -160,7 +160,7 @@
         </li>
 
         <!-- 分類2 -->
-        <li class="mb-1">
+        <li class="mb-1" sec:authorize="hasAuthority('product')">
             <button
                     class="btn btn-toggle d-flex justify-content-between align-items-center w-100 rounded border-0 text-white"
                     data-bs-toggle="collapse"
@@ -216,14 +216,14 @@
                 </button>
                 <div class="collapse" id="mobile-dashboard-employee">
                     <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-4 lh-lg">
-                        <li><a href="#" class="link-body-emphasis text-primary">員工列表</a></li>
-                        <li><a href="#" class="link-body-emphasis text-primary">權限設定</a></li>
-                        <li><a href="#" class="link-body-emphasis text-primary">部門管理</a></li>
+                        <li><a th:href="@{/backend/employee/list}" class="link-body-emphasis text-primary">員工列表</a></li>
+                        <li><a th:href="@{/backend/employee/permission}" class="link-body-emphasis text-primary">權限設定</a></li>
+                        <li><a th:href="@{/}" class="link-body-emphasis text-primary">部門管理</a></li>
                     </ul>
                 </div>
             </li>
             <!-- 分類2 -->
-            <li class="mb-1">
+            <li class="mb-1" sec:authorize="hasAuthority('product')">
                 <button
                         class="btn btn-toggle d-flex justify-content-between align-items-center w-100 rounded border-0 text-primary"
                         data-bs-toggle="collapse"
@@ -235,9 +235,9 @@
                 </button>
                 <div class="collapse" id="mobile-dashboard-product">
                     <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-4 lh-lg">
-                        <li><a href="#" class="link-body-emphasis text-primary">商品管理</a></li>
-                        <li><a href="#" class="link-body-emphasis text-primary">商品分類管理</a></li>
-                        <li><a href="#" class="link-body-emphasis text-primary">訂單管理</a></li>
+                        <li><a th:href="@{/backend/product/list}" class="link-body-emphasis text-primary">商品管理</a></li>
+                        <li><a th:href="@{/}" class="link-body-emphasis text-primary">商品分類管理</a></li>
+                        <li><a th:href="@{/}" class="link-body-emphasis text-primary">訂單管理</a></li>
                     </ul>
                 </div>
             </li>

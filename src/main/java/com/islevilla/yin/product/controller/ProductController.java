@@ -106,6 +106,7 @@ public class ProductController {
 
     //後台-商品列表
     @GetMapping("/backend/product/list")
+    @PreAuthorize("hasAuthority('product')")
     public String listProduct(@RequestParam(value = "categoryId", required = false) Integer categoryId,
                              @RequestParam(value = "status", required = false) Byte status, 
                              Model model) {
@@ -135,6 +136,7 @@ public class ProductController {
 
     //後台-編輯商品頁
     @GetMapping("/backend/product/edit/{productId}")
+    @PreAuthorize("hasAuthority('product')")
     public String showEditProductPage(@PathVariable Integer productId, Model model) {
         Product product = productService.getProductById(productId);
         model.addAttribute("product", product);

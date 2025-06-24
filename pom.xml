@@ -207,6 +207,12 @@
                 <groupId>nz.net.ultraq.thymeleaf</groupId>
                 <artifactId>thymeleaf-layout-dialect</artifactId>
             </dependency>
+            
+            <!-- Thymeleaf Spring Security -->
+            <dependency>
+                <groupId>org.thymeleaf.extras</groupId>
+                <artifactId>thymeleaf-extras-springsecurity6</artifactId>
+            </dependency>
 
             <!-- hot swapping, disable cache for template, enable live reload -->
             <dependency>
