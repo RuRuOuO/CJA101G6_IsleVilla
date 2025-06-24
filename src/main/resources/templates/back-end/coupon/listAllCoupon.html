@@ -4,10 +4,24 @@
     <meta charset="UTF-8">
     <title>優惠券列表</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .sort-link:hover {
+            color: #007bff !important;
+            text-decoration: underline !important;
+        }
+        .sort-link {
+            cursor: pointer;
+        }
+        .sort-icon {
+            font-size: 0.8em;
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-5">
         <h2>優惠券列表</h2>
+        
         <div class="row mt-4">
             <div class="col-md-12">
                 <div class="card">
@@ -15,12 +29,66 @@
                         <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th>優惠券編號</th>
-                                    <th>優惠券代碼</th>
-                                    <th>折扣金額</th>
-                                    <th>最低消費金額</th>
-                                    <th>啟用日期</th>
-                                    <th>結束日期</th>
+                                    <th>
+                                        <a th:href="@{/coupon/list(sortBy='couponId', sortOrder=${currentSortBy == 'couponId' and currentSortOrder == 'asc'} ? 'desc' : 'asc', couponCode=${param.couponCode}, minSpend=${param.minSpend})}" 
+                                           class="text-decoration-none text-dark sort-link">
+                                            優惠券編號
+                                            <span th:if="${currentSortBy == 'couponId'}" class="ml-1 sort-icon">
+                                                <i th:if="${currentSortOrder == 'asc'}" class="fas fa-sort-up"></i>
+                                                <i th:if="${currentSortOrder == 'desc'}" class="fas fa-sort-down"></i>
+                                            </span>
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a th:href="@{/coupon/list(sortBy='couponCode', sortOrder=${currentSortBy == 'couponCode' and currentSortOrder == 'asc'} ? 'desc' : 'asc', couponCode=${param.couponCode}, minSpend=${param.minSpend})}" 
+                                           class="text-decoration-none text-dark sort-link">
+                                            優惠券代碼
+                                            <span th:if="${currentSortBy == 'couponCode'}" class="ml-1 sort-icon">
+                                                <i th:if="${currentSortOrder == 'asc'}" class="fas fa-sort-up"></i>
+                                                <i th:if="${currentSortOrder == 'desc'}" class="fas fa-sort-down"></i>
+                                            </span>
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a th:href="@{/coupon/list(sortBy='discountValue', sortOrder=${currentSortBy == 'discountValue' and currentSortOrder == 'asc'} ? 'desc' : 'asc', couponCode=${param.couponCode}, minSpend=${param.minSpend})}" 
+                                           class="text-decoration-none text-dark sort-link">
+                                            折扣金額
+                                            <span th:if="${currentSortBy == 'discountValue'}" class="ml-1 sort-icon">
+                                                <i th:if="${currentSortOrder == 'asc'}" class="fas fa-sort-up"></i>
+                                                <i th:if="${currentSortOrder == 'desc'}" class="fas fa-sort-down"></i>
+                                            </span>
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a th:href="@{/coupon/list(sortBy='minSpend', sortOrder=${currentSortBy == 'minSpend' and currentSortOrder == 'asc'} ? 'desc' : 'asc', couponCode=${param.couponCode}, minSpend=${param.minSpend})}" 
+                                           class="text-decoration-none text-dark sort-link">
+                                            最低消費金額
+                                            <span th:if="${currentSortBy == 'minSpend'}" class="ml-1 sort-icon">
+                                                <i th:if="${currentSortOrder == 'asc'}" class="fas fa-sort-up"></i>
+                                                <i th:if="${currentSortOrder == 'desc'}" class="fas fa-sort-down"></i>
+                                            </span>
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a th:href="@{/coupon/list(sortBy='startDate', sortOrder=${currentSortBy == 'startDate' and currentSortOrder == 'asc'} ? 'desc' : 'asc', couponCode=${param.couponCode}, minSpend=${param.minSpend})}" 
+                                           class="text-decoration-none text-dark sort-link">
+                                            啟用日期
+                                            <span th:if="${currentSortBy == 'startDate'}" class="ml-1 sort-icon">
+                                                <i th:if="${currentSortOrder == 'asc'}" class="fas fa-sort-up"></i>
+                                                <i th:if="${currentSortOrder == 'desc'}" class="fas fa-sort-down"></i>
+                                            </span>
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a th:href="@{/coupon/list(sortBy='endDate', sortOrder=${currentSortBy == 'endDate' and currentSortOrder == 'asc'} ? 'desc' : 'asc', couponCode=${param.couponCode}, minSpend=${param.minSpend})}" 
+                                           class="text-decoration-none text-dark sort-link">
+                                            結束日期
+                                            <span th:if="${currentSortBy == 'endDate'}" class="ml-1 sort-icon">
+                                                <i th:if="${currentSortOrder == 'asc'}" class="fas fa-sort-up"></i>
+                                                <i th:if="${currentSortOrder == 'desc'}" class="fas fa-sort-down"></i>
+                                            </span>
+                                        </a>
+                                    </th>
                                     <th>操作</th>
                                 </tr>
                             </thead>

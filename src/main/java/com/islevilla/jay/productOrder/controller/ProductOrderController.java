@@ -238,13 +238,30 @@ public class ProductOrderController {
     public String listAllProductOrder(
         @RequestParam(value = "memberId", required = false) Integer memberId,
         @RequestParam(value = "orderStatus", required = false) Integer orderStatus,
+        @RequestParam(value = "productOrderId", required = false) Integer productOrderId,
+        @RequestParam(value = "orderTime", required = false) String orderTime,
         Model model) {
 
         List<ProductOrder> list;
-        if (memberId != null || orderStatus != null) {
-            list = productOrderSvc.findByMemberIdAndStatus(memberId, orderStatus);
+        if (productOrderId != null) {
+            // 只查單一訂單編號
+            ProductOrder order = productOrderSvc.getOneProductOrder(productOrderId);
+            list = (order != null) ? List.of(order) : List.of();
         } else {
             list = productOrderSvc.getAll();
+            if (memberId != null) {
+                list = list.stream().filter(o -> o.getMember() != null && o.getMember().getMemberId().equals(memberId)).toList();
+            }
+            if (orderStatus != null) {
+                list = list.stream().filter(o -> o.getOrderStatus() != null && o.getOrderStatus().intValue() == orderStatus).toList();
+            }
+            if (orderTime != null && !orderTime.isEmpty()) {
+                list = list.stream().filter(o -> {
+                    if (o.getOrderTime() == null) return false;
+                    String orderDate = o.getOrderTime().toLocalDate().toString();
+                    return orderDate.equals(orderTime);
+                }).toList();
+            }
         }
         model.addAttribute("productOrderListData", list);
         return "back-end/product-order/listAllProductOrder";
