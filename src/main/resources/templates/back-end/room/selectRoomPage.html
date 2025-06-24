@@ -27,6 +27,9 @@
                    			<strong>提示：</strong>可以使用單一條件或組合條件進行查詢，留空的欄位將不作為查詢條件。
                			</div>
                  </div>
+                 <div th:if="${successMessage}" class="alert alert-success" id="successMessage" role="alert">
+                            <span th:text="${successMessage}"></span>
+                        </div>
                  <div th:if="${errorMessage}" class="alert alert-error" id="errorMessage" role="alert">
                    <ul class="mb-0">
 			       	<li th:each="msg : ${errorMessage}" th:text="${msg}"></li>

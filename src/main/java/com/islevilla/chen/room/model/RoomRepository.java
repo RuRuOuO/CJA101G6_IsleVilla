@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.islevilla.chen.util.compoundQuery.RoomInterface;
 
 @Repository
-@Transactional
 public interface RoomRepository extends JpaRepository<Room, Integer>,RoomInterface{
    
 }

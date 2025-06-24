@@ -38,16 +38,16 @@ public class RoomController {
 	@Autowired
 	private RoomTypeService roomTypeService;
 	
-//	// 創建一個 Map 來存房間狀態對應的名稱
-//	private static final Map<Integer, String> roomStatusMap;
-//
-//	static {
-//	    roomStatusMap = new HashMap<>();
-//	    roomStatusMap.put(0, "空房");
-//	    roomStatusMap.put(1, "入住中");
-//	    roomStatusMap.put(2, "待清潔");
-//	    roomStatusMap.put(3, "待清潔");
-//	}
+	// 創建一個 Map 來存房間狀態對應的名稱
+	private static final Map<Integer, String> roomStatusMap;
+
+	static {
+	    roomStatusMap = new HashMap<>();
+	    roomStatusMap.put(0, "空房");
+	    roomStatusMap.put(1, "入住中");
+	    roomStatusMap.put(2, "待清潔");
+	    roomStatusMap.put(3, "待清潔");
+	}
 
 	
 // 顯示AddRoom網頁
@@ -63,14 +63,6 @@ public String showAddRoom(Model model) {
         roomTypeNameMap.put(roomType.getRoomTypeId(), roomType.getRoomTypeName());
     }
     
- // 建立房間狀態對應表
-    Map<Byte, String> roomStatusMap = new HashMap<>();
-    roomStatusMap.put((byte)0, "空房");
-    roomStatusMap.put((byte)1, "入住中");
-    roomStatusMap.put((byte)2, "待維修");
-    roomStatusMap.put((byte)3, "待清潔");
-    roomStatusMap.put((byte)4, "停用");
-    
 	System.out.println("進入頁面");
 	model.addAttribute("room", room); 
 	model.addAttribute("roomTypeList", roomTypeList); 
@@ -82,7 +74,16 @@ public String showAddRoom(Model model) {
 	@PostMapping("/addRoom")
 	public String addRoom(@ModelAttribute("room") Room room, Model model) {
 		Room existingRoom = roomService.findById(room.getRoomId());
-		 List<String> errorMessages = new ArrayList<>();
+		List<String> errorMessages = new ArrayList<>();
+		// 創建房型名稱對應表（查詢結果需要顯示房型名稱）
+	    Map<Integer, String> roomTypeNameMap = new HashMap<>();
+	    List<RoomType> roomTypeList = roomTypeService.findAll();
+	    for (RoomType roomType : roomTypeList) {
+	        roomTypeNameMap.put(roomType.getRoomTypeId(), roomType.getRoomTypeName());
+	    }
+	    
+		model.addAttribute("roomTypeList", roomTypeList); 
+		model.addAttribute("roomStatusMap", roomStatusMap); 
 		
 		//檢查房間是否已存在（避免重複）
 		if(existingRoom!=null) {
@@ -99,25 +100,9 @@ public String showAddRoom(Model model) {
 			return "/back-end/room/addRoom";
 		}else{
 			roomService.addRoom(room);
-			// 創建房型名稱對應表（查詢結果需要顯示房型名稱）
-		    Map<Integer, String> roomTypeNameMap = new HashMap<>();
-		    List<RoomType> roomTypeList = roomTypeService.findAll();
-		    for (RoomType roomType : roomTypeList) {
-		        roomTypeNameMap.put(roomType.getRoomTypeId(), roomType.getRoomTypeName());
-		    }
-		    
-		    // 建立房間狀態對應表
-		    Map<Byte, String> roomStatusMap = new HashMap<>();
-		    roomStatusMap.put((byte)0, "空房");
-		    roomStatusMap.put((byte)1, "入住中");
-		    roomStatusMap.put((byte)2, "待維修");
-		    roomStatusMap.put((byte)3, "待清潔");
-		    roomStatusMap.put((byte)4, "停用");
 			System.out.println("資料送出成功");
 			model.addAttribute("successMessage", "房間新增成功！");
 			model.addAttribute("room", room); 
-			model.addAttribute("roomTypeList", roomTypeList); 
-			model.addAttribute("roomStatusMap", roomStatusMap); 
 			return "back-end/room/addRoom";
 		}
 		
@@ -135,14 +120,6 @@ public String showSelectPage(Model model) {
     for (RoomType roomType : roomTypeList) {
         roomTypeNameMap.put(roomType.getRoomTypeId(), roomType.getRoomTypeName());
     }
-    
-    // 建立房間狀態對應表
-    Map<Byte, String> roomStatusMap = new HashMap<>();
-    roomStatusMap.put((byte)0, "空房");
-    roomStatusMap.put((byte)1, "入住中");
-    roomStatusMap.put((byte)2, "待維修");
-    roomStatusMap.put((byte)3, "待清潔");
-    roomStatusMap.put((byte)4, "停用");
     
 	System.out.println("進入頁面");
     model.addAttribute("room", room);
@@ -169,14 +146,6 @@ public String showSelectPage(Model model) {
 	    for (RoomType roomType : roomTypeList) {
 	        roomTypeNameMap.put(roomType.getRoomTypeId(), roomType.getRoomTypeName());
 	    }
-	    
-	    // 建立房間狀態對應表
-	    Map<Byte, String> roomStatusMap = new HashMap<>();
-	    roomStatusMap.put((byte)0, "空房");
-	    roomStatusMap.put((byte)1, "入住中");
-	    roomStatusMap.put((byte)2, "待維修");
-	    roomStatusMap.put((byte)3, "待清潔");
-	    roomStatusMap.put((byte)4, "停用");
 	    
 	    // 將結果傳遞給頁面
 	    model.addAttribute("searchResult", searchResult);
@@ -211,13 +180,6 @@ public String showSelectPage(Model model) {
 				roomTypeNameMap.put(room.getRoomTypeId(), roomType.getRoomTypeName());
 			}
 		}
-		// 建立房間狀態對應表
-	    Map<Byte, String> roomStatusMap = new HashMap<>();
-	    roomStatusMap.put((byte)0, "空房");
-	    roomStatusMap.put((byte)1, "入住中");
-	    roomStatusMap.put((byte)2, "待維修");
-	    roomStatusMap.put((byte)3, "待清潔");
-	    roomStatusMap.put((byte)4, "停用");
 
 		System.out.println("進入頁面");
 		model.addAttribute("roomList", roomList);  
@@ -243,13 +205,6 @@ public String showListAllRoom(Model model) {
 			roomTypeNameMap.put(room.getRoomTypeId(), roomType.getRoomTypeName());
 		}
 	}
-	// 建立房間狀態對應表
-    Map<Byte, String> roomStatusMap = new HashMap<>();
-    roomStatusMap.put((byte)0, "空房");
-    roomStatusMap.put((byte)1, "入住中");
-    roomStatusMap.put((byte)2, "待維修");
-    roomStatusMap.put((byte)3, "待清潔");
-    roomStatusMap.put((byte)4, "停用");
 
 	System.out.println("進入頁面");
 	model.addAttribute("roomList", roomList);  
@@ -269,14 +224,6 @@ public String showUpdateRoom(@PathVariable Integer roomId, Model model) {
     for (RoomType roomType : roomTypeList) {
         roomTypeNameMap.put(roomType.getRoomTypeId(), roomType.getRoomTypeName());
     }
-    
-    // 建立房間狀態對應表
-    Map<Byte, String> roomStatusMap = new HashMap<>();
-    roomStatusMap.put((byte)0, "空房");
-    roomStatusMap.put((byte)1, "入住中");
-    roomStatusMap.put((byte)2, "待維修");
-    roomStatusMap.put((byte)3, "待清潔");
-    roomStatusMap.put((byte)4, "停用");
     
     // 根據 roomId 查詢房間資料
     Room room = roomService.findById(roomId);
@@ -309,13 +256,6 @@ public String showUpdateRoom(@PathVariable Integer roomId, Model model) {
 		        roomTypeNameMap.put(roomType.getRoomTypeId(), roomType.getRoomTypeName());
 		    }
 		    
-		    // 建立房間狀態對應表
-		    Map<Byte, String> roomStatusMap = new HashMap<>();
-		    roomStatusMap.put((byte)0, "空房");
-		    roomStatusMap.put((byte)1, "入住中");
-		    roomStatusMap.put((byte)2, "待維修");
-		    roomStatusMap.put((byte)3, "待清潔");
-		    roomStatusMap.put((byte)4, "停用");
 		    
 			System.out.println("資料送出成功");
 			model.addAttribute("successMessage", "房間資料更新成功！");
