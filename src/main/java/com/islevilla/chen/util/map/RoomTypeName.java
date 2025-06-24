@@ -7,15 +7,12 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.islevilla.chen.room.model.Room;
 import com.islevilla.chen.room.model.RoomService;
 import com.islevilla.chen.roomType.model.RoomType;
 import com.islevilla.chen.roomType.model.RoomTypeService;
 
 @Component
-public class roomMap {
-	@Autowired
-	private RoomService roomService;
+public class RoomTypeName {
 	
 	@Autowired
 	private RoomTypeService roomTypeService;
@@ -29,5 +26,11 @@ public class roomMap {
 	        roomTypeNameMap.put(roomType.getRoomTypeId(), roomType.getRoomTypeName());
 	    }
 	    return roomTypeNameMap;
+	}
+	
+	// 房型下拉選單選項
+	public List<RoomType> getRoomTypeNameList(){
+	    List<RoomType> roomTypeList = roomTypeService.findAll();
+	    return roomTypeList;
 	}
 }

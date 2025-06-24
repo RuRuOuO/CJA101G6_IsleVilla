@@ -11,20 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.islevilla.chen.room.model.Room;
 import com.islevilla.chen.room.model.RoomService;
 import com.islevilla.chen.roomType.model.RoomType;
 import com.islevilla.chen.roomType.model.RoomTypeService;
+import com.islevilla.chen.util.map.RoomTypeName;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -38,15 +32,18 @@ public class RoomController {
 	@Autowired
 	private RoomTypeService roomTypeService;
 	
+	@Autowired
+	private RoomTypeName roomTypeName;
+	
 	// 創建一個 Map 來存房間狀態對應的名稱
-	private static final Map<Integer, String> roomStatusMap;
+	private static final Map<Byte, String> roomStatusMap;
 
 	static {
 	    roomStatusMap = new HashMap<>();
-	    roomStatusMap.put(0, "空房");
-	    roomStatusMap.put(1, "入住中");
-	    roomStatusMap.put(2, "待清潔");
-	    roomStatusMap.put(3, "待清潔");
+	    roomStatusMap.put((byte)0, "空房");
+	    roomStatusMap.put((byte)1, "入住中");
+	    roomStatusMap.put((byte)2, "待清潔");
+	    roomStatusMap.put((byte)3, "待清潔");
 	}
 
 	
@@ -55,13 +52,7 @@ public class RoomController {
 public String showAddRoom(Model model) {
 	
 	Room room = new Room();
-	
-    // 創建房型名稱對應表（查詢結果需要顯示房型名稱）
-    Map<Integer, String> roomTypeNameMap = new HashMap<>();
-    List<RoomType> roomTypeList = roomTypeService.findAll();
-    for (RoomType roomType : roomTypeList) {
-        roomTypeNameMap.put(roomType.getRoomTypeId(), roomType.getRoomTypeName());
-    }
+    List<RoomType> roomTypeList=roomTypeName.getRoomTypeNameList();
     
 	System.out.println("進入頁面");
 	model.addAttribute("room", room); 
@@ -75,12 +66,8 @@ public String showAddRoom(Model model) {
 	public String addRoom(@ModelAttribute("room") Room room, Model model) {
 		Room existingRoom = roomService.findById(room.getRoomId());
 		List<String> errorMessages = new ArrayList<>();
-		// 創建房型名稱對應表（查詢結果需要顯示房型名稱）
-	    Map<Integer, String> roomTypeNameMap = new HashMap<>();
-	    List<RoomType> roomTypeList = roomTypeService.findAll();
-	    for (RoomType roomType : roomTypeList) {
-	        roomTypeNameMap.put(roomType.getRoomTypeId(), roomType.getRoomTypeName());
-	    }
+		// 房型下拉選單選項
+	    List<RoomType> roomTypeList=roomTypeName.getRoomTypeNameList();
 	    
 		model.addAttribute("roomTypeList", roomTypeList); 
 		model.addAttribute("roomStatusMap", roomStatusMap); 
@@ -114,12 +101,8 @@ public String showAddRoom(Model model) {
 public String showSelectPage(Model model) {
 	Room room = new Room();
 	
-	// 創建房型名稱對應表
-    Map<Integer, String> roomTypeNameMap = new HashMap<>();
-    List<RoomType> roomTypeList = roomTypeService.findAll();
-    for (RoomType roomType : roomTypeList) {
-        roomTypeNameMap.put(roomType.getRoomTypeId(), roomType.getRoomTypeName());
-    }
+	// 房型下拉選單選項
+    List<RoomType> roomTypeList=roomTypeName.getRoomTypeNameList();
     
 	System.out.println("進入頁面");
     model.addAttribute("room", room);
@@ -140,12 +123,10 @@ public String showSelectPage(Model model) {
 	            errorMessage.add("查無符合條件的房間資料");
 	        }
 	    
+		// 房型下拉選單選項
+	    List<RoomType> roomTypeList=roomTypeName.getRoomTypeNameList();
 	    // 創建房型名稱對應表（查詢結果需要顯示房型名稱）
-	    Map<Integer, String> roomTypeNameMap = new HashMap<>();
-	    List<RoomType> roomTypeList = roomTypeService.findAll();
-	    for (RoomType roomType : roomTypeList) {
-	        roomTypeNameMap.put(roomType.getRoomTypeId(), roomType.getRoomTypeName());
-	    }
+	    Map<Integer, String> roomTypeNameMap=roomTypeName.getRoomTypeNameMap();
 	    
 	    // 將結果傳遞給頁面
 	    model.addAttribute("searchResult", searchResult);
@@ -163,30 +144,23 @@ public String showSelectPage(Model model) {
 	}
 
 // 顯示SearchRoom網頁
-	@GetMapping("/searchRoom")
-	public String showSearchRoom(@RequestParam(required = false) Integer roomId,
-					            @RequestParam(required = false) Integer roomTypeId,
-					            @RequestParam(required = false) Byte roomStatus,
-					            Model model) {
-		
-		List<Room> roomList = roomService.findAll();
-		// 創建一個 Map 來存房型ID對應的房型名稱
-		Map<Integer, String> roomTypeNameMap = new HashMap<>();
-		
-		// 獲取所有房型資料並建立對應關係
-		for (Room room : roomList) {
-			RoomType roomType = roomTypeService.findById(room.getRoomTypeId());
-			if (roomType != null) {
-				roomTypeNameMap.put(room.getRoomTypeId(), roomType.getRoomTypeName());
-			}
-		}
+@GetMapping("/searchRoom")
+public String showSearchRoom(@RequestParam(required = false) Integer roomId,
+				            @RequestParam(required = false) Integer roomTypeId,
+				            @RequestParam(required = false) Byte roomStatus,
+				            Model model) {
+	
+	List<Room> roomList = roomService.findAll();
 
-		System.out.println("進入頁面");
-		model.addAttribute("roomList", roomList);  
-		model.addAttribute("roomStatusMap", roomStatusMap);  
-		model.addAttribute("roomTypeNameMap", roomTypeNameMap);  
-		return "/back-end/room/searchRoom";
-		
+    // 創建房型名稱對應表（查詢結果需要顯示房型名稱）
+    Map<Integer, String> roomTypeNameMap=roomTypeName.getRoomTypeNameMap();
+
+	System.out.println("進入頁面");
+	model.addAttribute("roomList", roomList);  
+	model.addAttribute("roomStatusMap", roomStatusMap);  
+	model.addAttribute("roomTypeNameMap", roomTypeNameMap);  
+	return "/back-end/room/searchRoom";
+	
 	}
 
 // 顯示ListAllRoom網頁
@@ -195,16 +169,8 @@ public String showListAllRoom(Model model) {
 	
 	List<Room> roomList = roomService.findAll();
 	
-	// 創建一個 Map 來存房型ID對應的房型名稱
-	Map<Integer, String> roomTypeNameMap = new HashMap<>();
-	
-	// 獲取所有房型資料並建立對應關係
-	for (Room room : roomList) {
-		RoomType roomType = roomTypeService.findById(room.getRoomTypeId());
-		if (roomType != null) {
-			roomTypeNameMap.put(room.getRoomTypeId(), roomType.getRoomTypeName());
-		}
-	}
+    // 創建房型名稱對應表（查詢結果需要顯示房型名稱）
+    Map<Integer, String> roomTypeNameMap=roomTypeName.getRoomTypeNameMap();
 
 	System.out.println("進入頁面");
 	model.addAttribute("roomList", roomList);  
@@ -218,13 +184,9 @@ public String showListAllRoom(Model model) {
 public String showUpdateRoom(@PathVariable Integer roomId, Model model) {
     System.out.println("要修改的房間ID: " + roomId);
 	
-    // 創建房型名稱對應表（查詢結果需要顯示房型名稱）
-    Map<Integer, String> roomTypeNameMap = new HashMap<>();
-    List<RoomType> roomTypeList = roomTypeService.findAll();
-    for (RoomType roomType : roomTypeList) {
-        roomTypeNameMap.put(roomType.getRoomTypeId(), roomType.getRoomTypeName());
-    }
-    
+	// 房型下拉選單選項
+    List<RoomType> roomTypeList=roomTypeName.getRoomTypeNameList();
+
     // 根據 roomId 查詢房間資料
     Room room = roomService.findById(roomId);
     // 將房間資料傳給前端頁面
@@ -239,6 +201,12 @@ public String showUpdateRoom(@PathVariable Integer roomId, Model model) {
 	public String updateRoom(@ModelAttribute("room") Room room, Model model) {
 	    List<String> errorMessages = new ArrayList<>();
 		
+	    // 房型下拉選單選項
+	    List<RoomType> roomTypeList=roomTypeName.getRoomTypeNameList();
+	    
+	    model.addAttribute("roomTypeList", roomTypeList); 
+		model.addAttribute("roomStatusMap", roomStatusMap); 
+		
 		//檢查房型ID是否存在（避免外鍵錯誤）
 		if(roomTypeService.findById(room.getRoomTypeId()) == null) {
 			errorMessages.add("房型ID不存在，請重新輸入");
@@ -249,20 +217,11 @@ public String showUpdateRoom(@PathVariable Integer roomId, Model model) {
 			return "/back-end/room/updateRoom";
 		}else{
 			roomService.updateRoom(room);
-		    // 創建房型名稱對應表（查詢結果需要顯示房型名稱）
-		    Map<Integer, String> roomTypeNameMap = new HashMap<>();
-		    List<RoomType> roomTypeList = roomTypeService.findAll();
-		    for (RoomType roomType : roomTypeList) {
-		        roomTypeNameMap.put(roomType.getRoomTypeId(), roomType.getRoomTypeName());
-		    }
-		    
-		    
+
 			System.out.println("資料送出成功");
 			model.addAttribute("successMessage", "房間資料更新成功！");
 			model.addAttribute("room", room);
-			model.addAttribute("roomTypeList", roomTypeList); 
-			model.addAttribute("roomStatusMap", roomStatusMap); 
-			return "back-end/room/searchRoom";
+			return "back-end/room/updateRoom";
 		}
 	}
 	
