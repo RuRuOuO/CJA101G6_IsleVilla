@@ -24,5 +24,9 @@ public class ProductPhotoService {
         }
         return null;  // 如果沒有圖片，返回 null
     }
+
+    public void save(ProductPhoto productPhoto) {
+        productPhotoRepository.save(productPhoto);
+    }
 }
 

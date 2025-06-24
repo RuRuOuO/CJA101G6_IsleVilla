@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders;
 
 //頁面渲染
 @Controller
@@ -102,7 +104,19 @@ public class ProductController {
         return "front-end/product/listProduct";
     }
 
-
+    // 取得商品第一張圖片
+    @GetMapping("/backend/product/photo/{productId}")
+    @ResponseBody
+    public ResponseEntity<byte[]> getProductPhoto(@PathVariable Integer productId) {
+        ProductPhoto photo = productPhotoService.getFirstProductPhotoByProductId(productId);
+        if (photo != null && photo.getProductImage() != null) {
+            return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, "image/jpeg")
+                .body(photo.getProductImage());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
     //後台-商品列表
     @GetMapping("/backend/product/list")
