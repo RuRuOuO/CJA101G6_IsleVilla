@@ -6,6 +6,7 @@ import com.islevilla.yin.productphoto.ProductPhoto;
 import com.islevilla.yin.productphoto.ProductPhotoService;
 import com.islevilla.yin.productphoto.ProductWithImageDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -102,13 +103,33 @@ public class ProductController {
     }
 
 
+
     //後台-商品列表
     @GetMapping("/backend/product/list")
-    public String listProduct(Model model) {
-        List<Product> productList = productService.getAllProducts();
+    public String listProduct(@RequestParam(value = "categoryId", required = false) Integer categoryId,
+                             @RequestParam(value = "status", required = false) Byte status, 
+                             Model model) {
+        List<Product> productList;
+        
+        if (categoryId != null && status != null) {
+            // 根據類別和狀態過濾商品
+            productList = productService.getProductByCategoryIdAndStatus(categoryId, status);
+        } else if (categoryId != null) {
+            // 根據類別過濾商品
+            productList = productService.getProductByProductCategoryId(categoryId);
+        } else if (status != null) {
+            // 根據狀態過濾商品
+            productList = productService.getProductByStatus(status);
+        } else {
+            // 沒有選擇篩選條件時顯示所有商品
+            productList = productService.getAllProducts();
+        }
+        
         model.addAttribute("productList", productList); // 商品列表
         model.addAttribute("product", new Product());   // 空的 Product 給 modal 表單用
         model.addAttribute("category", productCategoryService.getAllProductCategory());
+        model.addAttribute("selectedCategoryId", categoryId);
+        model.addAttribute("selectedStatus", status);
         return "back-end/product/listProduct";
     }
 
@@ -120,6 +141,5 @@ public class ProductController {
         model.addAttribute("category", productCategoryService.getAllProductCategory());
         return "back-end/product/editProduct";
     }
-
 
 }

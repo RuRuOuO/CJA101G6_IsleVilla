@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>員工管理</title>
+    <title>權限管理</title>
     <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
 </head>
@@ -21,218 +21,226 @@
         <div class="card-header bg-transparent border-0 pt-4">
             <div class="d-flex justify-content-between align-items-center">
                 <h4 class="card-title mb-0 fw-bold">
-                    <i class="bi bi-people me-2"></i>權限管理
+                    <i class="bi bi-shield-check me-2"></i>權限管理
                 </h4>
                 <button
                         class="btn btn-success"
                         data-bs-toggle="modal"
-                        data-bs-target="#addEmployeeModal"
+                        data-bs-target="#addPermissionModal"
                 >
                     <i class="bi bi-plus-circle me-2"></i>新增權限
                 </button>
             </div>
         </div>
         <div class="card-body">
-            <!-- 搜尋與篩選 -->
-            <div class="row mb-4">
-                <div class="col-md-4">
-                    <div class="input-group">
-                  <span class="input-group-text"
-                  ><i class="bi bi-search"></i
-                  ></span>
-                        <input
-                                type="text"
-                                class="form-control"
-                                placeholder="搜尋員工姓名、信箱..."
-                        />
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <select class="form-select">
-                        <option>全部部門</option>
-                        <option>資訊部</option>
-                        <option>行銷部</option>
-                        <option>財務部</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <select class="form-select">
-                        <option>全部狀態</option>
-                        <option>在職</option>
-                        <option>離職</option>
-                        <option>停職</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- 員工表格 -->
+            <!-- 權限表格 -->
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
                     <tr>
                         <th>編號</th>
-                        <th>名稱</th>
-                        <th>描述</th>
+                        <th>權限名稱</th>
+                        <th>權限描述</th>
+                        <th>操作</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="permissionList : ${permissionList}">
-                        <td th:text="${permissionList.permissionId}">權限編號</td>
-                        <td th:text="${permissionList.permissionName}">姓名</td>
-                        <td th:text="${permissionList.permissionDescription}">信箱</td>
+                    <tr th:each="permission : ${permissionList}">
+                        <td th:text="${permission.permissionId}">權限編號</td>
+                        <td th:text="${permission.permissionName}">權限名稱</td>
+                        <td th:text="${permission.permissionDescription}">權限描述</td>
                         <td>
-                            <!-- 修改按鈕 -->
-                            <a href="/"
-                               class="btn btn-sm btn-primary me-1">
+                            <!-- 編輯按鈕 -->
+                            <button class="btn btn-sm btn-primary me-1" 
+                                    th:onclick="'editPermission(' + ${permission.permissionId} + ')'">
                                 <i class="bi bi-pencil"></i>
-                            </a>
+                            </button>
+                            <!-- 刪除按鈕 -->
+                            <button class="btn btn-sm btn-danger" 
+                                    th:onclick="'deletePermission(' + ${permission.permissionId} + ')'">
+                                <i class="bi bi-trash"></i>
+                            </button>
                         </td>
                     </tr>
                     </tbody>
                 </table>
             </div>
-
-            <!-- 分頁 -->
-            <nav>
-                <ul class="pagination justify-content-center">
-                    <li class="page-item disabled">
-                        <span class="page-link">上一頁</span>
-                    </li>
-                    <li class="page-item active">
-                        <span class="page-link">1</span>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">2</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">下一頁</a>
-                    </li>
-                </ul>
-            </nav>
             <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
     </th:block>
 </main>
-<!-- 新增員工 Modal -->
-<div class="modal fade" id="addEmployeeModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+
+<!-- 新增權限 Modal -->
+<div class="modal fade" id="addPermissionModal" tabindex="-1">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    <i class="bi bi-person-plus me-2"></i>新增員工
+                    <i class="bi bi-shield-plus me-2"></i>新增權限
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">員工姓名 <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">員工信箱 <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control" required>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">部門</label>
-                            <select class="form-select">
-                                <option>請選擇部門</option>
-                                <option>資訊部</option>
-                                <option>行銷部</option>
-                                <option>財務部</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">手機號碼</label>
-                            <input type="tel" class="form-control">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">性別</label>
-                            <select class="form-select">
-                                <option value="0">男</option>
-                                <option value="1">女</option>
-                                <option value="2">其它</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">生日</label>
-                            <input type="date" class="form-control">
-                        </div>
+                <form id="addPermissionForm">
+                    <div class="mb-3">
+                        <label class="form-label">權限名稱 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="permissionName" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">地址</label>
-                        <textarea class="form-control" rows="2"></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">員工照片</label>
-                        <input type="file" class="form-control" accept="image/*">
+                        <label class="form-label">權限描述 <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="permissionDescription" rows="3" required></textarea>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-success">
-                    <i class="bi bi-check-circle me-2"></i>新增員工
+                <button type="button" class="btn btn-success" onclick="savePermission()">
+                    <i class="bi bi-check-circle me-2"></i>新增權限
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- 編輯員工 Modal -->
-<div class="modal fade" id="editEmployeeModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+<!-- 編輯權限 Modal -->
+<div class="modal fade" id="editPermissionModal" tabindex="-1">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    <i class="bi bi-pencil me-2"></i>編輯員工資料
+                    <i class="bi bi-pencil me-2"></i>編輯權限
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">員工姓名</label>
-                            <input type="text" class="form-control" value="王小明">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">員工信箱</label>
-                            <input type="email" class="form-control" value="wang@islevilla.com">
-                        </div>
+                <form id="editPermissionForm">
+                    <input type="hidden" id="editPermissionId" name="permissionId">
+                    <div class="mb-3">
+                        <label class="form-label">權限名稱</label>
+                        <input type="text" class="form-control" id="editPermissionName" name="permissionName">
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">部門</label>
-                            <select class="form-select">
-                                <option selected>資訊部</option>
-                                <option>行銷部</option>
-                                <option>財務部</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">員工狀態</label>
-                            <select class="form-select">
-                                <option value="1" selected>在職</option>
-                                <option value="0">離職</option>
-                                <option value="2">停職</option>
-                            </select>
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">權限描述</label>
+                        <textarea class="form-control" id="editPermissionDescription" name="permissionDescription" rows="3"></textarea>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary">
+                <button type="button" class="btn btn-primary" onclick="savePermissionEdit()">
                     <i class="bi bi-check-circle me-2"></i>儲存變更
                 </button>
             </div>
         </div>
     </div>
 </div>
+
+<!-- ===== 載入統一的 JavaScript ===== -->
+<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
+
+<script>
+// 新增權限
+function savePermission() {
+    const form = document.getElementById('addPermissionForm');
+    const formData = new FormData(form);
+    
+    // 建立請求資料
+    const requestData = new FormData();
+    requestData.append('permissionName', formData.get('permissionName'));
+    requestData.append('permissionDescription', formData.get('permissionDescription'));
+    
+    // 發送請求
+    fetch('/backend/permission/add', {
+        method: 'POST',
+        body: requestData
+    })
+    .then(response => response.text())
+    .then(result => {
+        if (result === 'success') {
+            alert('權限新增成功！');
+            location.reload();
+        } else {
+            alert('新增失敗：' + result);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('新增失敗，請稍後再試');
+    });
+}
+
+// 編輯權限
+function editPermission(permissionId) {
+    // 取得權限資料
+    fetch(`/backend/permission/get/${permissionId}`)
+    .then(response => response.json())
+    .then(permission => {
+        // 填入表單資料
+        document.getElementById('editPermissionId').value = permission.permissionId;
+        document.getElementById('editPermissionName').value = permission.permissionName;
+        document.getElementById('editPermissionDescription').value = permission.permissionDescription;
+        
+        // 顯示 modal
+        const modal = new bootstrap.Modal(document.getElementById('editPermissionModal'));
+        modal.show();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('取得權限資料失敗');
+    });
+}
+
+// 儲存權限編輯
+function savePermissionEdit() {
+    const form = document.getElementById('editPermissionForm');
+    const formData = new FormData(form);
+    
+    // 建立請求資料
+    const requestData = new FormData();
+    requestData.append('permissionId', formData.get('permissionId'));
+    requestData.append('permissionName', formData.get('permissionName'));
+    requestData.append('permissionDescription', formData.get('permissionDescription'));
+    
+    // 發送請求
+    fetch('/backend/permission/update', {
+        method: 'POST',
+        body: requestData
+    })
+    .then(response => response.text())
+    .then(result => {
+        if (result === 'success') {
+            alert('權限更新成功！');
+            location.reload();
+        } else {
+            alert('更新失敗：' + result);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('更新失敗，請稍後再試');
+    });
+}
+
+// 刪除權限
+function deletePermission(permissionId) {
+    if (confirm('確定要刪除此權限嗎？此操作無法復原。')) {
+        fetch(`/backend/permission/delete/${permissionId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.text())
+        .then(result => {
+            if (result === 'success') {
+                alert('權限刪除成功！');
+                location.reload();
+            } else {
+                alert('刪除失敗：' + result);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('刪除失敗，請稍後再試');
+        });
+    }
+}
+</script>
 </body>
 </html>

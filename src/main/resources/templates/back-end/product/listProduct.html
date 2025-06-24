@@ -39,29 +39,27 @@
             <div class="row mb-4">
                 <div class="col-md-4">
                     <div class="input-group">
-                  <span class="input-group-text"
-                  ><i class="bi bi-search"></i
-                  ></span>
-                        <input
-                                type="text"
-                                class="form-control"
-                                placeholder="搜尋商品名稱、標號"
-                        />
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="searchInput" placeholder="搜尋商品名稱、編號" />
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <select class="form-select">
-                        <option>全部類別</option>
-                        <option>分類1</option>
-                        <option>分類2</option>
-                        <option>分類3</option>
+                    <select class="form-select" id="categoryFilter">
+                        <option value="">全部類別</option>
+                        <option th:each="cat : ${category}" 
+                                th:value="${cat.productCategoryId}" 
+                                th:text="${cat.productCategoryName}"
+                                th:selected="${cat.productCategoryId != null and cat.productCategoryId == selectedCategoryId}">
+                        </option>
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <select class="form-select">
-                        <option>全部狀態</option>
-                        <option>上架</option>
-                        <option>下架</option>
+                    <select class="form-select" id="statusFilter">
+                        <option value="">全部狀態</option>
+                        <option value="1" th:selected="${selectedStatus != null and selectedStatus == 1}">上架</option>
+                        <option value="0" th:selected="${selectedStatus != null and selectedStatus == 0}">下架</option>
                     </select>
                 </div>
             </div>
@@ -146,53 +144,52 @@
 
                 </div>
             </div>
-            <form th:action="@{/product/new}" th:object="${product}" method="post">
+            <form th:object="${product}" method="post" id="addProductForm" novalidate>
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="productName" class="form-label">商品名稱</label>
+                        <label for="productName" class="form-label">商品名稱 <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="productName" th:field="*{productName}" required>
-                        <div class="text-danger" th:if="${#fields.hasErrors('productName')}"
-                             th:errors="*{productName}"></div>
+                        <div class="invalid-feedback">請輸入商品名稱</div>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="productPrice" class="form-label">價格</label>
-                        <input type="number" class="form-control" id="productPrice" th:field="*{productPrice}" required>
-                        <div class="text-danger" th:if="${#fields.hasErrors('productPrice')}"
-                             th:errors="*{productPrice}"></div>
+                        <label for="productPrice" class="form-label">價格 <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="productPrice" th:field="*{productPrice}" required min="1">
+                        <div class="invalid-feedback">請輸入有效的價格（必須大於0）</div>
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label for="productDescription" class="form-label">商品描述</label>
-                    <textarea class="form-control" id="productDescription" th:field="*{productDescription}"
-                              rows="3"></textarea>
+                    <label for="productDescription" class="form-label">商品描述 <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="productDescription" th:field="*{productDescription}" rows="3" required></textarea>
+                    <div class="invalid-feedback">請輸入商品描述</div>
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="productQuantity" class="form-label">庫存量</label>
-                        <input type="number" class="form-control" id="productQuantity" th:field="*{productQuantity}"
-                               required>
-                        <div class="text-danger" th:if="${#fields.hasErrors('productQuantity')}"
-                             th:errors="*{productQuantity}"></div>
+                        <label for="productQuantity" class="form-label">庫存量 <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="productQuantity" th:field="*{productQuantity}" required min="0">
+                        <div class="invalid-feedback">請輸入有效的庫存量（必須大於等於0）</div>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="productStatus" class="form-label">狀態</label>
-                        <select class="form-select" id="productStatus" th:field="*{productStatus}">
+                        <label for="productStatus" class="form-label">狀態 <span class="text-danger">*</span></label>
+                        <select class="form-select" id="productStatus" th:field="*{productStatus}" required>
+                            <option value="">請選擇狀態</option>
                             <option th:value="1" th:selected="*{productStatus == 1}">上架</option>
                             <option th:value="0" th:selected="*{productStatus == 0}">下架</option>
                         </select>
+                        <div class="invalid-feedback">請選擇商品狀態</div>
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label for="productCategory" class="form-label">商品類別</label>
+                    <label for="productCategory" class="form-label">商品類別 <span class="text-danger">*</span></label>
                     <select class="form-select" id="productCategory" name="productCategory.productCategoryId" required>
-                        <option value="" disabled th:selected="${product.productCategory == null}">請選擇類別</option>
+                        <option value="">請選擇類別</option>
                         <option th:each="cat : ${category}"
                                 th:value="${cat.productCategoryId}"
                                 th:text="${cat.productCategoryName}"
                                 th:selected="${product.productCategory != null} ? ${cat.productCategoryId} == ${product.productCategory.productCategoryId} : false">
                         </option>
                     </select>
+                    <div class="invalid-feedback">請選擇商品類別</div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -222,62 +219,61 @@
 
                 </div>
             </div>
-            <form th:action="@{/product/edit}" th:object="${product}" method="post">
-                <input type="hidden" th:field="*{productId}">
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="productName" class="form-label">商品名稱</label>
-                            <input type="text" class="form-control" id="editProductName" th:field="*{productName}" required>
-                            <div class="text-danger" th:if="${#fields.hasErrors('productName')}"
-                                 th:errors="*{productName}"></div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="productPrice" class="form-label">價格</label>
-                            <input type="number" class="form-control" id="editProductPrice" th:field="*{productPrice}" required>
-                            <div class="text-danger" th:if="${#fields.hasErrors('productPrice')}"
-                                 th:errors="*{productPrice}"></div>
-                        </div>
+            <form th:object="${product}" method="post" id="editProductForm" novalidate>
+            <div class="modal-body">
+                <input type="hidden" name="productId" />
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="editProductName" class="form-label">商品名稱 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="editProductName" th:field="*{productName}" required>
+                        <div class="invalid-feedback">請輸入商品名稱</div>
                     </div>
-                    <div class="mb-3">
-                        <label for="productDescription" class="form-label">商品描述</label>
-                        <textarea class="form-control" id="editProductDescription" th:field="*{productDescription}"
-                                  rows="3"></textarea>
+                    <div class="col-md-6 mb-3">
+                        <label for="editProductPrice" class="form-label">價格 <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="editProductPrice" th:field="*{productPrice}" required min="1">
+                        <div class="invalid-feedback">請輸入有效的價格（必須大於0）</div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="productQuantity" class="form-label">庫存量</label>
-                            <input type="number" class="form-control" id="editProductQuantity" th:field="*{productQuantity}"
-                                   required>
-                            <div class="text-danger" th:if="${#fields.hasErrors('productQuantity')}"
-                                 th:errors="*{productQuantity}"></div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="productStatus" class="form-label">狀態</label>
-                            <select class="form-select" id="editProductStatus" th:field="*{productStatus}">
-                                <option th:value="1" th:selected="*{productStatus == 1}">上架</option>
-                                <option th:value="0" th:selected="*{productStatus == 0}">下架</option>
-                            </select>
-                        </div>
+                </div>
+                <div class="mb-3">
+                    <label for="editProductDescription" class="form-label">商品描述 <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="editProductDescription" th:field="*{productDescription}" rows="3" required></textarea>
+                    <div class="invalid-feedback">請輸入商品描述</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="editProductQuantity" class="form-label">庫存量 <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="editProductQuantity" th:field="*{productQuantity}" required min="0">
+                        <div class="invalid-feedback">請輸入有效的庫存量（必須大於等於0）</div>
                     </div>
-                    <div class="mb-3">
-                        <label for="productCategory" class="form-label">商品類別</label>
-                        <select class="form-select" id="editProductCategory" name="productCategory.productCategoryId" required>
-                            <option value="" disabled th:selected="${product.productCategory == null}">請選擇類別</option>
-                            <option th:each="cat : ${category}"
-                                    th:value="${cat.productCategoryId}"
-                                    th:text="${cat.productCategoryName}"
-                                    th:selected="${product.productCategory != null} ? ${cat.productCategoryId} == ${product.productCategory.productCategoryId} : false">
-                            </option>
+                    <div class="col-md-6 mb-3">
+                        <label for="editProductStatus" class="form-label">狀態 <span class="text-danger">*</span></label>
+                        <select class="form-select" id="editProductStatus" th:field="*{productStatus}" required>
+                            <option value="">請選擇狀態</option>
+                            <option th:value="1" th:selected="*{productStatus == 1}">上架</option>
+                            <option th:value="0" th:selected="*{productStatus == 0}">下架</option>
                         </select>
+                        <div class="invalid-feedback">請選擇商品狀態</div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="submit" class="btn btn-success">
-                        <i class="bi bi-check-circle me-2"></i>儲存
-                    </button>
+                <div class="mb-3">
+                    <label for="editProductCategory" class="form-label">商品類別 <span class="text-danger">*</span></label>
+                    <select class="form-select" id="editProductCategory" name="productCategory.productCategoryId" required>
+                        <option value="">請選擇類別</option>
+                        <option th:each="cat : ${category}"
+                                th:value="${cat.productCategoryId}"
+                                th:text="${cat.productCategoryName}"
+                                th:selected="${product.productCategory != null} ? ${cat.productCategoryId} == ${product.productCategory.productCategoryId} : false">
+                        </option>
+                    </select>
+                    <div class="invalid-feedback">請選擇商品類別</div>
                 </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-2"></i>儲存
+                </button>
+            </div>
             </form>
         </div>
     </div>
@@ -285,32 +281,135 @@
 
 
 <script>
+    // 商品搜尋功能
+    document.getElementById('searchInput').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const table = $('#productTable').DataTable();
+        
+        // 自定義搜尋函數，只搜尋編號（第0欄）和名字（第2欄）
+        $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+            const productId = data[0].toLowerCase(); // 編號欄位
+            const productName = data[2].toLowerCase(); // 名字欄位
+            
+            return productId.includes(searchTerm) || productName.includes(searchTerm);
+        });
+        
+        // 清除之前的搜尋結果
+        table.draw();
+        
+        // 移除自定義搜尋函數
+        $.fn.dataTable.ext.search.pop();
+    });
+
+    // 商品類別篩選功能
+    document.getElementById('categoryFilter').addEventListener('change', function() {
+        const categoryId = this.value;
+        const statusFilter = document.getElementById('statusFilter').value;
+        const url = new URL(window.location);
+        
+        if (categoryId) {
+            url.searchParams.set('categoryId', categoryId);
+        } else {
+            url.searchParams.delete('categoryId');
+        }
+        
+        if (statusFilter) {
+            url.searchParams.set('status', statusFilter);
+        } else {
+            url.searchParams.delete('status');
+        }
+        
+        window.location.href = url.toString();
+    });
+
+    // 商品狀態篩選功能
+    document.getElementById('statusFilter').addEventListener('change', function() {
+        const status = this.value;
+        const categoryFilter = document.getElementById('categoryFilter').value;
+        const url = new URL(window.location);
+        
+        if (status) {
+            url.searchParams.set('status', status);
+        } else {
+            url.searchParams.delete('status');
+        }
+        
+        if (categoryFilter) {
+            url.searchParams.set('categoryId', categoryFilter);
+        } else {
+            url.searchParams.delete('categoryId');
+        }
+        
+        window.location.href = url.toString();
+    });
+
     // 綁定「新增商品」與「修改商品」兩個 Modal 底下的 form submit
-    document.querySelectorAll('#addProductModal form, #editProductModal form')
+    document.querySelectorAll('#addProductForm, #editProductForm')
         .forEach(form => {
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
+                
+                // 清除之前的驗證狀態
+                form.classList.remove('was-validated');
+                
+                // 執行前端驗證
+                if (!form.checkValidity()) {
+                    form.classList.add('was-validated');
+                    return;
+                }
+                
                 const f = e.target;
 
                 // 判斷目前是新增還是編輯
-                const isEdit = f.productId && f.productId.value.trim() !== '';
+                const isEdit = f.id === 'editProductForm';
 
                 // 收集要送出的資料
                 const data = {
                     // 編輯模式才需帶入 productId
-                    ...(isEdit && { productId: f.productId.value }),
-                    productName:        f.productName.value,
-                    productPrice:       f.productPrice.value,
-                    productDescription: f.productDescription.value,
-                    productQuantity:    f.productQuantity.value,
-                    productStatus:      f.productStatus.value,
+                    ...(isEdit && { productId: parseInt(f.querySelector('input[name="productId"]').value) }),
+                    productName: f.querySelector('[name="productName"]').value.trim(),
+                    productPrice: parseInt(f.querySelector('[name="productPrice"]').value),
+                    productDescription: f.querySelector('[name="productDescription"]').value.trim(),
+                    productQuantity: parseInt(f.querySelector('[name="productQuantity"]').value),
+                    productStatus: parseInt(f.querySelector('[name="productStatus"]').value),
                     productCategory: {
-                        productCategoryId: f['productCategory.productCategoryId'].value
+                        productCategoryId: parseInt(f.querySelector('[name="productCategory.productCategoryId"]').value)
                     }
                 };
 
+                // 額外的前端驗證
+                if (data.productName.length === 0) {
+                    showFieldError(f.querySelector('[name="productName"]'), '請輸入商品名稱');
+                    return;
+                }
+                
+                if (data.productPrice <= 0) {
+                    showFieldError(f.querySelector('[name="productPrice"]'), '價格必須大於0');
+                    return;
+                }
+                
+                if (data.productDescription.length === 0) {
+                    showFieldError(f.querySelector('[name="productDescription"]'), '請輸入商品描述');
+                    return;
+                }
+                
+                if (data.productQuantity < 0) {
+                    showFieldError(f.querySelector('[name="productQuantity"]'), '庫存量不能小於0');
+                    return;
+                }
+                
+                if (!data.productStatus && data.productStatus !== 0) {
+                    showFieldError(f.querySelector('[name="productStatus"]'), '請選擇商品狀態');
+                    return;
+                }
+                
+                if (!data.productCategory.productCategoryId) {
+                    showFieldError(f.querySelector('[name="productCategory.productCategoryId"]'), '請選擇商品類別');
+                    return;
+                }
+
                 // 決定要呼叫的 API 路徑
-                const url = isEdit ? '/product/edit' : '/product/add';
+                const url = isEdit ? '/backend/product/edit' : '/backend/product/add';
 
                 try {
                     const resp = await fetch(url, {
@@ -320,17 +419,116 @@
                     });
 
                     if (resp.ok) {
-                        alert(`商品${isEdit ? '修改' : '新增'}成功！`);  // 先弹窗
-                        window.location.href = '/backend/product/list'; // 再跳转
+                        alert(`商品${isEdit ? '修改' : '新增'}成功！`);
+                        window.location.href = '/backend/product/list';
                     } else {
-                        alert('儲存失敗');
+                        const errorText = await resp.text();
+                        alert('儲存失敗: ' + errorText);
                     }
                 } catch (err) {
-                    console.error(err);
+                    console.error('網路錯誤:', err);
                     alert('儲存失敗，請稍後再試');
                 }
             });
         });
+
+    // 顯示欄位錯誤的函數
+    function showFieldError(field, message) {
+        field.classList.add('is-invalid');
+        const feedback = field.parentNode.querySelector('.invalid-feedback');
+        if (feedback) {
+            feedback.textContent = message;
+        }
+    }
+
+    // 清除欄位錯誤的函數
+    function clearFieldError(field) {
+        field.classList.remove('is-invalid');
+        field.classList.remove('is-valid');
+    }
+
+    // 即時驗證功能
+    document.addEventListener('DOMContentLoaded', function() {
+        // 商品名稱驗證
+        document.querySelectorAll('#productName, #editProductName').forEach(field => {
+            field.addEventListener('input', function() {
+                if (this.value.trim().length > 0) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                }
+            });
+        });
+
+        // 價格驗證
+        document.querySelectorAll('#productPrice, #editProductPrice').forEach(field => {
+            field.addEventListener('input', function() {
+                const value = parseInt(this.value);
+                if (value > 0) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                }
+            });
+        });
+
+        // 商品描述驗證
+        document.querySelectorAll('#productDescription, #editProductDescription').forEach(field => {
+            field.addEventListener('input', function() {
+                if (this.value.trim().length > 0) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                }
+            });
+        });
+
+        // 庫存量驗證
+        document.querySelectorAll('#productQuantity, #editProductQuantity').forEach(field => {
+            field.addEventListener('input', function() {
+                const value = parseInt(this.value);
+                if (value >= 0) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                }
+            });
+        });
+
+        // 狀態驗證
+        document.querySelectorAll('#productStatus, #editProductStatus').forEach(field => {
+            field.addEventListener('change', function() {
+                if (this.value !== '') {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                }
+            });
+        });
+
+        // 類別驗證
+        document.querySelectorAll('#productCategory, #editProductCategory').forEach(field => {
+            field.addEventListener('change', function() {
+                if (this.value !== '') {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                }
+            });
+        });
+    });
 
     // 編輯 Modal 打開時，自動把按鈕上的 data-* 值帶入表單欄位
     const editModal = document.getElementById('editProductModal');
@@ -381,6 +579,8 @@
 
 </script>
 
+<!-- ===== 載入統一腳本 ===== -->
+<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
 
 </body>
 </html>

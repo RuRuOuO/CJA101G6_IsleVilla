@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>員工系統</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+        font-family: "Arial", sans-serif;
+      }
+
+      .auth-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .auth-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        padding: 2rem;
+      }
+
+      #loginCard {
+        max-width: 400px;
+        margin: 32px auto;
+      }
+
+      .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .auth-header h2 {
+        color: #333;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .auth-header p {
+        color: #666;
+        margin: 0;
+      }
+
+      .form-control,
+      .form-select {
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .form-control:focus,
+      .form-select:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+      }
+
+      .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        border-radius: 6px;
+        padding: 0.75rem;
+        font-weight: 500;
+      }
+
+      .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+      }
+
+      .invalid-feedback {
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-top: 5px;
+        color: #e74a3b;
+        display: none;
+      }
+      .is-invalid {
+        border-color: #e74a3b !important;
+        animation: shake 0.5s ease-in-out;
+      }
+      .is-valid {
+        border-color: #1cc88a !important;
+      }
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        10%,
+        30%,
+        50%,
+        70%,
+        90% {
+          transform: translateX(-10px);
+        }
+        20%,
+        40%,
+        60%,
+        80% {
+          transform: translateX(10px);
+        }
+      }
+      /* 完全比照會員登入input-group最終解法，icon/input/btn高度、圓角、行高、padding一致 */
+      .input-group {
+        align-items: stretch; /* 讓所有子元素高度一致 */
+      }
+      .input-group-text,
+      .input-group .form-control,
+      .input-group .btn {
+        height: 48px; /* 或你想要的高度 */
+        padding: 0 15px;
+        font-size: 1.1rem;
+        border-radius: 10px;
+        border: 2px solid #e3e6f0;
+        box-sizing: border-box;
+      }
+      .input-group-text {
+        background-color: #f8f9fc;
+        border-right: none;
+        color: #6e707e;
+        border-radius: 10px 0 0 10px;
+        display: flex;
+        align-items: center;
+      }
+      .input-group .form-control {
+        border-left: none;
+        border-radius: 0 10px 10px 0;
+        border-right: none;
+        background: #fff;
+      }
+      .input-group .btn {
+        border-left: none;
+        border-radius: 0 10px 10px 0;
+        background: #fff;
+        color: #6e707e;
+        border-right: 2px solid #e3e6f0;
+        display: flex;
+        align-items: center;
+      }
+      .input-group .form-control:focus {
+        border-color: #4e73df;
+        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.15);
+      }
+      /* 修復沒有 input-group-text 時 input-group 左邊邊框消失問題 */
+      .input-group .form-control {
+        border-radius: 10px;
+        border-left: 2px solid #e3e6f0;
+      }
+      .input-group .form-control + .btn {
+        border-radius: 0 10px 10px 0;
+      }
+      .input-group-text + .form-control {
+        border-radius: 0 10px 10px 0;
+        border-left: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="auth-container" style="padding-top: 48px; padding-bottom: 48px">
+      <!-- 登入表單 -->
+      <div id="loginCard" class="auth-card">
+        <div id="loginForm">
+          <div class="auth-header">
+            <h2>員工登入</h2>
+            <p>請輸入您的帳號密碼</p>
+          </div>
+
+          <div th:if="${param.error}" class="alert alert-danger" role="alert">
+            <span th:text="${param.error}">登入失敗：帳號或密碼錯誤</span>
+          </div>
+          <div th:if="${param.logout}" class="alert alert-success" role="alert">
+            成功登出
+          </div>
+          <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}">
+          </div>
+
+          <form th:action="@{/backend/login/process}" method="post">
+            <label for="loginEmail" class="form-label">電子信箱</label>
+            <div class="input-group">
+              <span class="input-group-text"
+                ><i class="fas fa-envelope"></i
+              ></span>
+              <input
+                type="email"
+                name="email"
+                id="loginEmail"
+                class="form-control"
+                placeholder="請輸入電子信箱"
+                required
+              />
+            </div>
+
+            <label for="loginPassword" class="form-label">密碼</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-lock"></i></span>
+              <input
+                type="password"
+                name="password"
+                id="loginPassword"
+                class="form-control"
+                placeholder="請輸入密碼"
+                required
+              />
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                id="toggleLoginPassword"
+                tabindex="-1"
+              >
+                <i class="fas fa-eye" id="toggleLoginIcon"></i>
+              </button>
+            </div>
+            <div class="invalid-feedback" id="loginPasswordError"></div>
+
+            <div class="form-check mb-2">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="rememberMe"
+                name="remember-me"
+              />
+              <label class="form-check-label" for="rememberMe">記住我</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">登入</button>
+            <div class="text-end mt-2">
+              <a
+                href="/member/forgot-password"
+                class="link-secondary"
+                style="font-size: 0.95em"
+                >忘記密碼？</a
+              >
+            </div>
+          </form>
+
+          <div class="text-center mt-3">
+            <p class="text-muted">
+              員工帳號由管理員統一管理，如有問題請聯繫系統管理員
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // 密碼顯示/隱藏切換
+      document.getElementById('toggleLoginPassword').addEventListener('click', function() {
+        const passwordInput = document.getElementById('loginPassword');
+        const icon = document.getElementById('toggleLoginIcon');
+        
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+          icon.classList.remove('fa-eye');
+          icon.classList.add('fa-eye-slash');
+        } else {
+          passwordInput.type = 'password';
+          icon.classList.remove('fa-eye-slash');
+          icon.classList.add('fa-eye');
+        }
+      });
+    </script>
+  </body>
+</html>
