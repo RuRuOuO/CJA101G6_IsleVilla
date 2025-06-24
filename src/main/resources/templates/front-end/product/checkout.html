@@ -198,19 +198,19 @@
                         <div class="mb-4" th:if="${!availableCoupons.isEmpty()}">
                             <label class="form-label"><strong>選擇優惠券</strong></label>
                             <div class="coupon-list">
-                                <div th:each="memberCoupon : ${availableCoupons}" class="coupon-item">
+                                <div th:each="coupon : ${availableCoupons}" class="coupon-item">
                                     <input type="radio" name="selectedCouponId" 
-                                           th:value="${memberCoupon.coupon.couponId}" 
-                                           th:id="'coupon-' + ${memberCoupon.coupon.couponId}"
+                                           th:value="${coupon.couponId}" 
+                                           th:id="'coupon-' + ${coupon.couponId}"
                                            class="coupon-radio">
-                                    <label th:for="'coupon-' + ${memberCoupon.coupon.couponId}" class="coupon-label">
+                                    <label th:for="'coupon-' + ${coupon.couponId}" class="coupon-label">
                                         <div class="coupon-info">
-                                            <div class="coupon-code" th:text="${memberCoupon.coupon.couponCode}"></div>
+                                            <div class="coupon-code" th:text="${coupon.couponCode}"></div>
                                             <div class="coupon-desc">
-                                                折扣 NT$ <span th:text="${memberCoupon.coupon.discountValue}"></span>
+                                                折扣 NT$ <span th:text="${coupon.discountValue}"></span>
                                                 <br>
                                                 <small class="text-muted">
-                                                    最低消費 NT$ <span th:text="${memberCoupon.coupon.minSpend}"></span>
+                                                    最低消費 NT$ <span th:text="${coupon.minSpend}"></span>
                                                 </small>
                                             </div>
                                         </div>
@@ -326,6 +326,9 @@
                         <h5>實付金額</h5>
                         <h5>NT$ <span id="finalAmount" th:text="${totalAmount}"></span></h5>
                     </div>
+                    
+                    <!-- 隱藏的總金額欄位，供JavaScript使用 -->
+                    <input type="hidden" id="totalAmountValue" th:value="${totalAmount}">
                 </div>
             </div>
         </div>
@@ -367,10 +370,8 @@
         const discountAmount = document.getElementById('discountAmount');
         const finalAmount = document.getElementById('finalAmount');
         
-        // 從頁面中獲取總金額 - 使用更簡單的選擇器
-        const totalAmountText = document.querySelector('.order-summary .d-flex:first-child').textContent;
-        const totalAmountMatch = totalAmountText.match(/NT\$ (\d+)/);
-        const totalAmount = totalAmountMatch ? parseInt(totalAmountMatch[1]) : 0;
+        // 從隱藏的輸入欄位獲取總金額
+        const totalAmount = parseInt(document.getElementById('totalAmountValue').value) || 0;
         
         console.log('總金額:', totalAmount); // 調試信息
         
@@ -380,13 +381,19 @@
             const radio = item.querySelector('input[type="radio"]');
             if (radio && radio.value) {
                 const discountText = item.querySelector('.coupon-desc').textContent;
-                const discountMatch = discountText.match(/NT\$ (\d+)/);
+                console.log('優惠券文本:', discountText); // 調試信息
+                // 改進正則表達式，更準確地匹配折扣金額
+                const discountMatch = discountText.match(/折扣 NT\$ (\d+)/);
                 if (discountMatch) {
                     couponDiscounts[radio.value] = parseInt(discountMatch[1]);
                     console.log('優惠券折扣:', radio.value, couponDiscounts[radio.value]); // 調試信息
+                } else {
+                    console.log('無法解析折扣金額:', discountText); // 調試信息
                 }
             }
         });
+        
+        console.log('所有優惠券折扣映射:', couponDiscounts); // 調試信息
         
         // 初始化實付金額顯示
         finalAmount.textContent = totalAmount;
@@ -418,9 +425,11 @@
                 let discount = 0;
                 if (this.value && this.value !== '') {
                     discount = couponDiscounts[this.value] || 0;
+                    console.log('查找優惠券ID:', this.value, '在映射中找到:', couponDiscounts[this.value]); // 調試信息
                 }
                 
                 console.log('選擇的優惠券:', this.value, '折扣金額:', discount); // 調試信息
+                console.log('總金額:', totalAmount, '折扣:', discount, '實付金額:', totalAmount - discount); // 調試信息
                 
                 // 更新顯示
                 if (discount > 0) {

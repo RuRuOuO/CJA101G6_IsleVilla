@@ -35,8 +35,7 @@
             <!-- 內容 -->
             <div class="col-12">
                 <label for="newsContent" class="form-label">內容</label>
-                <textarea id="newsContent" th:field="*{newsContent}" onclick="hideContent('newsContent.errors')"
-                          class="form-control" rows="4"></textarea>
+                <textarea id="newsContent" th:field="*{newsContent}" maxlength="1000" rows="4" class="form-control"></textarea>
                 <span class="text-danger" id="newsContent.errors" th:if="${#fields.hasErrors('newsContent')}"
                       th:errors="*{newsContent}"></span>
             </div>
@@ -58,6 +57,18 @@
                 <select id="newsStatus" th:field="*{newsStatus}" class="form-select">
                     <option value="1">上架</option>
                     <option value="0">下架</option>
+                </select>
+            </div>
+            <!-- 對應優惠專案-->
+            <div class="col-12">
+                <label for="promotion">對應優惠專案</label>
+                <select id="promotion" name="promotion.roomPromotionId" class="form-control">
+                    <option value="">無</option>
+                    <th:block th:each="promotion : ${promotionList}">
+                        <option th:value="${promotion.roomPromotionId}"
+                                th:text="${promotion.roomPromotionTitle}">
+                        </option>
+                    </th:block>
                 </select>
             </div>
 
