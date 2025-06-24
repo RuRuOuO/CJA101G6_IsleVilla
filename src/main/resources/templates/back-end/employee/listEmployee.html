@@ -150,7 +150,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="addEmployeeForm" novalidate>
+                <form id="addEmployeeForm" novalidate enctype="multipart/form-data">
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">員工姓名 <span class="text-danger">*</span></label>
@@ -231,6 +231,10 @@
                         <input type="text" class="form-control" name="employeeAddress" required>
                         <div class="invalid-feedback">請輸入地址</div>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">員工照片</label>
+                        <input type="file" class="form-control" name="employeePhoto" accept="image/*">
+                    </div>
                     
                     <!-- 權限設定區塊 -->
                     <div class="mb-3">
@@ -275,7 +279,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="editEmployeeForm" novalidate>
+                <form id="editEmployeeForm" novalidate enctype="multipart/form-data">
                     <input type="hidden" id="editEmployeeId" name="employeeId">
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -311,6 +315,10 @@
                             </select>
                             <div class="invalid-feedback">請選擇員工狀態</div>
                         </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">員工照片</label>
+                        <input type="file" class="form-control" name="employeePhoto" accept="image/*">
                     </div>
                     
                     <!-- 權限設定區塊 -->
@@ -430,124 +438,34 @@ function clearAddEmployeeForm() {
 // 新增員工
 function saveEmployee() {
     const form = document.getElementById('addEmployeeForm');
-    
-    // 清除之前的驗證狀態
     form.classList.remove('was-validated');
-    
-    // 執行前端驗證
     if (!form.checkValidity()) {
         form.classList.add('was-validated');
         return;
     }
-    
     const formData = new FormData(form);
-    
     // 驗證密碼
     const password = formData.get('employeePassword');
     const confirmPassword = formData.get('confirmPassword');
-    
     if (password !== confirmPassword) {
         showFieldError(form.querySelector('[name="confirmPassword"]'), '密碼與確認密碼不一致！');
         return;
     }
-    
     if (password.length < 6) {
         showFieldError(form.querySelector('[name="employeePassword"]'), '密碼至少需要6個字元！');
         return;
     }
-    
-    // 收集選中的權限
+    // 權限
     const selectedPermissions = [];
-    const permissionCheckboxes = form.querySelectorAll('input[name="permissions"]:checked');
-    permissionCheckboxes.forEach(checkbox => {
-        selectedPermissions.push(checkbox.value);
-    });
-    
-    // 驗證權限
+    form.querySelectorAll('input[name="permissions"]:checked').forEach(cb => selectedPermissions.push(cb.value));
     if (selectedPermissions.length === 0) {
         showFieldError(form.querySelector('.form-check'), '請至少選擇一個權限');
         return;
     }
-    
-    // 額外的前端驗證
-    const employeeName = formData.get('employeeName').trim();
-    const employeeEmail = formData.get('employeeEmail').trim();
-    const employeeMobile = formData.get('employeeMobile').trim();
-    const employeeAddress = formData.get('employeeAddress').trim();
-    const departmentId = formData.get('departmentId');
-    const employeeGender = formData.get('employeeGender');
-    const employeeBirthdate = formData.get('employeeBirthdate');
-    const employeeHiredate = formData.get('employeeHiredate');
-    const employeeStatus = formData.get('employeeStatus');
-    
-    if (employeeName.length === 0) {
-        showFieldError(form.querySelector('[name="employeeName"]'), '請輸入員工姓名');
-        return;
-    }
-    
-    if (employeeEmail.length === 0) {
-        showFieldError(form.querySelector('[name="employeeEmail"]'), '請輸入員工信箱');
-        return;
-    }
-    
-    if (!isValidEmail(employeeEmail)) {
-        showFieldError(form.querySelector('[name="employeeEmail"]'), '請輸入有效的信箱格式');
-        return;
-    }
-    
-    if (!isValidMobile(employeeMobile)) {
-        showFieldError(form.querySelector('[name="employeeMobile"]'), '請輸入正確的手機號碼格式');
-        return;
-    }
-    
-    if (employeeAddress.length === 0) {
-        showFieldError(form.querySelector('[name="employeeAddress"]'), '請輸入地址');
-        return;
-    }
-    
-    if (!departmentId) {
-        showFieldError(form.querySelector('[name="departmentId"]'), '請選擇部門');
-        return;
-    }
-    
-    if (!employeeGender) {
-        showFieldError(form.querySelector('[name="employeeGender"]'), '請選擇性別');
-        return;
-    }
-    
-    if (!employeeBirthdate) {
-        showFieldError(form.querySelector('[name="employeeBirthdate"]'), '請選擇生日');
-        return;
-    }
-    
-    if (!employeeHiredate) {
-        showFieldError(form.querySelector('[name="employeeHiredate"]'), '請選擇到職日');
-        return;
-    }
-    
-    if (!employeeStatus) {
-        showFieldError(form.querySelector('[name="employeeStatus"]'), '請選擇員工狀態');
-        return;
-    }
-    
-    // 建立請求資料
-    const requestData = new FormData();
-    requestData.append('employeeName', employeeName);
-    requestData.append('employeeEmail', employeeEmail);
-    requestData.append('employeePassword', password);
-    requestData.append('departmentId', departmentId);
-    requestData.append('employeeMobile', employeeMobile);
-    requestData.append('employeeGender', employeeGender);
-    requestData.append('employeeBirthdate', employeeBirthdate);
-    requestData.append('employeeHiredate', employeeHiredate);
-    requestData.append('employeeStatus', employeeStatus);
-    requestData.append('employeeAddress', employeeAddress);
-    requestData.append('permissions', JSON.stringify(selectedPermissions));
-    
-    // 發送請求
+    formData.set('permissions', JSON.stringify(selectedPermissions));
     fetch('/backend/employee/add', {
         method: 'POST',
-        body: requestData
+        body: formData
     })
     .then(response => response.text())
     .then(result => {
@@ -606,75 +524,23 @@ function editEmployee(employeeId) {
 // 儲存員工編輯
 function saveEmployeeEdit() {
     const form = document.getElementById('editEmployeeForm');
-    
-    // 清除之前的驗證狀態
     form.classList.remove('was-validated');
-    
-    // 執行前端驗證
     if (!form.checkValidity()) {
         form.classList.add('was-validated');
         return;
     }
-    
     const formData = new FormData(form);
-    
-    // 收集選中的權限
+    // 權限
     const selectedPermissions = [];
-    const permissionCheckboxes = form.querySelectorAll('input[name="permissions"]:checked');
-    permissionCheckboxes.forEach(checkbox => {
-        selectedPermissions.push(checkbox.value);
-    });
-    
-    // 驗證權限
+    form.querySelectorAll('input[name="permissions"]:checked').forEach(cb => selectedPermissions.push(cb.value));
     if (selectedPermissions.length === 0) {
         showFieldError(form.querySelector('.form-check'), '請至少選擇一個權限');
         return;
     }
-    
-    // 額外的前端驗證
-    const employeeName = formData.get('employeeName').trim();
-    const employeeEmail = formData.get('employeeEmail').trim();
-    const departmentId = formData.get('departmentId');
-    const employeeStatus = formData.get('employeeStatus');
-    
-    if (employeeName.length === 0) {
-        showFieldError(form.querySelector('[name="employeeName"]'), '請輸入員工姓名');
-        return;
-    }
-    
-    if (employeeEmail.length === 0) {
-        showFieldError(form.querySelector('[name="employeeEmail"]'), '請輸入員工信箱');
-        return;
-    }
-    
-    if (!isValidEmail(employeeEmail)) {
-        showFieldError(form.querySelector('[name="employeeEmail"]'), '請輸入有效的信箱格式');
-        return;
-    }
-    
-    if (!departmentId) {
-        showFieldError(form.querySelector('[name="departmentId"]'), '請選擇部門');
-        return;
-    }
-    
-    if (!employeeStatus) {
-        showFieldError(form.querySelector('[name="employeeStatus"]'), '請選擇員工狀態');
-        return;
-    }
-    
-    // 建立請求資料
-    const requestData = new FormData();
-    requestData.append('employeeId', formData.get('employeeId'));
-    requestData.append('employeeName', employeeName);
-    requestData.append('employeeEmail', employeeEmail);
-    requestData.append('departmentId', departmentId);
-    requestData.append('employeeStatus', employeeStatus);
-    requestData.append('permissions', JSON.stringify(selectedPermissions));
-    
-    // 發送請求
+    formData.set('permissions', JSON.stringify(selectedPermissions));
     fetch('/backend/employee/update', {
         method: 'POST',
-        body: requestData
+        body: formData
     })
     .then(response => response.text())
     .then(result => {

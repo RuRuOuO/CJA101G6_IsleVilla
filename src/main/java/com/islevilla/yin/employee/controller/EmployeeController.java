@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders;
 
 import java.util.List;
 
@@ -89,42 +92,33 @@ public class EmployeeController {
                             @RequestParam String employeeHiredate,
                             @RequestParam Byte employeeStatus,
                             @RequestParam String employeeAddress,
-                            @RequestParam String permissions) {
+                            @RequestParam String permissions,
+                            @RequestParam(value = "employeePhoto", required = false) MultipartFile employeePhoto) {
         try {
-            // 建立新員工
             Employee employee = new Employee();
             employee.setEmployeeName(employeeName);
             employee.setEmployeeEmail(employeeEmail);
-            
-            // 加密密碼
             String hashedPassword = passwordEncoder.encode(employeePassword);
             employee.setEmployeePassword(hashedPassword);
-            
             employee.setEmployeeMobile(employeeMobile);
             employee.setEmployeeGender(employeeGender);
             employee.setEmployeeBirthdate(java.time.LocalDate.parse(employeeBirthdate));
             employee.setEmployeeHiredate(java.time.LocalDate.parse(employeeHiredate));
             employee.setEmployeeStatus(employeeStatus);
             employee.setEmployeeAddress(employeeAddress);
-            
-            // 設定部門
             employee.setDepartment(departmentService.getDepartmentById(departmentId));
-            
-            // 解析權限 JSON
             ObjectMapper mapper = new ObjectMapper();
             List<String> permissionNames = mapper.readValue(permissions, new TypeReference<List<String>>() {});
-            
-            // 新增選中的權限
             for (String permissionName : permissionNames) {
                 List<Permission> permissionsList = permissionService.getPermissionsByName(permissionName);
                 if (!permissionsList.isEmpty()) {
                     employee.getPermissions().add(permissionsList.get(0));
                 }
             }
-            
-            // 儲存員工
+            if (employeePhoto != null && !employeePhoto.isEmpty()) {
+                employee.setEmployeePhoto(employeePhoto.getBytes());
+            }
             employeeService.addEmployee(employee);
-            
             return "success";
         } catch (Exception e) {
             return "error: " + e.getMessage();
@@ -139,43 +133,47 @@ public class EmployeeController {
                                @RequestParam String employeeEmail,
                                @RequestParam Integer departmentId,
                                @RequestParam Byte employeeStatus,
-                               @RequestParam String permissions) {
+                               @RequestParam String permissions,
+                               @RequestParam(value = "employeePhoto", required = false) MultipartFile employeePhoto) {
         try {
-            // 取得員工資料
             Employee employee = employeeService.getEmployeeById(employeeId);
             if (employee == null) {
                 return "員工不存在";
             }
-            
-            // 更新基本資料
             employee.setEmployeeName(employeeName);
             employee.setEmployeeEmail(employeeEmail);
             employee.setEmployeeStatus(employeeStatus);
-            
-            // 更新部門
             employee.setDepartment(departmentService.getDepartmentById(departmentId));
-            
-            // 更新權限
-            employee.getPermissions().clear(); // 清除現有權限
-            
-            // 解析權限 JSON
+            employee.getPermissions().clear();
             ObjectMapper mapper = new ObjectMapper();
             List<String> permissionNames = mapper.readValue(permissions, new TypeReference<List<String>>() {});
-            
-            // 新增選中的權限
             for (String permissionName : permissionNames) {
                 List<Permission> permissionsList = permissionService.getPermissionsByName(permissionName);
                 if (!permissionsList.isEmpty()) {
                     employee.getPermissions().add(permissionsList.get(0));
                 }
             }
-            
-            // 儲存更新
+            if (employeePhoto != null && !employeePhoto.isEmpty()) {
+                employee.setEmployeePhoto(employeePhoto.getBytes());
+            }
             employeeService.updateEmployee(employee);
-            
             return "success";
         } catch (Exception e) {
             return "error: " + e.getMessage();
+        }
+    }
+
+    // 取得員工圖片
+    @GetMapping("/photo/{employeeId}")
+    @ResponseBody
+    public ResponseEntity<byte[]> getEmployeePhoto(@PathVariable Integer employeeId) {
+        Employee emp = employeeService.getEmployeeById(employeeId);
+        if (emp != null && emp.getEmployeePhoto() != null) {
+            return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, "image/jpeg")
+                .body(emp.getEmployeePhoto());
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 }
