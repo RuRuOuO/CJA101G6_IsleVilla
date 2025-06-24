@@ -10,10 +10,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.islevilla.lai.members.model.Members;
 import com.islevilla.lai.members.model.MembersService;
+import com.islevilla.lai.shuttle.model.SeatDTO;
 import com.islevilla.lai.shuttle.model.SeatService;
 import com.islevilla.lai.shuttle.model.ShuttleRVFrontEndService;
 import com.islevilla.lai.shuttle.model.ShuttleReservationSeatService;
@@ -22,6 +24,7 @@ import com.islevilla.lai.shuttle.model.ShuttleScheduleService;
 import com.islevilla.lai.shuttle.model.ShuttleScheduleWithAvailabilityDTO;
 import com.islevilla.lai.shuttle.model.ShuttleSeatAvailabilityService;
 import com.islevilla.lai.shuttle.model.TempShuttleRVRequestDTO;
+import com.islevilla.lai.shuttle.model.TempShuttleRVSummaryDTO;
 import com.islevilla.wei.room.model.RoomRVOrder;
 import com.islevilla.wei.room.model.RoomRVOrderService;
 
@@ -187,7 +190,7 @@ public class ShuttleReservationController {
         	System.out.println("抓蟲4");
 
             if (!isValid) {
-            	System.out.println("抓蟲5");
+            	System.out.println("會員編號、訂房編號不匹配，或接駁日期不在住宿期間內，或訂房已取消");
                 model.addAttribute("error", "會員編號、訂房編號不匹配，或接駁日期不在住宿期間內，或訂房已取消");
                 model.addAttribute("reservationRequest", reservationRequest);
                 model.addAttribute("currentStep", 1);
@@ -198,7 +201,7 @@ public class ShuttleReservationController {
             }
 
             // 儲存預約請求並取得ID
-        	System.out.println("抓蟲5");
+        	System.out.println("抓蟲5.1");
             Integer reservationRequestId = shuttleRVFrontEndService.saveReservationRequest(reservationRequest);
             
             // 查詢可用班次
@@ -238,6 +241,102 @@ public class ShuttleReservationController {
         return "front-end/shuttle/shuttle-reservation";
     }
     
+    /**
+     * 選擇班次 - 步驟2 -> 步驟3
+     */
+    @PostMapping("/shuttle/reservation/select-schedule")
+    public String selectSchedule(@RequestParam Integer reservationRequestId,
+                               @RequestParam Integer selectedScheduleId,
+                               HttpSession session,
+                               Model model,
+                               RedirectAttributes redirectAttributes) {
+        // 檢查登入狀態
+        Members member = (Members) session.getAttribute("member");
+        if (member == null) {
+            return "redirect:/member/login";
+        }
+        
+        try {
+            // 取得預約請求資訊
+            TempShuttleRVRequestDTO reservationRequest = shuttleRVFrontEndService.getReservationRequest(reservationRequestId);
+            
+            // 驗證預約請求是否屬於當前會員
+            if (!reservationRequest.getMemberId().equals(member.getMemberId())) {
+                redirectAttributes.addFlashAttribute("error", "無效的預約請求");
+                return "redirect:/shuttle/reservation";
+            }
+
+            // 更新預約請求的班次資訊
+            shuttleRVFrontEndService.updateScheduleSelection(reservationRequestId, selectedScheduleId);
+            
+            // 查詢座位資訊
+            List<SeatDTO> seats = shuttleRVFrontEndService.getSeatsWithAvailability(
+                selectedScheduleId, 
+                reservationRequest.getShuttleDate()
+            );
+
+            model.addAttribute("currentStep", 3);
+            model.addAttribute("reservationRequestId", reservationRequestId);
+            model.addAttribute("seats", seats);
+            model.addAttribute("requiredSeats", reservationRequest.getShuttleNumber());
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "選擇班次時發生錯誤：" + e.getMessage());
+            return "redirect:/shuttle/reservation";
+        }
+
+        return "front-end/shuttle/shuttle-reservation";
+    }
+    
+    /**
+     * 選擇座位 - 步驟3 -> 步驟4
+     */
+    @PostMapping("/shuttle/reservation/select-seats")
+    public String selectSeats(@RequestParam Integer reservationRequestId,
+                            @RequestParam List<Integer> selectedSeatIds,
+                            HttpSession session,
+                            Model model,
+                            RedirectAttributes redirectAttributes) {
+        // 檢查登入狀態
+        Members member = (Members) session.getAttribute("member");
+        if (member == null) {
+            return "redirect:/member/login";
+        }
+
+        try {
+            // 取得預約請求資訊
+            TempShuttleRVRequestDTO reservationRequest = shuttleRVFrontEndService.getReservationRequest(reservationRequestId);
+            
+            // 驗證預約請求是否屬於當前會員
+            if (!reservationRequest.getMemberId().equals(member.getMemberId())) {
+                redirectAttributes.addFlashAttribute("error", "無效的預約請求");
+                return "redirect:/shuttle/reservation";
+            }
+            
+            // 驗證選擇的座位數量
+            if (selectedSeatIds.size() != reservationRequest.getShuttleNumber()) {
+                redirectAttributes.addFlashAttribute("error", 
+                    "選擇的座位數量不正確，需要選擇 " + reservationRequest.getShuttleNumber() + " 個座位");
+                return "redirect:/reservation/step3?id=" + reservationRequestId;
+            }
+
+            // 儲存座位選擇
+            shuttleRVFrontEndService.updateSeatSelection(reservationRequestId, selectedSeatIds);
+            
+            // 取得預約摘要資訊
+            TempShuttleRVSummaryDTO reservationSummary = shuttleRVFrontEndService.getReservationSummary(reservationRequestId);
+
+            model.addAttribute("currentStep", 4);
+            model.addAttribute("reservationRequestId", reservationRequestId);
+            model.addAttribute("reservationSummary", reservationSummary);
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "選擇座位時發生錯誤：" + e.getMessage());
+            return "redirect:/shuttle/reservation/step3?id=" + reservationRequestId;
+        }
+
+        return "front-end/shuttle/shuttle-reservation";
+    }
     
     /**
      * 準備錯誤頁面的輔助方法
