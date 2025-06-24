@@ -15,6 +15,7 @@ import java.util.Base64;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 
 //頁面渲染
 @Controller
@@ -104,15 +105,20 @@ public class ProductController {
         return "front-end/product/listProduct";
     }
 
-    // 取得商品第一張圖片
+    // 取得商品第一張圖片（保留這個方法，刪除用 productPhotoId 查單一圖的方法）
     @GetMapping("/backend/product/photo/{productId}")
     @ResponseBody
     public ResponseEntity<byte[]> getProductPhoto(@PathVariable Integer productId) {
         ProductPhoto photo = productPhotoService.getFirstProductPhotoByProductId(productId);
         if (photo != null && photo.getProductImage() != null) {
+            byte[] img = photo.getProductImage();
+            String contentType = "image/jpeg";
+            if (img.length > 4 && img[0] == (byte)0x89 && img[1] == 0x50 && img[2] == 0x4E && img[3] == 0x47) {
+                contentType = "image/png";
+            }
             return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_TYPE, "image/jpeg")
-                .body(photo.getProductImage());
+                .header(HttpHeaders.CONTENT_TYPE, contentType)
+                .body(img);
         } else {
             return ResponseEntity.notFound().build();
         }
@@ -156,6 +162,46 @@ public class ProductController {
         model.addAttribute("product", product);
         model.addAttribute("category", productCategoryService.getAllProductCategory());
         return "back-end/product/editProduct";
+    }
+
+    // 查詢商品所有圖片（依順序）
+    @GetMapping("/backend/product/photos/{productId}")
+    @ResponseBody
+    public List<ProductPhoto> getProductPhotos(@PathVariable Integer productId) {
+        return productPhotoService.getProductPhotosByProductId(productId);
+    }
+
+    // 儲存圖片新順序
+    @PostMapping("/backend/product/photos/reorder")
+    @ResponseBody
+    public ResponseEntity<?> reorderProductPhotos(@RequestBody List<Integer> photoIds) {
+        for (int i = 0; i < photoIds.size(); i++) {
+            ProductPhoto photo = productPhotoService.getPhotoById(photoIds.get(i));
+            if (photo != null) {
+                photo.setDisplayOrder(i);
+                productPhotoService.save(photo);
+            }
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    // 根據圖片ID取得單一圖片（for 後台多圖預覽）
+    @GetMapping("/backend/product/photo/id/{productPhotoId}")
+    @ResponseBody
+    public ResponseEntity<byte[]> getProductPhotoById(@PathVariable Integer productPhotoId) {
+        ProductPhoto photo = productPhotoService.getPhotoById(productPhotoId);
+        if (photo != null && photo.getProductImage() != null) {
+            byte[] img = photo.getProductImage();
+            String contentType = "image/jpeg";
+            if (img.length > 4 && img[0] == (byte)0x89 && img[1] == 0x50 && img[2] == 0x4E && img[3] == 0x47) {
+                contentType = "image/png";
+            }
+            return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, contentType)
+                .body(img);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }
