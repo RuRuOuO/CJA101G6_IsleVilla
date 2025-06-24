@@ -848,7 +848,7 @@ CREATE TABLE employee (
     employee_name       VARCHAR(30)   NOT NULL,                                  -- 員工姓名
     employee_email      VARCHAR(100)  NOT NULL,                                  -- 員工信箱
     employee_address    VARCHAR(200)  NOT NULL,                                  -- 員工地址
-    employee_mobile     VARCHAR(20)   NOT NULL,                                  -- 員工手機
+    employee_mobile     VARCHAR(20)   NOT NULL,                                  -- 員工手機                                  -- 員工密碼
     employee_gender     TINYINT       NOT NULL  COMMENT '0:男 1:女 2:其它',      -- 員工性別
     employee_birthdate  DATE          NOT NULL,                                  -- 員工生日
     employee_photo      LONGBLOB,                                                -- 員工照片

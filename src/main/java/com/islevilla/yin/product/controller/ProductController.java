@@ -5,6 +5,8 @@ import com.islevilla.yin.productcategory.model.ProductCategoryService;
 import com.islevilla.yin.productphoto.ProductPhoto;
 import com.islevilla.yin.productphoto.ProductPhotoService;
 import com.islevilla.yin.productphoto.ProductWithImageDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -14,20 +16,16 @@ import java.util.List;
 
 //頁面渲染
 @Controller
-@RequestMapping("/product")
 public class ProductController {
-    private final ProductService productService;
-    private final ProductCategoryService productCategoryService;
-    private final ProductPhotoService productPhotoService;
-
-    public ProductController(ProductService productService, ProductCategoryService productCategoryService, ProductPhotoService productPhotoService) {
-        this.productService = productService;
-        this.productCategoryService = productCategoryService;
-        this.productPhotoService = productPhotoService;
-    }
+    @Autowired
+    private ProductService productService;
+    @Autowired
+    private ProductCategoryService productCategoryService;
+    @Autowired
+    private ProductPhotoService productPhotoService;
 
     //前台-商品首頁
-    @GetMapping
+    @GetMapping("/product")
     public String homeProduct(Model model) {
         // 獲取所有產品的資料
         List<Product> products = productService.getAllProducts();
@@ -69,7 +67,7 @@ public class ProductController {
     }
 
     //前台-商品分頁
-    @GetMapping("/list")
+    @GetMapping("/product/list")
     public String homeProduct(@RequestParam(value = "productCategoryId", required = false) Integer productCategoryId, Model model) {
         List<Product> products;
         if (productCategoryId != null) {
@@ -104,31 +102,46 @@ public class ProductController {
         return "front-end/product/listProduct";
     }
 
-    //後台-新增商品頁
-    @GetMapping("backend/new")
-    public String newProduct(Model model) {
-        Product product = new Product();
-        model.addAttribute("product", product);
-        model.addAttribute("category", productCategoryService.getAllProductCategory());
-        return "back-end/product/newProduct";
-    }
 
-    //後台-商品列表頁
-    @GetMapping("backend/list")
-    public String listProduct(Model model) {
-        List<Product> products = productService.getAllProducts();
-        model.addAttribute("product", products);
+
+    //後台-商品列表
+    @GetMapping("/backend/product/list")
+    @PreAuthorize("hasAuthority('product')")
+    public String listProduct(@RequestParam(value = "categoryId", required = false) Integer categoryId,
+                             @RequestParam(value = "status", required = false) Byte status, 
+                             Model model) {
+        List<Product> productList;
+        
+        if (categoryId != null && status != null) {
+            // 根據類別和狀態過濾商品
+            productList = productService.getProductByCategoryIdAndStatus(categoryId, status);
+        } else if (categoryId != null) {
+            // 根據類別過濾商品
+            productList = productService.getProductByProductCategoryId(categoryId);
+        } else if (status != null) {
+            // 根據狀態過濾商品
+            productList = productService.getProductByStatus(status);
+        } else {
+            // 沒有選擇篩選條件時顯示所有商品
+            productList = productService.getAllProducts();
+        }
+        
+        model.addAttribute("productList", productList); // 商品列表
+        model.addAttribute("product", new Product());   // 空的 Product 給 modal 表單用
+        model.addAttribute("category", productCategoryService.getAllProductCategory());
+        model.addAttribute("selectedCategoryId", categoryId);
+        model.addAttribute("selectedStatus", status);
         return "back-end/product/listProduct";
     }
 
     //後台-編輯商品頁
-    @GetMapping("backend/edit/{productId}")
+    @GetMapping("/backend/product/edit/{productId}")
+    @PreAuthorize("hasAuthority('product')")
     public String showEditProductPage(@PathVariable Integer productId, Model model) {
         Product product = productService.getProductById(productId);
         model.addAttribute("product", product);
         model.addAttribute("category", productCategoryService.getAllProductCategory());
         return "back-end/product/editProduct";
     }
-
 
 }
