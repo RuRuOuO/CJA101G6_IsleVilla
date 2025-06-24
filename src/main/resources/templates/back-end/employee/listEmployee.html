@@ -10,7 +10,7 @@
 <body>
 <!-- ===== 載入sidebar ===== -->
 <!-- 插入手機版側邊欄 -->
-<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+<th:block th:replace="~{fragments/backFragments :: mobileSidebar}"></th:block>
 <!-- 插入桌面版側邊欄 -->
 <div th:replace="~{fragments/backFragments :: sidebar}"></div>
 
@@ -69,16 +69,10 @@
                     <thead>
                     <tr>
                         <th>編號</th>
-                        <th>圖片</th>
                         <th>姓名</th>
-                        <th>性別</th>
                         <th>部門</th>
                         <th>信箱</th>
                         <th>手機</th>
-                        <th>生日</th>
-                        <th>到職日</th>
-                        <th>離職日</th>
-                        <th>地址</th>
                         <th>狀態</th>
                         <th>權限</th>
                         <th>操作</th>
@@ -87,27 +81,10 @@
                     <tbody>
                     <tr th:each="employee : ${employees}">
                         <td th:text="${employee.employeeId}">員工編號</td>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <img
-                                        src="https://via.placeholder.com/35x35"
-                                        class="rounded-circle me-2"
-                                        alt="員工圖片"
-                                />
-                            </div>
-                        </td>
                         <td th:text="${employee.employeeName}">姓名</td>
-                        <td>
-                            <span th:if="${employee.employeeGender == 1}">男生</span>
-                            <span th:if="${employee.employeeGender != 1}">女生</span>
-                        </td>
                         <td th:text="${employee.department != null ? employee.department.departmentName : ''}">部門</td>
                         <td th:text="${employee.employeeEmail}">信箱</td>
                         <td th:text="${employee.employeeMobile}">手機</td>
-                        <td th:text="${employee.employeeBirthdate != null ? #temporals.format(employee.employeeBirthdate, 'yyyy-MM-dd') : ''}">生日</td>
-                        <td th:text="${employee.employeeHiredate != null ? #temporals.format(employee.employeeHiredate, 'yyyy-MM-dd') : ''}">到職日</td>
-                        <td th:text="${employee.employeeLeavedate != null ? #temporals.format(employee.employeeLeavedate, 'yyyy-MM-dd') : ''}">離職日</td>
-                        <td th:text="${employee.employeeAddress}">地址</td>
                         <td>
                             <span th:if="${employee.employeeStatus == 1}" class="badge bg-success">在職</span>
                             <span th:if="${employee.employeeStatus == 0}" class="badge bg-danger">離職</span>
@@ -124,11 +101,14 @@
                             </div>
                         </td>
                         <td>
-                            <!-- 修改按鈕 -->
-                            <button class="btn btn-sm btn-primary me-1" 
-                                    th:attr="onclick='editEmployee(' + ${employee.employeeId} + ')'">
-                                <i class="bi bi-pencil"></i>
-                            </button>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <button class="btn btn-sm btn-primary" th:attr="onclick='editEmployee(' + ${employee.employeeId} + ')'">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-info" th:attr="onclick='viewEmployee(' + ${employee.employeeId} + ')'">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     </tbody>
@@ -233,7 +213,10 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">員工照片</label>
-                        <input type="file" class="form-control" name="employeePhoto" accept="image/*">
+                        <input type="file" class="form-control" name="employeePhoto" accept="image/*" onchange="previewEmployeePhoto(this, 'addEmployeePhotoPreview')">
+                        <div class="mt-2">
+                            <img id="addEmployeePhotoPreview" src="https://via.placeholder.com/120x120" style="width:120px;height:120px;object-fit:cover;" alt="預覽"/>
+                        </div>
                     </div>
                     
                     <!-- 權限設定區塊 -->
@@ -318,7 +301,10 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">員工照片</label>
-                        <input type="file" class="form-control" name="employeePhoto" accept="image/*">
+                        <input type="file" class="form-control" name="employeePhoto" accept="image/*" onchange="previewEmployeePhoto(this, 'editEmployeePhotoPreview')">
+                        <div class="mt-2">
+                            <img id="editEmployeePhotoPreview" src="https://via.placeholder.com/120x120" style="width:120px;height:120px;object-fit:cover;" alt="預覽"/>
+                        </div>
                     </div>
                     
                     <!-- 權限設定區塊 -->
@@ -348,6 +334,48 @@
                 <button type="button" class="btn btn-primary" onclick="saveEmployeeEdit()">
                     <i class="bi bi-check-circle me-2"></i>儲存變更
                 </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 員工詳細資料 Modal -->
+<div class="modal fade" id="viewEmployeeModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-eye me-2"></i>員工詳細資料
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4 text-center mb-3">
+                        <img id="viewEmployeePhoto" src="https://via.placeholder.com/120x120" class="border" style="width:120px;height:120px;object-fit:cover;" alt="員工圖片"/>
+                    </div>
+                    <div class="col-md-8">
+                        <table class="table table-borderless mb-0">
+                            <tbody>
+                                <tr><th>編號</th><td id="viewEmployeeId"></td></tr>
+                                <tr><th>姓名</th><td id="viewEmployeeName"></td></tr>
+                                <tr><th>性別</th><td id="viewEmployeeGender"></td></tr>
+                                <tr><th>部門</th><td id="viewEmployeeDepartment"></td></tr>
+                                <tr><th>信箱</th><td id="viewEmployeeEmail"></td></tr>
+                                <tr><th>手機</th><td id="viewEmployeeMobile"></td></tr>
+                                <tr><th>生日</th><td id="viewEmployeeBirthdate"></td></tr>
+                                <tr><th>到職日</th><td id="viewEmployeeHiredate"></td></tr>
+                                <tr><th>離職日</th><td id="viewEmployeeLeavedate"></td></tr>
+                                <tr><th>地址</th><td id="viewEmployeeAddress"></td></tr>
+                                <tr><th>狀態</th><td id="viewEmployeeStatus"></td></tr>
+                                <tr><th>權限</th><td id="viewEmployeePermissions"></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
             </div>
         </div>
     </div>
@@ -510,6 +538,9 @@ function editEmployee(employeeId) {
                 }
             });
         }
+        
+        // 設定預覽圖片
+        document.getElementById('editEmployeePhotoPreview').src = `/backend/employee/photo/${employee.employeeId}`;
         
         // 顯示 modal
         const modal = new bootstrap.Modal(document.getElementById('editEmployeeModal'));
@@ -776,6 +807,227 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
         }
     });
+});
+
+// 瀏覽員工詳細資料
+function viewEmployee(employeeId) {
+    fetch(`/backend/employee/get/${employeeId}`)
+        .then(response => response.json())
+        .then(employee => {
+            document.getElementById('viewEmployeeId').textContent = employee.employeeId;
+            document.getElementById('viewEmployeeName').textContent = employee.employeeName;
+            document.getElementById('viewEmployeeGender').textContent = employee.employeeGender == 1 ? '男' : '女';
+            document.getElementById('viewEmployeeDepartment').textContent = employee.department ? employee.department.departmentName : '';
+            document.getElementById('viewEmployeeEmail').textContent = employee.employeeEmail;
+            document.getElementById('viewEmployeeMobile').textContent = employee.employeeMobile;
+            document.getElementById('viewEmployeeBirthdate').textContent = employee.employeeBirthdate || '';
+            document.getElementById('viewEmployeeHiredate').textContent = employee.employeeHiredate || '';
+            document.getElementById('viewEmployeeLeavedate').textContent = employee.employeeLeavedate || '';
+            document.getElementById('viewEmployeeAddress').textContent = employee.employeeAddress;
+            let statusText = '';
+            if (employee.employeeStatus == 1) statusText = '在職';
+            else if (employee.employeeStatus == 0) statusText = '離職';
+            else if (employee.employeeStatus == 2) statusText = '停職';
+            document.getElementById('viewEmployeeStatus').textContent = statusText;
+            // 權限
+            let permHtml = '';
+            if (employee.permissions) {
+                permHtml = employee.permissions.map(p => `<span class='badge bg-info text-white me-1'>${p.permissionName}</span>`).join('');
+            }
+            document.getElementById('viewEmployeePermissions').innerHTML = permHtml;
+            // 照片
+            document.getElementById('viewEmployeePhoto').src = `/backend/employee/photo/${employee.employeeId}`;
+            // 顯示 modal
+            const modal = new bootstrap.Modal(document.getElementById('viewEmployeeModal'));
+            modal.show();
+        })
+        .catch(error => {
+            alert('取得員工資料失敗');
+        });
+}
+
+// 員工圖片預覽與檔案大小檢查
+function previewEmployeePhoto(input, previewId) {
+    const file = input.files[0];
+    const preview = document.getElementById(previewId);
+    if (file) {
+        if (file.size > 5 * 1024 * 1024) { // 5MB
+            alert('圖片大小不可超過 5MB！');
+            input.value = '';
+            preview.src = 'https://via.placeholder.com/120x120';
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    } else {
+        preview.src = 'https://via.placeholder.com/120x120';
+    }
+}
+
+// 優化即時驗證：只有用戶輸入過才顯示 is-valid
+function addTouchedValidation(selector, validateFn) {
+    document.querySelectorAll(selector).forEach(field => {
+        let touched = false;
+        field.addEventListener('input', function() {
+            touched = true;
+            validateFn(this, touched);
+        });
+        field.addEventListener('change', function() {
+            touched = true;
+            validateFn(this, touched);
+        });
+    });
+}
+
+// 姓名
+addTouchedValidation('[name="employeeName"], #editEmployeeName', function(field, touched) {
+    if (!touched) return;
+    if (field.value.trim().length > 0) {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+    } else {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+    }
+});
+
+// 信箱
+addTouchedValidation('[name="employeeEmail"], #editEmployeeEmail', function(field, touched) {
+    if (!touched) return;
+    if (isValidEmail(field.value)) {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+    } else {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+    }
+});
+
+// 密碼
+addTouchedValidation('[name="employeePassword"]', function(field, touched) {
+    if (!touched) return;
+    if (field.value.length >= 6) {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+    } else {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+    }
+});
+
+// 確認密碼
+addTouchedValidation('[name="confirmPassword"]', function(field, touched) {
+    if (!touched) return;
+    const password = document.querySelector('[name="employeePassword"]').value;
+    if (field.value === password && field.value.length >= 6) {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+    } else {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+    }
+});
+
+// 手機
+addTouchedValidation('[name="employeeMobile"]', function(field, touched) {
+    if (!touched) return;
+    if (isValidMobile(field.value)) {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+    } else {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+    }
+});
+
+// 地址
+addTouchedValidation('[name="employeeAddress"]', function(field, touched) {
+    if (!touched) return;
+    if (field.value.trim().length > 0) {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+    } else {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+    }
+});
+
+// 部門
+addTouchedValidation('[name="departmentId"], #editDepartmentId', function(field, touched) {
+    if (!touched) return;
+    if (field.value !== '') {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+    } else {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+    }
+});
+
+// 性別
+addTouchedValidation('[name="employeeGender"]', function(field, touched) {
+    if (!touched) return;
+    if (field.value !== '') {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+    } else {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+    }
+});
+
+// 生日
+addTouchedValidation('[name="employeeBirthdate"]', function(field, touched) {
+    if (!touched) return;
+    if (field.value !== '') {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+    } else {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+    }
+});
+
+// 到職日
+addTouchedValidation('[name="employeeHiredate"]', function(field, touched) {
+    if (!touched) return;
+    if (field.value !== '') {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+    } else {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+    }
+});
+
+// 員工狀態
+addTouchedValidation('[name="employeeStatus"], #editEmployeeStatus', function(field, touched) {
+    if (!touched) return;
+    if (field.value !== '') {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+    } else {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+    }
+});
+
+// 權限
+addTouchedValidation('input[name="permissions"]', function(field, touched) {
+    if (!touched) return;
+    const form = field.closest('form');
+    const checkedPermissions = form.querySelectorAll('input[name="permissions"]:checked');
+    const permissionContainer = form.querySelector('.form-check').parentNode;
+    if (checkedPermissions.length > 0) {
+        permissionContainer.classList.remove('is-invalid');
+        permissionContainer.classList.add('is-valid');
+    } else {
+        permissionContainer.classList.remove('is-valid');
+        permissionContainer.classList.add('is-invalid');
+    }
 });
 </script>
 </body>
