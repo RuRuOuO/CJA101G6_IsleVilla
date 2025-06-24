@@ -86,11 +86,7 @@
                         <td th:text="${prod.productId}">商品編號</td>
                         <td>
                             <div class="d-flex align-items-center">
-                                <img
-                                        src="https://via.placeholder.com/35x35"
-                                        class="rounded-circle me-2"
-                                        alt="商品圖片"
-                                />
+                                <img th:src="@{/backend/product/photo/{id}(id=${prod.productId})}" class="rounded-circle me-2" alt="商品圖片" style="width:35px;height:35px;object-fit:cover;"/>
                             </div>
                         </td>
                         <td th:text="${prod.productName}">商品名稱</td>
@@ -144,7 +140,7 @@
 
                 </div>
             </div>
-            <form th:object="${product}" method="post" id="addProductForm" novalidate>
+            <form th:object="${product}" method="post" id="addProductForm" novalidate enctype="multipart/form-data">
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -191,6 +187,10 @@
                     </select>
                     <div class="invalid-feedback">請選擇商品類別</div>
                 </div>
+                <div class="mb-3">
+                    <label class="form-label">商品圖片（可多選）</label>
+                    <input type="file" class="form-control" name="productPhotos" accept="image/*" multiple>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
@@ -219,7 +219,7 @@
 
                 </div>
             </div>
-            <form th:object="${product}" method="post" id="editProductForm" novalidate>
+            <form th:object="${product}" method="post" id="editProductForm" novalidate enctype="multipart/form-data">
             <div class="modal-body">
                 <input type="hidden" name="productId" />
                 <div class="row">
@@ -266,6 +266,10 @@
                         </option>
                     </select>
                     <div class="invalid-feedback">請選擇商品類別</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">商品圖片（可多選）</label>
+                    <input type="file" class="form-control" name="productPhotos" accept="image/*" multiple>
                 </div>
             </div>
             <div class="modal-footer">

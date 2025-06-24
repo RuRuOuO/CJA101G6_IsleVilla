@@ -61,8 +61,8 @@ public class Employee {
     @Column(name = "employee_birthdate")
     private LocalDate employeeBirthdate;
 
-//    @Column(name = "employee_photo")
-//    private byte[] employeePhoto; // 使用 byte[] 存儲圖片
+    @Column(name = "employee_photo")
+    private byte[] employeePhoto; // 使用 byte[] 存儲圖片
 
     @Column(name = "employee_hiredate")
     private LocalDate employeeHiredate;
