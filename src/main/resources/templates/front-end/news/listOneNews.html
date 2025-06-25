@@ -7,70 +7,113 @@
     <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
     <style type="text/css">
-        img {
+        .news-hero-image {
             width: 100%;
-            height: 100px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
+            height: 400px;
+            border-radius: 12px;
             object-fit: cover;
             object-position: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .news-hero-image {
+                height: 250px;
+            }
         }
     </style>
 </head>
-<body>
+<body class="bg-light">
 <!-- ===== 載入Header ===== -->
 <div th:replace="~{fragments/fragments :: header}"></div>
-<main>
-    <!--    <a class="btn btn-dark position-fixed" th:href="@{/news}">回消息列表</a>-->
-    <div class="container">
-        <div>
-            <!--                <label>圖片:</label>-->
-            <span class="news-content">
-            <img
-                    alt="消息圖片"
-                    class="news-image"
-                    th:if="${news.newsImage != null}"
-                    th:src="@{'/news/image/' + ${news.newsId}}"
-            />
-                <!-- 預設圖片 -->
-            <img
-                    alt="消息圖片"
-                    class="card-img-top w-100"
-                    src="https://images.unsplash.com/photo-1624474161796-7685c6919523?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                    th:unless="${news.newsImage != null}"
-            />
-          </span>
-        </div>
 
-        <div>
-            <h1 class="news-content" th:text="${news.newsTitle}">消息標題</h1>
-        </div>
+<main class="py-5">
+    <div class="container text-center">
+        <!-- 麵包屑導航 -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb bg-white p-3 rounded shadow-sm">
+                <li class="breadcrumb-item">
+                    <a href="#" class="text-decoration-none text-reset">
+                        <i class="fas fa-home me-1"></i>首頁
+                    </a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a th:href="@{/news/list}" class="text-decoration-none text-reset">最新消息</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">消息詳情</li>
+            </ol>
+        </nav>
 
-        <div>
-            <small>發布日期:</small>
-            <small
-                    class="news-content"
-                    th:text="${#temporals.format(news.newsTime, 'yyyy/MM/dd HH:mm')}"
-            >2024/01/01</small
-            >
-        </div>
+        <!-- 主要內容卡片 -->
+        <div class="card shadow-lg border-0 mb-5">
+            <div class="card-body p-4 p-md-5">
+                <!-- 消息圖片 -->
+                <div class="mb-4">
+                    <img
+                            alt="消息圖片"
+                            class="news-hero-image"
+                            th:if="${news.newsImage != null}"
+                            th:src="@{'/news/image/' + ${news.newsId}}"
+                    />
+                    <!-- 預設圖片 -->
+                    <img
+                            alt="消息圖片"
+                            class="news-hero-image"
+                            src="https://images.unsplash.com/photo-1624474161796-7685c6919523?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                            th:unless="${news.newsImage != null}"
+                    />
+                </div>
 
-        <div>
-            <!--            <label>內容:</label>-->
-            <p class="news-content" th:text="${news.newsContent}">消息內容</p>
-        </div>
+                <!-- 消息標題 -->
+                <div class="mb-4">
+                    <h2 class="display-5 fw-bold text-dark mb-0" th:text="${news.newsTitle}">消息標題</h2>
+                </div>
 
-        <div>
-            <label></label>
-            <span>
-            <button class="btn btn-dark" onclick="history.back()" type="button">
-              返回上頁
-            </button>
-          </span>
+                <div class="mb-4 pb-3 border-bottom">
+                    <div class="d-flex align-items-center text-muted">
+                        <!-- 發布日期 -->
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        <span class="me-2">發布日期：</span>
+                        <span th:text="${#temporals.format(news.newsTime, 'yyyy年MM月dd日 HH:mm')}">
+                            2024年01月01日 12:00
+                        </span>
+                    </div>
+                    <!-- 優惠專案日期-->
+                    <div th:if="${news.promotion != null}"
+                         class="d-flex align-items-center text-muted mb-3">
+                        <i class="fas fa-clock me-2"></i>
+                        <span class="me-2">專案適用期間：</span>
+                        <span th:text="${#dates.format(news.promotion.promotionStartDate, 'yyyy.MM.dd')}">
+                            2025.01.01
+                        </span>
+                        <span>&nbsp;~&nbsp;</span>
+                        <span th:text="${#dates.format(news.promotion.promotionEndDate, 'yyyy.MM.dd')}">
+                            2025.01.01
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 消息內容 -->
+                <div class="mb-5">
+                    <div class="fs-5 lh-lg text-dark" style="text-align: justify; line-height: 1.8;">
+                        <p th:text="${news.newsContent}">消息內容</p>
+                    </div>
+                </div>
+
+                <!-- 操作按鈕 -->
+                <div class="d-flex flex-column flex-sm-row gap-3 pt-4 border-top">
+                    <button class="btn btn-outline-secondary btn-lg px-4" onclick="history.back()" type="button">
+                        <i class="fas fa-arrow-left me-2"></i>返回上頁
+                    </button>
+                    <!--                    <a th:href="@{/news/list}" class="btn btn-outline-secondary btn-lg px-4">-->
+                    <!--                        <i class="fas fa-list me-2"></i>查看更多消息-->
+                    <!--                    </a>-->
+                </div>
+            </div>
         </div>
     </div>
-
 </main>
+
 <!-- ========== 載入Footer ========== -->
 <div th:replace="~{fragments/fragments :: footer}"></div>
 </body>

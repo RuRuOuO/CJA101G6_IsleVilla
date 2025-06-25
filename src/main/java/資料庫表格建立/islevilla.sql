@@ -57,19 +57,19 @@ DROP TABLE IF EXISTS members;                    -- 會員
 
 -- 會員 members （賴彥儒）
 CREATE TABLE members (
-	member_id              INT           AUTO_INCREMENT,                                           -- 會員編號 (PK)
-    member_email           VARCHAR(100)  NOT NULL  UNIQUE,                                         -- 會員信箱 (UNIQLE)
-    member_password_hash   VARCHAR(128)  NOT NULL,                                                 -- 會員雜湊密碼
-    member_name            VARCHAR(30)   NOT NULL,                                                 -- 會員姓名
-    member_birthdate       DATE          NOT NULL,                                                 -- 會員生日
-    member_gender          TINYINT       NOT NULL  COMMENT '0:男生 1:女生 2:其它',                 -- 會員性別
-    member_phone           VARCHAR(20)   NOT NULL  UNIQUE,                                         -- 會員電話
-    member_address         VARCHAR(200)  NOT NULL,                                                 -- 會員地址
-    member_photo           LONGBLOB,                                                               -- 會員照片
-    member_created_at      DATETIME      NOT NULL,                                                 -- 會員建立日期
-    member_updated_at      DATETIME      NOT NULL,                                                 -- 會員更新日期
-    member_last_login_time DATETIME      NOT NULL,                                                 -- 會員最後登入時間
-    member_status          TINYINT       NOT NULL  DEFAULT 0  COMMENT '0:未驗證 1:已驗證 2:停用',  -- 會員狀態
+	member_id				INT				AUTO_INCREMENT,												-- 會員編號 (PK)
+    member_email			VARCHAR(100)	NOT NULL	UNIQUE,											-- 會員信箱 (UNIQLE)
+    member_password_hash	VARCHAR(128)	NOT NULL,													-- 會員雜湊密碼
+    member_name				VARCHAR(30)		NOT NULL,													-- 會員姓名
+    member_birthdate		DATE			NOT NULL,													-- 會員生日
+    member_gender			TINYINT			NOT NULL	COMMENT '0:男生 1:女生 2:其它',					-- 會員性別
+    member_phone			VARCHAR(20)		NOT NULL	UNIQUE,											-- 會員電話
+    member_address			VARCHAR(200)	NOT NULL,													-- 會員地址
+    member_photo			LONGBLOB,																	-- 會員照片
+    member_created_at		DATETIME		NOT NULL,													-- 會員建立日期
+    member_updated_at		DATETIME		NOT NULL,													-- 會員更新日期
+    member_last_login_time	DATETIME		NOT NULL,													-- 會員最後登入時間
+    member_status			TINYINT			NOT NULL	DEFAULT 0	COMMENT '0:未驗證 1:已驗證 2:停用',	-- 會員狀態
     CONSTRAINT pk_member_id PRIMARY KEY (member_id)
 );
 
@@ -150,11 +150,12 @@ CREATE TABLE room_reservation_order (
 );
 
 INSERT INTO room_reservation_order (member_id, room_order_date, room_order_status, check_in_date, check_out_date, room_promotion_id, rv_remark, room_total_amount, rv_discount_amount, rv_paid_amount)
-VALUES (1,  '2024-01-01 09:24:18', 2, '2024-03-10', '2024-03-15', 1,    '備註', 3600*3,                  (3600-2160)*3, 2160*3),                  -- 3天 -- 優惠1
-       (4,  '2024-05-09 01:52:22', 1, '2025-05-17', '2025-05-18', NULL, '備註', (3600+4800)*1,           0,             (3600+4800)*1),           -- 1天 
-       (8,  '2024-09-12 21:03:18', 1, '2025-01-26', '2025-01-31', NULL, '備註', (6000+3600+6000+8400)*5, 0,             (6000+3600+6000+8400)*5), -- 5天
-       (7,  '2025-05-11 17:34:59', 1, '2025-05-21', '2025-05-22', NULL, '備註', 8400*1,                  0,             8400*1),                  -- 1天
-       (2,  '2025-07-24 15:37:12', 3, '2025-07-25', '2025-07-29', 2,    '備註', (7200+9600)*4,           (7200-6120)*4, (6120+9600)*4);           -- 4天 -- 優惠2
+VALUES (1,  '2024-01-01 09:24:18', 2, '2024-03-10', '2024-03-15', 1,    '備註', 3600*5,                  (3600-2160)*5, 2160*5),						-- 5天 -- 優惠1
+       (4,  '2024-05-09 01:52:22', 1, '2025-05-17', '2025-05-18', NULL, '備註', (3600+4800)*1,           0,             (3600+4800)*1),				-- 1天 
+       (8,  '2024-09-12 21:03:18', 1, '2025-01-26', '2025-01-31', NULL, '備註', (6000+3600+6000+8400)*5, 0,             (6000+3600+6000+8400)*5),	-- 5天
+       (7,  '2025-05-11 17:34:59', 1, '2025-05-21', '2025-05-22', NULL, '備註', 8400*1,                  0,             8400*1),						-- 1天
+       (2,  '2025-07-24 15:37:12', 3, '2025-07-25', '2025-07-29', 2,    '備註', (7200+9600)*4,           (7200-6120)*4, (6120+9600)*4),				-- 4天 -- 優惠2
+       (1,  '2025-07-25 09:24:18', 2, '2025-08-10', '2025-08-15', 2,    '備註', 3600*5,                  (3600-3060)*5, 3060*5);						-- 5天 -- 優惠2
 
 -- DROP TABLE IF EXISTS room_reservation_order;
 
@@ -307,7 +308,7 @@ CREATE TABLE room_reservation_detail(
 );
 
 INSERT INTO room_reservation_detail (room_reservation_id, room_id, room_type_id, guest_count, room_price, rv_discount_amount, rv_paid_amount)
-VALUES (1, 101,  1, 2, 3600*3, (3600-2160)*3, 2160*3), -- 訂房訂單1 房號101  房型1 2人 原單價:3600 -- 3天 -- 優惠1
+VALUES (1, 101,  1, 2, 3600*3, (3600-2160)*5, 2160*5), -- 訂房訂單1 房號101  房型1 2人 原單價:3600 -- 5天 -- 優惠1
 	   (2, 201,  1, 2, 3600*1, 0,             3600*1), -- 訂房訂單2 房號201  房型1 2人 原單價:3600 -- 1天
 	   (2, 301,  2, 2, 4800*1, 0,             4800*1), -- 訂房訂單2 房號301  房型2 2人 原單價:4800 -- 1天
        (3, 401,  3, 4, 6000*5, 0,             6000*5), -- 訂房訂單3 房號401  房型3 4人 原單價:6000 -- 5天
@@ -316,7 +317,8 @@ VALUES (1, 101,  1, 2, 3600*3, (3600-2160)*3, 2160*3), -- 訂房訂單1 房號10
        (3, 901,  5, 2, 8400*5, 0,             8400*5), -- 訂房訂單3 房號901  房型5 2人 原單價:8400 -- 5天
        (4, 801,  5, 3, 8400*1, 0,             8400*1), -- 訂房訂單4 房號801  房型5 3人 原單價:8400 -- 4天
        (5, 701,  4, 2, 7200*4, (7200-6120)*4, 6120*4), -- 訂房訂單5 房號701  房型4 2人 原單價:7200 -- 4天 -- 優惠2
-       (5, 1001, 6, 2, 9600*4, 0,             9600*4); -- 訂房訂單5 房號1001 房型6 2人 原單價:9600 -- 4天 -- 優惠2
+       (5, 1001, 6, 2, 9600*4, 0,             9600*4), -- 訂房訂單5 房號1001 房型6 2人 原單價:9600 -- 4天 -- 優惠2
+       (1, 101,  1, 2, 3600*3, (3600-3060)*5, 3060*5); -- 訂房訂單1 房號101  房型1 2人 原單價:3600 -- 5天 -- 優惠2
 
 -- DROP TABLE IF EXISTS room_reservation_detail;
 
@@ -522,24 +524,24 @@ CREATE TABLE seat (
 );
 
 INSERT INTO seat (seat_number, seat_status)
-VALUES ('A1', 1), ('A2', 1), ('A3', 1), ('A4', 0), ('A5', 1), ('A6', 1), ('A7', 1), ('A8', 1), ('A9', 1), ('A10', 1), -- 01~10
-	   ('B1', 1), ('B2', 1), ('B3', 1), ('B4', 1), ('B5', 1), ('B6', 1), ('B7', 1), ('B8', 1), ('B9', 1), ('B10', 1), -- 11~20
-	   ('C1', 1), ('C2', 1), ('C3', 1), ('C4', 1), ('C5', 1), ('C6', 1), ('C7', 1), ('C8', 1), ('C9', 1), ('C10', 1), -- 21~30
-       ('D1', 1), ('D2', 1), ('D3', 1), ('D4', 1), ('D5', 1), ('D6', 1), ('D7', 1), ('D8', 1), ('D9', 1), ('D10', 1), -- 31~40
-       ('E1', 1), ('E2', 1), ('E3', 1), ('E4', 1), ('E5', 1), ('E6', 1), ('E7', 1), ('E8', 1), ('E9', 1), ('E10', 1), -- 41~50
-       ('F1', 1), ('F2', 1), ('F3', 1), ('F4', 1), ('F5', 1), ('F6', 1), ('F7', 1), ('F8', 1), ('F9', 1), ('F10', 1), -- 51~60
-       ('G1', 1), ('G2', 1), ('G3', 1), ('G4', 1), ('G5', 1), ('G6', 1), ('G7', 1), ('G8', 0), ('G9', 1), ('G10', 1), -- 61~70
-       ('H1', 1), ('H2', 1), ('H3', 1), ('H4', 1), ('H5', 1), ('H6', 1), ('H7', 1), ('H8', 1), ('H9', 1), ('H10', 1), -- 71~80
-       ('I1', 1), ('I2', 1), ('I3', 1), ('I4', 1), ('I5', 1), ('I6', 1), ('I7', 1), ('I8', 1), ('I9', 1), ('I10', 1), -- 81~90
-       ('J1', 1), ('J2', 1), ('J3', 1), ('J4', 1), ('J5', 1), ('J6', 1), ('J7', 1), ('J8', 0), ('J9', 1), ('J10', 1); -- 91~100
+VALUES ('A01', 1), ('A02', 1), ('A03', 1), ('A04', 0), ('A05', 1), ('A06', 1), ('A07', 1), ('A08', 1), ('A09', 1), ('A10', 1), -- 01~10
+	   ('B01', 1), ('B02', 1), ('B03', 1), ('B04', 1), ('B05', 1), ('B06', 1), ('B07', 1), ('B08', 1), ('B09', 1), ('B10', 1), -- 11~20
+	   ('C01', 1), ('C02', 1), ('C03', 1), ('C04', 1), ('C05', 1), ('C06', 1), ('C07', 1), ('C08', 1), ('C09', 1), ('C10', 1), -- 21~30
+       ('D01', 1), ('D02', 1), ('D03', 1), ('D04', 1), ('D05', 1), ('D06', 1), ('D07', 1), ('D08', 1), ('D09', 1), ('D10', 1), -- 31~40
+       ('E01', 1), ('E02', 1), ('E03', 1), ('E04', 1), ('E05', 1), ('E06', 1), ('E07', 1), ('E08', 1), ('E09', 1), ('E10', 1), -- 41~50
+       ('F01', 1), ('F02', 1), ('F03', 1), ('F04', 1), ('F05', 1), ('F06', 1), ('F07', 1), ('F08', 1), ('F09', 1), ('F10', 1), -- 51~60
+       ('G01', 1), ('G02', 1), ('G03', 1), ('G04', 1), ('G05', 1), ('G06', 1), ('G07', 1), ('G08', 0), ('G09', 1), ('G10', 1), -- 61~70
+       ('H01', 1), ('H02', 1), ('H03', 1), ('H04', 1), ('H05', 1), ('H06', 1), ('H07', 1), ('H08', 1), ('H09', 1), ('H10', 1), -- 71~80
+       ('I01', 1), ('I02', 1), ('I03', 1), ('I04', 1), ('I05', 1), ('I06', 1), ('I07', 1), ('I08', 1), ('I09', 1), ('I10', 1), -- 81~90
+       ('J01', 1), ('J02', 1), ('J03', 1), ('J04', 1), ('J05', 1), ('J06', 1), ('J07', 1), ('J08', 0), ('J09', 1), ('J10', 1); -- 91~100
 
 -- DROP TABLE IF EXISTS seat_availability;
 
 
 -- 接駁預約座位對應 shuttle_reservation_seat （賴彥儒）
 CREATE TABLE shuttle_reservation_seat (
-	shuttle_reservation_id  INT  NOT NULL,  -- 接駁預約編號 (PK, FK)
-    seat_id                 INT  NOT NULL,  -- 座位編號 (PK, FK)
+	shuttle_reservation_id	INT	NOT NULL,	-- 接駁預約編號 (PK, FK)
+    seat_id					INT	NOT NULL,	-- 座位編號 (PK, FK)
     CONSTRAINT pk_shuttle_reservation_seat_id PRIMARY KEY(shuttle_reservation_id, seat_id),
     CONSTRAINT fk_shuttle_reservation_id FOREIGN KEY(shuttle_reservation_id) REFERENCES shuttle_reservation(shuttle_reservation_id),
     CONSTRAINT fk_seat_id FOREIGN KEY(seat_id) REFERENCES seat(seat_id)
@@ -767,28 +769,28 @@ VALUES (1, 1, '2025-01-11'),
 
 -- 商品圖片 product_photo （陳吟瑄）
 CREATE TABLE product_photo (
-	product_photo_id  INT       AUTO_INCREMENT  PRIMARY KEY,  -- 商品圖片編號 (PK) (AI)
-    product_id        INT       NOT NULL,                     -- 商品編號 (FK)
-    product_image     LONGBLOB,                               -- 商品圖片
+	product_photo_id	INT			AUTO_INCREMENT	PRIMARY KEY,	-- 商品圖片編號 (PK) (AI)
+    product_id			INT			NOT NULL,						-- 商品編號 (FK)
+    product_image		LONGBLOB,									-- 商品圖片
+    display_order		INT			NOT NULL,						-- 圖片順序
 	FOREIGN KEY (product_id) REFERENCES product(product_id)
 );
 
-INSERT INTO product_photo (product_id)
-VALUES (1),
-	   (2),
-       (3),
-       (4),
-       (5),
-       (6),
-       (7),
-       (8),
-       (9),
-       (10),
-       (1),
-       (2),
-       (3),
-       (4),
-       (5);
+INSERT INTO product_photo (product_id, display_order)
+VALUES (1, 0),
+       (1, 1),
+	   (2, 0),
+	   (2, 1),
+       (3, 0),
+       (4, 0),
+       (4, 1),
+       (5, 0),
+       (6, 0),
+       (7, 0),
+       (8, 0),
+	   (8, 1),
+       (9, 0),
+       (10, 0);
 
 -- DROP TABLE IF EXISTS product_photo;
 
@@ -843,32 +845,34 @@ VALUES ('營運部'),
 
 -- 員工 employee （陳吟瑄）
 CREATE TABLE employee (
-    employee_id         INT           AUTO_INCREMENT  PRIMARY KEY,               -- 員工編號 (PK) (AI)
-    department_id       INT           NOT NULL,                                  -- 部門編號 (FK)
-    employee_name       VARCHAR(30)   NOT NULL,                                  -- 員工姓名
-    employee_email      VARCHAR(100)  NOT NULL,                                  -- 員工信箱
-    employee_address    VARCHAR(200)  NOT NULL,                                  -- 員工地址
-    employee_mobile     VARCHAR(20)   NOT NULL,                                  -- 員工手機
-    employee_gender     TINYINT       NOT NULL  COMMENT '0:男 1:女 2:其它',      -- 員工性別
-    employee_birthdate  DATE          NOT NULL,                                  -- 員工生日
-    employee_photo      LONGBLOB,                                                -- 員工照片
-    employee_hiredate   DATE          NOT NULL,                                  -- 員工到職日
-    employee_leavedate  DATE,                                                    -- 員工離職日
-    employee_status     TINYINT       NOT NULL  COMMENT '0:離職 1:在職 2:停職',  -- 員工狀態
+    employee_id				INT				AUTO_INCREMENT	PRIMARY KEY,				-- 員工編號 (PK) (AI)
+    department_id			INT				NOT NULL,									-- 部門編號 (FK)
+    employee_name			VARCHAR(30)		NOT NULL,									-- 員工姓名
+    employee_email			VARCHAR(100)	NOT NULL	UNIQUE,							-- 員工信箱
+    employee_address		VARCHAR(200)	NOT NULL,									-- 員工地址
+    employee_mobile			VARCHAR(20)		NOT NULL,									-- 員工手機
+	employee_password_hash	VARCHAR(100)	NOT NULL,									-- 員工密碼
+    employee_gender			TINYINT			NOT NULL	COMMENT '0:男 1:女 2:其它',		-- 員工性別
+    employee_birthdate		DATE			NOT NULL,									-- 員工生日
+    employee_photo			LONGBLOB,													-- 員工照片
+    employee_hiredate		DATE			NOT NULL,									-- 員工到職日
+    employee_leavedate		DATE,														-- 員工離職日
+    employee_status			TINYINT			NOT NULL	COMMENT '0:離職 1:在職 2:停職',	-- 員工狀態
     FOREIGN KEY (department_id) REFERENCES department(department_id)
 );
 
-INSERT INTO employee (department_id, employee_name, employee_email, employee_address, employee_mobile, employee_gender, employee_birthdate, employee_hiredate, employee_leavedate, employee_status)
-VALUES (1, '潘筱涵', 'xiuying17@yan.tw',      '60413 新營士林路4號9樓',      '0912345678', 0, '1990-12-30', '2023-01-01', NULL,         1),
-	   (1, '黎俊宏', 'houjing@feng.tw',       '20869 彰化市育英街12號之0',   '0916345792', 2, '1978-03-20', '2023-01-15', NULL,         1),
-	   (2, '顧思穎', 'yangqiang@hotmail.com', '57698 中壢縣龍山寺巷61號8樓', '0923456789', 0, '1985-06-28', '2023-02-01', NULL,         1),
-	   (2, '段志宏', 'yanma@guo.net',         '769 白沙民富巷8號4樓',        '0967890123', 0, '1998-01-11', '2023-02-15', NULL,         1),
-	   (3, '王郁雯', 'fuchao@qiu.tw',         '23008 屏東大橋頭街8號之1',    '0978901234', 2, '1983-04-27', '2023-03-01', NULL,         1),
-	   (3, '王嘉玲', 'xiulan09@hotmail.com',  '965 臺東自由街3號之5',        '0927364758', 1, '1988-12-07', '2023-03-15', NULL,         1),
-	   (4, '陳詩涵', 'longjing@wen.com',      '754 桃園天母街8號7樓',        '0904522961', 2, '1968-11-08', '2023-04-01', NULL,         1),
-	   (5, '崔志豪', 'duanna@hotmail.com',    '479 雲林縣中山巷63號1樓',     '0958731762', 1, '1978-06-23', '2023-04-15', NULL,         1),
-	   (4, '韓承翰', 'xqian@xiang.com',       '729 古坑縣頂福州巷193號之5',  '0977082492', 0, '2004-01-17', '2023-05-01', NULL,         2),
-	   (5, '王志宏', 'jiangjie@cheng.org',    '352 永康縣忠義路2段563號之7', '0959930022', 2, '1998-11-13', '2023-05-15', '2023-12-31', 0);
+INSERT INTO employee (department_id, employee_name, employee_email, employee_address, employee_mobile, employee_password_hash, employee_gender, employee_birthdate, employee_hiredate, employee_leavedate, employee_status)
+VALUES (1, '管理員',		'admin@tibame.com',			'60413 新營士林路4號9樓',		'0900000101',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 0, '1990-12-30', '2023-01-01', NULL, 1), -- 密碼：asd123456
+	   (5, '楊捷',		'jay@tibame.com',			'20869 彰化市育英街12號之0',	'0900000102',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 2, '1978-03-20', '2023-01-15', NULL, 1),
+	   (4, '陳薇淨',		'vivian@tibame.com',		'57698 中壢縣龍山寺巷61號8樓',	'0900000103',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 0, '1985-06-28', '2023-02-01', NULL, 1),
+	   (5, '陳吟瑄',		'blaire@tibame.com',		'769 白沙民富巷8號4樓',		'0900000104',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 0, '1998-01-11', '2023-02-15', NULL, 1),
+	   (4, '詹力臻',		'patty@tibame.com',			'23008 屏東大橋頭街8號之1',	'0900000105',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 2, '1983-04-27', '2023-03-01', NULL, 1),
+	   (4, '曾宸瑩',		'sandy@tibame.com',			'965 臺東自由街3號之5',		'0900000106',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 1, '1988-12-07', '2023-03-15', NULL, 1),
+	   (3, '賴彥儒',		'lai@tibame.com',			'754 桃園天母街8號7樓',		'0900000107',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 2, '1968-11-08', '2023-04-01', NULL, 1),
+	   (3, '王人慶',		'nick@tibame.com',			'479 雲林縣中山巷63號1樓',	'0900000108',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 1, '1978-06-23', '2023-04-15', NULL, 1),
+	   (2, '客服員工',	'service@tibame.com',		'729 古坑縣頂福州巷193號之5', 	'0900000109',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 0, '2004-01-17', '2023-05-01', NULL, 1),
+	   (2, '停職員工',	'suspension@xiang.com',		'729 古坑縣頂福州巷193號之5',	'0900000110',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 0, '2004-01-17', '2023-05-01', NULL, 2),
+	   (2, '離職員工',	'resignation@xiang.com',	'729 古坑縣頂福州巷193號之5',	'0900000111',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 0, '2004-01-17', '2023-05-01', NULL, 0);
 
 -- DROP TABLE IF EXISTS employee;
 
@@ -881,16 +885,11 @@ CREATE TABLE permission (
 );
 
 INSERT INTO permission (permission_name, permission_description)
-VALUES ('op_r',   '營運瀏覽功能。'),
-	   ('op_cud', '營運新增、編輯及刪除功能。'),
-	   ('cs_r',   '客服瀏覽功能。'),
-	   ('cs_cud', '客服新增、編輯及刪除功能。'),
-	   ('ss_r',   '接駁瀏覽功能。'),
-	   ('ss_cud', '接駁新增、編輯及刪除功能。'),
-	   ('hk_r',   '房務瀏覽功能。'),
-	   ('hk_cud', '房務新增、編輯及刪除功能。'),
-	   ('po_r',   '產品瀏覽功能。'),
-	   ('po_cud', '產品新增、編輯及刪除功能。');
+VALUES ('operation',	'營運部門權限'),
+	   ('service',		'客服部門權限'),
+	   ('shuttle',		'接駁部門權限'),
+	   ('room',			'房務部門權限'),
+	   ('product',		'產品部門權限');
    
 -- DROP TABLE IF EXISTS permission;
 
@@ -904,23 +903,30 @@ CREATE TABLE employee_permission (
     FOREIGN KEY (employee_id) REFERENCES employee(employee_id)
 );
 
+-- 根據員工的部門自動分配對應權限
 INSERT INTO employee_permission (permission_id, employee_id)
-VALUES (1, 1),
-	   (2, 1),
-	   (1, 2),
-	   (3, 3),
-	   (4, 3),
-	   (3, 4),
-	   (5, 5),
-	   (6, 5),
-	   (5, 6),
-	   (7, 7),
-	   (8, 7),
-	   (9, 8),
-       (10, 8);
+SELECT p.permission_id, e.employee_id
+FROM employee e
+JOIN permission p ON p.permission_name = 
+    CASE e.department_id
+        WHEN 1 THEN 'operation'
+        WHEN 2 THEN 'service'
+        WHEN 3 THEN 'shuttle'
+        WHEN 4 THEN 'room'
+        WHEN 5 THEN 'product'
+    END
+WHERE e.employee_status = 1;
+
+-- 為員工編號01（管理員）添加全部權限
+-- 先清除該員工現有的權限
+DELETE FROM employee_permission WHERE employee_id = 1;
+
+-- 為員工編號01添加所有權限
+INSERT INTO employee_permission (permission_id, employee_id)
+SELECT p.permission_id, 1
+FROM permission p;
 
 -- DROP TABLE IF EXISTS employee_permission;
-
 
 -- 操作日誌 operation_log （楊捷）
 CREATE TABLE operation_log (
@@ -963,56 +969,100 @@ VALUES (2, '2025-05-01 09:15:00', '登入系統'),
 
 -- 問卷紀錄 feedback （陳薇淨）
 CREATE TABLE feedback (
-	feedback_id    INT          AUTO_INCREMENT,                                                           -- 問卷編號 (PK) (AI)
-    member_id      INT          NOT NULL,                                                                 -- 會員編號 (FK)
-    feedback_time  DATETIME     NOT NULL,                                                                 -- 問卷填寫時間
-    answer1        VARCHAR(50)  NOT NULL,                                                                 -- 回答一
-    answer2        VARCHAR(50)  NOT NULL,                                                                 -- 回答二
-    answer3        VARCHAR(50)  NOT NULL,                                                                 -- 回答三
-    answer4        VARCHAR(50)  NOT NULL,                                                                 -- 回答四
-    answer5        VARCHAR(50)  NOT NULL,                                                                 -- 回答五
-    rating         TINYINT      NOT NULL  DEFAULT 3  COMMENT '1:一顆星 2:2顆星 3:3顆星 4:4顆星 5:5顆星',  -- 評論星數
-    CONSTRAINT pk_feedback_id PRIMARY KEY(feedback_id),
-    CONSTRAINT fk_f_member_id FOREIGN KEY(member_id) REFERENCES members(member_id)
+	fb_id				INT			AUTO_INCREMENT,													-- 問卷編號 (PK) (AI)
+    room_reservation_id	INT			NOT NULL,														-- 訂單編號 (FK)
+    fb_created_at  		DATETIME	NOT NULL DEFAULT CURRENT_TIMESTAMP,								-- 問卷填寫時間
+    fb_updated_at 		DATETIME 	DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,			-- 問卷修改時間
+    fb_overall_rating	TINYINT		NOT NULL DEFAULT 3 COMMENT '1:一星 2:二星 3:三星 4:四星 5:五星',	-- 評論星數
+	fb_recommend		TINYINT		NOT NULL DEFAULT 1 COMMENT '0:否 1:是',							-- 是否會推薦給親朋好友？
+    fb_revisit 			TINYINT 	NOT NULL DEFAULT 1 COMMENT '0:否 1:是',							-- 是否願意再次入住？
+    fb_shuttle_rating 	TINYINT 	NOT NULL DEFAULT 3 COMMENT '1:一星 2:二星 3:三星 4:四星 5:五星',	-- 接駁服務滿意度
+    fb_reception_rating	TINYINT 	NOT NULL DEFAULT 3 COMMENT '1:一星 2:二星 3:三星 4:四星 5:五星',	-- 櫃台接待滿意度
+    fb_room_rating 		TINYINT 	NOT NULL DEFAULT 3 COMMENT '1:一星 2:二星 3:三星 4:四星 5:五星',	-- 客房整潔與舒適度
+    fb_facility_rating 	TINYINT 	NOT NULL DEFAULT 3 COMMENT '1:一星 2:二星 3:三星 4:四星 5:五星',	-- 設備與設施滿意度
+    fb_env_rating 		TINYINT 	NOT NULL DEFAULT 3 COMMENT '1:一星 2:二星 3:三星 4:四星 5:五星',	-- 飯店環境氛圍
+    fb_value_rating 	TINYINT 	NOT NULL DEFAULT 3 COMMENT '1:一星 2:二星 3:三星 4:四星 5:五星',	-- 性價比感受
+    fb_website_rating 	TINYINT 	NOT NULL DEFAULT 3 COMMENT '1:一星 2:二星 3:三星 4:四星 5:五星',	-- 網站操作流暢度
+    fb_compliment		VARCHAR(1000),																-- 有什麼特別滿意的地方嗎？
+    fb_suggestion		VARCHAR(1000),																-- 有什麼地方我們可以改進？
+    fb_image			LONGBLOB,																	-- 上傳圖片
+	fb_public			TINYINT		NOT NULL DEFAULT 1 COMMENT '0:否 1:是',							-- 是否願意公開評論？
+	fb_status			TINYINT		NOT NULL DEFAULT 0 COMMENT '0:下架 1:上架',						-- 評論狀態
+    CONSTRAINT	pk_fb_id					PRIMARY KEY(fb_id),
+    CONSTRAINT	fk_fb_room_reservation_id	FOREIGN KEY(room_reservation_id)	REFERENCES room_reservation_order(room_reservation_id)
 );
 
-INSERT INTO feedback (member_id, feedback_time, answer1, answer2, answer3, answer4, answer5, rating) -- feedback要有房型欄位？目前先設定成一張訂單不論幾間房都只有一份問卷
-VALUES (8, '2025-01-31 10:00:00', '非常不滿意', '房間有味道', '服務冷漠',   '隔音差',     '不推薦',     1),
-       (1, '2025-03-15 14:30:00', '非常滿意',   '乾淨整潔',   '服務親切',   '環境安靜',   '價格合理',   5),
-       (4, '2025-05-18 16:15:00', '普通',       '位置方便',   '設備老舊',   '服務中等',   '價格偏高',   3),
-       (7, '2025-05-22 18:10:00', '滿意',       '整潔乾淨',   '交通方便',   '服務良好',   '價格可接受', 4),
-       (2, '2025-07-29 13:20:00', '普通',       '還可以接受', '無特別亮點', '冷氣有點吵', '價格可接受', 3);
+INSERT INTO feedback (
+    room_reservation_id, fb_created_at, fb_updated_at,
+    fb_overall_rating, fb_recommend, fb_revisit,
+    fb_shuttle_rating, fb_reception_rating, fb_room_rating,
+    fb_facility_rating, fb_env_rating, fb_value_rating, fb_website_rating,
+    fb_compliment, fb_suggestion, fb_image, fb_public, fb_status
+) VALUES
+
+-- 訂單1：member_id=1，check_out=2024-03-15
+(1, '2024-03-15 12:00:00', '2024-03-15 12:00:00',
+ 5, 1, 1, 5, 5, 5, 5, 5, 5, 4,
+'這次入住微嶼 IsleVilla 是我們夫妻第一次的海島渡假體驗，整體從接駁到入住都非常流暢。尤其是搭乘專屬的接駁船讓我們感覺自己像是尊貴的VIP，服務人員親切貼心，還提供了小點心。房間面海，夜晚還可以聽到海浪聲，真的非常療癒，我們一定會再回來！',
+NULL, NULL, 1, 1),
+
+-- 訂單2：member_id=4，check_out=2025-05-18
+(2, '2025-05-18 12:00:00', '2025-05-18 12:00:00',
+ 5, 1, 1, 5, 5, 4, 4, 5, 5, 5,
+'我選擇在微嶼 IsleVilla 慶祝自己的生日，一切安排都非常完美。飯店知道是生日還特別在房間準備了小驚喜，這樣的貼心令人非常感動。雖然只住了一晚，但每一刻都覺得被照顧得很好，推薦給想要度過特別日子的朋友。',
+'希望未來可以開放更多元的客房風格，提供不同主題體驗。', NULL, 1, 1),
+
+-- 訂單3：member_id=8，check_out=2025-01-31
+(3, '2025-01-31 12:00:00', '2025-01-31 12:00:00',
+ 5, 1, 1, 5, 5, 5, 5, 5, 4, 5,
+'我們一家四口來微嶼 IsleVilla 度寒假，孩子們超喜歡這裡的沙灘和泳池，玩得不亦樂乎。爸媽也能好好放鬆，享受陽光與海風。接駁船服務非常穩定，也讓我們省去了交通煩惱。推薦給家庭旅遊的朋友，這裡非常適合全家出遊！',
+NULL, NULL, 1, 1),
+
+-- 訂單4：member_id=7，check_out=2025-05-22
+(4, '2025-05-22 12:00:00', '2025-05-22 12:00:00',
+ 5, 1, 1, 5, 5, 5, 4, 5, 5, 5,
+'這次短暫的微旅行選擇了微嶼 IsleVilla，從一登上接駁船那刻就有種逃離城市的感覺。渡假村內部乾淨整潔，植物與建築的設計非常有品味，讓人一走進就感受到寧靜與放鬆。即使只住一晚，也覺得身心獲得完整的充電。',
+'若能在房間內提供更多插座會更方便充電。', NULL, 1, 1),
+
+-- 訂單5：member_id=2，check_out=2025-07-29
+(5, '2025-07-29 12:00:00', '2025-07-29 12:00:00',
+ 5, 1, 1, 5, 5, 5, 5, 5, 5, 4,
+'微嶼 IsleVilla 是我近期住過最讓人放鬆的高級渡假村。不論是硬體設施還是人員服務都維持著高標準，網站訂房也很順利，資訊清楚、回覆迅速。感謝你們讓我與另一半度過一個完美假期，期待下次再訪！',
+NULL, NULL, 1, 1);
 
 -- DROP TABLE IF EXISTS feedback;
 
 
 -- 最新消息 news （陳薇淨）
 CREATE TABLE news(
-    news_id       INT           AUTO_INCREMENT,                      -- 最新消息編號 (PK) (AI)
-    news_title    VARCHAR(20)   NOT NULL,                            -- 最新消息標題
-    news_content  VARCHAR(100)  NOT NULL,                            -- 最新消息內容
-    news_image    LONGBLOB,                                          -- 最新消息圖片
-    news_time     DATETIME      NOT NULL,                            -- 最新消息上傳時間
-    news_status TINYINT NOT NULL DEFAULT 1 COMMENT '0:下架, 1:上架', -- 最新消息狀態
-    CONSTRAINT pk_news_id PRIMARY KEY(news_id)
+    news_id				INT				AUTO_INCREMENT,											-- 最新消息編號 (PK) (AI)
+    news_title			VARCHAR(20)		NOT NULL,												-- 最新消息標題
+    news_content		VARCHAR(1000)	NOT NULL,												-- 最新消息內容
+    news_image			LONGBLOB,																-- 最新消息圖片
+    news_time			DATETIME		NOT NULL,												-- 最新消息上傳時間
+    news_status			TINYINT			NOT NULL		DEFAULT 1	COMMENT '0:下架, 1:上架',	-- 最新消息狀態
+    room_promotion_id	INT,            														-- 對應優惠專案
+    CONSTRAINT pk_news_id PRIMARY KEY(news_id),
+    CONSTRAINT fk_n_room_promotion_id FOREIGN KEY(room_promotion_id) REFERENCES promotion(room_promotion_id)
 );
 
-INSERT INTO news (news_title, news_content, news_time, news_status)
-VALUES ('春假出遊推薦', '適合學生與家庭出遊的春假專案，2025/03/10 至 2025/03/20。',              '2025-03-03 09:00:00', 1),
-	   ('房客評價破千', '感謝支持，我們已累積超過1000則五星好評！',                              '2025-04-01 18:00:00', 1),
-       ('免費早餐延長至10點', '應顧客建議，即日起早餐供應時間延長至上午10點。',                  '2025-04-05 07:00:00', 1),
-       ('兒童遊樂區升級完成', '兒童遊樂區已完成升級，歡迎親子同遊！',                            '2025-04-15 12:00:00', 1),
-       ('泳池維修公告', '5/10~5/15泳池進行維修，造成不便敬請見諒。',                             '2025-04-25 11:00:00', 1),
-       ('網站改版通知', '全新官方網站上線，提供更便捷的訂房體驗！',                              '2025-05-10 10:30:00', 1),
-       ('暑期優惠開跑', '指定房型享 85 折優惠，活動期間為 2025/07/01 至 2025/08/31。',           '2025-06-25 00:00:00', 1),
-	   ('秋季旅行計畫推薦', '歡慶中秋佳節，景房限時優惠中，2025/10/03 至 2025/10/10。',          '2025-09-26 00:00:00', 1),
-       ('週末快閃特惠', '僅限週末訂房，2025/09/06 至 2025/09/08 優惠開跑！',                     '2025-09-05 00:00:00', 1),
-       ('限時快閃活動！', '限時兩天，先搶先贏！優惠期間：2025/09/15 至 2025/09/17。',            '2025-09-14 00:00:00', 1),
-       ('早鳥優惠開跑', '提前預訂享雙人房 75 折折扣，優惠至 2025/10/01。',                       '2025-09-24 00:00:00', 1),
-       ('中秋促銷限定', '歡慶中秋佳節，景房型優惠中，快來預訂！',                                '2025-10-03 00:00:00', 1),
-       ('週年慶活動', '慶祝開館週年，推出多項感恩回饋，活動期間：2025/11/01 至 2025/11/03。',    '2025-11-01 00:00:00', 1),
-       ('聖誕禮物大放送', '聖誕節首夜位房型回饋價！優惠期間：2025/12/24 至 2025/12/26。',        '2025-12-17 00:00:00', 1),
-       ('元旦住宿優惠開跑', '2026 開年住房折扣，優惠期間：2026/01/01 至 2026/01/07，快來搶訂！', '2025-12-24 00:00:00', 1);
+INSERT INTO news (news_title, news_content, news_time, news_status, room_promotion_id)
+VALUES 
+('春假出遊推薦', '適合學生與家庭出遊的春假專案', '2025-03-03 09:00:00', 1, 1),
+('房客評價破千', '感謝支持，我們已累積超過1000則五星好評！', '2025-04-01 18:00:00', 1, NULL),
+('免費早餐延長至10點', '應顧客建議，即日起早餐供應時間延長至上午10點。', '2025-04-05 07:00:00', 1, NULL),
+('兒童遊樂區升級完成', '兒童遊樂區已完成升級，歡迎親子同遊！', '2025-04-15 12:00:00', 1, NULL),
+('泳池維修公告', '5/10~5/15泳池進行維修，造成不便敬請見諒。', '2025-04-25 11:00:00', 1, NULL),
+('網站改版通知', '全新官方網站上線，提供更便捷的訂房體驗！', '2025-05-10 10:30:00', 1, NULL),
+('暑期優惠開跑', '指定房型享 85 折優惠', '2025-06-25 00:00:00', 1, 2),
+('秋季旅行計畫推薦', '歡慶中秋佳節，景房限時優惠中', '2025-09-26 00:00:00', 1, 7),
+('週末快閃特惠', '僅限週末訂房，2025/09/06 至 2025/09/08 優惠開跑！', '2025-09-05 00:00:00', 1, 3),
+('限時快閃活動！', '限時兩天，先搶先贏！', '2025-09-14 00:00:00', 1, 4),
+('早鳥優惠開跑', '提前預訂享雙人房 75 折折扣，優惠至 2025/10/01。', '2025-09-24 00:00:00', 1, 5),
+('中秋促銷限定', '歡慶中秋佳節，景房型優惠中，快來預訂！', '2025-10-03 00:00:00', 1, 6),
+('週年慶活動', '慶祝開館週年，推出多項感恩回饋', '2025-11-01 00:00:00', 1, 8),
+('聖誕禮物大放送', '聖誕節首夜位房型回饋價！', '2025-12-17 00:00:00', 1, 9),
+('元旦住宿優惠開跑', '2026 開年住房折扣，優惠期間：2026/01/01 至 2026/01/07，快來搶訂！', '2025-12-24 00:00:00', 1, 10);
 
 -- DROP TABLE IF EXISTS news;
 

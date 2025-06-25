@@ -3,108 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <title>優惠券列表</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+
+    <style>
+        /* .sort-link:hover {
+            color: #007bff !important;
+            text-decoration: underline !important;
+        }
+        .sort-link {
+            cursor: pointer;
+        }
+        .sort-icon {
+            font-size: 0.8em;
+        } */
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h2>優惠券列表</h2>
-        <div class="row mt-4">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-body">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>優惠券編號</th>
-                                    <th>優惠券代碼</th>
-                                    <th>折扣金額</th>
-                                    <th>最低消費金額</th>
-                                    <th>啟用日期</th>
-                                    <th>結束日期</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="coupon, iterStat : ${couponListData}">
-                                    <form th:action="@{/coupon/update}" method="post">
-                                        <td>
-                                            <input type="hidden" name="couponId" th:value="${coupon.couponId}" />
-                                            <span th:text="${coupon.couponId}"></span>
-                                        </td>
-                                        <td>
-                                            <span th:text="${coupon.couponCode}" th:attr="id='text-couponCode-' + ${iterStat.index}"></span>
-                                            <input type="text" name="couponCode" th:value="${coupon.couponCode}" class="form-control d-none" th:attr="id='input-couponCode-' + ${iterStat.index}" readonly />
-                                        </td>
-                                        <td>
-                                            <span th:text="${coupon.discountValue}" th:attr="id='text-discountValue-' + ${iterStat.index}"></span>
-                                            <input type="number" name="discountValue" th:value="${coupon.discountValue}" class="form-control d-none"
-                                                   th:attr="id='input-discountValue-' + ${iterStat.index}" required />
-                                        </td>
-                                        <td>
-                                            <span th:text="${coupon.minSpend}" th:attr="id='text-minSpend-' + ${iterStat.index}"></span>
-                                            <input type="number" name="minSpend" th:value="${coupon.minSpend}" class="form-control d-none"
-                                                   th:attr="id='input-minSpend-' + ${iterStat.index}" required />
-                                        </td>
-                                        <td>
-                                            <span th:text="${#temporals.format(coupon.startDate, 'yyyy-MM-dd')}" th:attr="id='text-startDate-' + ${iterStat.index}"></span>
-                                            <input type="date" name="startDate"
-                                                   th:value="${startDateMap[coupon.couponId]}"
-                                                   class="form-control d-none"
-                                                   th:attr="id='input-startDate-' + ${iterStat.index}" required />
-                                        </td>
-                                        <td>
-                                            <span th:text="${#temporals.format(coupon.endDate, 'yyyy-MM-dd')}" th:attr="id='text-endDate-' + ${iterStat.index}"></span>
-                                            <input type="date" name="endDate"
-                                                   th:value="${endDateMap[coupon.couponId]}"
-                                                   class="form-control d-none"
-                                                   th:attr="id='input-endDate-' + ${iterStat.index}" required />
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn btn-primary btn-sm"
-                                                    th:attr="id='editBtn-' + ${iterStat.index}"
-                                                    th:onclick="|enableEditRow(${iterStat.index})|"
-                                            >修改</button>
-                                            <button type="submit" class="btn btn-success btn-sm d-none"
-                                                    th:attr="id='saveBtn-' + ${iterStat.index}"
-                                                    th:onclick="|return validateRow(${iterStat.index})|"
-                                            >儲存</button>
-                                            <button type="button" class="btn btn-secondary btn-sm d-none"
-                                                    th:attr="id='cancelBtn-' + ${iterStat.index}"
-                                                    th:onclick="|cancelEditRow(${iterStat.index})|"
-                                            >取消</button>
-                                            <a th:href="@{/coupon/delete(couponId=${coupon.couponId})}" class="btn btn-danger btn-sm" onclick="return confirm('確定要刪除此優惠券嗎？')">刪除</a>
-                                            <div th:if="${rowErrorMap != null and rowErrorMap[coupon.couponId] != null}" class="text-danger">
-                                                <ul>
-                                                    <li th:each="msg : ${rowErrorMap[coupon.couponId]}" th:text="${msg}"></li>
-                                                </ul>
-                                            </div>
-                                        </td>
-                                    </form>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div class="mt-3">
-                            <a href="/coupon/add" class="btn btn-success">新增優惠券</a>
-                            <a href="/coupon/select_page" class="btn btn-secondary">返回查詢</a>
-                            <a href="/" class="btn btn-secondary">返回首頁</a>
-                        </div>
+<!-- ===== 載入Sidebar ===== -->
+<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+
+<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+    <th:block th:fragment="myContent">
+        <div class="card-header bg-transparent border-0 pt-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0 fw-bold">
+                    <i class="bi bi-ticket-perforated me-2"></i>優惠券管理
+                </h4>
+                <div>
+                    <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#addCouponModal">新增優惠券</button>
+                </div>
+            </div>
+            <!-- 查詢列：依優惠券代碼查詢 -->
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="couponCodeSearchInput" placeholder="輸入優惠券代碼查詢" />
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="couponTable" class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>優惠券編號</th>
+                            <th>優惠券代碼</th>
+                            <th>折扣金額</th>
+                            <th>最低消費金額</th>
+                            <th>啟用日期</th>
+                            <th>結束日期</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="coupon, iterStat : ${couponListData}">
+                            <form th:action="@{/backend/coupon/update}" method="post">
+                                <td>
+                                    <input type="hidden" name="couponId" th:value="${coupon.couponId}" />
+                                    <span th:text="${coupon.couponId}"></span>
+                                </td>
+                                <td>
+                                    <span th:text="${coupon.couponCode}" th:attr="id='text-couponCode-' + ${iterStat.index}"></span>
+                                    <input type="text" name="couponCode" th:value="${coupon.couponCode}" class="form-control d-none" th:attr="id='input-couponCode-' + ${iterStat.index}" readonly />
+                                </td>
+                                <td>
+                                    <span th:text="${coupon.discountValue}" th:attr="id='text-discountValue-' + ${iterStat.index}"></span>
+                                    <input type="number" name="discountValue" th:value="${coupon.discountValue}" class="form-control d-none"
+                                           th:attr="id='input-discountValue-' + ${iterStat.index}" required />
+                                </td>
+                                <td>
+                                    <span th:text="${coupon.minSpend}" th:attr="id='text-minSpend-' + ${iterStat.index}"></span>
+                                    <input type="number" name="minSpend" th:value="${coupon.minSpend}" class="form-control d-none"
+                                           th:attr="id='input-minSpend-' + ${iterStat.index}" required />
+                                </td>
+                                <td>
+                                    <span th:text="${#temporals.format(coupon.startDate, 'yyyy-MM-dd')}" th:attr="id='text-startDate-' + ${iterStat.index}"></span>
+                                    <input type="date" name="startDate"
+                                           th:value="${startDateMap[coupon.couponId]}"
+                                           class="form-control d-none"
+                                           th:attr="id='input-startDate-' + ${iterStat.index}" required />
+                                </td>
+                                <td>
+                                    <span th:text="${#temporals.format(coupon.endDate, 'yyyy-MM-dd')}" th:attr="id='text-endDate-' + ${iterStat.index}"></span>
+                                    <input type="date" name="endDate"
+                                           th:value="${endDateMap[coupon.couponId]}"
+                                           class="form-control d-none"
+                                           th:attr="id='input-endDate-' + ${iterStat.index}" required />
+                                </td>
+                                <td>
+                                    <a type="button" class="btn btn-sm btn-primary"
+                                       th:attr="id='editBtn-' + ${iterStat.index},data-id=${coupon.couponId},data-code=${coupon.couponCode},data-name=${coupon.couponCode},data-value=${coupon.discountValue},data-min=${coupon.minSpend},data-start=${#temporals.format(coupon.startDate, 'yyyy-MM-dd')},data-end=${#temporals.format(coupon.endDate, 'yyyy-MM-dd')}"
+                                       th:onclick="|enableEditRow(${iterStat.index})|">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="submit" class="btn btn-success btn-sm d-none"
+                                            th:attr="id='saveBtn-' + ${iterStat.index}"
+                                            th:onclick="|return validateRow(${iterStat.index})|"
+                                    >儲存</button>
+                                    <button type="button" class="btn btn-secondary btn-sm d-none"
+                                            th:attr="id='cancelBtn-' + ${iterStat.index}"
+                                            th:onclick="|cancelEditRow(${iterStat.index})|"
+                                    >取消</button>
+                                    <a th:href="@{/backend/coupon/delete(couponId=${coupon.couponId})}" class="btn btn-danger btn-sm" onclick="return confirm('確定要刪除此優惠券嗎？')">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                    <div th:if="${rowErrorMap != null and rowErrorMap[coupon.couponId] != null}" class="text-danger">
+                                        <ul>
+                                            <li th:each="msg : ${rowErrorMap[coupon.couponId]}" th:text="${msg}"></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </form>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </th:block>
+</main>
+<!-- DataTable排序與分頁功能 -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/v/bs5/dt-1.13.4/datatables.min.js"></script>
+<script>
+$(function(){
+    var table = $('#couponTable').DataTable({
+        dom: "t<'d-flex justify-content-center my-3'p>",
+        pagingType: 'simple_numbers',
+        lengthChange: false,
+        info: false,
+        order: [],
+        language: {
+            paginate: {
+                previous: '上一頁',
+                next:     '下一頁'
+            }
+        },
+        drawCallback: function(){
+            var $pg = $('#couponTable_wrapper .pagination');
+            $pg.find('li.disabled a, li.active a')
+                .each(function(){
+                    var txt = $(this).text();
+                    $(this).replaceWith(
+                        $('<span/>').addClass('page-link').text(txt)
+                    );
+                });
+        }
+    });
+    // 優惠券代碼查詢功能
+    $('#couponCodeSearchInput').on('keyup', function(){
+        table.column(1).search(this.value).draw();
+    });
+});
+</script>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
     <script>
         function enableEditRow(idx) {
-            // 只允許其他欄位可編輯，couponCode 不顯示 input
             ["discountValue", "minSpend", "startDate", "endDate"].forEach(function(field) {
                 document.getElementById('text-' + field + '-' + idx).classList.add('d-none');
-                document.getElementById('input-' + field + '-' + idx).classList.remove('d-none');
+                var input = document.getElementById('input-' + field + '-' + idx);
+                input.classList.remove('d-none');
+                input.removeAttribute('readonly');
             });
-            // couponCode 僅顯示 span，不顯示 input
             document.getElementById('text-couponCode-' + idx).classList.remove('d-none');
             document.getElementById('input-couponCode-' + idx).classList.add('d-none');
             document.getElementById('editBtn-' + idx).classList.add('d-none');
@@ -114,7 +180,9 @@
         function cancelEditRow(idx) {
             ["discountValue", "minSpend", "startDate", "endDate"].forEach(function(field) {
                 document.getElementById('text-' + field + '-' + idx).classList.remove('d-none');
-                document.getElementById('input-' + field + '-' + idx).classList.add('d-none');
+                var input = document.getElementById('input-' + field + '-' + idx);
+                input.classList.add('d-none');
+                input.setAttribute('readonly', true);
             });
             document.getElementById('text-couponCode-' + idx).classList.remove('d-none');
             document.getElementById('input-couponCode-' + idx).classList.add('d-none');
@@ -142,6 +210,54 @@
                 return true;
             }
         }
+    </script>
+    <!-- 新增優惠券 Modal -->
+    <div class="modal fade" id="addCouponModal" tabindex="-1" aria-labelledby="addCouponModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCouponModalLabel">新增優惠券</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/backend/coupon/add}" th:object="${coupon}" method="post">
+                    <div class="modal-body">
+                        <div th:if="${errorMessages}" class="alert alert-danger">
+                            <ul>
+                                <li th:each="msg : ${errorMessages}" th:text="${msg}"></li>
+                            </ul>
+                        </div>
+                        <div class="mb-3">
+                            <label for="couponCode" class="form-label">優惠券代碼</label>
+                            <input type="text" class="form-control" id="couponCode" th:field="*{couponCode}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="discountValue" class="form-label">折扣金額</label>
+                            <input type="number" class="form-control" id="discountValue" th:field="*{discountValue}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="minSpend" class="form-label">最低消費金額</label>
+                            <input type="number" class="form-control" id="minSpend" th:field="*{minSpend}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="startDate" class="form-label">啟用日期</label>
+                            <input type="date" class="form-control" id="startDate" th:field="*{startDate}" th:value="${startDateStr}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="endDate" class="form-label">結束日期</label>
+                            <input type="date" class="form-control" id="endDate" th:field="*{endDate}" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-success">新增</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script th:if="${showAddModal}">
+        var addCouponModal = new bootstrap.Modal(document.getElementById('addCouponModal'));
+        addCouponModal.show();
     </script>
 </body>
 </html> 

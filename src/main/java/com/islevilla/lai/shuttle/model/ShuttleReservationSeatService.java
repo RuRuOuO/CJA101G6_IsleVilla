@@ -26,9 +26,8 @@ public class ShuttleReservationSeatService {
 
 	// 根據複合主鍵查詢座位預約關聯
 	public Optional<ShuttleReservationSeat> findById(Integer shuttleReservationId, Integer seatId) {
-		ShuttleReservationSeat.ShuttleReservationSeatId id = new ShuttleReservationSeat.ShuttleReservationSeatId();
-		id.setShuttleReservationId(shuttleReservationId);
-		id.setSeatId(seatId);
+		ShuttleReservationSeat.ShuttleReservationSeatId id = 
+			new ShuttleReservationSeat.ShuttleReservationSeatId(shuttleReservationId, seatId);
 		return shuttleReservationSeatRepository.findById(id);
 	}
 
@@ -38,64 +37,65 @@ public class ShuttleReservationSeatService {
 	}
 
 	// 根據預約ID查詢所有座位
-//	public List<ShuttleReservationSeat> findByShuttleReservationId(Integer shuttleReservationId) {
-//		return shuttleReservationSeatRepository.findByShuttleReservationId(shuttleReservationId);
-//	}
+	public List<ShuttleReservationSeat> findByShuttleReservationId(Integer shuttleReservationId) {
+		return shuttleReservationSeatRepository.findByShuttleReservationId(shuttleReservationId);
+	}
 
 	// 根據座位ID查詢所有預約
-//	public List<ShuttleReservationSeat> findBySeatId(Integer seatId) {
-//		return shuttleReservationSeatRepository.findBySeatId(seatId);
-//	}
+	public List<ShuttleReservationSeat> findBySeatId(Integer seatId) {
+		return shuttleReservationSeatRepository.findBySeatId(seatId);
+	}
 
 	// 檢查座位預約關聯是否存在
-//	public boolean existsByShuttleReservationIdAndSeatId(Integer shuttleReservationId, Integer seatId) {
-//		return shuttleReservationSeatRepository.existsByShuttleReservationIdAndSeatId(shuttleReservationId, seatId);
-//	}
+	public boolean existsByShuttleReservationIdAndSeatId(Integer shuttleReservationId, Integer seatId) {
+		return shuttleReservationSeatRepository.existsByShuttleReservationIdAndSeatId(shuttleReservationId, seatId);
+	}
 
 	// 刪除座位預約關聯
 	public void deleteById(Integer shuttleReservationId, Integer seatId) {
-		ShuttleReservationSeat.ShuttleReservationSeatId id = new ShuttleReservationSeat.ShuttleReservationSeatId();
-		id.setShuttleReservationId(shuttleReservationId);
-		id.setSeatId(seatId);
+		ShuttleReservationSeat.ShuttleReservationSeatId id = 
+			new ShuttleReservationSeat.ShuttleReservationSeatId(shuttleReservationId, seatId);
 		shuttleReservationSeatRepository.deleteById(id);
 	}
 
 	// 刪除特定預約的所有座位
-//	public void deleteByShuttleReservationId(Integer shuttleReservationId) {
-//		shuttleReservationSeatRepository.deleteByShuttleReservationId(shuttleReservationId);
-//	}
+	public void deleteByShuttleReservationId(Integer shuttleReservationId) {
+		shuttleReservationSeatRepository.deleteByShuttleReservationId(shuttleReservationId);
+	}
 
 	// 刪除特定座位的所有預約
-//	public void deleteBySeatId(Integer seatId) {
-//		shuttleReservationSeatRepository.deleteBySeatId(seatId);
-//	}
+	public void deleteBySeatId(Integer seatId) {
+		shuttleReservationSeatRepository.deleteBySeatId(seatId);
+	}
 
 	// 計算特定預約的座位數量
-//	public Long countSeatsByReservationId(Integer shuttleReservationId) {
-//		return shuttleReservationSeatRepository.countSeatsByReservationId(shuttleReservationId);
-//	}
+	public Long countSeatsByReservationId(Integer shuttleReservationId) {
+		return shuttleReservationSeatRepository.countSeatsByReservationId(shuttleReservationId);
+	}
 
-	// 計算特定座位的預約數量 (出錯)
-//	public Long countReservationsBySeatId(Integer seatId) {
-//		return shuttleReservationSeatRepository.countReservationsBySeatId(seatId);
-//	}
+	// 計算特定座位的預約數量
+	public Long countReservationsBySeatId(Integer seatId) {
+		return shuttleReservationSeatRepository.countReservationsBySeatId(seatId);
+	}
 
 	// 為特定預約新增座位
-//	public ShuttleReservationSeat addSeatToReservation(Integer shuttleReservationId, Integer seatId) {
-//		if (existsByShuttleReservationIdAndSeatId(shuttleReservationId, seatId)) {
-//			throw new IllegalArgumentException("座位已經被預約");
-//		}
-//
-//		ShuttleReservationSeat shuttleReservationSeat = new ShuttleReservationSeat();
-//		shuttleReservationSeat.setShuttleReservationId(shuttleReservationId);
-//		shuttleReservationSeat.setSeatId(seatId);
-//
-//		return save(shuttleReservationSeat);
-//	}
+	public ShuttleReservationSeat addSeatToReservation(Integer shuttleReservationId, Integer seatId) {
+		if (existsByShuttleReservationIdAndSeatId(shuttleReservationId, seatId)) {
+			throw new IllegalArgumentException("座位已經被預約");
+		}
+
+		ShuttleReservationSeat shuttleReservationSeat = new ShuttleReservationSeat();
+		shuttleReservationSeat.setShuttleReservationId(shuttleReservationId);
+		shuttleReservationSeat.setSeatId(seatId);
+
+		return save(shuttleReservationSeat);
+	}
 
 	// 為特定預約新增多個座位
-//	public List<ShuttleReservationSeat> addSeatsToReservation(Integer shuttleReservationId, List<Integer> seatIds) {
-//		return seatIds.stream().map(seatId -> addSeatToReservation(shuttleReservationId, seatId)).toList();
-//	}
+	public List<ShuttleReservationSeat> addSeatsToReservation(Integer shuttleReservationId, List<Integer> seatIds) {
+		return seatIds.stream()
+			.map(seatId -> addSeatToReservation(shuttleReservationId, seatId))
+			.toList();
+	}
 	
 }
