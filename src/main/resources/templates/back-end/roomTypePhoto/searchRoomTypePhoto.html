@@ -1,25 +1,71 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>微嶼 | Isle Villa 後台首頁</title>
-    <!-- ===== 載入統一樣式 ===== -->
-    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>微嶼 | Isle Villa 後台首頁</title>
+<!-- ===== 載入統一樣式 ===== -->
+<th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+<link href="/css/roomTypePhoto.css" rel="stylesheet">
 </head>
 <body>
-<!-- ===== 載入sidebar ===== -->
-<!-- 插入手機版側邊欄 -->
-<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
-<!-- 插入桌面版側邊欄 -->
-<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+	<!-- ===== 載入sidebar ===== -->
+	<!-- 插入手機版側邊欄 -->
+	<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+	<!-- 插入桌面版側邊欄 -->
+	<div th:replace="~{fragments/backFragments :: sidebar}"></div>
 
-<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
-    <th:block th:fragment="myContent">
-        <!-- //////////////////// 頁面內容放在這個card裡面(外框已經有加card和container，直接放入table和標題即可)//////////////////// -->
-        
-        <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
-    </th:block>
-</main>
+	<main
+		th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+		<th:block th:fragment="myContent">
+			<div class=" text-center py-4 ">
+				<h1 class="h3 mb-0">
+					<i class="bi bi-house-add me-2"></i>圖片查詢結果
+				</h1>
+			</div>
+			<div class="table-responsive">
+				<table class="table table-striped table-hover">
+					<thead class="table-dark">
+						<tr>
+							<th>房型圖片ID</th>
+							<th>房型</th>
+							<th>圖片</th>
+							<th>修改</th>
+							<th>刪除</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="rtp : ${searchResult}">
+							<td th:text="${rtp.roomTpyePhotoId}">房型圖片ID</td>
+							<td th:text="${rtp.roomType.roomTypeName}">房型</td>
+							<td th:text="${rtp.roomTpyePhoto}">圖片</td>
+							<td>
+								<a th:href="@{/backend/roomTypePhoto/updateRoomTypePhoto/{roomTpyePhotoId}(roomTpyePhotoId=${rtp.roomTpyePhotoId})}"
+									class="btn btn-primary btn-sm"> 
+									<i class="bi bi-pencil"></i>修改
+								</a>
+							</td>
+							<td>
+								<a th:href="@{/backend/roomTypePhoto/deleteRoomTypePhoto/{roomTpyePhotoId}(roomTpyePhotoId=${rtp.roomTpyePhotoId})}"
+									class="btn btn-primary btn-sm"> 
+									<i class="bi bi-pencil"></i> 刪除
+								</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<div class="d-grid gap-2 d-md-flex justify-content-md-end">
+					<a th:href="@{/backend/room/listAllRoomTypePhoto}"
+						class="btn btn-primary btn-sm"> 
+						<i class="bi bi-arrow-left me-1"></i>回到總覽頁面
+					</a>
+				</div>
+			</div>
+
+			<!-- JS -->
+			<script src="/js/roomTypePhoto.js"></script>
+		</th:block>
+	</main>
 </body>
 </html>

@@ -2,6 +2,7 @@ package com.islevilla.chen.roomTypePhoto.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -12,64 +13,87 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.islevilla.chen.room.model.Room;
 import com.islevilla.chen.roomType.model.RoomType;
 import com.islevilla.chen.roomType.model.RoomTypeService;
 import com.islevilla.chen.roomTypePhoto.model.RoomTypePhoto;
 import com.islevilla.chen.roomTypePhoto.model.RoomTypePhotoService;
+import com.islevilla.chen.util.map.RoomTypeName;
 
 @Controller
 @RequestMapping("/backend/roomTypePhoto")
 public class RoomTypePhotoController {
-	
+
 	@Autowired
 	private  RoomTypePhotoService roomTypePhotoService;
 	@Autowired
-	private  RoomTypeService roomTypeService;
+	private  RoomTypeName roomTypeName;
 
 //顯示selectRoomTypePhoto網頁
 @GetMapping("/selectRoomTypePhoto")
 public String showSelectPage(Model model) {
-	
 	RoomTypePhoto roomTypePhoto = new RoomTypePhoto();
 	// 獲取所有房型供下拉選單使用
-    List<RoomType> roomTypeList = roomTypeService.findAll();
+    List<RoomType> roomTypeList = roomTypeName.getRoomTypeNameList();
     
     System.out.println("進入頁面");
     model.addAttribute("roomTypePhoto", roomTypePhoto);
     model.addAttribute("roomTypeList", roomTypeList);
-    return "back-end/roomTypePhoto/selectRoomTypePhoto";
+    return "/back-end/roomTypePhoto/selectRoomTypePhoto";
 }
-//	    @PostMapping("/selectRoomTypePhoto")
-//	    public String showSelectPage() {
-//	    	return "room_type_photo/select_page";
-//	    }
-	    
-//	    @GetMapping("/getOne")
-//	    public String getOne(@RequestParam("roomTypePhotoId") String roomTypePhotoIdStr, 
-//	                        Model model, RedirectAttributes redirectAttributes) {
-//	        
-//	        List<String> errorMsg = new ArrayList<>();
-//	        
-//	        // 驗證輸入
-//	        if (roomTypePhotoIdStr == null || roomTypePhotoIdStr.trim().isEmpty()) {
-//	            errorMsg.add("沒輸入數字，請輸入圖片編號");
-//	        }
-//	        
-//	        if (!errorMsg.isEmpty()) {
-//	            redirectAttributes.addFlashAttribute("errorMsg", errorMsg);
-//	            return "redirect:/room-type-photo/select";
-//	        }
-//	        
-//	        Integer roomTypePhotoId;
-//	        try {
-//	            roomTypePhotoId = Integer.valueOf(roomTypePhotoIdStr);
-//	        } catch (NumberFormatException e) {
-//	            errorMsg.add("輸入不是數字格式，請重新輸入");
-//	            redirectAttributes.addFlashAttribute("errorMsg", errorMsg);
-//	            return "redirect:/room-type-photo/select";
-//	        }
-//	    }
-}
+	    @PostMapping("/selectRoomTypePhoto")
+	    public String selectRoomTypePhoto(@ModelAttribute("roomTypePhoto") RoomTypePhoto roomTypePhoto, Model model) {
+	    	List<String> errorMessage = new ArrayList<>();
+	    	List<RoomTypePhoto> searchResult = roomTypePhotoService.compoundQuery(roomTypePhoto.getRoomTypePhotoId(), roomTypePhoto.getRoomType().getRoomTypeId());
+	    	if (searchResult.isEmpty()) {
+	            errorMessage.add("查無符合條件的房間資料");
+	        }
+	        
+	        // 房型下拉選單選項
+		    List<RoomType> roomTypeList=roomTypeName.getRoomTypeNameList();
+		    // 創建房型名稱對應表（查詢結果需要顯示房型名稱）
+		    Map<Integer, String> roomTypeNameMap=roomTypeName.getRoomTypeNameMap();
+		    // 將結果傳遞給頁面
+		    model.addAttribute("searchResult", searchResult);
+		    model.addAttribute("roomTypeList", roomTypeList);
+		    model.addAttribute("roomTypeNameMap", roomTypeNameMap);
+		    
+		    if (!errorMessage.isEmpty()) {
+		        model.addAttribute("errorMessage", errorMessage);
+		        return "/back-end/roomTypePhoto/selectRoomTypePhoto";
+		    }
+		    
+		    System.out.println("查詢完成，找到 " + searchResult.size() + " 筆資料");
+		    return "back-end/roomTypePhoto/searchRoomTypePhoto";
+	    }
+}	    
+////顯示searchRoomTypePhoto網頁
+//@GetMapping("/searchRoomTypePhoto")
+//public String getOne(@RequestParam("roomTypePhotoId") String roomTypePhotoIdStr, 
+//                    Model model, RedirectAttributes redirectAttributes) {
+//    
+//    List<String> errorMsg = new ArrayList<>();
+//    
+//    // 驗證輸入
+//    if (roomTypePhotoIdStr == null || roomTypePhotoIdStr.trim().isEmpty()) {
+//        errorMsg.add("沒輸入數字，請輸入圖片編號");
+//    }
+//    
+//    if (!errorMsg.isEmpty()) {
+//        redirectAttributes.addFlashAttribute("errorMsg", errorMsg);
+//        return "redirect:/room-type-photo/select";
+//    }
+//    
+//    Integer roomTypePhotoId;
+//    try {
+//        roomTypePhotoId = Integer.valueOf(roomTypePhotoIdStr);
+//    } catch (NumberFormatException e) {
+//        errorMsg.add("輸入不是數字格式，請重新輸入");
+//        redirectAttributes.addFlashAttribute("errorMsg", errorMsg);
+//        return "redirect:/room-type-photo/select";
+//    }
+//}
+//}
 //	        
 //	        // 查詢資料
 //	        Optional<RoomTypePhoto> photoOpt = roomTypePhotoService.getOne(roomTypePhotoId);

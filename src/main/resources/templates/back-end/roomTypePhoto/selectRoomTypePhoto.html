@@ -6,6 +6,7 @@
     <title>微嶼 | Isle Villa 後台首頁</title>
     <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+	<link href="/css/roomTypePhoto.css" rel="stylesheet">
 </head>
 <body>
 <!-- ===== 載入sidebar ===== -->
@@ -16,30 +17,27 @@
 
 <main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
     <th:block th:fragment="myContent">
+    
               <div class="text-center">
                 <h1 class="h3 mb-0"><i class="bi bi-camera me-2"></i>房型照片查詢</h1>
               </div>
-
               <div class="card-body p-4">
                 <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
                   <i class="bi bi-info-circle me-2"></i>
                   <div>
-                    <strong>提示：</strong>支援上傳房型照片格式為 JPG、PNG，檔案大小不超過 5MB。
+                    <strong>提示：</strong>可以使用單一條件或組合條件進行查詢，留空的欄位將不作為查詢條件。
                   </div>
                 </div>
-                
+                <div th:if="${successMessage}" class="alert alert-success" id="successMessage" role="alert">
+                    <span th:text="${successMessage}"></span>
+                </div>
                 <div th:if="${errorMessage}" class="alert alert-error" id="errorMessage" role="alert">
                   <ul class="mb-0">
                     <li th:each="msg : ${errorMessage}" th:text="${msg}"></li>
                   </ul>
                 </div>
 
-                <div th:if="${successMessage}" class="alert alert-success d-none" id="successMessage" role="alert">
-                  <i class="bi bi-check-circle me-2"></i>
-                  <span th:text="${successMessage}"></span>
-                </div>
-
-                <form id="roomTypePhotoForm" th:action="@{/backend/roomTypePhoto/selectRoomTypePhoto}" method="post" enctype="multipart/form-data" novalidate data-validate-mode="strict">
+                <form id="roomTypePhotoForm" th:action="@{/backend/roomTypePhoto/selectRoomTypePhoto}" th:object="${roomTypePhoto}" method="post" enctype="multipart/form-data" novalidate data-validate-mode="loose">
                   <div class="mb-3">
                     <label for="roomTypePhotoId" class="form-label">
                       <i class="bi bi-hash me-1"></i>圖片ID
@@ -48,9 +46,7 @@
                       type="number"
                       class="form-control form-control-lg" 
                       placeholder="請輸入要查詢的圖片ID"
-                      name="roomTypePhotoId"
-                      id="roomTypePhotoId"
-                      readonly
+                      th:field="*{roomTypePhotoId}"
                     >
                   </div>
 
@@ -59,8 +55,8 @@
                       <i class="bi bi-house me-1"></i>房型ID <span class="text-danger">*</span>
                     </label>
                     <select 
-                      name="roomTypeId"  
-                      id="roomTypeId"  
+                      th:field="*{roomType}" 
+                       
                       class="form-select form-select-lg"
                       required
                     >
@@ -74,15 +70,18 @@
                   </div>
 
                   <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                    <button type="submit" class="btn btn-primary btn-lg px-4">
-                      <i class="bi bi-cloud-upload me-1"></i>上傳照片
-                    </button>
+                    <a th:href="@{/backend/roomTypePhoto/addRoomTypePhoto}" class="btn btn-primary btn-sm">
+                      <i class="bi bi-cloud-upload me-1"></i>新增照片
+                    </a>
                     <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="resetForm()">
                       <i class="bi bi-arrow-clockwise me-1"></i>重置
                     </button>
-                    <button type="button" class="btn btn-secondary btn-lg px-4" onclick="goRoomTypePhotoList()">
-                      <i class="bi bi-list me-1"></i>全部圖片
+					<button type="submit" class="btn btn-success btn-lg px-4">
+                      <i class="bi bi-search me-1"></i>查詢
                     </button>
+                    <a th:href="@{/backend/room/listAllRoomTypePhoto}" class="btn btn-primary btn-sm">
+                      <i class="bi bi-list me-1"></i>全部圖片
+                    </a>
                   </div>
                 </form>
               </div>

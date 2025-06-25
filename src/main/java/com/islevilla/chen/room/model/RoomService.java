@@ -9,6 +9,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.islevilla.chen.util.exception.BusinessException;
+
 @Service
 public class RoomService {
 
@@ -17,6 +19,9 @@ public class RoomService {
 	
 	@Transactional
 	public Room addRoom(Room room) {
+		if(roomRepository.findById(room.getRoomId()).isPresent()) {
+	        throw new BusinessException("房間ID已存在！");
+	    }
 		return roomRepository.save(room);
 	}
 	

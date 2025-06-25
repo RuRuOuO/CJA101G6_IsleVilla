@@ -18,6 +18,7 @@ import com.islevilla.chen.room.model.Room;
 import com.islevilla.chen.room.model.RoomService;
 import com.islevilla.chen.roomType.model.RoomType;
 import com.islevilla.chen.roomType.model.RoomTypeService;
+import com.islevilla.chen.util.exception.BusinessException;
 import com.islevilla.chen.util.map.RoomTypeName;
 
 import jakarta.servlet.http.HttpSession;
@@ -61,39 +62,28 @@ public String showAddRoom(Model model) {
 	return "/back-end/room/addRoom";
 }
 	
-	//處理網頁送出的請求
+//處理網頁送出的請求
 	@PostMapping("/addRoom")
 	public String addRoom(@ModelAttribute("room") Room room, Model model) {
-		Room existingRoom = roomService.findById(room.getRoomId());
-		List<String> errorMessages = new ArrayList<>();
 		// 房型下拉選單選項
 	    List<RoomType> roomTypeList=roomTypeName.getRoomTypeNameList();
 	    
 		model.addAttribute("roomTypeList", roomTypeList); 
 		model.addAttribute("roomStatusMap", roomStatusMap); 
 		
-		//檢查房間是否已存在（避免重複）
-		if(existingRoom!=null) {
-			System.out.println("資料已存在");
-			errorMessages.add("房間ID已存在");
-		}
-		//檢查房型ID是否存在（避免外鍵錯誤）
-		if(roomTypeService.findById(room.getRoomTypeId()) == null) {
-			errorMessages.add("房型ID不存在，請重新輸入");
-		}
-
-		if(!errorMessages.isEmpty()) {
-			model.addAttribute("errorMessage", errorMessages);
-			return "/back-end/room/addRoom";
-		}else{
-			roomService.addRoom(room);
+		try {
+	        roomService.addRoom(room);
 			System.out.println("資料送出成功");
 			model.addAttribute("successMessage", "房間新增成功！");
 			model.addAttribute("room", room); 
 			return "back-end/room/addRoom";
-		}
-		
+	    } catch (BusinessException e) {
+	        // 統一處理例外，顯示給使用者
+	        model.addAttribute("errorMessage", e.getMessage());
+	        return "/back-end/room/addRoom";
+	    }
 	}
+
 
 	
 // 顯示SelectPage網頁
@@ -112,7 +102,7 @@ public String showSelectPage(Model model) {
 }	
 	
 	@PostMapping("/selectRoomPage")
-	public String searchRoom(@RequestParam(required = false) Integer roomId,
+	public String selectRoomPage(@RequestParam(required = false) Integer roomId,
 	                        @RequestParam(required = false) Integer roomTypeId,
 	                        @RequestParam(required = false) Byte roomStatus,
 	                        Model model) {

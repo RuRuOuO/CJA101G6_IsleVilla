@@ -11,16 +11,19 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "room_type_photo")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Component
-public class RoomTypePhoto {
-	
+public class RoomTypePhoto implements java.io.Serializable {
+	private static final long serialVersionUID = 1L;
 	@Id
 	@Column(name = "room_type_photo_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
