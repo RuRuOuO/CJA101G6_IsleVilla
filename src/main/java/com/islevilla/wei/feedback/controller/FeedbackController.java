@@ -22,11 +22,17 @@ public class FeedbackController {
         return "front-end/feedback/listAllFeedback";
     }
 
-    // 後台顯示全部feedback
-    @GetMapping("/backend/feedback/list")
-    public String backFeedbackList(Model model){
+    // 後台顯示全部feedback (thymeleaf版)
+    @GetMapping("/backend/thymeleaf/feedback/list")
+    public String backThyleafFeedbackList(Model model) {
         List<Feedback> feedbackList = feedbackService.findAll();
         model.addAttribute("feedbackList", feedbackList);
+        return "back-end/feedback/listAllFeedback_Thymeleaf";
+    }
+
+    // 後台顯示全部feedback (thymeleaf版)
+    @GetMapping("/backend/feedback/list")
+    public String backFeedbackList() {
         return "back-end/feedback/listAllFeedback";
     }
 }
