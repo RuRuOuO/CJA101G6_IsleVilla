@@ -20,34 +20,45 @@
         <h2 class="section-title text-center mb-5">最新消息一覽</h2>
         <!--新增最新消息-->
         <a class="btn btn-dark" th:href="@{/backend/news/add}">新增最新消息</a>
-        <table class="table table-striped-columns shadow-sm">
+        <table class="table table-striped-columns shadow-sm align-middle">
             <thead>
             <tr>
                 <th>編號</th>
                 <th>標題</th>
                 <th>內文</th>
-                <th>時間</th>
+                <th>優惠專案</th>
+                <th>上傳時間</th>
                 <th>圖片</th>
                 <th>狀態</th>
+                <th>操作</th>
             </tr>
             </thead>
             <tbody>
             <th:block th:each="news : ${newsList}">
                 <tr>
                     <td th:text="${news.newsId}"></td>
-                    <td th:text="${news.newsTitle}"></td>
-                    <td th:text="${news.newsContent}"></td>
+                    <td>
+                        <span class="d-inline-block text-truncate" style="width: 150px;"
+                        th:text="${news.newsTitle}"></span>
+                    </td>
+                    <td>
+                        <span class="d-inline-block text-truncate" style="width: 200px;"
+                        th:text="${news.newsContent}"></span>
+                    </td>
+                    <td>
+                        <span class="d-inline-block text-truncate" style="width: 120px;"
+                        th:text="${news.promotion != null ? news.promotion.roomPromotionTitle : '無'}"></span>
+                    </td>
                     <td th:text="${news.newsTime}"></td>
                     <td>
                         <img alt="消息圖片"
-                             style="max-height:40px; width: 80px; object-fit: cover;"
+                             style="max-height:40px; width: 40px; object-fit: cover;"
                              th:if="${news.newsImage != null}" th:src="@{'/news/image/' + ${news.newsId}}"/>
-                        <!-- 沒有圖片時顯示文字 -->
-                        <span th:unless="${news.newsImage != null}">無圖片</span>
+                        <span th:unless="${news.newsImage != null}">無</span>
                     </td>
                     <td th:text="${news.newsStatus == 1 ? '上架' : '下架'}"></td>
                     <td>
-                        <a class="btn btn-dark" th:href="@{'/backend/news/edit/' + ${news.newsId}}">修改</a>
+                        <a class="btn btn-dark btn-sm" th:href="@{'/backend/news/edit/' + ${news.newsId}}">修改</a>
                     </td>
                 </tr>
             </th:block>

@@ -1,5 +1,7 @@
 package com.islevilla.wei.news.controller;
 
+import com.islevilla.patty.promotion.model.Promotion;
+import com.islevilla.patty.promotion.model.PromotionService;
 import com.islevilla.wei.PageUtil;
 import com.islevilla.wei.news.model.News;
 import com.islevilla.wei.news.model.NewsService;
@@ -25,6 +27,9 @@ public class NewsController {
 
     @Autowired
     private NewsService newsService;
+
+    @Autowired
+    private PromotionService promotionService;
 
     // 前台顯示全部消息
     @GetMapping("/news/list")
@@ -62,7 +67,8 @@ public class NewsController {
     // 新增消息頁面
     @GetMapping("/backend/news/add")
     public String addNewsPage(Model model) { // model: spring自動建立的物件，用來傳遞資料
-        model.addAttribute("news", new News()); // ✅ news 名稱要對應上
+        model.addAttribute("news", new News());
+        model.addAttribute("promotionList", promotionService.getAll());
         return "back-end/news/addNews";
     }
 
@@ -71,8 +77,19 @@ public class NewsController {
     public String addNews(@Valid @ModelAttribute("news") News news,
                           BindingResult result,
                           Model model) {
+
+        // 表單驗證失敗：回填promotionList讓下拉選單能正確顯示
         if (result.hasErrors()) {
+            model.addAttribute("promotionList", promotionService.getAll());
             return "back-end/news/addNews";
+        }
+
+        //　如果有設定 Promotion，就從資料庫抓取實體
+        if (news.getPromotion() != null && news.getPromotion().getRoomPromotionId() != null) {
+            Promotion promotion = promotionService.getOnePromotion(news.getPromotion().getRoomPromotionId());
+            news.setPromotion(promotion);
+        } else {
+            news.setPromotion(null); // 沒有選擇就設為 null
         }
 
         newsService.addNews(news);
@@ -84,6 +101,7 @@ public class NewsController {
     public String editNews(@PathVariable("id") Integer id, Model model) {
         News news = newsService.getById(id); // 假設這方法存在
         model.addAttribute("news", news);
+        model.addAttribute("promotionList", promotionService.getAll());
         return "back-end/news/update_news_input"; // 指向你要渲染的編輯畫面
     }
 
@@ -91,6 +109,13 @@ public class NewsController {
     public String updateNews(
             @ModelAttribute("news") News news,
             @RequestParam("newsImageFile") MultipartFile imageFile) {
+        // 避免 TransientObjectException
+        if (news.getPromotion() != null && news.getPromotion().getRoomPromotionId() != null) {
+            Promotion promotion = promotionService.getOnePromotion(news.getPromotion().getRoomPromotionId());
+            news.setPromotion(promotion);
+        } else {
+            news.setPromotion(null); // 沒有選擇優惠專案就設為 null
+        }
 
         // 取得原始資料（含原圖）
         News originalNews = newsService.getById(news.getNewsId());

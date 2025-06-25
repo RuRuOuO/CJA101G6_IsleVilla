@@ -1,108 +1,6 @@
-// 日期範圍更新
-function updateDateRange() {
-    const roomSelect = document.querySelector('select[name="roomReservationId"]');
-    const dateInput = document.querySelector('input[name="shuttleDate"]');
-
-    if (!roomSelect || !dateInput) return;
-
-    const selectedOption = roomSelect.options[roomSelect.selectedIndex];
-
-    if (selectedOption && selectedOption.value) {
-        const checkInDate = selectedOption.getAttribute('data-checkin');
-        const checkOutDate = selectedOption.getAttribute('data-checkout');
-
-        if (checkInDate && checkOutDate) {
-            dateInput.min = checkInDate;
-            dateInput.max = checkOutDate;
-            dateInput.disabled = false;
-
-            // 更新提示文字
-            const helpText = dateInput.parentNode.querySelector('.form-text');
-            if (helpText) {
-                helpText.textContent = `可選擇日期範圍：${checkInDate} 至 ${checkOutDate}`;
-                helpText.style.color = '#28a745';
-            }
-        }
-    } else {
-        dateInput.disabled = true;
-        dateInput.value = '';
-        const helpText = dateInput.parentNode.querySelector('.form-text');
-        if (helpText) {
-            helpText.textContent = '請先選擇訂房記錄';
-            helpText.style.color = '#6c757d';
-        }
-    }
-}
-
-// 訂房選擇功能
-
-document.querySelectorAll('button[data-room-id]').forEach(button => {
-    button.addEventListener('click', function () {
-        const roomId = this.dataset.roomId;
-        const checkIn = this.dataset.checkIn;
-        const checkOut = this.dataset.checkOut;
-        selectRoomReservation(roomId, checkIn, checkOut);
-    });
-});
-
-
-function selectRoomReservation(roomReservationId, checkInDate, checkOutDate) {
-    // 設置訂房ID
-    const roomSelect = document.querySelector('select[name="roomReservationId"]');
-    if (roomSelect) {
-        roomSelect.value = roomReservationId;
-        updateDateRange();
-    }
-
-    // 滾動到表單區域
-    document.querySelector('#reservationForm').scrollIntoView({
-        behavior: 'smooth'
-    });
-}
-
 // 座位選擇相關功能
 let selectedSeats = [];
 let requiredSeats = 0;
-
-// 初始化座位選擇功能
-function initializeSeatSelection() {
-    const seatContainer = document.getElementById('seatGrid');
-    if (!seatContainer) return;
-
-    const requiredSeatsElement = document.querySelector('[th\\:text="${requiredSeats}"]');
-    const confirmButton = document.getElementById('confirmSeatBtn');
-
-    if (requiredSeatsElement) {
-        requiredSeats = parseInt(requiredSeatsElement.textContent) || 0;
-    }
-
-    // 為每個座位添加點擊事件
-    seatContainer.addEventListener('click', function (e) {
-        const seat = e.target.closest('.seat');
-        if (!seat || !seat.classList.contains('available')) return;
-
-        const checkbox = seat.querySelector('input[type="checkbox"]');
-        if (!checkbox) return;
-
-        // 切換選擇狀態
-        if (checkbox.checked) {
-            checkbox.checked = false;
-        } else {
-            // 檢查是否已達到最大選擇數量
-            const selectedCount = document.querySelectorAll('input[name="selectedSeatIds"]:checked').length;
-            if (selectedCount >= requiredSeats) {
-                showMessage(`最多只能選擇 ${requiredSeats} 個座位`, 'warning');
-                return;
-            }
-            checkbox.checked = true;
-        }
-
-        updateSeatSelection();
-    });
-
-    // 初始化狀態
-    updateSeatSelection();
-}
 
 // 更新座位選擇狀態
 function updateSeatSelection() {
@@ -155,6 +53,48 @@ function updateSeatSelection() {
     }
 }
 
+// 初始化座位選擇功能
+function initializeSeatSelection() {
+    const seatContainer = document.getElementById('seatGrid');
+    if (!seatContainer) return;
+
+    const requiredSeatsElement = document.querySelector('[th\\:text="${requiredSeats}"]');
+    const confirmButton = document.getElementById('confirmSeatBtn');
+
+    if (requiredSeatsElement) {
+        requiredSeats = parseInt(requiredSeatsElement.textContent) || 0;
+    }
+
+    // 為每個座位添加點擊事件
+    seatContainer.addEventListener('click', function (e) {
+        const seat = e.target.closest('.seat');
+        if (!seat || !seat.classList.contains('available')) return;
+
+        const checkbox = seat.querySelector('input[type="checkbox"]');
+        if (!checkbox) return;
+
+        // 切換選擇狀態
+        if (checkbox.checked) {
+            checkbox.checked = false;
+        } else {
+            // 檢查是否已達到最大選擇數量
+            const selectedCount = document.querySelectorAll('input[name="selectedSeatIds"]:checked').length;
+            if (selectedCount >= requiredSeats) {
+                showMessage(`最多只能選擇 ${requiredSeats} 個座位`, 'warning');
+                return;
+            }
+            checkbox.checked = true;
+        }
+
+        updateSeatSelection();
+    });
+
+    // 初始化狀態
+    updateSeatSelection();
+}
+//
+
+//
 // 班次選擇功能
 function initializeScheduleSelection() {
     const scheduleCards = document.querySelectorAll('.schedule-card');
@@ -175,59 +115,59 @@ function initializeScheduleSelection() {
         });
     });
 }
-
-// 表單驗證
-function validateReservationForm() {
-    const form = document.querySelector('form[action*="/validate"]');
-    if (!form) return true;
-
-    let isValid = true;
-    const errors = [];
-
-    // 檢查訂房選擇
-    const roomSelect = form.querySelector('select[name="roomReservationId"]');
-    if (!roomSelect || !roomSelect.value) {
-        errors.push('請選擇訂房記錄');
-        isValid = false;
-    }
-
-    // 檢查接駁日期
-    const dateInput = form.querySelector('input[name="shuttleDate"]');
-    if (!dateInput || !dateInput.value) {
-        errors.push('請選擇接駁日期');
-        isValid = false;
-    } else {
-        const selectedDate = new Date(dateInput.value);
-        const minDate = new Date(dateInput.min);
-        const maxDate = new Date(dateInput.max);
-
-        if (selectedDate < minDate || selectedDate > maxDate) {
-            errors.push('接駁日期必須在住宿期間內');
-            isValid = false;
-        }
-    }
-
-    // 檢查人數
-    const numberSelect = form.querySelector('select[name="shuttleNumber"]');
-    if (!numberSelect || !numberSelect.value) {
-        errors.push('請選擇接駁人數');
-        isValid = false;
-    }
-
-    // 檢查方向
-    const directionRadio = form.querySelector('input[name="shuttleDirection"]:checked');
-    if (!directionRadio) {
-        errors.push('請選擇接駁方向');
-        isValid = false;
-    }
-
-    if (!isValid) {
-        showMessage(errors.join('、'), 'error');
-    }
-
-    return isValid;
-}
-
+//
+//// 表單驗證
+//function validateReservationForm() {
+//    const form = document.querySelector('form[action*="/validate"]');
+//    if (!form) return true;
+//
+//    let isValid = true;
+//    const errors = [];
+//
+//    // 檢查訂房選擇
+//    const roomSelect = form.querySelector('select[name="roomReservationId"]');
+//    if (!roomSelect || !roomSelect.value) {
+//        errors.push('請選擇訂房記錄');
+//        isValid = false;
+//    }
+//
+//    // 檢查接駁日期
+//    const dateInput = form.querySelector('input[name="shuttleDate"]');
+//    if (!dateInput || !dateInput.value) {
+//        errors.push('請選擇接駁日期');
+//        isValid = false;
+//    } else {
+//        const selectedDate = new Date(dateInput.value);
+//        const minDate = new Date(dateInput.min);
+//        const maxDate = new Date(dateInput.max);
+//
+//        if (selectedDate < minDate || selectedDate > maxDate) {
+//            errors.push('接駁日期必須在住宿期間內');
+//            isValid = false;
+//        }
+//    }
+//
+//    // 檢查人數
+//    const numberSelect = form.querySelector('select[name="shuttleNumber"]');
+//    if (!numberSelect || !numberSelect.value) {
+//        errors.push('請選擇接駁人數');
+//        isValid = false;
+//    }
+//
+//    // 檢查方向
+//    const directionRadio = form.querySelector('input[name="shuttleDirection"]:checked');
+//    if (!directionRadio) {
+//        errors.push('請選擇接駁方向');
+//        isValid = false;
+//    }
+//
+//    if (!isValid) {
+//        showMessage(errors.join('、'), 'error');
+//    }
+//
+//    return isValid;
+//}
+//
 // 顯示訊息
 function showMessage(message, type = 'info') {
     // 移除現有的訊息
@@ -264,48 +204,151 @@ function showMessage(message, type = 'info') {
         }
     }, 5000);
 }
+//
+//// 文檔加載完成後初始化
+//document.addEventListener('DOMContentLoaded', function () {
+//    initializeScheduleSelection();
+//    initializeSeatSelection();
+//
+//    // 訂房選擇變更事件
+//    const roomSelect = document.querySelector('select[name="roomReservationId"]');
+//    if (roomSelect) {
+//        roomSelect.addEventListener('change', updateDateRange);
+//    }
+//
+//    // 表單驗證事件監聽
+//    const reservationForm = document.querySelector('form[th\\:action="@{/reservation/validate}"]');
+//    if (reservationForm) {
+//        reservationForm.addEventListener('submit', function (e) {
+//            if (!validateReservationForm()) {
+//                e.preventDefault();
+//            }
+//        });
+//    }
+//
+//    // 座位表單提交驗證
+//    const seatForm = document.getElementById('seatForm');
+//    if (seatForm) {
+//        seatForm.addEventListener('submit', function (e) {
+//            const selectedCount = document.querySelectorAll('input[name="selectedSeatIds"]:checked').length;
+//            if (selectedCount !== requiredSeats) {
+//                e.preventDefault();
+//                showMessage(`請選擇 ${requiredSeats} 個座位`, 'warning');
+//            }
+//        });
+//    }
+//
+//    // 自動關閉Alert
+//    setTimeout(function () {
+//        const alerts = document.querySelectorAll('.alert:not(.alert-info):not(.dynamic-alert)');
+//        alerts.forEach(alert => {
+//            const closeBtn = alert.querySelector('.btn-close');
+//            if (closeBtn) {
+//                closeBtn.click();
+//            }
+//        });
+//    }, 5000);
+//});
 
-// 文檔加載完成後初始化
-document.addEventListener('DOMContentLoaded', function () {
-    initializeScheduleSelection();
-    initializeSeatSelection();
+document.addEventListener('DOMContentLoaded', function() {
+	
+	// 班次選擇功能
+	initializeScheduleSelection()
+	// 初始化座位選擇功能
+	initializeSeatSelection()
+	
+    const selectRoomBtns = document.querySelectorAll('.select-room-btn');
+    const submitBtn = document.getElementById('submitBtn');
+    const selectedRoomInfo = document.getElementById('selectedRoomInfo');
+    
+    // 接駁方向選項
+    const directionOutward = document.getElementById('direction-outward');
+    const directionReturn = document.getElementById('direction-return');
 
-    // 訂房選擇變更事件
-    const roomSelect = document.querySelector('select[name="roomReservationId"]');
-    if (roomSelect) {
-        roomSelect.addEventListener('change', updateDateRange);
+    selectRoomBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // 移除其他按鈕的 active 狀態
+            selectRoomBtns.forEach(b => b.classList.remove('btn-success'));
+            selectRoomBtns.forEach(b => b.classList.add('btn-primary'));
+            selectRoomBtns.forEach(b => b.textContent = '選擇此訂房');
+            
+            // 設定當前按鈕為 active
+            this.classList.remove('btn-primary');
+            this.classList.add('btn-success');
+            this.textContent = '✓ 已選擇';
+
+            // 獲取訂房資料
+            const roomReservationId = this.getAttribute('data-room-reservation-id');
+            const checkInDate = this.getAttribute('data-check-in-date');
+            const checkOutDate = this.getAttribute('data-check-out-date');
+
+            // 設定隱藏欄位值
+            document.getElementById('selectedRoomReservationId').value = roomReservationId;
+
+            // 顯示選擇的訂房資訊
+            document.getElementById('displayRoomId').textContent = roomReservationId;
+            document.getElementById('displayCheckIn').textContent = checkInDate;
+            document.getElementById('displayCheckOut').textContent = checkOutDate;
+            selectedRoomInfo.style.display = 'block';
+
+            // 重置接駁方向選擇
+            directionOutward.checked = false;
+            directionReturn.checked = false;
+            document.getElementById('displayShuttleDate').textContent = '';
+            document.getElementById('selectedShuttleDate').value = '';
+
+            // 檢查是否可以啟用提交按鈕
+            checkSubmitButton();
+        });
+    });
+
+    // 監聽接駁方向變更
+    directionOutward.addEventListener('change', function() {
+        if (this.checked) {
+            updateShuttleDate();
+        }
+    });
+
+    directionReturn.addEventListener('change', function() {
+        if (this.checked) {
+            updateShuttleDate();
+        }
+    });
+
+    function updateShuttleDate() {
+        const selectedRoom = document.querySelector('.select-room-btn.btn-success');
+        if (!selectedRoom) return;
+
+        const checkInDate = selectedRoom.getAttribute('data-check-in-date');
+        const checkOutDate = selectedRoom.getAttribute('data-check-out-date');
+        
+        let shuttleDate;
+        if (directionOutward.checked) {
+            shuttleDate = checkInDate;
+        } else if (directionReturn.checked) {
+            shuttleDate = checkOutDate;
+        }
+
+        if (shuttleDate) {
+            document.getElementById('selectedShuttleDate').value = shuttleDate;
+            document.getElementById('displayShuttleDate').textContent = shuttleDate;
+            checkSubmitButton();
+        }
     }
 
-    // 表單驗證事件監聽
-    const reservationForm = document.querySelector('form[th\\:action="@{/reservation/validate}"]');
-    if (reservationForm) {
-        reservationForm.addEventListener('submit', function (e) {
-            if (!validateReservationForm()) {
-                e.preventDefault();
-            }
-        });
+    function checkSubmitButton() {
+        const roomSelected = document.querySelector('.select-room-btn.btn-success');
+        const directionSelected = directionOutward.checked || directionReturn.checked;
+        const shuttleNumberSelected = document.querySelector('select[name="shuttleNumber"]').value;
+
+        if (roomSelected && directionSelected && shuttleNumberSelected) {
+            submitBtn.disabled = false;
+        } else {
+            submitBtn.disabled = true;
+        }
     }
 
-    // 座位表單提交驗證
-    const seatForm = document.getElementById('seatForm');
-    if (seatForm) {
-        seatForm.addEventListener('submit', function (e) {
-            const selectedCount = document.querySelectorAll('input[name="selectedSeatIds"]:checked').length;
-            if (selectedCount !== requiredSeats) {
-                e.preventDefault();
-                showMessage(`請選擇 ${requiredSeats} 個座位`, 'warning');
-            }
-        });
-    }
-
-    // 自動關閉Alert
-    setTimeout(function () {
-        const alerts = document.querySelectorAll('.alert:not(.alert-info):not(.dynamic-alert)');
-        alerts.forEach(alert => {
-            const closeBtn = alert.querySelector('.btn-close');
-            if (closeBtn) {
-                closeBtn.click();
-            }
-        });
-    }, 5000);
+    // 監聽接駁人數變更
+    document.querySelector('select[name="shuttleNumber"]').addEventListener('change', checkSubmitButton);
+	
 });

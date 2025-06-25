@@ -22,7 +22,7 @@ public class TempShuttleRVRequestDTO {
     private Integer roomReservationId;
     
     @NotNull(message = "請選擇接駁日期")
-    @Future(message = "接駁日期必須是未來日期")
+//    @Future(message = "接駁日期必須是未來日期")
     private LocalDate shuttleDate;
     
     @NotNull(message = "請選擇接駁人數")

@@ -12,14 +12,14 @@
 <div th:replace="~{fragments/fragments :: header}"></div>
 <main>
     <div class="container py-5">
-        <h2 class="text-center mb-4">會員專區</h2>
+        <h1 class="text-center mb-4">會員專區</h1>
         <div class="row">
             <!-- ===== 載入側邊欄 ===== -->
             <div th:replace="~{fragments/fragments :: memberSidebar(activeTab='room')}"></div>
             <!-- 右側內容區 -->
             <div class="col-md-9">
                 <!-- //////////////////// 會員頁面內容放這裡 //////////////////// -->
-                <div th:if="${!orderList.isEmpty()}">
+                <div th:if="${orderList!=null and !orderList.isEmpty()}">
                     <div class="col-12" th:each="order : ${orderList}">
                         <div class="card shadow-sm p-3">
                             <h5 class="card-title mb-3">訂單編號：<span th:text="${order.roomReservationId}"></span>
@@ -51,7 +51,7 @@
                         </div>
                     </div>
                 </div>
-                <div th:unless="${!orderList.isEmpty()}">
+                <div th:unless="${orderList!=null and !orderList.isEmpty()}">
                     <p>尚無訂單建立</p>
                 </div>
                 <!-- //////////////////// 會員頁面內容放這裡 //////////////////// -->

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>權限管理</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+</head>
+<body>
+<!-- ===== 載入sidebar ===== -->
+<!-- 插入手機版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+<!-- 插入桌面版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+
+<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+    <th:block th:fragment="myContent">
+        <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+        <!-- 卡片標題與新增按鈕 -->
+        <div class="card-header bg-transparent border-0 pt-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0 fw-bold">
+                    <i class="bi bi-shield-check me-2"></i>權限管理
+                </h4>
+                <button
+                        class="btn btn-success"
+                        data-bs-toggle="modal"
+                        data-bs-target="#addPermissionModal"
+                >
+                    <i class="bi bi-plus-circle me-2"></i>新增權限
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- 權限表格 -->
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>編號</th>
+                        <th>權限名稱</th>
+                        <th>權限描述</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="permission : ${permissionList}">
+                        <td th:text="${permission.permissionId}">權限編號</td>
+                        <td th:text="${permission.permissionName}">權限名稱</td>
+                        <td th:text="${permission.permissionDescription}">權限描述</td>
+                        <td>
+                            <!-- 編輯按鈕 -->
+                            <button class="btn btn-sm btn-primary me-1" 
+                                    th:onclick="'editPermission(' + ${permission.permissionId} + ')'">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <!-- 刪除按鈕 -->
+                            <button class="btn btn-sm btn-danger" 
+                                    th:onclick="'deletePermission(' + ${permission.permissionId} + ')'">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+    </th:block>
+</main>
+
+<!-- 新增權限 Modal -->
+<div class="modal fade" id="addPermissionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-shield-plus me-2"></i>新增權限
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addPermissionForm">
+                    <div class="mb-3">
+                        <label class="form-label">權限名稱 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="permissionName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">權限描述 <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="permissionDescription" rows="3" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-success" onclick="savePermission()">
+                    <i class="bi bi-check-circle me-2"></i>新增權限
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 編輯權限 Modal -->
+<div class="modal fade" id="editPermissionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-pencil me-2"></i>編輯權限
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editPermissionForm">
+                    <input type="hidden" id="editPermissionId" name="permissionId">
+                    <div class="mb-3">
+                        <label class="form-label">權限名稱</label>
+                        <input type="text" class="form-control" id="editPermissionName" name="permissionName">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">權限描述</label>
+                        <textarea class="form-control" id="editPermissionDescription" name="permissionDescription" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="savePermissionEdit()">
+                    <i class="bi bi-check-circle me-2"></i>儲存變更
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== 載入統一的 JavaScript ===== -->
+<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
+
+<script>
+// 新增權限
+function savePermission() {
+    const form = document.getElementById('addPermissionForm');
+    const formData = new FormData(form);
+    
+    // 建立請求資料
+    const requestData = new FormData();
+    requestData.append('permissionName', formData.get('permissionName'));
+    requestData.append('permissionDescription', formData.get('permissionDescription'));
+    
+    // 發送請求
+    fetch('/backend/permission/add', {
+        method: 'POST',
+        body: requestData
+    })
+    .then(response => response.text())
+    .then(result => {
+        if (result === 'success') {
+            alert('權限新增成功！');
+            location.reload();
+        } else {
+            alert('新增失敗：' + result);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('新增失敗，請稍後再試');
+    });
+}
+
+// 編輯權限
+function editPermission(permissionId) {
+    // 取得權限資料
+    fetch(`/backend/permission/get/${permissionId}`)
+    .then(response => response.json())
+    .then(permission => {
+        // 填入表單資料
+        document.getElementById('editPermissionId').value = permission.permissionId;
+        document.getElementById('editPermissionName').value = permission.permissionName;
+        document.getElementById('editPermissionDescription').value = permission.permissionDescription;
+        
+        // 顯示 modal
+        const modal = new bootstrap.Modal(document.getElementById('editPermissionModal'));
+        modal.show();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('取得權限資料失敗');
+    });
+}
+
+// 儲存權限編輯
+function savePermissionEdit() {
+    const form = document.getElementById('editPermissionForm');
+    const formData = new FormData(form);
+    
+    // 建立請求資料
+    const requestData = new FormData();
+    requestData.append('permissionId', formData.get('permissionId'));
+    requestData.append('permissionName', formData.get('permissionName'));
+    requestData.append('permissionDescription', formData.get('permissionDescription'));
+    
+    // 發送請求
+    fetch('/backend/permission/update', {
+        method: 'POST',
+        body: requestData
+    })
+    .then(response => response.text())
+    .then(result => {
+        if (result === 'success') {
+            alert('權限更新成功！');
+            location.reload();
+        } else {
+            alert('更新失敗：' + result);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('更新失敗，請稍後再試');
+    });
+}
+
+// 刪除權限
+function deletePermission(permissionId) {
+    if (confirm('確定要刪除此權限嗎？此操作無法復原。')) {
+        fetch(`/backend/permission/delete/${permissionId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.text())
+        .then(result => {
+            if (result === 'success') {
+                alert('權限刪除成功！');
+                location.reload();
+            } else {
+                alert('刪除失敗：' + result);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('刪除失敗，請稍後再試');
+        });
+    }
+}
+</script>
+</body>
+</html>

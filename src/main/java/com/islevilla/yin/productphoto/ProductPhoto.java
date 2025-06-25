@@ -18,4 +18,7 @@ public class ProductPhoto {
 
     @Column(name = "product_image")
     private byte[] productImage; // 使用 byte[] 存儲圖片
+
+    @Column(name = "display_order")
+    private Integer displayOrder;
 }

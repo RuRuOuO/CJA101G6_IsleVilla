@@ -18,9 +18,6 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
             <a class="navbar-brand" th:href="@{/}"><i class="fas fa-ship me-2"></i>接駁船預約系統</a>
-            <div class="navbar-nav ms-auto">
-                <a class="btn btn-outline-light" th:href="@{/reservation}">會員預約</a>
-            </div>
         </div>
     </nav>
 
@@ -81,56 +78,7 @@
                     <h4><i class="fas fa-calendar-plus me-2"></i>申請預約接駁</h4>
                 </div>
                 <div class="card-body">
-                    <!-- 顯示會員訂房記錄 -->
-                    <div th:if="${memberRoomReservations != null and !memberRoomReservations.empty}" class="mb-4">
-                        <div class="card">
-                            <div class="card-header">
-                                <h6><i class="fas fa-list me-2"></i>您的訂房記錄</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>訂房編號</th>
-                                                <th>入住日期</th>
-                                                <th>退房日期</th>
-                                                <!-- <th>房型</th> -->
-                                                <th>狀態</th>
-                                                <th>操作</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr th:each="room : ${memberRoomReservations}">
-                                                <td th:text="${room.roomReservationId}"></td>
-                                                <td th:text="${#temporals.format(room.checkInDate, 'yyyy-MM-dd')}"></td>
-                                                <td th:text="${#temporals.format(room.checkOutDate, 'yyyy-MM-dd')}"></td>
-                                                <!-- <td th:text="${room.roomType != null ? room.roomType : '標準房'}"></td> -->
-                                                <td>
-                                                    <span class="badge bg-success">已完成付款</span>
-                                                </td>
-                                                <td>
-                                                	<!-- 把資料放到 data-* 屬性 -->
-													<button type="button" class="btn btn-primary btn-sm"
-													        th:attr="data-room-reservation-id=${room.roomReservationId},
-													                 data-check-in-date=${#temporals.format(room.checkInDate, 'yyyy-MM-dd')}, 
-													                 data-check-out-date=${#temporals.format(room.checkOutDate, 'yyyy-MM-dd')}">
-													    選擇此訂房
-													</button>
-<!--                                                     <button type="button" class="btn btn-primary btn-sm" -->
-<!--                                                         th:onclick="'selectRoomReservation(' + ${room.roomReservationId} + ', \'' + ${#temporals.format(room.checkInDate, 'yyyy-MM-dd')} + '\', \'' + ${#temporals.format(room.checkOutDate, 'yyyy-MM-dd')} + '\')'"> -->
-<!--                                                         選擇此訂房 -->
-<!--                                                     </button> -->
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 沒有訂房記錄時顯示 -->
+                	<!-- 沒有訂房記錄時顯示 -->
                     <div th:if="${memberRoomReservations == null or memberRoomReservations.empty}"
                         class="alert alert-warning">
                         <h6><i class="fas fa-exclamation-triangle me-2"></i>找不到訂房記錄</h6>
@@ -145,43 +93,63 @@
                             </a>
                         </p>
                     </div>
-
+                    <!-- 顯示會員訂房記錄 -->
+                    <div th:if="${memberRoomReservations != null and !memberRoomReservations.empty}" class="mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6><i class="fas fa-list me-2"></i>您的訂房記錄</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>訂房編號</th>
+                                                <th>入住日期</th>
+                                                <th>退房日期</th>
+                                                <th>狀態</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="room : ${memberRoomReservations}">
+                                                <td th:text="${room.roomReservationId}"></td>
+                                                <td th:text="${#temporals.format(room.checkInDate, 'yyyy-MM-dd')}"></td>
+                                                <td th:text="${#temporals.format(room.checkOutDate, 'yyyy-MM-dd')}"></td>
+                                                <td>
+                                                    <span class="badge bg-success">已完成付款</span>
+                                                </td>
+                                                <td>
+                                                	<!-- 選擇訂房按鈕 -->
+													<button type="button" class="btn btn-primary btn-sm select-room-btn"
+													        th:attr="data-room-reservation-id=${room.roomReservationId},
+													                 data-check-in-date=${#temporals.format(room.checkInDate, 'yyyy-MM-dd')}, 
+													                 data-check-out-date=${#temporals.format(room.checkOutDate, 'yyyy-MM-dd')}">
+													    選擇此訂房
+													</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
                     <!-- 預約表單 -->
                     <form th:if="${memberRoomReservations != null and !memberRoomReservations.empty}"
-                        th:action="@{/shuttle/reservation/validate}" th:object="${reservationRequest}" method="post">
-<!--                         <div class="row"> -->
-<!--                             <div class="col-md-6"> -->
-<!--                                 <div class="mb-3"> -->
-<!--                                     <label for="roomReservationId" class="form-label">選擇訂房 <span -->
-<!--                                             class="text-danger">*</span></label> -->
-<!--                                     <select class="form-select" th:field="*{roomReservationId}" -->
-<!--                                         th:classappend="${#fields.hasErrors('roomReservationId')} ? 'is-invalid' : ''" -->
-<!--                                         required onchange="updateDateRange()"> -->
-<!--                                         <option value="">請選擇訂房記錄</option> -->
-<!--                                         <option th:each="room : ${memberRoomReservations}" -->
-<!--                                             th:value="${room.roomReservationId}" -->
-<!--                                             th:data-checkin="${#dates.format(room.checkInDate, 'yyyy-MM-dd')}" -->
-<!--                                             th:data-checkout="${#dates.format(room.checkOutDate, 'yyyy-MM-dd')}" -->
-<!--                                             th:text="'訂房編號 ' + ${room.roomReservationId} + ' (' + ${#dates.format(room.checkInDate, 'yyyy-MM-dd')} + ' ~ ' + ${#dates.format(room.checkOutDate, 'yyyy-MM-dd')} + ')'"> -->
-<!--                                         </option> -->
-<!--                                     </select> -->
-<!--                                     <div th:if="${#fields.hasErrors('roomReservationId')}" class="invalid-feedback" -->
-<!--                                         th:errors="*{roomReservationId}"></div> -->
-<!--                                 </div> -->
-<!--                             </div> -->
-<!--                             <div class="col-md-6"> -->
-<!--                                 <div class="mb-3"> -->
-<!--                                     <label for="shuttleDate" class="form-label">接駁日期 <span -->
-<!--                                             class="text-danger">*</span></label> -->
-<!--                                     <input type="date" class="form-control" th:field="*{shuttleDate}" -->
-<!--                                         th:classappend="${#fields.hasErrors('shuttleDate')} ? 'is-invalid' : ''" -->
-<!--                                         required disabled> -->
-<!--                                     <div th:if="${#fields.hasErrors('shuttleDate')}" class="invalid-feedback" -->
-<!--                                         th:errors="*{shuttleDate}"></div> -->
-<!--                                     <div class="form-text">請先選擇訂房記錄</div> -->
-<!--                                 </div> -->
-<!--                             </div> -->
-<!--                         </div> -->
+                        th:action="@{/shuttle/reservation/validate}" th:object="${reservationRequest}" method="post" id="reservationForm">
+                        
+                        <!-- 隱藏欄位：會員ID (由 session 自動設定) -->
+                        <input type="hidden" th:field="*{memberId}">
+                        
+                        <!-- 隱藏欄位：訂房編號 (由 JavaScript 設定) -->
+                        <input type="hidden" th:field="*{roomReservationId}" id="selectedRoomReservationId">
+                        
+                        <!-- 隱藏欄位：接駁日期 (由 JavaScript 設定) -->
+                        <input type="hidden" th:field="*{shuttleDate}" id="selectedShuttleDate">
+                        
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
@@ -204,13 +172,13 @@
                                     <div>
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input" type="radio" th:field="*{shuttleDirection}"
-                                                value="0" required>
-                                            <label class="form-check-label">去程</label>
+                                                value="0" required id="direction-outward">
+                                            <label class="form-check-label" for="direction-outward">去程</label>
                                         </div>
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input" type="radio" th:field="*{shuttleDirection}"
-                                                value="1" required>
-                                            <label class="form-check-label">回程</label>
+                                                value="1" required id="direction-return">
+                                            <label class="form-check-label" for="direction-return">回程</label>
                                         </div>
                                     </div>
                                     <div th:if="${#fields.hasErrors('shuttleDirection')}" class="text-danger"
@@ -219,8 +187,19 @@
                             </div>
                         </div>
 
+                        <!-- 顯示已選擇的訂房資訊 -->
+                        <div id="selectedRoomInfo" class="alert alert-secondary" style="display: none;">
+                            <h6><i class="fas fa-check-circle me-2"></i>已選擇的訂房</h6>
+                            <p class="mb-0">
+                                <strong>訂房編號：</strong><span id="displayRoomId"></span><br>
+                                <strong>入住日期：</strong><span id="displayCheckIn"></span><br>
+                                <strong>退房日期：</strong><span id="displayCheckOut"></span><br>
+                                <strong>接駁日期：</strong><span id="displayShuttleDate"></span>
+                            </p>
+                        </div>
+
                         <div class="mt-3">
-                            <button type="submit" class="btn btn-primary">
+                            <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
                                 <i class="fas fa-search me-2"></i>驗證資料並查詢班次
                             </button>
                         </div>
@@ -234,7 +213,7 @@
                     <h4><i class="fas fa-clock me-2"></i>選擇日期與時段</h4>
                 </div>
                 <div class="card-body">
-                    <form th:action="@{/reservation/select-schedule}" method="post">
+                    <form th:action="@{/shuttle/reservation/select-schedule}" method="post">
                         <input type="hidden" th:name="reservationRequestId" th:value="${reservationRequestId}">
                         <div class="row" id="scheduleList">
                             <div th:each="schedule : ${availableSchedules}" class="col-md-4 mb-3">
@@ -250,10 +229,10 @@
                                                 <p class="card-text">
                                                     <i class="fas fa-clock me-2"></i>
                                                     <span
-                                                        th:text="${#dates.format(schedule.shuttleDepartureTime, 'HH:mm')}"></span>
+                                                        th:text="${#temporals.format(schedule.shuttleDepartureTime, 'HH:mm')}"></span>
                                                     -
                                                     <span
-                                                        th:text="${#dates.format(schedule.shuttleArrivalTime, 'HH:mm')}"></span><br>
+                                                        th:text="${#temporals.format(schedule.shuttleArrivalTime, 'HH:mm')}"></span><br>
                                                     <small class="text-muted">剩餘座位：<span
                                                             th:text="${schedule.availableSeats}"></span>個</small>
                                                 </p>
@@ -264,7 +243,7 @@
                             </div>
                         </div>
                         <div class="mt-3">
-                            <a th:href="@{/reservation}" class="btn btn-secondary me-2">上一步</a>
+                            <a th:href="@{/shuttle/reservation}" class="btn btn-secondary me-2">上一步</a>
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-arrow-right me-2"></i>選擇座位
                             </button>
@@ -279,7 +258,7 @@
                     <h4><i class="fas fa-chair me-2"></i>選擇座位</h4>
                 </div>
                 <div class="card-body">
-                    <form th:action="@{/reservation/select-seats}" method="post" id="seatForm">
+                    <form th:action="@{/shuttle/reservation/select-seats}" method="post" id="seatForm">
                         <input type="hidden" th:name="reservationRequestId" th:value="${reservationRequestId}">
                         <div class="row">
                             <div class="col-md-8">
@@ -338,7 +317,7 @@
                             </div>
                         </div>
                         <div class="mt-3">
-                            <a th:href="@{/reservation/step2(id=${reservationRequestId})}"
+                            <a th:href="@{/shuttle/reservation/validate}"
                                 class="btn btn-secondary me-2">上一步</a>
                             <button type="submit" class="btn btn-primary" id="confirmSeatBtn" disabled>
                                 <i class="fas fa-arrow-right me-2"></i>確認預約
@@ -401,7 +380,7 @@
                     <form th:action="@{/reservation/submit}" method="post">
                         <input type="hidden" th:name="reservationRequestId" th:value="${reservationRequestId}">
                         <div class="mt-3">
-                            <a th:href="@{/reservation/step3(id=${reservationRequestId})}"
+                            <a th:href="@{/shuttle/reservation/select-schedule"
                                 class="btn btn-secondary me-2">上一步</a>
                             <button type="submit" class="btn btn-success">
                                 <i class="fas fa-paper-plane me-2"></i>送出接駁申請
