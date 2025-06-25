@@ -33,4 +33,5 @@ public class ShuttleSchedule {
 	
 	@OneToMany(mappedBy = "shuttleSchedule")
 	private List<ShuttleSeatAvailability> shuttleSeatAvailability;
+	
 }

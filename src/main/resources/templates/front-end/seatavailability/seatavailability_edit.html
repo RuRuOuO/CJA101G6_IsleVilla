@@ -1,58 +1,64 @@
 <!DOCTYPE html>
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8" />
-  <title>微嶼 | 編輯接駁座位</title>
+<meta charset="UTF-8" />
+<title>微嶼 | 編輯接駁座位</title>
 
-  <!-- 載入後台共用樣式 -->
-  <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+<!-- 載入後台共用樣式 -->
+<th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
 </head>
 <body>
-  <!-- 載入側邊欄 -->
-  <div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
-  <div th:replace="~{fragments/backFragments :: sidebar}"></div>
+	<!-- 載入側邊欄 -->
+	<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+	<div th:replace="~{fragments/backFragments :: sidebar}"></div>
 
-  <!-- 主內容區塊 -->
-  <main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
-    <th:block th:fragment="myContent">
-      <h2 class="mb-4 fw-bold">🛠 編輯座位可用情況</h2>
+	<!-- 主內容區塊 -->
+	<main
+		th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+		<th:block th:fragment="myContent">
+			<h2 class="mb-4 fw-bold">🛠 編輯座位可用情況</h2>
 
-      <form th:action="@{/seatavailability/edit}" th:object="${seatavailability}" method="post" class="needs-validation" novalidate>
-        <!-- 隱藏主鍵欄位 -->
-        <input type="hidden" th:field="*{scheduleId}" />
-        <input type="hidden" th:field="*{date}" />
+			<form th:action="@{/seatavailability/edit}"
+				th:object="${seatavailability}" method="post"
+				class="needs-validation" novalidate>
+				<!-- 隱藏主鍵欄位 -->
+				<input type="hidden" th:field="*{shuttleScheduleId}" /> <input
+					type="hidden" th:field="*{shuttleDate}" />
 
-        <!-- 顯示班次資訊（只讀） -->
-        <div class="mb-3">
-          <label class="form-label">班次</label>
-          <input type="text" class="form-control" readonly
-                 th:value="|${#temporals.format(seatavailability.schedule.departureTime, 'HH:mm')} ~ ${#temporals.format(seatavailability.schedule.arrivalTime, 'HH:mm')} (${seatavailability.schedule.direction == 0 ? '去程' : '回程'})|">
-        </div>
+				<!-- 顯示班次資訊（只讀） -->
+				<div class="mb-3">
+					<label class="form-label">班次</label> <input type="text"
+						class="form-control" readonly
+						th:value="|${#temporals.format(seatavailability.shuttleSchedule.shuttleDepartureTime, 'HH:mm')} ~ ${#temporals.format(seatavailability.shuttleSchedule.shuttleArrivalTime, 'HH:mm')} (${seatavailability.shuttleSchedule.shuttleDirection == 0 ? '去程' : '回程'})|">
+				</div>
 
-        <!-- 顯示日期（只讀） -->
-        <div class="mb-3">
-          <label class="form-label">接駁日期</label>
-          <input type="text" class="form-control" readonly th:value="${seatavailability.date}" />
-        </div>
+				<!-- 顯示日期（只讀） -->
+				<div class="mb-3">
+					<label class="form-label">接駁日期</label> <input type="text"
+						class="form-control" readonly
+						th:value="${#temporals.format(seatavailability.shuttleDate, 'yyyy-MM-dd')}" />
+				</div>
 
-        <!-- 可用座位數 -->
-        <div class="mb-3">
-          <label for="seatQuantity" class="form-label">可用座位數</label>
-          <input type="number" class="form-control" id="seatQuantity" min="0" required th:field="*{seatQuantity}" />
-          <div class="invalid-feedback">請輸入可用座位數（不可為負數）</div>
-        </div>
+				<!-- 可用座位數 -->
+				<div class="mb-3">
+					<label for="seatQuantity" class="form-label">可用座位數</label> <input
+						type="number" class="form-control" id="seatQuantity"
+						th:field="*{seatQuantity}" min="1" max="100" required />
+					<div class="invalid-feedback">請輸入 1～100 之間的座位數</div>
+				</div>
 
-        <!-- 按鈕區塊 -->
-        <div class="d-flex justify-content-start mt-4">
-          <button type="submit" class="btn btn-primary">更新</button>
-          <a th:href="@{/seatavailability/list}" class="btn btn-secondary ms-3">取消</a>
-        </div>
-      </form>
-    </th:block>
-  </main>
+				<!-- 按鈕區塊 -->
+				<div class="d-flex justify-content-start mt-4">
+					<button type="submit" class="btn btn-primary">更新</button>
+					<a th:href="@{/seatavailability/list}"
+						class="btn btn-secondary ms-3">取消</a>
+				</div>
+			</form>
+		</th:block>
+	</main>
 
-  <!-- 驗證 JS -->
-  <script>
+	<!-- 驗證 JS -->
+	<script>
     (() => {
       'use strict';
       const forms = document.querySelectorAll('.needs-validation');

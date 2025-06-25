@@ -6,14 +6,14 @@ import org.springframework.stereotype.Repository;
 @Repository("chingShuttleScheduleRepository")
 public interface ShuttleScheduleRepository extends JpaRepository<ShuttleSchedule, Integer> {
 
-	boolean existsByDirectionAndDepartureTimeAndArrivalTime(
-			Integer direction, 
-			java.time.LocalTime departureTime,
-			java.time.LocalTime arrivalTime);
+	boolean existsByShuttleDirectionAndShuttleDepartureTimeAndShuttleArrivalTime(
+			Integer shuttleDirection, 
+			java.time.LocalTime shuttleDepartureTime,
+			java.time.LocalTime shuttleArrivalTime);
 
-	boolean existsByDirectionAndDepartureTimeAndArrivalTimeAndIdNot(
-			Integer direction,
-			java.time.LocalTime departureTime, 
-			java.time.LocalTime arrivalTime, 
-			Integer id);
+	boolean existsByShuttleDirectionAndShuttleDepartureTimeAndShuttleArrivalTimeAndShuttleScheduleIdNot(
+			Integer shuttleDirection,
+			java.time.LocalTime shuttleDepartureTime, 
+			java.time.LocalTime shuttleArrivalTime, 
+			Integer shuttleScheduleId);
 }

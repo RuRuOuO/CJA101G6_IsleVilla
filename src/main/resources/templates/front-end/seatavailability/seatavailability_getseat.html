@@ -1,4 +1,4 @@
-	<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
 <head>
 <meta charset="UTF-8" />
@@ -26,7 +26,7 @@
 	<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
 	<div th:replace="~{fragments/backFragments :: sidebar}"></div>
 
-	<!-- 主內容：嵌入 mainContent 卡片 -->
+	<!-- 主內容 -->
 	<main
 		th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
 		<th:block th:fragment="myContent">
@@ -43,6 +43,12 @@
 						th:text="${d}" th:selected="${d} == ${selectedDate}"></option>
 				</select>
 			</form>
+			<!-- 返回列表按鈕 -->
+        <div class="mb-3">
+            <a class="btn btn-secondary" th:href="@{/seatavailability/list}">
+                返回列表
+            </a>
+        </div>
 
 			<!-- 班次選擇 -->
 			<div th:if="${selectedDate != null}" class="mb-4">
@@ -52,21 +58,17 @@
 					onchange="redirectToResult()">
 					<option value="">請選擇班次</option>
 					<option th:each="s : ${scheduleForSelectedDate}"
-						th:value="${s.scheduleId}"
-						th:text="'班次 ' + ${s.scheduleId} + '（' 
-                    + (${s.schedule.direction == 0 ? '去程' : '回程'}) + '｜'
-                    + ${#temporals.format(s.schedule.departureTime, 'HH:mm')} + ' - ' 
-                    + ${#temporals.format(s.schedule.arrivalTime, 'HH:mm')} + ')'"
-						th:selected="${s.scheduleId} == ${selectedScheduleId}"></option>
+						th:value="${s.shuttleScheduleId}"
+						th:text="'班次 ' + ${s.shuttleScheduleId} + '（' 
+                          + (${s.shuttleSchedule.shuttleDirection == 0 ? '去程' : '回程'}) + '｜'
+                          + ${#temporals.format(s.shuttleSchedule.shuttleDepartureTime, 'HH:mm')} + ' - ' 
+                          + ${#temporals.format(s.shuttleSchedule.shuttleArrivalTime, 'HH:mm')} + ')'"
+						th:selected="${s.shuttleScheduleId} == ${selectedScheduleId}">
+					</option>
 				</select>
-
-				<!-- 返回列表按鈕 -->
-				<a class="btn btn-secondary" th:href="@{/seatavailability/list}">
-					<i></i>返回列表
-				</a>
 			</div>
 
-			<!-- 查無資料錯誤 -->
+			<!-- 錯誤訊息 -->
 			<div th:if="${errorMSG != null}" class="alert alert-danger">
 				<i class="fa-solid fa-triangle-exclamation me-1"></i> <span
 					th:text="${errorMSG}"></span>
@@ -77,18 +79,19 @@
 				<h4 class="mb-3">查詢結果</h4>
 				<ul class="list-group">
 					<li class="list-group-item"><strong>班次：</strong> <span
-						th:text="${seat.scheduleId}"></span></li>
+						th:text="${seat.shuttleScheduleId}"></span></li>
 					<li class="list-group-item"><strong>日期：</strong> <span
-						th:text="${seat.date}"></span></li>
+						th:text="${seat.shuttleDate}"></span></li>
 					<li class="list-group-item"><strong>時段：</strong> <span
-						th:text="${#temporals.format(seat.schedule.departureTime, 'HH:mm')} + ' - ' + ${#temporals.format(seat.schedule.arrivalTime, 'HH:mm')}"></span>
+						th:text="${#temporals.format(seat.shuttleSchedule.shuttleDepartureTime, 'HH:mm')} + ' - ' + ${#temporals.format(seat.shuttleSchedule.shuttleArrivalTime, 'HH:mm')}"></span>
 					</li>
 					<li class="list-group-item"><strong>方向：</strong> <span
-						th:text="${seat.schedule.direction == 0 ? '去程' : '回程'}"></span></li>
+						th:text="${seat.shuttleSchedule.shuttleDirection == 0 ? '去程' : '回程'}"></span>
+					</li>
 					<li class="list-group-item"><strong>可用座位：</strong> <span
 						th:text="${seat.seatQuantity}"></span></li>
 					<li class="list-group-item"><strong>更新時間：</strong> <span
-						th:text="${#temporals.format(seat.seatUpdateAt, 'yyyy-MM-dd HH:mm')}"></span>
+						th:text="${#temporals.format(seat.seatUpdatedAt, 'yyyy-MM-dd HH:mm')}"></span>
 					</li>
 				</ul>
 			</div>

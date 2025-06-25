@@ -31,7 +31,6 @@
 				</a>
 			</div>
 
-
 			<div class="table-responsive">
 				<table class="table table-bordered text-center align-middle">
 					<thead class="table-secondary">
@@ -46,15 +45,16 @@
 					<tbody>
 						<tr th:each="seat : ${seatavailability}">
 							<!-- 日期 -->
-							<td th:text="${#temporals.format(seat.date, 'yyyy-MM-dd')}"></td>
+							<td
+								th:text="${#temporals.format(seat.shuttleDate, 'yyyy-MM-dd')}"></td>
 
 							<!-- 時段資訊 -->
 							<td
-								th:text="${seat.schedule != null ? 
-								'#' + seat.schedule.id + '｜' +
-								(seat.schedule.direction == 0 ? '去' : '回') + ' - ' +
-								#temporals.format(seat.schedule.departureTime, 'HH:mm') + ' ~ ' +
-								#temporals.format(seat.schedule.arrivalTime, 'HH:mm') : '未指定'}">
+								th:text="${seat.shuttleSchedule != null ?
+							    '#' + seat.shuttleSchedule.shuttleScheduleId + '｜' +
+							    (seat.shuttleSchedule.shuttleDirection == 0 ? '去' : '回') + ' - ' +
+							    #temporals.format(seat.shuttleSchedule.shuttleDepartureTime, 'HH:mm') + ' ~ ' +
+							    #temporals.format(seat.shuttleSchedule.shuttleArrivalTime, 'HH:mm') : '未指定'}">
 							</td>
 
 							<!-- 可用座位 -->
@@ -62,14 +62,14 @@
 
 							<!-- 最後更新時間 -->
 							<td
-								th:text="${seat.seatUpdateAt != null ? #temporals.format(seat.seatUpdateAt, 'yyyy-MM-dd HH:mm') : ''}"></td>
+								th:text="${seat.seatUpdatedAt != null ? #temporals.format(seat.seatUpdatedAt, 'yyyy-MM-dd HH:mm') : ''}"></td>
 
 							<!-- 操作按鈕 -->
 							<td><a class="btn btn-sm btn-primary me-1"
-								th:href="@{'/seatavailability/edit/' + ${seat.scheduleId} + '/' + ${#temporals.format(seat.date, 'yyyy-MM-dd')} }">
+								th:href="@{'/seatavailability/edit/' + ${seat.shuttleScheduleId} + '/' + ${#temporals.format(seat.shuttleDate, 'yyyy-MM-dd')} }">
 									<i class="fa-solid fa-pen-to-square me-1"></i>編輯
 							</a> <a class="btn btn-sm btn-danger"
-								th:href="@{'/seatavailability/delete/' + ${seat.scheduleId} + '/' + ${#temporals.format(seat.date, 'yyyy-MM-dd')} }"
+								th:href="@{'/seatavailability/delete/' + ${seat.shuttleScheduleId} + '/' + ${#temporals.format(seat.shuttleDate, 'yyyy-MM-dd')} }"
 								onclick="return confirm('確定要刪除嗎？');"> <i
 									class="fa-solid fa-trash me-1"></i>刪除
 							</a></td>

@@ -1,87 +1,79 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>微嶼 | Isle Villa 後台首頁</title>
-<!-- ===== 載入統一樣式 ===== -->
-<th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>微嶼 | Isle Villa 後台首頁</title>
+  <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
 </head>
 <body>
-	<!-- ===== 載入sidebar ===== -->
-	<!-- 插入手機版側邊欄 -->
-	<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
-	<!-- 插入桌面版側邊欄 -->
-	<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+  <div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+  <div th:replace="~{fragments/backFragments :: sidebar}"></div>
 
-	<main
-		th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
-		<th:block th:fragment="myContent">
-			<!-- //////////////////// 頁面內容放在這個card裡面(外框已經有加card和container，直接放入table和標題即可)//////////////////// -->
-				<h2 class="mb-4"
-					th:text="${formMode == 'add'} ? '✏️ 新增接駁時段' : '🛠️ 修改接駁時段'"></h2>
+  <main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+    <th:block th:fragment="myContent">
+      <h2 class="mb-4" th:text="${formMode == 'add'} ? '✏️ 新增接駁時段' : '🛠️ 修改接駁時段'"></h2>
 
-				<form
-					th:action="${formMode == 'add'} ? @{/shuttle/add} : @{/shuttle/edit}"
-					th:object="${shuttleSchedule}" method="post"
-					class="needs-validation" novalidate>
-					
-					<input type="hidden" th:field="*{id}" />
-					
+      <form
+        th:action="${formMode == 'add'} ? @{/shuttle/add} : @{/shuttle/edit}"
+        th:object="${shuttleSchedule}" method="post"
+        class="needs-validation" novalidate>
 
-					<!-- ✅ 全域錯誤提示（只顯示第一筆） -->
-					<div class="text-danger mb-3" th:if="${#fields.hasGlobalErrors()}"
-						th:text="${#fields.globalErrors()[0]}"></div>
+        <!-- ✅ 正確主鍵欄位 -->
+        <input type="hidden" th:field="*{shuttleScheduleId}" />
 
-					<!-- 方向 -->
-      <div class="mb-3">
-        <label for="direction" class="form-label">方向</label>
-        <select th:field="*{direction}" class="form-select" id="direction"
-                th:disabled="${formMode == 'edit'}" required>
-          <option value="0" th:selected="${shuttleSchedule.direction == 0}">去程</option>
-          <option value="1" th:selected="${shuttleSchedule.direction == 1}">回程</option>
-        </select>
+        <!-- ✅ 全域錯誤提示（只顯示第一筆） -->
+        <div class="text-danger mb-3" th:if="${#fields.hasGlobalErrors()}"
+             th:text="${#fields.globalErrors()[0]}"></div>
 
-        <!-- 補上 hidden input，確保 disabled select 的值能送出 -->
-        <input type="hidden" name="direction" th:value="${shuttleSchedule.direction}" 
-               th:if="${formMode == 'edit'}"/>
+        <!-- 方向 -->
+        <div class="mb-3">
+          <label for="shuttleDirection" class="form-label">方向</label>
+          <select th:field="*{shuttleDirection}" class="form-select" id="shuttleDirection"
+                  th:disabled="${formMode == 'edit'}" required>
+            <option value="0" th:selected="${shuttleSchedule.shuttleDirection == 0}">去程</option>
+            <option value="1" th:selected="${shuttleSchedule.shuttleDirection == 1}">回程</option>
+          </select>
 
-        <div class="text-danger" th:if="${#fields.hasErrors('direction')}"
-             th:errors="*{direction}"></div>
-      </div>
+          <!-- Hidden input：disabled 的 select 不會提交 -->
+          <input type="hidden" name="shuttleDirection"
+                 th:value="${shuttleSchedule.shuttleDirection}" th:if="${formMode == 'edit'}"/>
 
-					<!-- 出發時間 -->
-					<div class="mb-3">
-						<label for="departureHour" class="form-label">出發時間（時）</label> <select
-							th:field="*{departureTime}" class="form-control"
-							id="departureHour" required>
-							<option th:each="hour : ${#numbers.sequence(0,23)}"
-								th:value="${hour < 10 ? '0' + hour + ':00' : hour + ':00'}"
-								th:text="${hour < 10 ? '0' + hour : hour} + ':00'"></option>
-						</select>
-						<div class="text-danger"
-							th:if="${#fields.hasErrors('departureTime')}"
-							th:errors="*{departureTime}"></div>
-					</div>
+          <div class="text-danger" th:if="${#fields.hasErrors('shuttleDirection')}"
+               th:errors="*{shuttleDirection}"></div>
+        </div>
 
-					<!-- 抵達時間 -->
-					<div class="mb-3">
-						<label for="arrivalTime" class="form-label">抵達時間（時）</label> <select
-							th:field="*{arrivalTime}" class="form-control" id="arrivalTime"
-							required>
-							<option th:each="hour : ${#numbers.sequence(0,23)}"
-								th:value="${hour < 10 ? '0' + hour + ':00' : hour + ':00'}"
-								th:text="${hour < 10 ? '0' + hour : hour} + ':00'"></option>
-						</select>
-					</div>
+        <!-- 出發時間 -->
+        <div class="mb-3">
+          <label for="shuttleDepartureTime" class="form-label">出發時間（時）</label>
+          <select th:field="*{shuttleDepartureTime}" class="form-control"
+                  id="shuttleDepartureTime" required>
+            <option th:each="hour : ${#numbers.sequence(0,23)}"
+                    th:value="${hour < 10 ? '0' + hour + ':00' : hour + ':00'}"
+                    th:text="${hour < 10 ? '0' + hour : hour} + ':00'"></option>
+          </select>
+          <div class="text-danger" th:if="${#fields.hasErrors('shuttleDepartureTime')}"
+               th:errors="*{shuttleDepartureTime}"></div>
+        </div>
 
-					<!-- 送出/取消 -->
-					<button type="submit" class="btn btn-primary me-2">送出</button>
-					<a th:href="@{/shuttle/list}" class="btn btn-secondary">取消</a>
-				</form>
-			</main>
-			<!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
-		</th:block>
-	</main>
+        <!-- 抵達時間 -->
+        <div class="mb-3">
+          <label for="shuttleArrivalTime" class="form-label">抵達時間（時）</label>
+          <select th:field="*{shuttleArrivalTime}" class="form-control"
+                  id="shuttleArrivalTime" required>
+            <option th:each="hour : ${#numbers.sequence(0,23)}"
+                    th:value="${hour < 10 ? '0' + hour + ':00' : hour + ':00'}"
+                    th:text="${hour < 10 ? '0' + hour : hour} + ':00'"></option>
+          </select>
+          <div class="text-danger" th:if="${#fields.hasErrors('shuttleArrivalTime')}"
+               th:errors="*{shuttleArrivalTime}"></div>
+        </div>
+
+        <!-- 送出/取消 -->
+        <button type="submit" class="btn btn-primary me-2">送出</button>
+        <a th:href="@{/shuttle/list}" class="btn btn-secondary">取消</a>
+      </form>
+    </th:block>
+  </main>
 </body>
 </html>

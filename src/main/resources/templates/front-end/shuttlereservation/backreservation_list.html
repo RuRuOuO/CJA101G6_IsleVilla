@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>接駁預約列表</title>
+<th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+</head>
+<body>
+	<!-- 載入側邊欄（桌機） -->
+	<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+	<!-- 載入側邊欄（手機） -->
+	<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+
+	<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+    <th:block th:fragment="myContent">
+
+        <h2 class="mb-4">⛴️ 接駁預約列表</h2>
+
+        <!-- 🔍 查詢按鈕 -->
+        <div class="mb-3">
+            <a class="btn btn-primary ms-2"
+               th:href="@{/reservation/getbackres}">
+               <i class="fa-solid fa-magnifying-glass me-1"></i>
+                查詢接駁預約</a>
+                
+              
+                
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle text-center">
+                <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>會員</th>
+                    <th>訂房編號</th>
+                    <th>接駁日期</th>
+                    <th>班次</th>
+                    <th>方向</th>
+                    <th>人數</th>
+                    <th>狀態</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="res, iterStat : ${shuttleReservationList}"
+                    th:with="scheduleText=|${res.shuttleSchedule.shuttleDepartureTime} → ${res.shuttleSchedule.shuttleArrivalTime}|">
+                    <td th:text="${iterStat.count}">1</td>
+                    <td th:text="${res.members?.memberName}">會員名稱</td>
+                    <td th:text="${res.roomRVOrder?.roomReservationId}">訂房ID</td>
+                    <td th:text="${res.shuttleDate}">日期</td>
+                    <td th:text="${scheduleText}">班次</td>
+                    <td>
+                        <span th:text="${res.shuttleDirection == 0 ? '去程' : '回程'}">方向</span>
+                    </td>
+                    <td th:text="${res.shuttleNumber}">人數</td>
+                    <td>
+                        <span th:classappend="${res.shuttleReservationStatus == 1 ? 'text-success' : 'text-danger'}"
+                              th:text="${res.shuttleReservationStatus == 1 ? '正常' : '取消'}">狀態</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </th:block>
+</main>
+
+</body>
+</html>

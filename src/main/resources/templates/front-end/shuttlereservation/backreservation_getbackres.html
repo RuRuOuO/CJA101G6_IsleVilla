@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>接駁預約查詢 | IsleVilla</title>
+<th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+</head>
+<body>
+
+	<!-- 手機 sidebar -->
+	<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+
+	<!-- 桌機 sidebar -->
+	<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+
+	<!-- 主要內容 -->
+	<main
+		th:replace="~{fragments/backFragments :: mainContent(~{::content})}">
+		<th:block th:fragment="content">
+			<h2 class="mb-4">🔍 接駁預約查詢</h2>
+
+			<!-- 查詢表單 -->
+			<form class="row g-3 align-items-center mb-4"
+				th:action="@{/reservation/getbackres/get}" method="get">
+				<div class="col-auto">
+					<label for="shuttleReservationId" class="col-form-label">選擇預約編號：</label>
+				</div>
+				<div class="col-auto">
+					<select id="shuttleReservationId" name="shuttleReservationId"
+						class="form-select" required>
+						<!-- 預設提示 -->
+						<option value="" disabled
+							th:selected="${backShuttleReservation == null}">請選擇預約編號
+						</option>
+
+						<!-- 動態選項 -->
+						<option th:each="res : ${allShuttleReservation}"
+							th:value="${res.shuttleReservationId}"
+							th:text="'編號: ' + ${res.shuttleReservationId} + ' | 日期: ' + ${res.shuttleDate}"
+							th:selected="${backShuttleReservation != null} ? ${res.shuttleReservationId} == ${backShuttleReservation.shuttleReservationId} : false">
+						</option>
+					</select>
+
+				</div>
+				<div class="col-auto">
+					<button type="submit" class="btn btn-primary">查詢</button>
+				</div>
+			</form>
+
+			<!-- 提示訊息 -->
+			<div th:if="${message}" class="alert alert-info" th:text="${message}"></div>
+
+			<!-- 返回列表按鈕 -->
+			<div class="mb-3">
+				<a class="btn btn-secondary" th:href="@{/reservation/list}">
+					返回列表 </a>
+			</div>
+
+			<!-- 查詢結果 -->
+			<div class="card" th:if="${backShuttleReservation != null}">
+				<div class="card-body">
+
+					<p>
+						<strong>預約編號：</strong> <span
+							th:text="${backShuttleReservation.shuttleReservationId}"></span>
+					</p>
+
+					<p>
+						<strong>會員名稱：</strong> <span
+							th:text="${backShuttleReservation.members.memberName}"></span>
+					</p>
+
+					<p>
+						<strong>訂房編號：</strong> <span
+							th:text="${backShuttleReservation.roomRVOrder.roomReservationId}"></span>
+					</p>
+
+					<p>
+						<strong>接駁日期：</strong> <span
+							th:text="${backShuttleReservation.shuttleDate}"></span>
+					</p>
+
+					<p>
+						<strong>接駁時段：</strong> <span
+							th:text="
+                               	${backShuttleReservation.shuttleSchedule.shuttleDepartureTime}
+                                + ' 出發 → ' + ${backShuttleReservation.shuttleSchedule.shuttleArrivalTime} + ' 抵達'
+                            ">
+						</span>
+					</p>
+
+					<p>
+						<strong>去回程：</strong> <span
+							th:text="${backShuttleReservation.shuttleDirection == 0 ? '去程' : '回程'}"></span>
+					</p>
+
+					<p>
+						<strong>預約人數：</strong> <span
+							th:text="${backShuttleReservation.shuttleNumber}"></span> 人
+					</p>
+
+					<p>
+						<strong>預約狀態：</strong> <span
+							th:text="${backShuttleReservation.shuttleReservationStatus == 1 ? '正常' : '取消'}"></span>
+					</p>
+				</div>
+			</div>
+		</th:block>
+	</main>
+
+</body>
+</html>

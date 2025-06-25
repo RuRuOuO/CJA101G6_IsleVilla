@@ -50,19 +50,19 @@ public class ShuttleScheduleController {
 		}
 
 		// 驗證：抵達時間不能早於出發時間
-		if (shuttleSchedule.getArrivalTime().isBefore(shuttleSchedule.getDepartureTime())) {
+		if (shuttleSchedule.getShuttleArrivalTime().isBefore(shuttleSchedule.getShuttleDepartureTime())) {
 			result.reject("time.invalid", "抵達時間不得早於出發時間 !");
 			model.addAttribute("formMode", "add");
 			return "front-end/shuttle/shuttle_add";
 		}
-		if (shuttleSchedule.getArrivalTime().equals(shuttleSchedule.getDepartureTime())) {
+		if (shuttleSchedule.getShuttleArrivalTime().equals(shuttleSchedule.getShuttleDepartureTime())) {
 			result.reject("time.equal", "出發與抵達時間不可相同 !");
 			return "front-end/shuttle/shuttle_add";
 		}
 
 		// 驗證：是否已有相同時間、方向的班次存在
-		boolean exists = shuttleService.existsSchedule(shuttleSchedule.getDirection(),
-				shuttleSchedule.getDepartureTime(), shuttleSchedule.getArrivalTime());
+		boolean exists = shuttleService.existsSchedule(shuttleSchedule.getShuttleDirection(),
+				shuttleSchedule.getShuttleDepartureTime(), shuttleSchedule.getShuttleArrivalTime());
 
 		if (exists) {
 			result.reject("duplicate.schedule", "已有相同的出發與抵達時間 !");
@@ -74,9 +74,9 @@ public class ShuttleScheduleController {
 	}
 
 	// 顯示編輯表單
-	@GetMapping("/edit/{id}")
-	public String showEditForm(@PathVariable("id") Integer id, Model model) {
-		ShuttleSchedule shuttle = shuttleService.getShuttleById(id);
+	@GetMapping("/edit/{shuttleScheduleId}")
+	public String showEditForm(@PathVariable("shuttleScheduleId") Integer shuttleScheduleId, Model model) {
+		ShuttleSchedule shuttle = shuttleService.getShuttleById(shuttleScheduleId);
 		if (shuttle == null) {
 			return "redirect:/shuttle/list";
 		}
@@ -96,19 +96,20 @@ public class ShuttleScheduleController {
 			return "front-end/shuttle/shuttle_add";
 		}
 		// 抵達時間不能早於出發時間
-		if (shuttleSchedule.getArrivalTime().isBefore(shuttleSchedule.getDepartureTime())) {
+		if (shuttleSchedule.getShuttleArrivalTime().isBefore(shuttleSchedule.getShuttleDepartureTime())) {
 			result.reject("time.invalid", "抵達時間不得早於出發時間 !");
 			return "front-end/shuttle/shuttle_add";
 		}
 
-		if (shuttleSchedule.getArrivalTime().equals(shuttleSchedule.getDepartureTime())) {
+		if (shuttleSchedule.getShuttleArrivalTime().equals(shuttleSchedule.getShuttleDepartureTime())) {
 			result.reject("time.equal", "出發時間與抵達時間不可相同 !");
 			return "front-end/shuttle/shuttle_add";
 		}
 
 		// 檢查是否有「其他班次」使用相同時間
-		boolean exists = shuttleService.existsScheduleExcludingSelf(shuttleSchedule.getDirection(),
-				shuttleSchedule.getDepartureTime(), shuttleSchedule.getArrivalTime(), shuttleSchedule.getId());
+		boolean exists = shuttleService.existsScheduleExcludingSelf(shuttleSchedule.getShuttleDirection(),
+				shuttleSchedule.getShuttleDepartureTime(), shuttleSchedule.getShuttleArrivalTime(),
+				shuttleSchedule.getShuttleScheduleId());
 
 		if (exists) {
 			result.reject("duplicate.schedule", "已有其他班次使用相同的出發與抵達時間 !");
@@ -120,30 +121,34 @@ public class ShuttleScheduleController {
 	}
 
 	// 刪除班次
-	@GetMapping("/delete/{id}")
-	public String deleteShuttle(@PathVariable("id") Integer id) {
-		shuttleService.deleteShuttle(id);
+	@GetMapping("/delete/{shuttleScheduleId}")
+	public String deleteShuttle(@PathVariable("shuttleScheduleId") Integer shuttleScheduleId) {
+		shuttleService.deleteShuttle(shuttleScheduleId);
 		return "redirect:/shuttle/list";
 	}
 
 	// 顯示查詢頁面
-	@GetMapping("/getshuttle")
+	@GetMapping("/get")
 	public String showGetOneForm(Model model) {
 		model.addAttribute("allShuttleSchedules", shuttleService.getAllShuttle());
 		model.addAttribute("shuttle", null); // 第一次載入沒有資料
-		return "front-end/shuttle/shuttle_getshuttle";
+		return "front-end/shuttle/shuttle_get";
 	}
 
-	// 處裡查詢頁面
-	@GetMapping("/get/{id}")
-	public String getShuttleById(@PathVariable("id") Integer id, Model model) {
-		//加入所有班次給下拉式選單
-		model.addAttribute("allShuttleSchedules",shuttleService.getAllShuttle());
-		//查詢指定班次
-		ShuttleSchedule shuttle = shuttleService.getShuttleById(id);
-		
+	// 查詢功能
+	@GetMapping("/getshuttle")
+	public String getShuttleById(@RequestParam(value = "shuttleId", required = false) Integer shuttleId, Model model) {
+		ShuttleSchedule shuttle = null;
+		if (shuttleId != null) {
+			shuttle = shuttleService.getShuttleById(shuttleId);
+			if (shuttle == null) {
+				model.addAttribute("errorMsg", "查無此班次編號：" + shuttleId);
+			}
+		}
+		model.addAttribute("allShuttleSchedules", shuttleService.getAllShuttle());
 		model.addAttribute("shuttle", shuttle);
-		return "front-end/shuttle/shuttle_getshuttle";
+		model.addAttribute("selectedShuttleId", shuttleId);
+		return "front-end/shuttle/shuttle_get";
 	}
 
 }

@@ -27,25 +27,24 @@
 
 						<!-- 接駁日期 -->
 						<div class="mb-3">
-							<label for="date" class="form-label">接駁日期</label> <input
-								type="date" th:field="*{date}" class="form-control" id="date"
-								required>
+							<label for="shuttleDate" class="form-label">接駁日期</label> <input
+								type="date" th:field="*{shuttleDate}" class="form-control"
+								id="shuttleDate" required>
 							<div class="invalid-feedback">請選擇日期</div>
 						</div>
 
 						<!-- 班次選單 -->
 						<div class="mb-3">
-							<label for="scheduleId" class="form-label">選擇班次</label> <select
-								th:field="*{scheduleId}" class="form-select" id="scheduleId"
-								required>
+							<label for="shuttleScheduleId" class="form-label">選擇班次</label> <select
+								th:field="*{shuttleScheduleId}" class="form-select"
+								id="shuttleScheduleId" required>
 								<option value="" disabled
-									th:if="${seatavailability.scheduleId == null}" selected>請選擇班次</option>
+									th:if="${seatavailability.shuttleScheduleId == null}" selected>請選擇班次</option>
 								<option th:each="schedule : ${scheduleList}"
-									th:value="${schedule.id}"
-									th:text="'#' + ${schedule.id} + '｜' + (${schedule.direction == 0 ? '去' : '回'}) + ' - ' + ${#temporals.format(schedule.departureTime, 'HH:mm')} + ' ~ ' + ${#temporals.format(schedule.arrivalTime, 'HH:mm')}">
+									th:value="${schedule.shuttleScheduleId}"
+									th:text="'#' + ${schedule.shuttleScheduleId} + '｜' + (${schedule.shuttleDirection == 0 ? '去' : '回'}) + ' - ' + ${#temporals.format(schedule.shuttleDepartureTime, 'HH:mm')} + ' ~ ' + ${#temporals.format(schedule.shuttleArrivalTime, 'HH:mm')}">
 								</option>
 							</select>
-
 							<div class="invalid-feedback">請選擇一個班次</div>
 						</div>
 
@@ -53,17 +52,15 @@
 						<div class="mb-3">
 							<label for="seatQuantity" class="form-label">可用座位數</label> <input
 								type="number" th:field="*{seatQuantity}" class="form-control"
-								id="seatQuantity" min="0" required>
-							<div class="invalid-feedback">請輸入可用座位數（不可為負數）</div>
+								id="seatQuantity" min="1" max="100" required>
+							<div class="invalid-feedback">座位數量請輸入 1～100 之間的整數</div>
 						</div>
 
 						<!-- 按鈕 -->
 						<div class="d-flex justify-content-start mt-4">
-							<button type="submit" class="btn btn-primary">
-							送出
-							</button>
+							<button type="submit" class="btn btn-primary">送出</button>
 							<a th:href="@{/seatavailability/list}"
-								class="btn btn-secondary ms-3">取消</a>
+								class="btn btn-secondary ms-3">取消及返回列表</a>
 						</div>
 					</form>
 				</div>
@@ -75,19 +72,19 @@
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 	<script>
-		(() => {
-			'use strict';
-			const forms = document.querySelectorAll('.needs-validation');
-			Array.from(forms).forEach(form => {
-				form.addEventListener('submit', event => {
-					if (!form.checkValidity()) {
-						event.preventDefault();
-						event.stopPropagation();
-					}
-					form.classList.add('was-validated');
-				}, false);
-			});
-		})();
-	</script>
+    (() => {
+      'use strict';
+      const forms = document.querySelectorAll('.needs-validation');
+      Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          form.classList.add('was-validated');
+        }, false);
+      });
+    })();
+  </script>
 </body>
 </html>

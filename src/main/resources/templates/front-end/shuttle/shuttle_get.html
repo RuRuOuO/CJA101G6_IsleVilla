@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>接駁班次查詢</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+
+<style>
+    .form-inline {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+    }
+    .form-inline select {
+        width: auto;
+        min-width: 300px;
+    }
+</style>
+</head>
+<body>
+	<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+	<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+
+	<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+		<th:block th:fragment="myContent">
+
+			<h2 class="mb-4">🔍 接駁班次查詢</h2>
+
+			<!-- 查詢表單 -->
+			<form method="get" th:action="@{/shuttle/getshuttle}" class="form-inline mb-4">
+				<label for="shuttleId" class="form-label mb-0">選擇班次：</label>
+
+				<select class="form-select" id="shuttleId" name="shuttleId">
+					<option value="">請選擇班次</option>
+					<option th:each="shuttle : ${allShuttleSchedules}"
+						th:value="${shuttle.shuttleScheduleId}"
+						th:text="'班次 ' + ${shuttle.shuttleScheduleId} + ' | ' 
+				                + (${shuttle.shuttleDirection} == 0 ? '去程' : '回程') 
+				                + ' | 出發 ' + ${shuttle.shuttleDepartureTime} 
+				                + ' | 抵達 ' + ${shuttle.shuttleArrivalTime}"
+						th:selected="${shuttle.shuttleScheduleId == selectedShuttleId}">
+					</option>
+				</select>
+
+				<button type="submit" class="btn btn-primary">查詢</button>
+			</form>
+			<div class="mb-3">
+            <a class="btn btn-secondary" th:href="@{/shuttle/list}">
+                返回列表
+            </a>
+        </div>
+
+			<!-- 查詢結果 -->
+			<div th:if="${shuttle != null}" class="card p-4">
+				<h4>查詢結果</h4>
+				<table class="table">
+					<tr>
+						<th>班次編號</th>
+						<td th:text="${shuttle.shuttleScheduleId}"></td>
+					</tr>
+					<tr>
+						<th>方向</th>
+						<td th:text="${shuttle.shuttleDirection == 0 ? '去程' : '回程'}"></td>
+					</tr>
+					<tr>
+						<th>出發時間</th>
+						<td th:text="${shuttle.shuttleDepartureTime}"></td>
+					</tr>
+					<tr>
+						<th>抵達時間</th>
+						<td th:text="${shuttle.shuttleArrivalTime}"></td>
+					</tr>
+				</table>
+			</div>
+
+			<!-- 錯誤訊息 -->
+			<div th:if="${errorMsg != null}" class="alert alert-danger">
+				<p th:text="${errorMsg}"></p>
+			</div>
+
+		</th:block>
+	</main>
+</body>
+</html>
