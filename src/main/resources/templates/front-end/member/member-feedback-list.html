@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>微嶼 | Isle Villa</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+    <style>
+        .star-rating {
+            display: inline-flex;
+            flex-direction: row-reverse;
+            font-size: 1.5rem;
+        }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            color: #ddd;
+            cursor: pointer;
+            padding: 0 2px;
+            transition: color 0.2s;
+        }
+
+        .star-rating input:checked ~ label,
+        .star-rating input:checked ~ label ~ label {
+            color: #ffc107;
+        }
+
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: #ffc107;
+        }
+    </style>
+</head>
+<body>
+<!-- ===== 載入Header ===== -->
+<div th:replace="~{fragments/fragments :: header}"></div>
+<main>
+    <div class="container py-5">
+        <h1 class="text-center mb-4">會員專區</h1>
+        <div class="row">
+            <!-- ===== 載入側邊欄 ===== -->
+            <div th:replace="~{fragments/fragments :: memberSidebar(activeTab='feedback')}"></div>
+            <!-- 右側內容區 -->
+            <div class="col-md-9">
+                <!-- //////////////////// 會員頁面內容放這裡 //////////////////// -->
+                <div class="card p-4 shadow-sm">
+                    <form id="feedbackForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="roomReservationId" class="form-label">請選擇訂單</label>
+                            <select class="form-select" id="roomReservationId" name="roomReservationId" required>
+                                <option value="">-- 請選擇 --</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">整體評價 <span class="text-danger">*</span></label>
+                            <div class="star-rating">
+                                <input type="radio" name="fbOverallRating" value="5" id="overall5" required>
+                                <label for="overall5">★</label>
+                                <input type="radio" name="fbOverallRating" value="4" id="overall4">
+                                <label for="overall4">★</label>
+                                <input type="radio" name="fbOverallRating" value="3" id="overall3">
+                                <label for="overall3">★</label>
+                                <input type="radio" name="fbOverallRating" value="2" id="overall2">
+                                <label for="overall2">★</label>
+                                <input type="radio" name="fbOverallRating" value="1" id="overall1">
+                                <label for="overall1">★</label>
+                            </div>
+                        </div>
+
+                        <!-- 推薦與否 -->
+                        <div class="mb-3">
+                            <label class="form-label">是否推薦？ <span class="text-danger">*</span></label><br>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="fbRecommend" value="1" required>
+                                <label class="form-check-label">推薦</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="fbRecommend" value="0">
+                                <label class="form-check-label">不推薦</label>
+                            </div>
+                        </div>
+
+                        <!-- 再訪意願 -->
+                        <div class="mb-3">
+                            <label class="form-label">再訪意願 <span class="text-danger">*</span></label><br>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="fbRevisit" value="1" required>
+                                <label class="form-check-label">願意</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="fbRevisit" value="0">
+                                <label class="form-check-label">不願意</label>
+                            </div>
+                        </div>
+
+                        <!-- 接駁服務評價 -->
+                        <div class="mb-3">
+                            <label class="form-label">接駁服務 <span class="text-danger">*</span></label>
+                            <div class="star-rating">
+                                <input type="radio" name="fbShuttleRating" value="5" id="shuttle5" required>
+                                <label for="shuttle5">★</label>
+                                <input type="radio" name="fbShuttleRating" value="4" id="shuttle4">
+                                <label for="shuttle4">★</label>
+                                <input type="radio" name="fbShuttleRating" value="3" id="shuttle3">
+                                <label for="shuttle3">★</label>
+                                <input type="radio" name="fbShuttleRating" value="2" id="shuttle2">
+                                <label for="shuttle2">★</label>
+                                <input type="radio" name="fbShuttleRating" value="1" id="shuttle1">
+                                <label for="shuttle1">★</label>
+                            </div>
+                        </div>
+
+                        <!-- 接待服務評價 -->
+                        <div class="mb-3">
+                            <label class="form-label">接待服務 <span class="text-danger">*</span></label>
+                            <div class="star-rating">
+                                <input type="radio" name="fbReceptionRating" value="5" id="reception5" required>
+                                <label for="reception5">★</label>
+                                <input type="radio" name="fbReceptionRating" value="4" id="reception4">
+                                <label for="reception4">★</label>
+                                <input type="radio" name="fbReceptionRating" value="3" id="reception3">
+                                <label for="reception3">★</label>
+                                <input type="radio" name="fbReceptionRating" value="2" id="reception2">
+                                <label for="reception2">★</label>
+                                <input type="radio" name="fbReceptionRating" value="1" id="reception1">
+                                <label for="reception1">★</label>
+                            </div>
+                        </div>
+
+                        <!-- 房間評價 -->
+                        <div class="mb-3">
+                            <label class="form-label">房間評價 <span class="text-danger">*</span></label>
+                            <div class="star-rating">
+                                <input type="radio" name="fbRoomRating" value="5" id="room5" required>
+                                <label for="room5">★</label>
+                                <input type="radio" name="fbRoomRating" value="4" id="room4">
+                                <label for="room4">★</label>
+                                <input type="radio" name="fbRoomRating" value="3" id="room3">
+                                <label for="room3">★</label>
+                                <input type="radio" name="fbRoomRating" value="2" id="room2">
+                                <label for="room2">★</label>
+                                <input type="radio" name="fbRoomRating" value="1" id="room1">
+                                <label for="room1">★</label>
+                            </div>
+                        </div>
+
+                        <!-- 設施評價 -->
+                        <div class="mb-3">
+                            <label class="form-label">設施評價 <span class="text-danger">*</span></label>
+                            <div class="star-rating">
+                                <input type="radio" name="fbFacilityRating" value="5" id="facility5" required>
+                                <label for="facility5">★</label>
+                                <input type="radio" name="fbFacilityRating" value="4" id="facility4">
+                                <label for="facility4">★</label>
+                                <input type="radio" name="fbFacilityRating" value="3" id="facility3">
+                                <label for="facility3">★</label>
+                                <input type="radio" name="fbFacilityRating" value="2" id="facility2">
+                                <label for="facility2">★</label>
+                                <input type="radio" name="fbFacilityRating" value="1" id="facility1">
+                                <label for="facility1">★</label>
+                            </div>
+                        </div>
+
+                        <!-- 環境評價 -->
+                        <div class="mb-3">
+                            <label class="form-label">環境評價 <span class="text-danger">*</span></label>
+                            <div class="star-rating">
+                                <input type="radio" name="fbEnvRating" value="5" id="env5" required>
+                                <label for="env5">★</label>
+                                <input type="radio" name="fbEnvRating" value="4" id="env4">
+                                <label for="env4">★</label>
+                                <input type="radio" name="fbEnvRating" value="3" id="env3">
+                                <label for="env3">★</label>
+                                <input type="radio" name="fbEnvRating" value="2" id="env2">
+                                <label for="env2">★</label>
+                                <input type="radio" name="fbEnvRating" value="1" id="env1">
+                                <label for="env1">★</label>
+                            </div>
+                        </div>
+
+                        <!-- 性價比評價 -->
+                        <div class="mb-3">
+                            <label class="form-label">性價比評價 <span class="text-danger">*</span></label>
+                            <div class="star-rating">
+                                <input type="radio" name="fbValueRating" value="5" id="value5" required>
+                                <label for="value5">★</label>
+                                <input type="radio" name="fbValueRating" value="4" id="value4">
+                                <label for="value4">★</label>
+                                <input type="radio" name="fbValueRating" value="3" id="value3">
+                                <label for="value3">★</label>
+                                <input type="radio" name="fbValueRating" value="2" id="value2">
+                                <label for="value2">★</label>
+                                <input type="radio" name="fbValueRating" value="1" id="value1">
+                                <label for="value1">★</label>
+                            </div>
+                        </div>
+
+                        <!-- 網站使用評價 -->
+                        <div class="mb-3">
+                            <label class="form-label">網站使用 <span class="text-danger">*</span></label>
+                            <div class="star-rating">
+                                <input type="radio" name="fbWebsiteRating" value="5" id="website5" required>
+                                <label for="website5">★</label>
+                                <input type="radio" name="fbWebsiteRating" value="4" id="website4">
+                                <label for="website4">★</label>
+                                <input type="radio" name="fbWebsiteRating" value="3" id="website3">
+                                <label for="website3">★</label>
+                                <input type="radio" name="fbWebsiteRating" value="2" id="website2">
+                                <label for="website2">★</label>
+                                <input type="radio" name="fbWebsiteRating" value="1" id="website1">
+                                <label for="website1">★</label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="fbCompliment" class="form-label">好評內容</label>
+                            <textarea class="form-control" id="fbCompliment" name="fbCompliment" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="fbSuggestion" class="form-label">建議與改進</label>
+                            <textarea class="form-control" id="fbSuggestion" name="fbSuggestion" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="fbImage" class="form-label">上傳照片（非必填）</label>
+                            <input type="file" class="form-control" id="fbImage" name="fbImage" accept="image/*">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">是否願意公開評論？ <span class="text-danger">*</span></label><br>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="fbPublic" value="1" required>
+                                <label class="form-check-label">公開</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="fbPublic" value="0">
+                                <label class="form-check-label">不公開</label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">提交問卷</button>
+                    </form>
+                </div>
+                <!-- //////////////////// 會員頁面內容放這裡 //////////////////// -->
+            </div>
+        </div>
+    </div>
+</main>
+<!-- ========== 載入Footer ========== -->
+<footer th:replace="~{fragments/fragments :: footer}"></footer>
+<script>
+    // 初始化訂單下拉選單（從 /api/member/orders 撈資料）
+    fetch('/api/member/orders')
+        .then(res => res.json())
+        .then(data => {
+            const select = document.getElementById('roomReservationId');
+            data.forEach(order => {
+                const opt = document.createElement('option');
+                opt.value = order.roomReservationId;
+                opt.textContent = `訂單 #${order.roomReservationId}（${order.checkInDate} ~ ${order.checkOutDate}）`;
+                select.appendChild(opt);
+            });
+        });
+
+    // 表單提交
+    document.getElementById('feedbackForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        fetch('/api/feedbacks', {
+            method: 'POST',
+            body: formData
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert('問卷提交成功！');
+                    location.reload();
+                } else {
+                    alert('提交失敗，請再試一次。');
+                }
+            });
+    });
+</script>
+</body>
+</html>

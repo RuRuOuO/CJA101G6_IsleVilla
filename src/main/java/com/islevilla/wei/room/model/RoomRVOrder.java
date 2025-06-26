@@ -35,15 +35,21 @@ public class RoomRVOrder {
 
     @Column(name = "room_order_status")
     @NotEmpty(message = "請選擇訂單狀態")
-    private String roomOrderStatus;
+    private Integer roomOrderStatus;
 
     @Column(name = "check_in_date")
     @NotNull(message = "請選擇住宿開始日期")
     private LocalDate checkInDate;
 
+    @Column(name = "actual_check_in_date")
+    private LocalDateTime actualCheckInDate;
+
     @Column(name = "check_out_date")
     @NotNull(message = "請選擇住宿結束日期")
     private LocalDate checkOutDate;
+
+    @Column(name = "actual_check_out_date")
+    private LocalDateTime actualCheckOutDate;
 
     @ManyToOne
     @JoinColumn(name = "room_promotion_id")
@@ -66,6 +72,9 @@ public class RoomRVOrder {
     @Min(value = 0, message = "金額不能為負數")
     @NotNull(message = "請輸入實際付款金額")
     private Integer rvPaidAmount;
+
+    @Column(name = "cancel_reason")
+    private String cancelReason;
 
     // @OneToMamy
     @OneToMany(mappedBy = "roomRVOrder", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -1,16 +1,13 @@
 package com.islevilla.ching.shuttleSchedule.model;
 
 import java.time.LocalTime;
+import java.util.List;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-@Entity(name = "ShuttleScheduleChing")
+@Entity(name = "chingShuttleSchedule")
 @Table(name = "shuttle_schedule")
 @Data
 public class ShuttleSchedule {
@@ -18,47 +15,23 @@ public class ShuttleSchedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "shuttle_schedule_id")
-    private Integer id;
+    private Integer shuttleScheduleId;
 
-    @Column(name = "shuttle_direction")
-    private Integer direction;
+    @Column(name = "shuttle_direction", nullable = false)
+    @NotNull(message = "請選擇去回程")
+    private Integer shuttleDirection; // 0:去程 1:回程
 
-    @Column(name = "shuttle_departure_time")
-    private LocalTime departureTime;
+    @Column(name = "shuttle_departure_time", nullable = false)
+    @NotNull(message = "請輸入出發時間")
+    private LocalTime shuttleDepartureTime;
 
-    @Column(name = "shuttle_arrival_time")
-    private LocalTime arrivalTime;
+    @Column(name = "shuttle_arrival_time", nullable = false)
+    @NotNull(message = "請輸入抵達時間")
+    private LocalTime shuttleArrivalTime;
 
-
-//	public Integer getId() {
-//		return id;
-//	}
+//    @OneToMany(mappedBy = "shuttleSchedule")
+//    private List<ShuttleReservation> shuttleReservation;
 //
-//	public void setId(Integer id) {
-//		this.id = id;
-//	}
-//
-//	public Integer getDirection() {
-//		return direction;
-//	}
-//
-//	public void setDirection(Integer direction) {
-//		this.direction = direction;
-//	}
-//
-//	public LocalTime getDepartureTime() {
-//		return departureTime;
-//	}
-//
-//	public void setDepartureTime(LocalTime departureTime) {
-//		this.departureTime = departureTime;
-//	}
-//
-//	public LocalTime getArrivalTime() {
-//		return arrivalTime;
-//	}
-//
-//	public void setArrivalTime(LocalTime arrivalTime) {
-//		this.arrivalTime = arrivalTime;
-//	}
+//    @OneToMany(mappedBy = "shuttleSchedule")
+//    private List<ShuttleSeatAvailability> shuttleSeatAvailability;
 }
