@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>微嶼 | Isle Villa 後台首頁</title>
+<!-- ===== 載入統一樣式 ===== -->
+<th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+</head>
+<body>
+	<!-- ===== 載入sidebar ===== -->
+	<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+	<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+
+	<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+		<th:block th:fragment="myContent">
+			<h1 class="mb-4">⛴️ 接駁船時段列表</h1>
+
+			<!-- 顯示操作成功訊息（若有） -->
+			<div th:if="${successMessage}" class="alert alert-success" role="alert">
+				<i class="fa-solid fa-circle-check me-2"></i>
+				<span th:text="${successMessage}">操作成功</span>
+			</div>
+
+			<div class="d-flex align-items-center mb-3">
+				<a class="btn btn-primary" th:href="@{/backend/shuttle/add}">
+					<i class="fa-solid fa-plus text-white me-1"></i>新增時段
+				</a>
+				<a class="btn btn-primary ms-2" href="/backend/shuttle/getshuttle">
+					<i class="fa-solid fa-magnifying-glass me-1"></i>查詢時段
+				</a>
+			</div>
+
+			<div class="table-responsive">
+				<table class="table table-bordered text-center align-middle">
+					<thead class="table-secondary">
+						<tr>
+							<th style="width: 100px;">時段編號</th>
+							<th style="width: 80px;">方向</th>
+							<th>出發時間</th>
+							<th>抵達時間</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="shuttle : ${shuttleList}">
+							<td th:text="${shuttle.shuttleScheduleId}">1</td>
+							<td th:text="${shuttle.shuttleDirection == 0 ? '去程' : '回程'}">去程</td>
+							<td th:text="${#temporals.format(shuttle.shuttleDepartureTime, 'HH:mm')}">08:00</td>
+							<td th:text="${#temporals.format(shuttle.shuttleArrivalTime, 'HH:mm')}">09:00</td>
+							<td>
+								<a class="btn btn-sm btn-primary me-1"
+								   th:href="@{/backend/shuttle/edit/{id}(id=${shuttle.shuttleScheduleId})}">
+									<i class="fa-solid fa-pen-to-square me-1"></i>編輯
+								</a>
+								<a class="btn btn-sm btn-danger"
+								   th:href="@{/backend/shuttle/delete/{id}(id=${shuttle.shuttleScheduleId})}"
+								   onclick="return confirm('確定要刪除嗎？');">
+									<i class="fa-solid fa-trash me-1"></i>刪除
+								</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</th:block>
+	</main>
+</body>
+</html>
