@@ -62,12 +62,32 @@
                 width: 280px;
                 background-color: #223363;
                 z-index: 1040;
+                display: flex;
+                flex-direction: column;
             }
 
             .content {
                 padding: 20px;
                 margin-left: 280px;
                 min-height: 100vh;
+            }
+
+            .sidebar-menu {
+                flex: 1;
+            }
+
+            .sidebar-user {
+                border-top: 1px solid rgba(255, 255, 255, 0.3);
+                padding-top: 1rem;
+                margin-top: auto;
+            }
+
+            .user-avatar {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 2px solid rgba(255, 255, 255, 0.3);
             }
 
             @media (max-width: 991.98px) {
@@ -123,16 +143,13 @@
 <!-- Sidebar（桌機版） -->
 <div th:fragment="sidebar" class="sidebar p-3 position-fixed top-0 start-0 vh-100">
     <a
-            class="d-flex justify-content-center align-items-center mt-3 mb-4 link-body-emphasis text-decoration-none text-white"
+            class="d-flex justify-content-center align-items-center mt-3 mb-2 link-body-emphasis text-decoration-none text-white"
             th:href="@{/backend/dashboard}"
     >
         <span class="fs-5 text-white" style="font-family: Kaisei HarunoUmi">IsleVilla微嶼 後台管理</span>
     </a>
-    <div
-            class="border-bottom mb-4"
-            style="border-bottom: 1px solid rgba(255, 255, 255, 0.3)"
-    ></div>
-    <ul class="list-unstyled ps-0" id="sidebarMenu">
+    <hr class="my-4" style="border-color: #e3e6f0; opacity: 0.5;">
+    <ul class="list-unstyled ps-0 sidebar-menu" id="sidebarMenu">
         <!-- 分類1 -->
         <li class="mb-1">
             <button
@@ -193,6 +210,21 @@
             </div>
         </li>
     </ul>
+    
+    <!-- 用戶資訊和登出按鈕 -->
+    <div class="sidebar-user">
+        <div class="d-flex align-items-center mb-3">
+            <div class="flex-grow-1">
+                <div class="text-white fw-bold" th:text="${#authentication.principal.employeeName}">員工姓名</div>
+                <div class="text-white-50 small" th:text="${#authentication.principal.employeeEmail}">員工信箱</div>
+            </div>
+        </div>
+        <form th:action="@{/backend/logout}" method="post" style="margin: 0;">
+            <button type="submit" class="btn btn-outline-light btn-sm w-100">
+                <i class="bi bi-box-arrow-right me-2"></i>登出
+            </button>
+        </form>
+    </div>
 </div>
 
 <!-- Sidebar（手機版 Offcanvas） -->
@@ -245,6 +277,21 @@
                 </div>
             </li>
         </ul>
+        
+        <!-- 手機版用戶資訊和登出按鈕 -->
+        <div class="border-top pt-3 mt-3">
+            <div class="d-flex align-items-center mb-3">
+                <div class="flex-grow-1">
+                    <div class="text-primary fw-bold" th:text="${#authentication.principal.employeeName}">員工姓名</div>
+                    <div class="text-muted small" th:text="${#authentication.principal.employeeEmail}">員工信箱</div>
+                </div>
+            </div>
+            <form th:action="@{/backend/logout}" method="post" style="margin: 0;">
+                <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                    <i class="bi bi-box-arrow-right me-2"></i>登出
+                </button>
+            </form>
+        </div>
     </div>
 </div>
 

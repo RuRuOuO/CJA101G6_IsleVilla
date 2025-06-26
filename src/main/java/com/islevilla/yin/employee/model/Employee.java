@@ -10,8 +10,11 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,7 +22,7 @@ import java.util.Set;
 @Table(name = "employee")
 @Data
 @EqualsAndHashCode(exclude = "permissions")
-public class Employee {
+public class Employee implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,7 +51,6 @@ public class Employee {
     @Pattern(regexp = "^09\\d{8}$", message = "手機格式錯誤")
     @Column(name = "employee_mobile")
     private String employeeMobile;
-
 
     @Column(name = "employee_password_hash")
     private String employeePassword;
@@ -82,4 +84,46 @@ public class Employee {
     @ToString.Exclude
     private Set<Permission> permissions = new HashSet<>();
 
+    // Spring Security UserDetails 介面實作
+    @Transient
+    private Collection<? extends GrantedAuthority> authorities;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(Collection<? extends GrantedAuthority> authorities) {
+        this.authorities = authorities;
+    }
+
+    @Override
+    public String getPassword() {
+        return employeePassword;
+    }
+
+    @Override
+    public String getUsername() {
+        return employeeEmail;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return employeeStatus != 0 && employeeStatus != 2; // 非離職且非停職
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return employeeStatus == 1; // 在職
+    }
 }
