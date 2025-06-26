@@ -18,6 +18,7 @@ import com.islevilla.lai.members.model.MembersService;
 import com.islevilla.lai.shuttle.model.SeatDTO;
 import com.islevilla.lai.shuttle.model.SeatService;
 import com.islevilla.lai.shuttle.model.ShuttleRVFrontEndService;
+import com.islevilla.lai.shuttle.model.ShuttleReservation;
 import com.islevilla.lai.shuttle.model.ShuttleReservationSeatService;
 import com.islevilla.lai.shuttle.model.ShuttleReservationService;
 import com.islevilla.lai.shuttle.model.ShuttleScheduleService;
@@ -73,6 +74,24 @@ public class ShuttleReservationController {
 //		model.addAttribute("member", member);
 //		return "front-end/shuttle/shuttle-reservation";
 //	}
+	
+	// 前台渲染會員接駁預約
+    @GetMapping("/member/shuttle/list")
+    public String getShuttleRVFromMember(Model model, HttpSession session) {
+//  public String getShuttleRVFromMember(Model model) {
+        Members member = (Members) session.getAttribute("member");
+        
+        if (member == null) {
+            return "redirect:/member/login";
+        }
+        
+        // 查詢預約
+        List<ShuttleReservation> shuttleReservationList = shuttleReservationService.getReservationsByMember(member);
+        if (!shuttleReservationList.isEmpty()) {
+            model.addAttribute("shuttleReservationList", shuttleReservationList);
+        }
+        return "front-end/member/member-shuttle-list";
+    }
 	
 	/**
      * 顯示預約首頁 - 步驟1：申請預約

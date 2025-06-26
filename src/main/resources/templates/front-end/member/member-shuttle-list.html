@@ -19,7 +19,35 @@
             <!-- 右側內容區 -->
             <div class="col-md-9">
                 <!-- //////////////////// 會員頁面內容放這裡 //////////////////// -->
-
+				<div th:if="${shuttleReservationList!=null and !shuttleReservationList.isEmpty()}">
+                    <div class="col-12" th:each="shuttleReservation : ${shuttleReservationList}">
+                        <div class="card shadow-sm p-3">
+                            <h5 class="card-title mb-3">預約編號：<span th:text="${shuttleReservation.shuttleReservationId}"></span>
+                            </h5>
+                            <ul class="list-group list-group-flush">
+                            	<li class="list-group-item">訂房編號：<span
+                                        th:text="${shuttleReservation.roomRVOrder.roomReservationId}"></span></li>
+                                <li class="list-group-item">接駁日期：<span
+                                        th:text="${#temporals.format(shuttleReservation.shuttleDate, 'yyyy-MM-dd')}"></span></li>
+                                <li class="list-group-item">接駁班次編號：<span
+                                        th:text="${shuttleReservation.shuttleSchedule.shuttleScheduleId}"></span></li>
+                                <li class="list-group-item">去/回程：<span th:switch="${shuttleReservation.shuttleDirection}">
+                                    <span th:case="'0'">去程</span>
+                                    <span th:case="'1'">回程</span>
+                                    <span th:case="'*'">未知</span>
+                                </span></li>
+                                <li class="list-group-item">預約狀態：<span th:switch="${shuttleReservation.shuttleReservationStatus}">
+                                    <span th:case="'0'">取消</span>
+                                    <span th:case="'1'">正常</span>
+                                    <span th:case="'*'">未知</span>
+                                </span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div th:unless="${shuttleReservationList!=null and !shuttleReservationList.isEmpty()}">
+                    <p>尚無訂單建立</p>
+                </div>
                 <!-- //////////////////// 會員頁面內容放這裡 //////////////////// -->
             </div>
         </div>
