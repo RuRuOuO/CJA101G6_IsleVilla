@@ -106,7 +106,7 @@ public class ProductController {
     }
 
     // 取得商品第一張圖片（保留這個方法，刪除用 productPhotoId 查單一圖的方法）
-    @GetMapping("/backend/product/photo/{productId}")
+    @GetMapping("/product/photo/{productId}")
     @ResponseBody
     public ResponseEntity<byte[]> getProductPhoto(@PathVariable Integer productId) {
         ProductPhoto photo = productPhotoService.getFirstProductPhotoByProductId(productId);

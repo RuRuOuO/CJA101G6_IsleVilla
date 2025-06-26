@@ -154,7 +154,7 @@
                                    class="btn btn-secondary btn-sm text-center"
                                    style="flex: 1 1 0; min-width: 0; white-space: nowrap;">查看詳情</a>
                                 <!-- 加入購物車按鈕 -->
-                                <form th:action="@{/addToCart}" method="post" style="flex: 1 1 0; min-width: 0;">
+                                <form th:action="@{/addToCart}" method="post" class="add-to-cart-form" style="flex: 1 1 0; min-width: 0;">
                                     <input type="hidden" name="productId" th:value="${prod.productId}" />
                                     <input type="hidden" name="quantity" value="1" />
                                     <button type="submit" class="btn btn-primary btn-sm text-center w-100"
@@ -175,5 +175,30 @@
 <!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
 <!-- ========== 載入Footer ========== -->
 <div th:replace="~{fragments/fragments :: footer}"></div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 加入購物車AJAX
+    document.querySelectorAll('.add-to-cart-form').forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(form);
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('加入購物車失敗');
+                return response.text();
+            })
+            .then(msg => {
+                alert(msg || '加入購物車成功');
+            })
+            .catch(() => {
+                alert('加入購物車失敗，請稍後再試');
+            });
+        });
+    });
+});
+</script>
 </body>
 </html>
