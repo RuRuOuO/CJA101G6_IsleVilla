@@ -13,10 +13,15 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.islevilla.yin.auth.CustomLoginSuccessHandler;
 
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)  // 啟用 @PreAuthorize 註解
 public class SecurityConfig {
+
+    @Autowired
+    private CustomLoginSuccessHandler customLoginSuccessHandler;
 
     // 1) 註冊 PasswordEncoder Bean
     @Bean
@@ -65,7 +70,8 @@ public class SecurityConfig {
                         // —— 一次放行所有公開頁面 ——
                         .requestMatchers(
                                 "/backend/auth",           // 登入頁 GET
-                                "/css/**", "/js/**", "/images/**"    // 靜態資源
+                                "/css/**", "/js/**", "/images/**", // 靜態資源
+                                "/api/**"//放行api測試
                         ).permitAll()
 
                         // —— 其餘 backend 頁面必須登入 ——
@@ -81,7 +87,7 @@ public class SecurityConfig {
                         .loginProcessingUrl("/backend/login/process")  // 處理 POST /login
                         .usernameParameter("email")                     // 表單 field name
                         .passwordParameter("password")
-                        .defaultSuccessUrl("/backend/dashboard", true) // 返回dashboard頁面
+                        .successHandler(customLoginSuccessHandler) // 使用自定義成功處理器
                         .failureHandler(customAuthenticationFailureHandler()) // 使用自定義失敗處理器
                         .permitAll()
                 )
