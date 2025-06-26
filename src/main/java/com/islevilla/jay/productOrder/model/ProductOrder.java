@@ -1,5 +1,6 @@
 package com.islevilla.jay.productOrder.model;
 
+// import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.islevilla.jay.coupon.model.Coupon;
 import com.islevilla.jay.productOrderDetail.model.ProductOrderDetail;
 import com.islevilla.lai.members.model.Members;
