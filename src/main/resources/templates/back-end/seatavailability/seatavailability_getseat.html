@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
+
+<head>
+<meta charset="UTF-8" />
+<title>查詢接駁座位 | 後台管理</title>
+
+<!-- 引入後台樣式 -->
+<th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+
+<script>
+	function autoSubmit(id) {
+		document.getElementById(id).submit();
+	}
+
+	function redirectToResult() {
+		const scheduleId = document.getElementById("scheduleId").value;
+		const selectedDate = document.getElementById("selectedDate").value;
+		if (scheduleId && selectedDate) {
+			window.location.href = `/backend/seatavailability/get/${scheduleId}/${selectedDate}`;
+		}
+	}
+</script>
+</head>
+
+<body>
+	<!-- 載入側邊欄 -->
+	<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+	<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+
+	<!-- 主內容 -->
+	<main
+		th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+		<th:block th:fragment="myContent">
+
+			<h2 class="mb-4">🔍 剩餘座位查詢</h2>
+
+			<!-- 查詢表單 -->
+			<form id="dateForm" th:action="@{/backend/seatavailability/getseat}"
+				method="get" class="mb-3">
+				<label for="date" class="form-label">選擇日期：</label> <select id="date"
+					name="date" class="form-select" required
+					onchange="autoSubmit('dateForm')">
+					<option value="">請選擇日期</option>
+					<option th:each="d : ${availableDates}" th:value="${d}"
+						th:text="${d}" th:selected="${d} == ${selectedDate}"></option>
+				</select>
+			</form>
+
+			<!-- 返回列表按鈕 -->
+			<div class="mb-3">
+				<a class="btn btn-secondary" th:href="@{/backend/seatavailability/list}">返回列表</a>
+			</div>
+
+			<!-- 班次選擇 -->
+			<div th:if="${selectedDate != null}" class="mb-4">
+				<input type="hidden" id="selectedDate" th:value="${selectedDate}" />
+				<label for="scheduleId" class="form-label">選擇班次：</label> <select
+					id="scheduleId" name="scheduleId" class="form-select mb-3" required
+					onchange="redirectToResult()">
+					<option value="">請選擇班次</option>
+					<option th:each="s : ${scheduleForSelectedDate}"
+						th:value="${s.shuttleScheduleId}"
+						th:text="'班次 ' + ${s.shuttleScheduleId} + '（' 
+                                + (${s.shuttleSchedule.shuttleDirection == 0 ? '去程' : '回程'}) + '｜' 
+                                + ${#temporals.format(s.shuttleSchedule.shuttleDepartureTime, 'HH:mm')} + ' - ' 
+                                + ${#temporals.format(s.shuttleSchedule.shuttleArrivalTime, 'HH:mm')} + ')' "
+						th:selected="${s.shuttleScheduleId} == ${selectedScheduleId}">
+					</option>
+				</select>
+			</div>
+
+			<!-- 錯誤訊息 -->
+			<div th:if="${errorMSG != null}" class="alert alert-danger">
+				<i class="fa-solid fa-triangle-exclamation me-1"></i> <span
+					th:text="${errorMSG}"></span>
+			</div>
+
+			<!-- 查詢結果 -->
+			<div class="card shadow-sm p-4" th:if="${seat != null}">
+				<div class="card-body text-start">
+
+					<p>
+						<strong>班次：</strong> <span th:text="${seat.shuttleScheduleId}"></span>
+					</p>
+					<hr>
+
+					<p>
+						<strong>日期：</strong> <span th:text="${seat.shuttleDate}"></span>
+					</p>
+					<hr>
+
+					<p>
+						<strong>時段：</strong> <span
+							th:text="${#temporals.format(seat.shuttleSchedule.shuttleDepartureTime, 'HH:mm')} 
+                                + ' → ' + 
+                                ${#temporals.format(seat.shuttleSchedule.shuttleArrivalTime, 'HH:mm')}">
+						</span>
+					</p>
+					<hr>
+
+					<p>
+						<strong>去回程：</strong> <span
+							th:text="${seat.shuttleSchedule.shuttleDirection == 0 ? '去程' : '回程'}"></span>
+					</p>
+					<hr>
+
+					<p>
+						<strong>可用座位數：</strong> <span th:text="${seat.seatQuantity}"></span>
+					</p>
+					<hr>
+
+					<p>
+						<strong>更新時間：</strong> <span
+							th:text="${#temporals.format(seat.seatUpdatedAt, 'yyyy-MM-dd HH:mm')}"></span>
+					</p>
+				</div>
+			</div>
+
+		</th:block>
+	</main>
+</body>
+
+</html>

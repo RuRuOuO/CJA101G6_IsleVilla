@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>座位列表 | 後台管理</title>
+
+    <!-- 共用樣式 -->
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+
+    <style>
+        /* 壓縮表格 */
+        table {
+            font-size: 0.9rem;
+        }
+        th, td {
+            padding: 4px 8px !important;
+        }
+        th {
+            background-color: #f8f9fa;
+        }
+        .badge {
+            font-size: 0.8rem;
+            padding: 3px 6px;
+        }
+/*         h1 { */
+/*             font-size: 1.4rem; */
+/*         } */
+        .card {
+            padding: 1rem !important;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 側邊欄 -->
+<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+
+<!-- 主內容 -->
+<main th:replace="~{fragments/backFragments :: mainContent(~{::content})}">
+
+    <th:block th:fragment="content">
+        <h1 class="mb-3">💺 座位列表</h1>
+
+        <div class="card shadow-sm">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>座位編號</th>
+                        <th>座位號碼</th>
+                        <th>待檢修狀態</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="seat : ${backSeatList}">
+                        <td th:text="${seat.seatId}">1</td>
+                        <td th:text="${seat.seatNumber}">A01</td>
+                        <td>
+                            <span th:if="${seat.seatStatus == 1}" class="badge bg-success">正常</span>
+                            <span th:if="${seat.seatStatus == 0}" class="badge bg-danger">故障</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </th:block>
+
+</main>
+
+</body>
+</html>
