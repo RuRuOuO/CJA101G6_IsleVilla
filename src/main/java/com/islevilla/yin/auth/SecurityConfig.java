@@ -2,6 +2,7 @@ package com.islevilla.yin.auth;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -70,49 +71,29 @@ public class SecurityConfig {
         };
     }
 
-    // 3) SecurityFilterChain
+    // 3) 員工後台系統的 SecurityFilterChain
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    @Order(1)
+    public SecurityFilterChain employeeFilterChain(HttpSecurity http) throws Exception {
         http
-                // 暫時禁用 CSRF 以便測試
-                .csrf(csrf -> csrf.disable())
-
-                // 授權規則 (Authorization rules)，注意順序：先公開、再認證、最後 anyRequest
+                .securityMatcher("/backend/**")  // 只處理 /backend/** 路徑
+//                .csrf(csrf -> csrf.disable())
+                
                 .authorizeHttpRequests(auth -> auth
-                        // —— 一次放行所有公開頁面 ——
-                        .requestMatchers(
-                                "/backend/auth",           // 登入頁 GET
-                                "/css/**", "/js/**", "/images/**", // 靜態資源
-                                "/api/**"//放行api測試
-                        ).permitAll()
-
-                        // —— 員工相關 API 需要認證 ——
-                        .requestMatchers(
-                                "/backend/employee/get/**",    // 取得員工資料 API
-                                "/backend/employee/photo/**",  // 取得員工照片 API
-                                "/backend/employee/update",    // 更新員工資料 API
-                                "/backend/employee/add"        // 新增員工 API
-                        ).authenticated()
-
-                        // —— 其餘 backend 頁面必須登入 ——
-                        .requestMatchers("/backend/**").authenticated()
-
-                        // —— 其餘一律放行 ——
-                        .anyRequest().permitAll()
+                        .requestMatchers("/backend/auth").permitAll()  // 員工登入頁面
+                        .anyRequest().authenticated()  // 其他 backend 路徑需要認證
                 )
-
-                // 表單登入 Form-Login 設定
+                
                 .formLogin(form -> form
-                        .loginPage("/backend/auth")           // 自訂登入頁面
-                        .loginProcessingUrl("/backend/login/process")  // 處理 POST /login
-                        .usernameParameter("email")                     // 表單 field name
+                        .loginPage("/backend/auth")
+                        .loginProcessingUrl("/backend/login/process")
+                        .usernameParameter("email")
                         .passwordParameter("password")
-                        .successHandler(customLoginSuccessHandler) // 使用自定義成功處理器
-                        .failureHandler(customAuthenticationFailureHandler()) // 使用自定義失敗處理器
+                        .successHandler(customLoginSuccessHandler)
+                        .failureHandler(customAuthenticationFailureHandler())
                         .permitAll()
                 )
-
-                // 登出 Logout 設定
+                
                 .logout(logout -> logout
                         .logoutUrl("/backend/logout")
                         .logoutSuccessUrl("/backend/auth?logout")
@@ -120,10 +101,9 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 
-                // 配置 UserDetailsService
-                .userDetailsService(userDetailsService)
-        ;
-
+                .userDetailsService(userDetailsService);
+        
         return http.build();
     }
+
 }
