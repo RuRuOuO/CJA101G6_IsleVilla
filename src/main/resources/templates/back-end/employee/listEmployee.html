@@ -577,7 +577,7 @@ function editEmployee(employeeId) {
         
         // 自動填入欄位
         document.getElementById('editEmployeeMobile').value = employee.employeeMobile || '';
-        document.getElementById('editEmployeeGender').value = String(employee.employeeGender || '');
+        document.getElementById('editEmployeeGender').value = (employee.employeeGender !== null && employee.employeeGender !== undefined) ? String(employee.employeeGender) : '';
         document.getElementById('editEmployeeBirthdate').value = employee.employeeBirthdate || '';
         document.getElementById('editEmployeeHiredate').value = employee.employeeHiredate || '';
         document.getElementById('editEmployeeLeavedate').value = employee.employeeLeavedate || '';

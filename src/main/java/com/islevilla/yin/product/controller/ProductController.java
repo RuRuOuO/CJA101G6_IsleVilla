@@ -30,8 +30,8 @@ public class ProductController {
     //前台-商品首頁
     @GetMapping("/product")
     public String homeProduct(Model model) {
-        // 獲取所有產品的資料
-        List<Product> products = productService.getAllProducts();
+        // 只查詢上架商品
+        List<Product> products = productService.getProductByStatus((byte)1);
         // 創建一個用來封裝產品資料和圖片 URL 的 DTO 列表
         List<ProductWithImageDTO> productWithImageDTOs = new ArrayList<>();
         // 查詢每個產品的第一張圖片並設置給產品資料
@@ -74,11 +74,11 @@ public class ProductController {
     public String homeProduct(@RequestParam(value = "productCategoryId", required = false) Integer productCategoryId, Model model) {
         List<Product> products;
         if (productCategoryId != null) {
-            // 根據商品類別過濾商品
-            products = productService.getProductByProductCategoryId(productCategoryId);
+            // 只查詢該分類且上架的商品
+            products = productService.getProductByCategoryIdAndStatus(productCategoryId, (byte)1);
         } else {
-            // 沒有選擇類別時顯示所有商品
-            products = productService.getAllProducts();
+            // 只查詢上架商品
+            products = productService.getProductByStatus((byte)1);
         }
 
         List<ProductWithImageDTO> productWithImageDTOs = new ArrayList<>();
