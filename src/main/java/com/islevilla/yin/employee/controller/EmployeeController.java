@@ -22,8 +22,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/backend/employee")
@@ -95,6 +100,11 @@ public class EmployeeController {
                             @RequestParam String permissions,
                             @RequestParam(value = "employeePhoto", required = false) MultipartFile employeePhoto) {
         try {
+            // 驗證性別值
+            if (employeeGender != 0 && employeeGender != 1) {
+                return "error: 性別值必須是 0(女) 或 1(男)";
+            }
+            
             Employee employee = new Employee();
             employee.setEmployeeName(employeeName);
             employee.setEmployeeEmail(employeeEmail);
@@ -132,16 +142,23 @@ public class EmployeeController {
                                @RequestParam String employeeName,
                                @RequestParam String employeeEmail,
                                @RequestParam Integer departmentId,
+                               @RequestParam Byte employeeGender,
                                @RequestParam Byte employeeStatus,
                                @RequestParam String permissions,
                                @RequestParam(value = "employeePhoto", required = false) MultipartFile employeePhoto) {
         try {
+            // 驗證性別值
+            if (employeeGender != 0 && employeeGender != 1) {
+                return "error: 性別值必須是 0(女) 或 1(男)";
+            }
+            
             Employee employee = employeeService.getEmployeeById(employeeId);
             if (employee == null) {
                 return "員工不存在";
             }
             employee.setEmployeeName(employeeName);
             employee.setEmployeeEmail(employeeEmail);
+            employee.setEmployeeGender(employeeGender);
             employee.setEmployeeStatus(employeeStatus);
             employee.setDepartment(departmentService.getDepartmentById(departmentId));
             employee.getPermissions().clear();
@@ -157,6 +174,30 @@ public class EmployeeController {
                 employee.setEmployeePhoto(employeePhoto.getBytes());
             }
             employeeService.updateEmployee(employee);
+            
+            // 如果更新的是當前登入用戶，重新載入認證資訊
+            Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
+            if (currentAuth != null && currentAuth.getPrincipal() instanceof Employee) {
+                Employee currentEmployee = (Employee) currentAuth.getPrincipal();
+                if (currentEmployee.getEmployeeId().equals(employeeId)) {
+                    // 重新設定權限
+                    List<SimpleGrantedAuthority> authorities = employee.getPermissions() != null ?
+                        employee.getPermissions().stream()
+                            .map(p -> new SimpleGrantedAuthority(p.getPermissionName()))
+                            .collect(Collectors.toList()) :
+                        List.of(new SimpleGrantedAuthority("USER"));
+                    
+                    employee.setAuthorities(authorities);
+                    
+                    // 建立新的認證物件
+                    UsernamePasswordAuthenticationToken newAuth = 
+                        new UsernamePasswordAuthenticationToken(employee, currentAuth.getCredentials(), authorities);
+                    
+                    // 更新 SecurityContext
+                    SecurityContextHolder.getContext().setAuthentication(newAuth);
+                }
+            }
+            
             return "success";
         } catch (Exception e) {
             return "error: " + e.getMessage();

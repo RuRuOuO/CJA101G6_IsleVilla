@@ -4,7 +4,6 @@ import com.islevilla.yin.employee.model.Employee;
 import com.islevilla.yin.employee.model.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -45,10 +44,9 @@ public class MyUserDetailsService implements UserDetailsService {
                 .collect(Collectors.toList()) :
             List.of(new SimpleGrantedAuthority("USER")); // 預設權限
 
-        return User.builder()
-                .username(e.getEmployeeEmail())
-                .password(e.getEmployeePassword())
-                .authorities(authorities)
-                .build();
+        // 設定權限到Employee物件
+        e.setAuthorities(authorities);
+        
+        return e;
     }
 }

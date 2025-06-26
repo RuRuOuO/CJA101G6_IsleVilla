@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -15,11 +16,12 @@ public class CartController {
     private CartService cartService;
 
     @PostMapping("/addToCart")
-    public String addToCart(@RequestParam Integer productId,
-                            @RequestParam Integer quantity) {
+    @ResponseBody
+    public ResponseEntity<?> addToCart(@RequestParam Integer productId,
+                                       @RequestParam Integer quantity) {
         String userId = "testUser"; // 測試階段先固定假帳號
         cartService.addToCart(userId, productId, quantity);
-        return "redirect:/cart";
+        return ResponseEntity.ok().body("加入購物車成功");
     }
 
     @GetMapping("/cart")
@@ -45,6 +47,13 @@ public class CartController {
     public String removeFromCart(@RequestParam Integer productId) {
         String userId = "testUser"; // 假設暫時使用測試用戶
         cartService.removeFromCart(userId, productId);
+        return "redirect:/cart";
+    }
+
+    @PostMapping("/clearCart")
+    public String clearCart() {
+        String userId = "testUser";
+        cartService.clearCart(userId);
         return "redirect:/cart";
     }
 }
