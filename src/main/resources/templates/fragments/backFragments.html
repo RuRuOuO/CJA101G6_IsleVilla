@@ -143,15 +143,12 @@
 <!-- Sidebar（桌機版） -->
 <div th:fragment="sidebar" class="sidebar p-3 position-fixed top-0 start-0 vh-100">
     <a
-            class="d-flex justify-content-center align-items-center mt-3 mb-4 link-body-emphasis text-decoration-none text-white"
+            class="d-flex justify-content-center align-items-center mt-3 mb-2 link-body-emphasis text-decoration-none text-white"
             th:href="@{/backend/dashboard}"
     >
         <span class="fs-5 text-white" style="font-family: Kaisei HarunoUmi">IsleVilla微嶼 後台管理</span>
     </a>
-    <div
-            class="border-bottom mb-4"
-            style="border-bottom: 1px solid rgba(255, 255, 255, 0.3)"
-    ></div>
+    <hr class="my-4" style="border-color: #e3e6f0; opacity: 0.5;">
     <ul class="list-unstyled ps-0 sidebar-menu" id="sidebarMenu">
         <!-- 分類1 -->
         <li class="mb-1">
