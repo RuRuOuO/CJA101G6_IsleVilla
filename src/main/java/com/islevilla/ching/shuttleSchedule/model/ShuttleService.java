@@ -1,5 +1,6 @@
 package com.islevilla.ching.shuttleSchedule.model;
 
+
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class ShuttleService {
 
 	@Autowired
-	@Qualifier("chingShuttleScheduleRepository")
+
 	private ShuttleScheduleRepository shuttleScheduleRepository;
 
 	public void addShuttle(ShuttleSchedule shuttleSchedule) {
@@ -23,9 +24,9 @@ public class ShuttleService {
 		shuttleScheduleRepository.save(shuttleSchedule);
 	}
 
-	public void deleteShuttle(Integer Id) {
-		if (shuttleScheduleRepository.existsById(Id)) {
-			shuttleScheduleRepository.deleteById(Id);
+	public void deleteShuttle(Integer shuttleScheduleId) {
+		if (shuttleScheduleRepository.existsById(shuttleScheduleId)) {
+			shuttleScheduleRepository.deleteById(shuttleScheduleId);
 		}
 	}
 
@@ -41,23 +42,32 @@ public class ShuttleService {
 
 	// 避免抵達時間早於出發時間
 	public boolean existsSchedule(
-			Integer direction, 
-			java.time.LocalTime departure, 
-			java.time.LocalTime arrival) {
-		return shuttleScheduleRepository.existsByDirectionAndDepartureTimeAndArrivalTime(direction, departure, arrival);
+			Integer shuttleDirection, 
+			java.time.LocalTime shuttleDepartureTime, 
+			java.time.LocalTime shuttleArrivalTime) {
+		return shuttleScheduleRepository.existsByShuttleDirectionAndShuttleDepartureTimeAndShuttleArrivalTime(shuttleDirection, shuttleDepartureTime, shuttleArrivalTime);
 	}
 
 	// 避免出發與抵達時間重複
 	public boolean existsScheduleExcludingSelf(
-			Integer direction, 
-			LocalTime departure, 
-			LocalTime arrival, 
-			Integer selfId) {
-	    return shuttleScheduleRepository.existsByDirectionAndDepartureTimeAndArrivalTimeAndIdNot(direction, departure, arrival, selfId);
+			Integer shuttleDirection, 
+			LocalTime shuttleDepartureTime, 
+			LocalTime shuttleArrivalTime, 
+			Integer selfshuttleScheduleId) {
+	    return shuttleScheduleRepository.existsByShuttleDirectionAndShuttleDepartureTimeAndShuttleArrivalTimeAndShuttleScheduleIdNot(shuttleDirection, shuttleDepartureTime, shuttleArrivalTime, selfshuttleScheduleId);
 	}
 	
 	public List<ShuttleSchedule> getShuttlesByIds(List<Integer> ids) {
 	    return shuttleScheduleRepository.findAllById(ids);
 	}
 
+	// 查詢去程班次
+	public List<ShuttleSchedule> getDepartureShuttles() {
+	    return shuttleScheduleRepository.findByShuttleDirection(0);
+	}
+
+	// 查詢回程班次
+	public List<ShuttleSchedule> getReturnShuttles() {
+	    return shuttleScheduleRepository.findByShuttleDirection(1);
+	}
 }

@@ -14,8 +14,6 @@ import java.util.Optional;
 public class RoomRVOrderService {
     @Autowired
     private RoomRVOrderRepository roomRVOrderRepository;
-    @Autowired
-    private MembersRepository membersRepository;
 
     // 查詢全部
     public Page<RoomRVOrder> getAll(Pageable pageable) {
@@ -42,7 +40,7 @@ public class RoomRVOrderService {
     public void cancelOrderFront(Integer orderId) {
         RoomRVOrder order = getById(orderId);
         if (order != null) {
-            order.setRoomOrderStatus("3");
+            order.setRoomOrderStatus(3);
             updateRoomRVOrder(order);
         }
     }
@@ -51,7 +49,7 @@ public class RoomRVOrderService {
     public void cancelOrderBack(Integer orderId) {
         RoomRVOrder order = getById(orderId);
         if (order != null) {
-            order.setRoomOrderStatus("4");
+            order.setRoomOrderStatus(4);
             updateRoomRVOrder(order);
         }
     }

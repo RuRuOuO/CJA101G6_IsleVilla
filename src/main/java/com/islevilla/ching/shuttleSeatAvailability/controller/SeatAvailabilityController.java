@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.islevilla.ching.shuttleSchedule.model.ShuttleService;
 import com.islevilla.ching.shuttleSeatAvailability.model.SeatAvailability;
-import com.islevilla.ching.shuttleSeatAvailability.model.SeatAvailabilityId;
+import com.islevilla.ching.shuttleSeatAvailability.model.SeatAvailability.ShuttleSeatAvailabilityId;
 import com.islevilla.ching.shuttleSeatAvailability.model.SeatAvailabilityService;
 
 @Controller
-@RequestMapping("/seatavailability")
+@RequestMapping("/backend/seatavailability")
 public class SeatAvailabilityController {
 
 	private final SeatAvailabilityService seatAvailabilityService;
@@ -35,7 +35,7 @@ public class SeatAvailabilityController {
 	public String listSeatAvailability(Model model) {
 		List<SeatAvailability> list = seatAvailabilityService.getAllSeatAvailability();
 		model.addAttribute("seatavailability", list);
-		return "front-end/seatavailability/seatavailability_list";
+		return "back-end/seatavailability/seatavailability_list";
 	}
 
 	// 顯示新增表單
@@ -43,7 +43,7 @@ public class SeatAvailabilityController {
 	public String showAddForm(Model model) {
 		model.addAttribute("seatavailability", new SeatAvailability());
 		model.addAttribute("scheduleList", shuttleService.getAllShuttle());
-		return "front-end/seatavailability/seatavailability_add";
+		return "back-end/seatavailability/seatavailability_add";
 	}
 
 	// 處理提交新增
@@ -56,11 +56,10 @@ public class SeatAvailabilityController {
 	// 處理複合主鍵刪除（必須同時接收兩個路徑變數）
 	@GetMapping("/delete/{scheduleId}/{date}")
 	public String deleteSeatAvailability(@PathVariable("scheduleId") Integer scheduleId,
-			@PathVariable("date") String dateStr) {
+										 @PathVariable("date") String dateStr) {
 
 		LocalDate date = LocalDate.parse(dateStr);
-		SeatAvailabilityId id = new SeatAvailabilityId(scheduleId, date);
-		seatAvailabilityService.deleteSeatAvailability(id);
+		seatAvailabilityService.deleteSeatAvailability(scheduleId,date);
 
 		return "redirect:/seatavailability/list";
 	}
@@ -71,13 +70,12 @@ public class SeatAvailabilityController {
 	                           @PathVariable("date") String dateStr,
 	                           Model model) {
 		LocalDate date = LocalDate.parse(dateStr);
-		SeatAvailabilityId id = new SeatAvailabilityId(scheduleId, date);
-		SeatAvailability seatAvailability = seatAvailabilityService.getSeatById(id);
+		SeatAvailability seatAvailability = seatAvailabilityService.getSeatById(scheduleId, date);
 
 		if (seatAvailability != null) {
 			model.addAttribute("seatavailability", seatAvailability);
-			model.addAttribute("scheduleList", shuttleService.getAllShuttle()); // 雖然這裡用不到但也可保留
-			return "front-end/seatavailability/seatavailability_edit";
+//			model.addAttribute("scheduleList", shuttleService.getAllShuttle()); // 雖然這裡用不到但也可保留
+			return "back-end/seatavailability/seatavailability_edit";
 		} else {
 			return "redirect:/seatavailability/list";
 		}
@@ -86,8 +84,10 @@ public class SeatAvailabilityController {
 	// 提交編輯表單
 	@PostMapping("/edit")
 	public String updateSeatAvailability(@ModelAttribute("seatavailability") SeatAvailability formInput) {
-	    SeatAvailabilityId id = new SeatAvailabilityId(formInput.getScheduleId(), formInput.getDate());
-	    SeatAvailability existing = seatAvailabilityService.getSeatById(id);
+	    Integer scheduleId = formInput.getShuttleScheduleId();
+	    LocalDate date = formInput.getShuttleDate();
+
+	    SeatAvailability existing = seatAvailabilityService.getSeatById(scheduleId, date);
 
 	    if (existing != null) {
 	        existing.setSeatQuantity(formInput.getSeatQuantity());
@@ -108,14 +108,14 @@ public class SeatAvailabilityController {
 		if(date != null) {
 			List<SeatAvailability> schedules = seatAvailabilityService.getAllSeatAvailability()
 					.stream()
-					.filter(sa -> sa.getDate().equals(date))
+					.filter(sa -> sa.getShuttleDate().equals(date))
 					.toList();
 		model.addAttribute("availableDates", dates);
 		model.addAttribute("scheduleForSelectedDate",schedules);
 		model.addAttribute("selectedDate",date);
 		}
 		model.addAttribute("seat",null);
-		return "front-end/seatavailability/seatavailability_getseat";
+		return "back-end/seatavailability/seatavailability_getseat";
 	}
 	
 	//處裡查詢頁面
@@ -123,8 +123,8 @@ public class SeatAvailabilityController {
 	public String getSeatById(@PathVariable("scheduleId") Integer scheduleId,
 							  @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,Model model) {
 		//查詢seat的資料
-		SeatAvailabilityId id = new SeatAvailabilityId(scheduleId,date);
-		SeatAvailability seat = seatAvailabilityService.getSeatById(id);
+		SeatAvailability.ShuttleSeatAvailabilityId id = new SeatAvailability.ShuttleSeatAvailabilityId(scheduleId, date);
+		SeatAvailability seat = seatAvailabilityService.getSeatById(scheduleId, date);
 
 		// 重新取得所有可選日期
 		List<LocalDate> dates = seatAvailabilityService.getAllAvailableDates();
@@ -133,18 +133,19 @@ public class SeatAvailabilityController {
 		//帶入該選擇日期的所有班次(選單顯示)
 		List<SeatAvailability> schedules = seatAvailabilityService.getAllSeatAvailability()
 	            .stream()
-	            .filter(sa -> sa.getDate().equals(date))
+	            .filter(sa -> sa.getShuttleDate().equals(date))
 	            .toList();
 	    model.addAttribute("scheduleForSelectedDate", schedules);
 		
 	    // 傳回原本選擇的日期 顯示在getseat下拉選單上
 	    model.addAttribute("selectedDate", date);
+	    
 	    // 傳回原本選擇的班次 顯示在getseat下拉選單上
 	    model.addAttribute("selectedScheduleId", scheduleId);
 	    
 	    //帶入查詢結果
 	    model.addAttribute("seat", seat);
 	    
-		return "front-end/seatavailability/seatavailability_getseat";
+		return "back-end/seatavailability/seatavailability_getseat";
 		}
 	}
