@@ -49,7 +49,7 @@ public class FeedbackService implements FeedbackService_interface {
 
     @Override
     public List<RoomRVOrderDTO> getAvailableOrders(Members member) {
-        List<RoomRVOrder> orders = roomRVOrderRepository.findByMembersAndRoomOrderStatus(member, "2");
+        List<RoomRVOrder> orders = roomRVOrderRepository.findByMembersAndRoomOrderStatus(member, 2);
 
         return orders.stream().map(order -> {
             RoomRVOrderDTO dto = new RoomRVOrderDTO();
