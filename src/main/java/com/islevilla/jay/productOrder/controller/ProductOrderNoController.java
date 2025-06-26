@@ -6,6 +6,7 @@ import java.util.Set;
 import com.islevilla.lai.members.model.Members;
 import com.islevilla.lai.members.model.MembersService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
@@ -128,4 +129,51 @@ public class ProductOrderNoController {
         model.addAttribute("orderList", orderList);
         return "front-end/product-order/memberOrderList";
     }
+    
+    // 顯示會員訂單
+    @GetMapping("memOrders")
+    public String listMemAllOrder(HttpSession session, Model model) {
+        Members loggedInMember = (Members) session.getAttribute("member");
+        
+        if (loggedInMember == null) {
+            return "redirect:/member/login";
+        }
+        
+        Integer loginMemNo = loggedInMember.getMemberId();
+        
+        List<ProductOrder> memOrderList = productOrderSvc.getMemAllOrder(loginMemNo);
+        model.addAttribute("loginMemNo", loginMemNo);
+        model.addAttribute("memOrderList", memOrderList);
+        return "front-end/product-order/memberOrderList";
+    }
+
+    // 會員訂單詳情頁面
+    @GetMapping("memberOrderDetail")
+    public String memberOrderDetail(@RequestParam("orderNo") Integer orderNo, HttpSession session, Model model) {
+        // 檢查會員是否已登入
+        Members loggedInMember = (Members) session.getAttribute("member");
+        if (loggedInMember == null) {
+            return "redirect:/member/login";
+        }
+        
+        // 查詢訂單
+        ProductOrder order = productOrderSvc.getOneProductOrder(orderNo);
+        if (order == null) {
+            return "redirect:/product-order/memOrders";
+        }
+        
+        // 檢查訂單是否屬於當前登入會員
+        if (!order.getMember().getMemberId().equals(loggedInMember.getMemberId())) {
+            return "redirect:/product-order/memOrders";
+        }
+        
+        // 查詢訂單明細
+        List<ProductOrderDetail> orderDetails = orderDetailSvc.findByProductOrderId(orderNo);
+        
+        model.addAttribute("order", order);
+        model.addAttribute("orderDetails", orderDetails);
+        return "front-end/product-order/memberOrderDetail";
+    }
+
+    
 } 
