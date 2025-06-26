@@ -95,6 +95,12 @@
                 left: 1rem;
                 z-index: 1100;
             }
+            /* 移除 sidebar 內所有 a、button 的底線 */
+            .sidebar a,
+            .sidebar .btn-toggle,
+            .sidebar-toggle {
+                text-decoration: none !important;
+            }
             /* 縮小分頁按鈕間距 */
             .dataTables_wrapper .pagination .page-item {
                 margin: 0rem;
@@ -147,10 +153,7 @@
                            class="link-body-emphasis text-white">員工列表</a>
                     </li>
                     <li>
-                        <a th:href="@{/backend/employee/permission}" class="link-body-emphasis text-white">權限設定</a>
-                    </li>
-                    <li>
-                        <a th:href="@{/}" class="link-body-emphasis text-white">部門管理</a>
+                        <a th:href="@{/backend/department/list}" class="link-body-emphasis text-white">部門管理</a>
                     </li>
                     <li>
                         <a th:href="@{/backend/operation-log/list}" class="link-body-emphasis text-white">log檢視</a>
@@ -178,7 +181,7 @@
                         <a th:href="@{/backend/product/list}" class="link-body-emphasis text-white">商品管理</a>
                     </li>
                     <li>
-                        <a th:href="@{/}" class="link-body-emphasis text-white">商品分類管理</a>
+                        <a th:href="@{/backend/product/category/list}" class="link-body-emphasis text-white">商品分類管理</a>
                     </li>
                     <li>
                         <a th:href="@{/backend/product-order/listAllProductOrder}" class="link-body-emphasis text-white">訂單管理</a>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>部門管理</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+</head>
+<body>
+<!-- ===== 載入sidebar ===== -->
+<!-- 插入手機版側邊欄 -->
+<th:block th:replace="~{fragments/backFragments :: mobileSidebar}"></th:block>
+<!-- 插入桌面版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+
+<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+    <th:block th:fragment="myContent">
+        <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+        <!-- 卡片標題與新增按鈕 -->
+        <div class="card-header bg-transparent border-0 pt-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0 fw-bold">
+                    <i class="bi bi-building me-2"></i>部門管理
+                </h4>
+                <button
+                        class="btn btn-success"
+                        data-bs-toggle="modal"
+                        data-bs-target="#addDepartmentModal"
+                >
+                    <i class="bi bi-plus-circle me-2"></i>新增部門
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- 搜尋與篩選 -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="searchInput" placeholder="搜尋部門名稱" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- 部門表格 -->
+            <div class="table-responsive">
+                <table class="table table-hover" id="departmentTable">
+                    <thead>
+                    <tr>
+                        <th>部門名稱</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="department, iterStat : ${departments}">
+                        <td>
+                            <input type="hidden" name="departmentId" th:value="${department.departmentId}" />
+                            <span th:text="${department.departmentName}" th:attr="id='text-departmentName-' + ${iterStat.index}"></span>
+                            <input type="text" name="departmentName" th:value="${department.departmentName}" class="form-control d-none" th:attr="id='input-departmentName-' + ${iterStat.index}" required />
+                        </td>
+                        <td>
+                            <a type="button" class="btn btn-sm btn-primary" th:attr="id='editBtn-' + ${iterStat.index},data-id=${department.departmentId},data-name=${department.departmentName}" th:onclick="|enableEditRow(${iterStat.index})|">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <button type="button" class="btn btn-success btn-sm d-none" th:attr="id='saveBtn-' + ${iterStat.index}" th:onclick="|saveEditRow(${iterStat.index})|">儲存</button>
+                            <button type="button" class="btn btn-secondary btn-sm d-none" th:attr="id='cancelBtn-' + ${iterStat.index}" th:onclick="|cancelEditRow(${iterStat.index})|">取消</button>
+                            <a href="#" class="btn btn-danger btn-sm" th:onclick="|deleteDepartment(${department.departmentId})|">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+    </div></th:block>
+</main>
+
+<!-- 新增部門 Modal -->
+<div class="modal fade" id="addDepartmentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-building-add me-2"></i>新增部門
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addDepartmentForm" novalidate>
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">部門名稱 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="departmentName" required>
+                            <div class="invalid-feedback">請輸入部門名稱</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-success" onclick="saveDepartment()">新增</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 編輯部門 Modal -->
+<div class="modal fade" id="editDepartmentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-pencil me-2"></i>編輯部門
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editDepartmentForm" novalidate>
+                    <input type="hidden" name="departmentId" id="editDepartmentId">
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">部門名稱 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="departmentName" id="editDepartmentName" required>
+                            <div class="invalid-feedback">請輸入部門名稱</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="submitEditDepartment()">更新</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 查看部門 Modal -->
+<div class="modal fade" id="viewDepartmentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-eye me-2"></i>查看部門
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">部門編號</label>
+                        <p id="viewDepartmentId" class="form-control-plaintext"></p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">部門名稱</label>
+                        <p id="viewDepartmentName" class="form-control-plaintext"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/v/bs5/dt-1.13.4/datatables.min.js"></script>
+<script>
+// DataTable 分頁與全欄位搜尋
+$(function(){
+    var table = $('#departmentTable').DataTable({
+        dom: "t<'d-flex justify-content-center my-3'p>",
+        pagingType: 'simple_numbers',
+        lengthChange: false,
+        info: false,
+        language: {
+            paginate: {
+                previous: '上一頁',
+                next:     '下一頁'
+            }
+        },
+        columnDefs: [
+            { orderable: false, targets: -1 }
+        ],
+        drawCallback: function(){
+            var $pg = $('#departmentTable_wrapper .pagination');
+            $pg.find('li.disabled a, li.active a')
+                .each(function(){
+                    var txt = $(this).text();
+                    $(this).replaceWith(
+                        $('<span/>').addClass('page-link').text(txt)
+                    );
+                });
+        }
+    });
+    $('#searchInput').on('keyup', function(){
+        table.search(this.value).draw();
+    });
+});
+// 新增部門
+function saveDepartment() {
+    const form = document.getElementById('addDepartmentForm');
+    if (!form.checkValidity()) {
+        form.classList.add('was-validated');
+        return;
+    }
+    const formData = new FormData(form);
+    fetch('/backend/department/add', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())
+    .then(result => {
+        if (result === 'success') {
+            alert('新增成功！');
+            location.reload();
+        } else {
+            alert('新增失敗：' + result);
+        }
+    })
+    .catch(error => {
+        alert('發生錯誤：' + error);
+    });
+}
+function enableEditRow(idx) {
+    document.getElementById('text-departmentName-' + idx).classList.add('d-none');
+    var input = document.getElementById('input-departmentName-' + idx);
+    input.classList.remove('d-none');
+    input.removeAttribute('readonly');
+    document.getElementById('editBtn-' + idx).classList.add('d-none');
+    document.getElementById('saveBtn-' + idx).classList.remove('d-none');
+    document.getElementById('cancelBtn-' + idx).classList.remove('d-none');
+}
+function cancelEditRow(idx) {
+    document.getElementById('text-departmentName-' + idx).classList.remove('d-none');
+    var input = document.getElementById('input-departmentName-' + idx);
+    input.classList.add('d-none');
+    input.setAttribute('readonly', true);
+    document.getElementById('editBtn-' + idx).classList.remove('d-none');
+    document.getElementById('saveBtn-' + idx).classList.add('d-none');
+    document.getElementById('cancelBtn-' + idx).classList.add('d-none');
+}
+function saveEditRow(idx) {
+    var row = document.getElementById('input-departmentName-' + idx).closest('tr');
+    var departmentId = row.querySelector('input[name="departmentId"]').value;
+    var departmentName = row.querySelector('input[name="departmentName"]').value;
+    if (!departmentName) {
+        alert('請輸入部門名稱');
+        return;
+    }
+    var formData = new FormData();
+    formData.append('departmentId', departmentId);
+    formData.append('departmentName', departmentName);
+    fetch('/backend/department/update', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())
+    .then(result => {
+        if (result === 'success') {
+            alert('更新成功！');
+            location.reload();
+        } else {
+            alert('更新失敗：' + result);
+        }
+    })
+    .catch(error => {
+        alert('發生錯誤：' + error);
+    });
+}
+function deleteDepartment(departmentId) {
+    if (!confirm('確定要刪除此部門嗎？')) return;
+    fetch('/backend/department/delete?departmentId=' + departmentId, {
+        method: 'POST'
+    })
+    .then(response => response.text())
+    .then(result => {
+        if (result === 'success') {
+            alert('刪除成功！');
+            location.reload();
+        } else if(result.includes('部門內還有員工')) {
+            alert('部門內還有員工，不能刪除該部門');
+        } else {
+            alert('刪除失敗：' + result);
+        }
+    })
+    .catch(error => {
+        alert('發生錯誤：' + error);
+    });
+}
+</script>
+</body>
+</html> 

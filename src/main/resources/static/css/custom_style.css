@@ -68,6 +68,7 @@ li {
 .btn-primary,
 .border-primary {
     background-color: rgb(200, 210, 0) !important;
+    /*background: linear-gradient(45deg, #4e73df, #224abe) !important;*/
     color: rgb(255, 255, 255) !important;
     border: 1px solid white;
 }
@@ -92,6 +93,12 @@ li {
 .btn:hover {
     border: 1px solid white !important;
     box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.2);
+    filter: brightness(1.05);
+    /*font-weight:bold;*/
+}
+
+.bth-dark:hover {
+    filter: brightness(2);
 }
 
 /* 固定預訂按鈕 */
@@ -101,8 +108,12 @@ li {
     right: 60px;
     padding: 12px 30px;
     z-index: 1050;
-    box-shadow: 0 0px 20px rgba(255, 255, 255, 1);
+    box-shadow: 0 0px 15px rgba(255, 255, 200, 1);
     border: 1px solid white;
+}
+
+.booking-fixed-btn:hover{
+    box-shadow: 0px 0px 20px rgba(255, 255, 200, 1);
 }
 
 /* ==================== 導覽列樣式 ==================== */
