@@ -137,18 +137,34 @@ public class ShuttleScheduleController {
 
 	// 查詢功能
 	@GetMapping("/getshuttle")
-	public String getShuttleById(@RequestParam(value = "shuttleId", required = false) Integer shuttleId, Model model) {
-		ShuttleSchedule shuttle = null;
-		if (shuttleId != null) {
-			shuttle = shuttleService.getShuttleById(shuttleId);
-			if (shuttle == null) {
-				model.addAttribute("errorMsg", "查無此班次編號：" + shuttleId);
+	public String getShuttleById(@RequestParam(value = "departureId", required = false) Integer departureId,
+								 @RequestParam(value = "returnId", required = false) Integer returnId, Model model) {
+
+		ShuttleSchedule departureShuttle = null;
+		ShuttleSchedule returnShuttle = null;
+
+		if (departureId != null) {
+			departureShuttle = shuttleService.getShuttleById(departureId);
+			if (departureShuttle == null) {
+				model.addAttribute("errorMsg", "查無去程班次編號：" + departureId);
 			}
 		}
-		model.addAttribute("allShuttleSchedules", shuttleService.getAllShuttle());
-		model.addAttribute("shuttle", shuttle);
-		model.addAttribute("selectedShuttleId", shuttleId);
-		return "front-end/shuttle/shuttle_get";
-	}
 
+		if (returnId != null) {
+			returnShuttle = shuttleService.getShuttleById(returnId);
+			if (returnShuttle == null) {
+				model.addAttribute("errorMsg", "查無回程班次編號：" + returnId);
+			}
+		}
+
+		model.addAttribute("departureShuttles", shuttleService.getDepartureShuttles());
+	    model.addAttribute("returnShuttles", shuttleService.getReturnShuttles());
+
+	    model.addAttribute("departureShuttle", departureShuttle);
+	    model.addAttribute("returnShuttle", returnShuttle);
+	    model.addAttribute("selectedDepartureId", departureId);
+	    model.addAttribute("selectedReturnId", returnId);
+
+	    return "front-end/shuttle/shuttle_get";
+	}
 }

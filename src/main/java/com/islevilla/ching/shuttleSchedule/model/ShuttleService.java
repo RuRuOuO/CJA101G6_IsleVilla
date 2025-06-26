@@ -61,4 +61,13 @@ public class ShuttleService {
 	    return shuttleScheduleRepository.findAllById(ids);
 	}
 
+	// 查詢去程班次
+	public List<ShuttleSchedule> getDepartureShuttles() {
+	    return shuttleScheduleRepository.findByShuttleDirection(0);
+	}
+
+	// 查詢回程班次
+	public List<ShuttleSchedule> getReturnShuttles() {
+	    return shuttleScheduleRepository.findByShuttleDirection(1);
+	}
 }

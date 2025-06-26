@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>接駁預約座位列表 | 後台管理</title>
+
+    <!-- 載入共用CSS -->
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+</head>
+
+<body>
+
+    <!-- 側邊欄 -->
+    <div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+    <div th:replace="~{fragments/backFragments :: sidebar}"></div>
+
+    <!-- 主內容 -->
+    <main th:replace="~{fragments/backFragments :: mainContent(~{::content})}">
+        <th:block th:fragment="content">
+
+            <!-- 標題 -->
+            <h1 class="mb-3">🚐 接駁預約座位列表</h1>
+
+            <!-- 🔍 查詢按鈕 -->
+        <div class="mb-3">
+            <a class="btn btn-primary ms-2"
+               th:href="@{/backshuttlereservationseat/getbackresseat}">
+               <i class="fa-solid fa-magnifying-glass me-1"></i>
+                查詢預約座位列表</a>
+                
+              
+                
+        </div>
+
+            <!-- 資料表 -->
+            <div class="card shadow-sm p-4">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>預約編號</th>
+                            <th>座位號碼</th>
+                            <th>座位名稱</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="seat : ${shuttleReservationSeatList}">
+                            <td th:text="${seat.shuttleReservationId}">1</td>
+                            <td th:text="${seat.seatId}">A1</td>
+                            <td th:text="${seat.seat.seatNumber}">座位A1</td>
+                        </tr>
+
+                        <!-- 無資料提示 -->
+                        <tr th:if="${#lists.isEmpty(shuttleReservationSeatList)}">
+                            <td colspan="3" class="text-center">目前沒有任何資料</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </th:block>
+    </main>
+
+    <!-- 共用JS -->
+    <th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
+</body>
+
+</html>

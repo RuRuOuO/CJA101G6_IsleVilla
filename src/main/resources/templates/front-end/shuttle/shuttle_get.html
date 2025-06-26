@@ -8,76 +8,117 @@
 <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
 
 <style>
-    .form-inline {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 8px;
-    }
-    .form-inline select {
-        width: auto;
-        min-width: 300px;
-    }
+.form-vertical {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	max-width: 400px;
+}
+
+.form-vertical label {
+	font-weight: bold;
+}
+
+.button-group {
+	display: flex;
+	gap: 12px;
+	margin-top: 12px;
+}
+
+.button-group {
+	display: flex;
+	gap: 12px;
+	margin-top: 12px;
+	margin-bottom: 16px; /* ✅ 新增這行 */
+}
 </style>
 </head>
+
 <body>
 	<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
 	<div th:replace="~{fragments/backFragments :: sidebar}"></div>
 
-	<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+	<main
+		th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
 		<th:block th:fragment="myContent">
 
 			<h2 class="mb-4">🔍 接駁班次查詢</h2>
 
 			<!-- 查詢表單 -->
-			<form method="get" th:action="@{/shuttle/getshuttle}" class="form-inline mb-4">
-				<label for="shuttleId" class="form-label mb-0">選擇班次：</label>
+			<form method="get" th:action="@{/shuttle/getshuttle}"
+				class="form-vertical">
 
-				<select class="form-select" id="shuttleId" name="shuttleId">
-					<option value="">請選擇班次</option>
-					<option th:each="shuttle : ${allShuttleSchedules}"
-						th:value="${shuttle.shuttleScheduleId}"
-						th:text="'班次 ' + ${shuttle.shuttleScheduleId} + ' | ' 
-				                + (${shuttle.shuttleDirection} == 0 ? '去程' : '回程') 
-				                + ' | 出發 ' + ${shuttle.shuttleDepartureTime} 
-				                + ' | 抵達 ' + ${shuttle.shuttleArrivalTime}"
-						th:selected="${shuttle.shuttleScheduleId == selectedShuttleId}">
-					</option>
-				</select>
+				<!-- 去程 -->
+				<div>
+					<label for="departureId">去程班次：</label> <select class="form-select"
+						id="departureId" name="departureId">
+						<option value="">請選擇去程班次</option>
+						<option th:each="shuttle : ${departureShuttles}"
+							th:value="${shuttle.shuttleScheduleId}"
+							th:text="'班次 ' + ${shuttle.shuttleScheduleId} + ' | 出發 ' + ${shuttle.shuttleDepartureTime}"
+							th:selected="${shuttle.shuttleScheduleId == selectedDepartureId}">
+						</option>
+					</select>
+				</div>
 
-				<button type="submit" class="btn btn-primary">查詢</button>
+				<!-- 回程 -->
+				<div>
+					<label for="returnId">回程班次：</label> <select class="form-select"
+						id="returnId" name="returnId">
+						<option value="">請選擇回程班次</option>
+						<option th:each="shuttle : ${returnShuttles}"
+							th:value="${shuttle.shuttleScheduleId}"
+							th:text="'班次 ' + ${shuttle.shuttleScheduleId} + ' | 出發 ' + ${shuttle.shuttleDepartureTime}"
+							th:selected="${shuttle.shuttleScheduleId == selectedReturnId}">
+						</option>
+					</select>
+				</div>
+
+				<!-- 按鈕 -->
+				<div class="button-group">
+					<button type="submit" class="btn btn-primary">查詢</button>
+					<a class="btn btn-secondary" th:href="@{/shuttle/getshuttle}">清除查詢</a>
+					<a class="btn btn-secondary" th:href="@{/shuttle/list}">返回列表</a>
+				</div>
+
+
 			</form>
-			<div class="mb-3">
-            <a class="btn btn-secondary" th:href="@{/shuttle/list}">
-                返回列表
-            </a>
-        </div>
 
 			<!-- 查詢結果 -->
-			<div th:if="${shuttle != null}" class="card p-4">
+			<div th:if="${departureShuttle != null || returnShuttle != null}"
+				class="card p-4 mt-4">
 				<h4>查詢結果</h4>
-				<table class="table">
-					<tr>
-						<th>班次編號</th>
-						<td th:text="${shuttle.shuttleScheduleId}"></td>
-					</tr>
-					<tr>
-						<th>方向</th>
-						<td th:text="${shuttle.shuttleDirection == 0 ? '去程' : '回程'}"></td>
-					</tr>
-					<tr>
-						<th>出發時間</th>
-						<td th:text="${shuttle.shuttleDepartureTime}"></td>
-					</tr>
-					<tr>
-						<th>抵達時間</th>
-						<td th:text="${shuttle.shuttleArrivalTime}"></td>
-					</tr>
+				<table class="table table-bordered">
+					<thead>
+						<tr>
+							<th>類型</th>
+							<th>班次ID</th>
+							<th>方向</th>
+							<th>出發時間</th>
+							<th>抵達時間</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:if="${departureShuttle != null}">
+							<td>去程</td>
+							<td th:text="${departureShuttle.shuttleScheduleId}"></td>
+							<td>去程</td>
+							<td th:text="${departureShuttle.shuttleDepartureTime}"></td>
+							<td th:text="${departureShuttle.shuttleArrivalTime}"></td>
+						</tr>
+						<tr th:if="${returnShuttle != null}">
+							<td>回程</td>
+							<td th:text="${returnShuttle.shuttleScheduleId}"></td>
+							<td>回程</td>
+							<td th:text="${returnShuttle.shuttleDepartureTime}"></td>
+							<td th:text="${returnShuttle.shuttleArrivalTime}"></td>
+						</tr>
+					</tbody>
 				</table>
 			</div>
 
 			<!-- 錯誤訊息 -->
-			<div th:if="${errorMsg != null}" class="alert alert-danger">
+			<div th:if="${errorMsg != null}" class="alert alert-danger mt-3">
 				<p th:text="${errorMsg}"></p>
 			</div>
 
