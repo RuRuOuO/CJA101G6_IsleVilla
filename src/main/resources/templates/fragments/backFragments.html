@@ -222,9 +222,11 @@
                 <div class="text-white-50 small" th:text="${#authentication.principal.employeeEmail}">員工信箱</div>
             </div>
         </div>
-        <a th:href="@{/backend/logout}" class="btn btn-outline-light btn-sm w-100">
-            <i class="bi bi-box-arrow-right me-2"></i>登出
-        </a>
+        <form th:action="@{/backend/logout}" method="post" style="margin: 0;">
+            <button type="submit" class="btn btn-outline-light btn-sm w-100">
+                <i class="bi bi-box-arrow-right me-2"></i>登出
+            </button>
+        </form>
     </div>
 </div>
 
@@ -287,9 +289,11 @@
                     <div class="text-muted small" th:text="${#authentication.principal.employeeEmail}">員工信箱</div>
                 </div>
             </div>
-            <a th:href="@{/backend/logout}" class="btn btn-outline-primary btn-sm w-100">
-                <i class="bi bi-box-arrow-right me-2"></i>登出
-            </a>
+            <form th:action="@{/backend/logout}" method="post" style="margin: 0;">
+                <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                    <i class="bi bi-box-arrow-right me-2"></i>登出
+                </button>
+            </form>
         </div>
     </div>
 </div>
