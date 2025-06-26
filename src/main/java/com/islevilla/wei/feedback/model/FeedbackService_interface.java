@@ -24,7 +24,7 @@ public interface FeedbackService_interface {
     // 根據會員查詢訂單
 //    List<RoomRVOrder> getAvailableOrders(Members loginMember);
 
-    List<RoomRVOrderDTO> getAvailableOrders(Integer memberId);
+    List<RoomRVOrderDTO> getAvailableOrders(Members member);
 
     boolean saveFeedback(FeedbackFormDTO dto, Members loginMember);
 }

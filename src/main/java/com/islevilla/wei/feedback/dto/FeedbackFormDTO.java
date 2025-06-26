@@ -28,8 +28,8 @@ public class FeedbackFormDTO {
     private Integer fbValueRating;
     @NotNull
     private Integer fbWebsiteRating;
-    private Integer fbCompliment;
-    private Integer fbSuggestion;
+    private String fbCompliment;
+    private String fbSuggestion;
     private MultipartFile fbImage;
     @NotNull
     private Integer fbPublic;

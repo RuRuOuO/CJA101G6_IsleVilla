@@ -37,8 +37,13 @@ public class FeedbackApiController {
 
     @GetMapping("/member/orders")
     public List<RoomRVOrderDTO> getMemberOrders(HttpSession session) {
-        Integer memberId = (Integer) session.getAttribute("memberId"); // 假設登入後存入 session
-        return feedbackService.getAvailableOrders(memberId);
+        Members loginMember = (Members) session.getAttribute("member");
+
+        if (loginMember == null) {
+            return List.of(); // 或回傳錯誤訊息
+        }
+
+        return feedbackService.getAvailableOrders(loginMember);
     }
 
     @PostMapping("/feedbacks")

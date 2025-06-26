@@ -36,5 +36,5 @@ public interface RoomRVOrderRepository extends JpaRepository<RoomRVOrder, Intege
             @Param("roomReservationId") Integer roomReservationId,
             @Param("shuttleDate") LocalDate shuttleDate);
 
-    List<RoomRVOrder> findByMembers_MemberIdAndRoomOrderStatus(Integer memberId, String status);
+    List<RoomRVOrder> findByMembersAndRoomOrderStatus(Members members, String status);
 }
