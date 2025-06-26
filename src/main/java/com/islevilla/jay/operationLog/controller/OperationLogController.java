@@ -40,7 +40,7 @@ public class OperationLogController {
             @RequestParam(required = false) String endDate,
             @RequestParam(required = false) String operationDate,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "10") int size,
             Model model) {
 
         // 將查詢參數組成 map
@@ -52,15 +52,17 @@ public class OperationLogController {
         if (endDate != null && !endDate.isEmpty()) paramMap.put("endDate", new String[]{endDate});
 
         List<OperationLog> operationLogs;
+        Page<OperationLog> pageResult = null;
         if (!paramMap.isEmpty()) {
-            operationLogs = operationLogService.getAll(paramMap);
-        } else {
-            Page<OperationLog> pageResult = operationLogService.getOperationLogsWithPagination(page, size);
+            pageResult = operationLogService.getAllWithPagination(paramMap, page, size);
             operationLogs = pageResult.getContent();
-            model.addAttribute("currentPage", page);
-            model.addAttribute("totalPages", pageResult.getTotalPages());
-            model.addAttribute("totalElements", pageResult.getTotalElements());
+        } else {
+            pageResult = operationLogService.getOperationLogsWithPagination(page, size);
+            operationLogs = pageResult.getContent();
         }
+        model.addAttribute("currentPage", pageResult.getNumber());
+        model.addAttribute("totalPages", pageResult.getTotalPages());
+        model.addAttribute("totalElements", pageResult.getTotalElements());
 
         // 獲取所有員工（用於搜尋下拉選單）
         List<Employee> employees = employeeService.getAllEmployees();

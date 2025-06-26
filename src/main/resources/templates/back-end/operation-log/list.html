@@ -136,14 +136,16 @@
                             <td th:text="${#temporals.format(log.operationTime, 'yyyy-MM-dd HH:mm:ss')}">2025-01-01 12:00:00</td>
                             <td th:text="${log.logDescription}">操作描述</td>
                             <td>
-                                <a th:href="@{/backend/operation-log/detail/{id}(id=${log.operationLogId})}" 
-                                   class="btn btn-sm btn-info btn-action">
-                                    <i class="fas fa-eye"></i> 詳情
-                                </a>
-                                <button type="button" class="btn btn-sm btn-danger btn-action" 
-                                        th:onclick="'deleteLog(' + ${log.operationLogId} + ')'">
-                                    <i class="fas fa-trash"></i> 刪除
-                                </button>
+                                <div class="d-flex gap-2">
+                                    <a th:href="@{/backend/operation-log/detail/{id}(id=${log.operationLogId})}" 
+                                       class="btn btn-sm btn-info btn-action">
+                                        <i class="fas fa-eye"></i> 詳情
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-danger btn-action" 
+                                            th:onclick="'deleteLog(' + ${log.operationLogId} + ')'">
+                                        <i class="fas fa-trash"></i> 刪除
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                         <tr th:if="${#lists.isEmpty(operationLogs)}">
@@ -228,6 +230,7 @@
     $(function(){
         $('#operationLogTable').DataTable({
             dom: "t<'d-flex justify-content-center my-3'p>",
+            paging: false, // 關閉 DataTables 分頁
             pagingType: 'simple_numbers',
             lengthChange: false,
             info: false,

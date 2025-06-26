@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.islevilla.yin.auth.CustomLoginSuccessHandler;
+import com.islevilla.yin.auth.CustomLogoutSuccessHandler;
 
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)  // 啟用 @PreAuthorize 註解
@@ -22,6 +23,9 @@ public class SecurityConfig {
 
     @Autowired
     private CustomLoginSuccessHandler customLoginSuccessHandler;
+
+    @Autowired
+    private CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
     // 1) 註冊 PasswordEncoder Bean
     @Bean
@@ -95,6 +99,7 @@ public class SecurityConfig {
                 // 登出 Logout 設定
                 .logout(logout -> logout
                         .logoutUrl("/backend/logout")
+                        .logoutSuccessHandler(customLogoutSuccessHandler) // 註冊自訂登出 Handler
                         .logoutSuccessUrl("/backend/auth?logout")
                         .invalidateHttpSession(true)
                         .permitAll()
