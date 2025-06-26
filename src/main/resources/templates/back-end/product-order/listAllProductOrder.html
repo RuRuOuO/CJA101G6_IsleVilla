@@ -21,7 +21,7 @@
                 <!-- 複合查詢表單 -->
                 <div class="row mt-3">
                     <div class="col-md-12">
-                        <form action="/product-order/listProductOrders_ByCompositeQuery" method="post" class="row g-3">
+                        <form action="/backend/product-order/listProductOrders_ByCompositeQuery" method="post" class="row g-3">
                             <div class="col-md-2">
                                 <label for="memberId" class="form-label">會員編號</label>
                                 <input type="number" class="form-control" id="memberId" name="memberId" placeholder="請輸入會員編號">
@@ -47,7 +47,7 @@
                                 <button type="submit" class="btn btn-primary me-2">
                                     <i class="fas fa-search"></i> 查詢
                                 </button>
-                                <a href="/product-order/listAllProductOrder" class="btn btn-secondary">重置</a>
+                                <a href="/backend/product-order/listAllProductOrder" class="btn btn-secondary">重置</a>
                             </div>
                         </form>
                     </div>
@@ -223,28 +223,59 @@
 
     <!-- 詳細資訊 Modal -->
     <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-labelledby="orderDetailModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="orderDetailModalLabel">訂單詳細資訊</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <ul class="list-group">
-              <li class="list-group-item"><b>訂單編號：</b><span id="detailOrderId"></span></li>
-              <li class="list-group-item"><b>會員名稱：</b><span id="detailMember"></span></li>
-              <li class="list-group-item"><b>訂單金額：</b><span id="detailAmount"></span></li>
-              <li class="list-group-item"><b>折扣金額：</b><span id="detailDiscount"></span></li>
-              <li class="list-group-item"><b>實付金額：</b><span id="detailPaid"></span></li>
-              <li class="list-group-item"><b>付款方式：</b><span id="detailPayment"></span></li>
-              <li class="list-group-item"><b>取貨方式：</b><span id="detailShipping"></span></li>
-              <li class="list-group-item"><b>聯絡人姓名：</b><span id="detailName"></span></li>
-              <li class="list-group-item"><b>聯絡人電話：</b><span id="detailPhone"></span></li>
-              <li class="list-group-item"><b>聯絡人地址：</b><span id="detailAddress"></span></li>
-              <li class="list-group-item"><b>備註：</b><span id="detailNote"></span></li>
-              <li class="list-group-item"><b>訂單狀態：</b><span id="detailStatus"></span></li>
-              <li class="list-group-item"><b>訂單時間：</b><span id="detailTime"></span></li>
-            </ul>
+            <div class="row">
+              <div class="col-md-6">
+                <h6 class="mb-3">訂單基本資訊</h6>
+                <ul class="list-group">
+                  <li class="list-group-item"><b>訂單編號：</b><span id="detailOrderId"></span></li>
+                  <li class="list-group-item"><b>會員名稱：</b><span id="detailMember"></span></li>
+                  <li class="list-group-item"><b>訂單金額：</b><span id="detailAmount"></span></li>
+                  <li class="list-group-item"><b>折扣金額：</b><span id="detailDiscount"></span></li>
+                  <li class="list-group-item"><b>實付金額：</b><span id="detailPaid"></span></li>
+                  <li class="list-group-item"><b>付款方式：</b><span id="detailPayment"></span></li>
+                  <li class="list-group-item"><b>取貨方式：</b><span id="detailShipping"></span></li>
+                  <li class="list-group-item"><b>訂單狀態：</b><span id="detailStatus"></span></li>
+                  <li class="list-group-item"><b>訂單時間：</b><span id="detailTime"></span></li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <h6 class="mb-3">聯絡資訊</h6>
+                <ul class="list-group">
+                  <li class="list-group-item"><b>聯絡人姓名：</b><span id="detailName"></span></li>
+                  <li class="list-group-item"><b>聯絡人電話：</b><span id="detailPhone"></span></li>
+                  <li class="list-group-item"><b>聯絡人地址：</b><span id="detailAddress"></span></li>
+                  <li class="list-group-item"><b>備註：</b><span id="detailNote"></span></li>
+                </ul>
+              </div>
+            </div>
+            
+            <div class="row mt-4">
+              <div class="col-12">
+                <h6 class="mb-3">商品明細</h6>
+                <div class="table-responsive">
+                  <table class="table table-striped table-sm">
+                    <thead>
+                      <tr>
+                        <th>商品名稱</th>
+                        <th>單價</th>
+                        <th>數量</th>
+                        <th>小計</th>
+                      </tr>
+                    </thead>
+                    <tbody id="orderDetailsTable">
+                      <!-- 商品明細將在這裡動態載入 -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
@@ -254,6 +285,9 @@
     </div>
     <script>
     function openDetailModal(btn) {
+        var orderId = btn.getAttribute('data-id');
+        
+        // 設定基本資訊
         document.getElementById('detailOrderId').textContent = btn.getAttribute('data-id');
         document.getElementById('detailMember').textContent = btn.getAttribute('data-member');
         document.getElementById('detailAmount').textContent = btn.getAttribute('data-amount');
@@ -267,8 +301,44 @@
         document.getElementById('detailNote').textContent = btn.getAttribute('data-note');
         document.getElementById('detailStatus').textContent = btn.getAttribute('data-status');
         document.getElementById('detailTime').textContent = btn.getAttribute('data-time');
+        
+        // 載入商品明細
+        loadOrderDetails(orderId);
+        
         var modal = new bootstrap.Modal(document.getElementById('orderDetailModal'));
         modal.show();
+    }
+    
+    function loadOrderDetails(orderId) {
+        // 清空表格
+        document.getElementById('orderDetailsTable').innerHTML = '<tr><td colspan="4" class="text-center">載入中...</td></tr>';
+        
+        // 發送 AJAX 請求獲取訂單明細
+        fetch('/backend/product-order/getOrderDetails?orderId=' + orderId)
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.getElementById('orderDetailsTable');
+                tbody.innerHTML = '';
+                
+                if (data && data.length > 0) {
+                    data.forEach(item => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${item.product ? item.product.productName : (item.productOrderName || '商品已刪除')}</td>
+                            <td>$${item.productOrderPrice}</td>
+                            <td>${item.productOrderQuantity}</td>
+                            <td>$${item.productOrderPrice * item.productOrderQuantity}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center">無商品明細</td></tr>';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading order details:', error);
+                document.getElementById('orderDetailsTable').innerHTML = '<tr><td colspan="4" class="text-center text-danger">載入失敗</td></tr>';
+            });
     }
     </script>
 </body>

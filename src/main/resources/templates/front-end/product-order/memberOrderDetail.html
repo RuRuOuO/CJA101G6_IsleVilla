@@ -121,6 +121,13 @@
     <main class="container py-5">
         <h1 class="section-title text-center mb-5">訂單詳情</h1>
 
+        <!-- 按鈕區域移到上方 -->
+        <div class="text-center mb-4">
+            <button onclick="goBack()" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>回上一頁
+            </button>
+        </div>
+
         <div class="card">
             <div class="card-body">
                 <div class="order-info">
@@ -160,11 +167,6 @@
                     </table>
                 </div>
             </div>
-        </div>
-
-        <div class="text-center mt-4">
-            <a th:href="@{/product-order/memOrders}" class="btn btn-back me-3">回到訂單列表</a>
-            <button onclick="goBack()" class="btn btn-secondary">回上一頁</button>
         </div>
     </main>
 
