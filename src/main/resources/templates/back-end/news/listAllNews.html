@@ -38,16 +38,16 @@
                 <tr>
                     <td th:text="${news.newsId}"></td>
                     <td>
-                <span class="d-inline-block text-truncate" style="width: 150px;"
-                      th:text="${news.newsTitle}"></span>
+                        <span class="d-inline-block text-truncate" style="width: 150px;"
+                        th:text="${news.newsTitle}"></span>
                     </td>
                     <td>
-                <span class="d-inline-block text-truncate" style="width: 200px;"
-                      th:text="${news.newsContent}"></span>
+                        <span class="d-inline-block text-truncate" style="width: 200px;"
+                        th:text="${news.newsContent}"></span>
                     </td>
                     <td>
-                <span class="d-inline-block text-truncate" style="width: 120px;"
-                      th:text="${news.promotion != null ? news.promotion.roomPromotionTitle : '無'}"></span>
+                        <span class="d-inline-block text-truncate" style="width: 120px;"
+                        th:text="${news.promotion != null ? news.promotion.roomPromotionTitle : '無'}"></span>
                     </td>
                     <td th:text="${news.newsTime}"></td>
                     <td>

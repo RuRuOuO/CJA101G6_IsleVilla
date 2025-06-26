@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>微嶼 | Isle Villa 後台首頁</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+</head>
+<body>
+<!-- ===== 載入sidebar ===== -->
+<!-- 插入手機版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+<!-- 插入桌面版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+
+<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+    <th:block th:fragment="myContent">
+        <!-- 表格檢視 -->
+        <div id="tableViewContainer" class="table-responsive">
+            <table class="table table-hover align-middle shadow-sm">
+                <thead class="table-dark">
+                <tr>
+                    <th width="60">編號</th>
+                    <th width="100">訂單編號</th>
+                    <th width="100">填寫時間</th>
+                    <th width="80">整體評分</th>
+                    <th width="80">推薦度</th>
+                    <th width="80">再訪意願</th>
+                    <th width="100">公開/狀態</th>
+                    <th width="80">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <th:block th:each="fb, iterStat : ${feedbackList}">
+                    <tr class="expandable-row" data-bs-toggle="collapse"
+                        th:data-bs-target="'#details-' + ${iterStat.index}"
+                        th:attr="data-overall=${fb.fbOverallRating}, data-recommend=${fb.fbRecommend}, data-public=${fb.fbPublic}, data-status=${fb.fbStatus}">
+                        <td>
+                            <span class="fw-bold" th:text="${fb.fbId}"></span>
+                            <i class="fas fa-chevron-down ms-2 text-muted"></i>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary" th:text="${fb.roomRVOrder.roomReservationId}"></span>
+                        </td>
+                        <td>
+                            <small th:text="${#dates.format(fb.fbCreatedAt, 'yyyy-MM-dd')}"></small>
+                        </td>
+                        <td>
+                                <span class="rating-badge"
+                                      th:classappend="${fb.fbOverallRating >= 4 ? 'rating-excellent' : fb.fbOverallRating >= 3 ? 'rating-good' : fb.fbOverallRating >= 2 ? 'rating-average' : 'rating-poor'}"
+                                      th:text="${fb.fbOverallRating} + '★'"></span>
+                        </td>
+                        <td>
+                                <span class="badge"
+                                      th:classappend="${fb.fbRecommend == 1 ? 'bg-success' : 'bg-warning'}"
+                                      th:text="${fb.fbRecommend == 1 ? '推薦' : '不推薦'}"></span>
+                        </td>
+                        <td>
+                                <span class="badge"
+                                      th:classappend="${fb.fbRevisit == 1 ? 'bg-info' : 'bg-secondary'}"
+                                      th:text="${fb.fbRevisit == 1 ? '會再訪' : '不會'}"></span>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-column gap-1">
+                                    <span class="badge"
+                                          th:classappend="${fb.fbPublic == 1 ? 'bg-primary' : 'bg-secondary'}"
+                                          th:text="${fb.fbPublic == 1 ? '公開' : '不公開'}"></span>
+                                <span class="badge"
+                                      th:classappend="${fb.fbStatus == 1 ? 'bg-success' : 'bg-danger'}"
+                                      th:text="${fb.fbStatus == 1 ? '上架' : '下架'}"></span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-primary btn-sm" title="編輯">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm" title="刪除">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- 展開的詳細資訊 -->
+                    <tr class="collapse details-row" th:id="'details-' + ${iterStat.index}">
+                        <td colspan="8" class="p-4">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <h6 class="text-primary mb-3">
+                                        <i class="fas fa-star me-2"></i>各項評分
+                                    </h6>
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <div class="d-flex justify-content-between">
+                                                <span>接駁服務:</span>
+                                                <span class="rating-badge rating-good"
+                                                      th:text="${fb.fbShuttleRating} + '★'"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="d-flex justify-content-between">
+                                                <span>櫃台服務:</span>
+                                                <span class="rating-badge rating-good"
+                                                      th:text="${fb.fbReceptionRating} + '★'"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="d-flex justify-content-between">
+                                                <span>客房品質:</span>
+                                                <span class="rating-badge rating-good"
+                                                      th:text="${fb.fbRoomRating} + '★'"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="d-flex justify-content-between">
+                                                <span>設備設施:</span>
+                                                <span class="rating-badge rating-good"
+                                                      th:text="${fb.fbFacilityRating} + '★'"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="d-flex justify-content-between">
+                                                <span>環境品質:</span>
+                                                <span class="rating-badge rating-good"
+                                                      th:text="${fb.fbEnvRating} + '★'"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="d-flex justify-content-between">
+                                                <span>性價比:</span>
+                                                <span class="rating-badge rating-good"
+                                                      th:text="${fb.fbValueRating} + '★'"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="d-flex justify-content-between">
+                                                <span>網站體驗:</span>
+                                                <span class="rating-badge rating-good"
+                                                      th:text="${fb.fbWebsiteRating} + '★'"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-success mb-3">
+                                        <i class="fas fa-comments me-2"></i>評價內容
+                                    </h6>
+                                    <div class="mb-3">
+                                        <strong class="text-success">好評:</strong>
+                                        <p class="mb-2 text-muted"
+                                           th:text="${fb.fbCompliment != null ? fb.fbCompliment : '無'}"></p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <strong class="text-warning">建議:</strong>
+                                        <p class="mb-2 text-muted"
+                                           th:text="${fb.fbSuggestion != null ? fb.fbSuggestion : '無'}"></p>
+                                    </div>
+                                    <div class="small text-muted">
+                                        <i class="fas fa-clock me-1"></i>
+                                        修改時間: <span
+                                            th:text="${#dates.format(fb.fbUpdatedAt, 'yyyy-MM-dd HH:mm')}"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </th:block>
+                </tbody>
+            </table>
+        </div>
+    </th:block>
+</main>
+<!-- Bootstrap JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+    // 展開/收起圖示切換
+    document.querySelectorAll('.expandable-row').forEach(row => {
+        row.addEventListener('click', function () {
+            const icon = this.querySelector('.fa-chevron-down');
+            setTimeout(() => {
+                const target = document.querySelector(this.dataset.bsTarget);
+                if (target.classList.contains('show')) {
+                    icon.classList.remove('fa-chevron-down');
+                    icon.classList.add('fa-chevron-up');
+                } else {
+                    icon.classList.remove('fa-chevron-up');
+                    icon.classList.add('fa-chevron-down');
+                }
+            }, 50);
+        });
+    });
+</script>
+</body>
+</html>

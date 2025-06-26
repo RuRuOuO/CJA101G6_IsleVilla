@@ -30,8 +30,8 @@ public class ProductController {
     //前台-商品首頁
     @GetMapping("/product")
     public String homeProduct(Model model) {
-        // 獲取所有產品的資料
-        List<Product> products = productService.getAllProducts();
+        // 只查詢上架商品
+        List<Product> products = productService.getProductByStatus((byte)1);
         // 創建一個用來封裝產品資料和圖片 URL 的 DTO 列表
         List<ProductWithImageDTO> productWithImageDTOs = new ArrayList<>();
         // 查詢每個產品的第一張圖片並設置給產品資料
@@ -74,11 +74,11 @@ public class ProductController {
     public String homeProduct(@RequestParam(value = "productCategoryId", required = false) Integer productCategoryId, Model model) {
         List<Product> products;
         if (productCategoryId != null) {
-            // 根據商品類別過濾商品
-            products = productService.getProductByProductCategoryId(productCategoryId);
+            // 只查詢該分類且上架的商品
+            products = productService.getProductByCategoryIdAndStatus(productCategoryId, (byte)1);
         } else {
-            // 沒有選擇類別時顯示所有商品
-            products = productService.getAllProducts();
+            // 只查詢上架商品
+            products = productService.getProductByStatus((byte)1);
         }
 
         List<ProductWithImageDTO> productWithImageDTOs = new ArrayList<>();
@@ -106,7 +106,7 @@ public class ProductController {
     }
 
     // 取得商品第一張圖片（保留這個方法，刪除用 productPhotoId 查單一圖的方法）
-    @GetMapping("/backend/product/photo/{productId}")
+    @GetMapping("/product/photo/{productId}")
     @ResponseBody
     public ResponseEntity<byte[]> getProductPhoto(@PathVariable Integer productId) {
         ProductPhoto photo = productPhotoService.getFirstProductPhotoByProductId(productId);
@@ -121,6 +121,66 @@ public class ProductController {
                 .body(img);
         } else {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    //前台-商品詳細頁
+    @GetMapping("/product/detail/{productId}")
+    public String productDetail(@PathVariable Integer productId, Model model) {
+        try {
+            // 獲取商品資料
+            Product product = productService.getProductById(productId);
+            if (product == null) {
+                return "redirect:/product/list"; // 商品不存在時重導向到商品列表
+            }
+
+            // 獲取商品的所有圖片
+            List<ProductPhoto> productPhotos = productPhotoService.getProductPhotosByProductId(productId);
+            List<String> productImageUrls = new ArrayList<>();
+
+            if (productPhotos == null || productPhotos.isEmpty()) {
+                // 如果沒有圖片，使用預設圖片
+                productImageUrls.add("https://dummyimage.com/400x300/");
+            } else {
+                // 將所有圖片轉換為 Base64
+                for (ProductPhoto photo : productPhotos) {
+                    if (photo != null && photo.getProductImage() != null) {
+                        String imageUrl = convertImageToBase64(photo.getProductImage());
+                        productImageUrls.add(imageUrl);
+                    }
+                }
+            }
+
+            // 如果沒有成功轉換的圖片，使用預設圖片
+            if (productImageUrls.isEmpty()) {
+                productImageUrls.add("https://dummyimage.com/400x300/");
+            }
+
+            // 獲取商品分類資訊
+            String categoryName = "未分類";
+            if (product.getProductCategory() != null) {
+                try {
+                    categoryName = product.getProductCategory().getProductCategoryName();
+                    if (categoryName == null || categoryName.trim().isEmpty()) {
+                        categoryName = "未分類";
+                    }
+                } catch (Exception e) {
+                    categoryName = "未分類";
+                }
+            }
+
+            // 將資料添加到模型中
+            model.addAttribute("product", product);
+            model.addAttribute("productImages", productImageUrls);
+            model.addAttribute("categoryName", categoryName);
+            model.addAttribute("mainImage", productImageUrls.get(0));
+
+            return "front-end/product/detailProduct";
+        } catch (Exception e) {
+            // 記錄錯誤並重導向
+            System.err.println("商品詳細頁錯誤: " + e.getMessage());
+            e.printStackTrace();
+            return "redirect:/product/list";
         }
     }
 
@@ -203,5 +263,7 @@ public class ProductController {
             return ResponseEntity.notFound().build();
         }
     }
+
+
 
 }

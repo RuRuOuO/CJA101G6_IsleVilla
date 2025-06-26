@@ -1,29 +1,29 @@
 /* member-auth.css - 會員登入、註冊、忘記密碼頁面樣式 */
 
-/* 全域樣式 */
-body {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+/*!* 全域樣式 *!*/
+/*body {*/
+/*    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);*/
+/*    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;*/
+/*}*/
 
-/* 卡片樣式 */
-.card {
-    backdrop-filter: blur(10px);
-    background-color: rgba(255, 255, 255, 0.95);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
+/*!* 卡片樣式 *!*/
+/*.card {*/
+/*    backdrop-filter: blur(10px);*/
+/*    background-color: rgba(255, 255, 255, 0.95);*/
+/*    transition: transform 0.3s ease, box-shadow 0.3s ease;*/
+/*}*/
 
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
-}
+/*!*.card:hover {*!*/
+/*    transform: translateY(-5px);*/
+/*    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;*/
+/*}*/
 
-/* 主要標題樣式 */
-h2.text-primary {
-    color: #4e73df !important;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-}
+/*!* 主要標題樣式 *!*/
+/*h2.text-primary {*/
+/*    color: #4e73df !important;*/
+/*    font-weight: 700;*/
+/*    letter-spacing: -0.5px;*/
+/*}*/
 
 /* 表單控制項樣式 */
 .form-control {
@@ -69,28 +69,28 @@ h2.text-primary {
     border-left: none;
 }
 
-/* 按鈕樣式 */
-.btn-primary {
-    background: linear-gradient(45deg, #4e73df, #224abe);
-    border: none;
-    border-radius: 10px;
-    padding: 12px 30px;
-    font-weight: 600;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
+/*!* 按鈕樣式 *!*/
+/*.btn-primary {*/
+/*    background: linear-gradient(45deg, #4e73df, #224abe);*/
+/*    border: none;*/
+/*    border-radius: 10px;*/
+/*    padding: 12px 30px;*/
+/*    font-weight: 600;*/
+/*    font-size: 16px;*/
+/*    transition: all 0.3s ease;*/
+/*    position: relative;*/
+/*    overflow: hidden;*/
+/*}*/
 
-.btn-primary:hover {
-    background: linear-gradient(45deg, #224abe, #4e73df);
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(78, 115, 223, 0.3);
-}
+/*.btn-primary:hover {*/
+/*    background: linear-gradient(45deg, #224abe, #4e73df);*/
+/*    transform: translateY(-2px);*/
+/*    box-shadow: 0 10px 20px rgba(78, 115, 223, 0.3);*/
+/*}*/
 
-.btn-primary:active {
-    transform: translateY(0);
-}
+/*.btn-primary:active {*/
+/*    transform: translateY(0);*/
+/*}*/
 
 .btn-outline-secondary {
     border-color: #e3e6f0;

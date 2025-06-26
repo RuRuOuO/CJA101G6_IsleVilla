@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +39,44 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/backend/product-order")
 public class ProductOrderController {
+
+    // 靜態內部類別作為 DTO
+    public static class OrderDetailDTO {
+        private Integer productOrderPrice;
+        private Integer productOrderQuantity;
+        private String productOrderName;
+        private ProductDTO product;
+        
+        public OrderDetailDTO(ProductOrderDetail detail) {
+            this.productOrderPrice = detail.getProductOrderPrice();
+            this.productOrderQuantity = detail.getProductOrderQuantity();
+            this.productOrderName = detail.getProductOrderName();
+            
+            if (detail.getProduct() != null) {
+                this.product = new ProductDTO(detail.getProduct());
+            }
+        }
+        
+        // Getters
+        public Integer getProductOrderPrice() { return productOrderPrice; }
+        public Integer getProductOrderQuantity() { return productOrderQuantity; }
+        public String getProductOrderName() { return productOrderName; }
+        public ProductDTO getProduct() { return product; }
+    }
+    
+    public static class ProductDTO {
+        private Integer productId;
+        private String productName;
+        
+        public ProductDTO(Product product) {
+            this.productId = product.getProductId();
+            this.productName = product.getProductName();
+        }
+        
+        // Getters
+        public Integer getProductId() { return productId; }
+        public String getProductName() { return productName; }
+    }
 
     @Autowired
     ProductOrderService productOrderSvc;
@@ -62,18 +102,18 @@ public class ProductOrderController {
     /*
      * This method will serve as addProductOrder.html handler.
      */
-    @GetMapping("addProductOrder")
-    public String addProductOrder(ModelMap model) {
-        ProductOrder productOrder = new ProductOrder();
-        model.addAttribute("productOrder", productOrder);
-        return "back-end/product-order/addProductOrder";
-    }
+    // @GetMapping("addProductOrder")
+    // public String addProductOrder(ModelMap model) {
+    //     ProductOrder productOrder = new ProductOrder();
+    //     model.addAttribute("productOrder", productOrder);
+    //     return "back-end/product-order/addProductOrder";
+    // }
 
     /*
      * This method will be called on addProductOrder.html form submission, handling POST request
      * It also validates the user input
      */
-    @PostMapping("insert")
+    @PostMapping("insert")  //結帳用
     public String insert(@Valid 
             @ModelAttribute("productOrder") ProductOrder productOrder,
             BindingResult result,
@@ -168,12 +208,12 @@ public class ProductOrderController {
     /*
      * This method will be called on listAllProductOrder.html form submission, handling POST request
      */
-    @PostMapping("getOne_For_Update")
-    public String getOne_For_Update(@RequestParam("productOrderId") String productOrderId, ModelMap model) {
-        ProductOrder productOrder = productOrderSvc.getOneProductOrder(Integer.valueOf(productOrderId));
-        model.addAttribute("productOrder", productOrder);
-        return "back-end/product-order/update_productOrder_input";// 查詢完成後轉交update_productOrder_input.html
-    }
+    // @PostMapping("getOne_For_Update")
+    // public String getOne_For_Update(@RequestParam("productOrderId") String productOrderId, ModelMap model) {
+    //     ProductOrder productOrder = productOrderSvc.getOneProductOrder(Integer.valueOf(productOrderId));
+    //     model.addAttribute("productOrder", productOrder);
+    //     return "back-end/product-order/update_productOrder_input";// 查詢完成後轉交update_productOrder_input.html
+    // }
 
     /*
      * This method will be called on update_productOrder_input.html form submission, handling POST request
@@ -221,17 +261,15 @@ public class ProductOrderController {
         return "redirect:/backend/product-order/listAllProductOrder";
     }
 
-    /*
-     * This method will be called on listAllProductOrder.html form submission, handling POST request
-     */
-    @PostMapping("delete")
-    public String delete(@RequestParam("productOrderId") String productOrderId, ModelMap model) {
-        productOrderSvc.deleteProductOrder(Integer.valueOf(productOrderId));
-        List<ProductOrder> list = productOrderSvc.getAll();
-        model.addAttribute("productOrderListData", list);
-        // model.addAttribute("success", "- (刪除成功)");
-        return "back-end/product-order/listAllProductOrder";
-    }
+    
+    // @PostMapping("delete")
+    // public String delete(@RequestParam("productOrderId") String productOrderId, ModelMap model) {
+    //     productOrderSvc.deleteProductOrder(Integer.valueOf(productOrderId));
+    //     List<ProductOrder> list = productOrderSvc.getAll();
+    //     model.addAttribute("productOrderListData", list);
+    //     // model.addAttribute("success", "- (刪除成功)");
+    //     return "back-end/product-order/listAllProductOrder";
+    // }
 
     // 顯示所有訂單
     @GetMapping("listAllProductOrder")
@@ -380,8 +418,45 @@ public class ProductOrderController {
         return "front-end/product-order/memberOrderDetail";
     }
 
-    @GetMapping("select_page")
-    public String select_page(Model model) {
-        return "back-end/product-order/select_page";
+    // @GetMapping("select_page")
+    // public String select_page(Model model) {
+    //     return "back-end/product-order/select_page";
+    // }
+    
+    // API: 獲取訂單明細
+    @GetMapping("getOrderDetails")
+    @ResponseBody
+    public String getOrderDetails(@RequestParam("orderId") Integer orderId) {
+        try {
+            List<ProductOrderDetail> details = orderDetailSvc.findByProductOrderId(orderId);
+            StringBuilder json = new StringBuilder("[");
+            
+            for (int i = 0; i < details.size(); i++) {
+                ProductOrderDetail detail = details.get(i);
+                if (i > 0) json.append(",");
+                
+                json.append("{");
+                json.append("\"productOrderPrice\":").append(detail.getProductOrderPrice()).append(",");
+                json.append("\"productOrderQuantity\":").append(detail.getProductOrderQuantity()).append(",");
+                json.append("\"productOrderName\":\"").append(detail.getProductOrderName() != null ? detail.getProductOrderName() : "").append("\",");
+                
+                if (detail.getProduct() != null) {
+                    json.append("\"product\":{");
+                    json.append("\"productId\":").append(detail.getProduct().getProductId()).append(",");
+                    json.append("\"productName\":\"").append(detail.getProduct().getProductName()).append("\"");
+                    json.append("}");
+                } else {
+                    json.append("\"product\":null");
+                }
+                
+                json.append("}");
+            }
+            
+            json.append("]");
+            return json.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "[]";
+        }
     }
 }

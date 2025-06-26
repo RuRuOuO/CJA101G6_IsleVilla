@@ -178,8 +178,8 @@
                             <label class="form-label">性別 <span class="text-danger">*</span></label>
                             <select class="form-select" name="employeeGender" required>
                                 <option value="">請選擇性別</option>
-                                <option value="1">男</option>
                                 <option value="0">女</option>
+                                <option value="1">男</option>
                             </select>
                             <div class="invalid-feedback">請選擇性別</div>
                         </div>
@@ -215,7 +215,7 @@
                         <label class="form-label">員工照片</label>
                         <input type="file" class="form-control" name="employeePhoto" accept="image/*" onchange="previewEmployeePhoto(this, 'addEmployeePhotoPreview')">
                         <div class="mt-2">
-                            <img id="addEmployeePhotoPreview" src="https://via.placeholder.com/120x120" style="width:120px;height:120px;object-fit:cover;" alt="預覽"/>
+                            <img id="addEmployeePhotoPreview" src="" style="width:120px;height:120px;object-fit:cover;display:none;" alt="預覽"/>
                         </div>
                     </div>
                     
@@ -299,11 +299,63 @@
                             <div class="invalid-feedback">請選擇員工狀態</div>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">手機號碼 <span class="text-danger">*</span></label>
+                            <input type="tel" class="form-control" id="editEmployeeMobile" name="employeeMobile" required pattern="^09\d{8}$">
+                            <div class="invalid-feedback">請輸入正確的手機號碼格式（09開頭，共10位數字）</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">性別 <span class="text-danger">*</span></label>
+                            <select class="form-select" id="editEmployeeGender" name="employeeGender" required>
+                                <option value="">請選擇性別</option>
+                                <option value="0">女</option>
+                                <option value="1">男</option>
+                            </select>
+                            <div class="invalid-feedback">請選擇性別</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">生日 <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="editEmployeeBirthdate" name="employeeBirthdate" required>
+                            <div class="invalid-feedback">請選擇生日</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">到職日 <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="editEmployeeHiredate" name="employeeHiredate" required>
+                            <div class="invalid-feedback">請選擇到職日</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">離職日期</label>
+                            <input type="date" class="form-control" id="editEmployeeLeavedate" name="employeeLeavedate" disabled>
+                            <div class="invalid-feedback">請選擇離職日期</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">地址 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="editEmployeeAddress" name="employeeAddress" required>
+                            <div class="invalid-feedback">請輸入地址</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">密碼</label>
+                            <input type="password" class="form-control" id="editEmployeePassword" name="employeePassword" minlength="6" placeholder="如需修改請輸入新密碼，否則留空">
+                            <div class="invalid-feedback">密碼至少需要6個字元</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">確認密碼</label>
+                            <input type="password" class="form-control" id="editConfirmPassword" name="confirmPassword" minlength="6" placeholder="請再次輸入新密碼">
+                            <div class="invalid-feedback">請確認密碼</div>
+                        </div>
+                    </div>
                     <div class="mb-3">
                         <label class="form-label">員工照片</label>
                         <input type="file" class="form-control" name="employeePhoto" accept="image/*" onchange="previewEmployeePhoto(this, 'editEmployeePhotoPreview')">
                         <div class="mt-2">
-                            <img id="editEmployeePhotoPreview" src="https://via.placeholder.com/120x120" style="width:120px;height:120px;object-fit:cover;" alt="預覽"/>
+                            <img id="editEmployeePhotoPreview" src="" style="width:120px;height:120px;object-fit:cover;display:none;" alt="預覽"/>
                         </div>
                     </div>
                     
@@ -352,7 +404,7 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-4 text-center mb-3">
-                        <img id="viewEmployeePhoto" src="https://via.placeholder.com/120x120" class="border" style="width:120px;height:120px;object-fit:cover;" alt="員工圖片"/>
+                        <img id="viewEmployeePhoto" src="" class="border" style="width:120px;height:120px;object-fit:cover;display:none;" alt="員工圖片"/>
                     </div>
                     <div class="col-md-8">
                         <table class="table table-borderless mb-0">
@@ -523,6 +575,27 @@ function editEmployee(employeeId) {
         document.getElementById('editDepartmentId').value = employee.department.departmentId;
         document.getElementById('editEmployeeStatus').value = employee.employeeStatus;
         
+        // 自動填入欄位
+        document.getElementById('editEmployeeMobile').value = employee.employeeMobile || '';
+        document.getElementById('editEmployeeGender').value = (employee.employeeGender !== null && employee.employeeGender !== undefined) ? String(employee.employeeGender) : '';
+        document.getElementById('editEmployeeBirthdate').value = employee.employeeBirthdate || '';
+        document.getElementById('editEmployeeHiredate').value = employee.employeeHiredate || '';
+        document.getElementById('editEmployeeLeavedate').value = employee.employeeLeavedate || '';
+        document.getElementById('editEmployeeAddress').value = employee.employeeAddress || '';
+        
+        // 密碼欄位不自動填值
+        document.getElementById('editEmployeePassword').value = '';
+        document.getElementById('editConfirmPassword').value = '';
+        
+        // 根據員工狀態控制離職日期欄位
+        const leavedateField = document.getElementById('editEmployeeLeavedate');
+        if (employee.employeeStatus === 0) { // 離職狀態
+            leavedateField.disabled = false;
+        } else {
+            leavedateField.disabled = true;
+            leavedateField.value = '';
+        }
+        
         // 清除所有權限 checkbox
         const permissionCheckboxes = document.querySelectorAll('#editEmployeeForm input[name="permissions"]');
         permissionCheckboxes.forEach(checkbox => {
@@ -540,7 +613,13 @@ function editEmployee(employeeId) {
         }
         
         // 設定預覽圖片
-        document.getElementById('editEmployeePhotoPreview').src = `/backend/employee/photo/${employee.employeeId}`;
+        const photoPreview = document.getElementById('editEmployeePhotoPreview');
+        if (employee.employeePhoto && employee.employeePhoto.length > 0) {
+            photoPreview.src = `/backend/employee/photo/${employee.employeeId}`;
+            photoPreview.style.display = 'block';
+        } else {
+            photoPreview.style.display = 'none';
+        }
         
         // 顯示 modal
         const modal = new bootstrap.Modal(document.getElementById('editEmployeeModal'));
@@ -758,6 +837,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.classList.remove('is-valid');
                 this.classList.add('is-invalid');
             }
+            
+            // 控制離職日期欄位（僅在編輯表單中）
+            if (this.id === 'editEmployeeStatus') {
+                const leavedateField = document.getElementById('editEmployeeLeavedate');
+                if (this.value === '0') { // 離職狀態
+                    leavedateField.disabled = false;
+                } else {
+                    leavedateField.disabled = true;
+                    leavedateField.value = '';
+                }
+            }
         });
     });
 
@@ -836,7 +926,13 @@ function viewEmployee(employeeId) {
             }
             document.getElementById('viewEmployeePermissions').innerHTML = permHtml;
             // 照片
-            document.getElementById('viewEmployeePhoto').src = `/backend/employee/photo/${employee.employeeId}`;
+            const viewPhoto = document.getElementById('viewEmployeePhoto');
+            if (employee.employeePhoto && employee.employeePhoto.length > 0) {
+                viewPhoto.src = `/backend/employee/photo/${employee.employeeId}`;
+                viewPhoto.style.display = 'block';
+            } else {
+                viewPhoto.style.display = 'none';
+            }
             // 顯示 modal
             const modal = new bootstrap.Modal(document.getElementById('viewEmployeeModal'));
             modal.show();
@@ -854,16 +950,17 @@ function previewEmployeePhoto(input, previewId) {
         if (file.size > 5 * 1024 * 1024) { // 5MB
             alert('圖片大小不可超過 5MB！');
             input.value = '';
-            preview.src = 'https://via.placeholder.com/120x120';
+            preview.style.display = 'none';
             return;
         }
         const reader = new FileReader();
         reader.onload = function(e) {
             preview.src = e.target.result;
+            preview.style.display = 'block';
         };
         reader.readAsDataURL(file);
     } else {
-        preview.src = 'https://via.placeholder.com/120x120';
+        preview.style.display = 'none';
     }
 }
 
@@ -934,12 +1031,12 @@ addTouchedValidation('[name="confirmPassword"]', function(field, touched) {
 // 手機
 addTouchedValidation('[name="employeeMobile"]', function(field, touched) {
     if (!touched) return;
-    if (isValidMobile(field.value)) {
-        field.classList.remove('is-invalid');
-        field.classList.add('is-valid');
+    if (isValidMobile(this.value)) {
+        this.classList.remove('is-invalid');
+        this.classList.add('is-valid');
     } else {
-        field.classList.remove('is-valid');
-        field.classList.add('is-invalid');
+        this.classList.remove('is-valid');
+        this.classList.add('is-invalid');
     }
 });
 
@@ -1021,6 +1118,7 @@ addTouchedValidation('input[name="permissions"]', function(field, touched) {
     const form = field.closest('form');
     const checkedPermissions = form.querySelectorAll('input[name="permissions"]:checked');
     const permissionContainer = form.querySelector('.form-check').parentNode;
+    
     if (checkedPermissions.length > 0) {
         permissionContainer.classList.remove('is-invalid');
         permissionContainer.classList.add('is-valid');

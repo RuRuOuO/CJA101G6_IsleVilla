@@ -19,7 +19,7 @@
             <!-- 右側內容區 -->
             <div class="col-md-9">
                 <!-- //////////////////// 會員頁面內容放這裡 //////////////////// -->
-                <div th:if="${!orderList.isEmpty()}">
+                <div th:if="${orderList!=null and !orderList.isEmpty()}">
                     <div class="col-12" th:each="order : ${orderList}">
                         <div class="card shadow-sm p-3">
                             <h5 class="card-title mb-3">訂單編號：<span th:text="${order.roomReservationId}"></span>
@@ -51,7 +51,7 @@
                         </div>
                     </div>
                 </div>
-                <div th:unless="${!orderList.isEmpty()}">
+                <div th:unless="${orderList!=null and !orderList.isEmpty()}">
                     <p>尚無訂單建立</p>
                 </div>
                 <!-- //////////////////// 會員頁面內容放這裡 //////////////////// -->

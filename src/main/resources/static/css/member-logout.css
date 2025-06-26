@@ -1,13 +1,13 @@
-/* 共用樣式 */
-body {
-    min-height: 100vh;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+/*!* 共用樣式 *!*/
+/*body {*/
+/*    min-height: 100vh;*/
+/*    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;*/
+/*}*/
 
-/* 登出確認頁面樣式 */
-body.logout-page {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
+/*!* 登出確認頁面樣式 *!*/
+/*body.logout-page {*/
+/*    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);*/
+/*}*/
 
 .logout-container {
     display: flex;
@@ -45,7 +45,7 @@ body.logout-page {
 .logout-icon {
     width: 80px;
     height: 80px;
-    background: linear-gradient(135deg, #ff6b6b, #ffa500);
+    /*background: linear-gradient(135deg, #ff6b6b, #ffa500);*/
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -115,37 +115,37 @@ body.logout-page {
 }
 
 .btn-logout {
-    background: linear-gradient(135deg, #ff6b6b, #ffa500);
+    /*background: linear-gradient(135deg, #ff6b6b, #ffa500);*/
     border: none;
     color: white;
     padding: 12px 30px;
     border-radius: 50px;
     font-weight: 600;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+    /*box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);*/
 }
 
-.btn-logout:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
-    color: white;
-}
+/*.btn-logout:hover {*/
+/*    transform: translateY(-2px);*/
+/*    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);*/
+/*    color: white;*/
+/*}*/
 
-.btn-cancel {
-    background: rgba(102, 126, 234, 0.1);
-    border: 2px solid #667eea;
-    color: #667eea;
-    padding: 10px 30px;
-    border-radius: 50px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
+/*.btn-cancel {*/
+/*    background: rgba(102, 126, 234, 0.1);*/
+/*    border: 2px solid #667eea;*/
+/*    color: #667eea;*/
+/*    padding: 10px 30px;*/
+/*    border-radius: 50px;*/
+/*    font-weight: 600;*/
+/*    transition: all 0.3s ease;*/
+/*}*/
 
-.btn-cancel:hover {
-    background: #667eea;
-    color: white;
-    transform: translateY(-2px);
-}
+/*.btn-cancel:hover {*/
+/*    background: #667eea;*/
+/*    color: white;*/
+/*    transform: translateY(-2px);*/
+/*}*/
 
 .footer-text {
     margin-top: 2rem;
@@ -153,11 +153,11 @@ body.logout-page {
     font-size: 0.9rem;
 }
 
-/* 登出成功頁面樣式 */
-body.success-page {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    overflow-x: hidden;
-}
+/*!* 登出成功頁面樣式 *!*/
+/*body.success-page {*/
+/*    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);*/
+/*    overflow-x: hidden;*/
+/*}*/
 
 .success-container {
     display: flex;
@@ -182,7 +182,7 @@ body.success-page {
 .floating-shape {
     position: absolute;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
+    /*background: rgba(255, 255, 255, 0.1);*/
     animation: float 6s ease-in-out infinite;
 }
 
@@ -252,7 +252,7 @@ body.success-page {
 .success-icon {
     width: 100px;
     height: 100px;
-    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    /*background: linear-gradient(135deg, #4facfe, #00f2fe);*/
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -289,7 +289,7 @@ body.success-page {
     font-size: 2.5rem;
     font-weight: 700;
     margin-bottom: 1rem;
-    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    /*background: linear-gradient(135deg, #4facfe, #00f2fe);*/
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -341,44 +341,44 @@ body.success-page {
     margin-bottom: 2rem;
 }
 
-.btn-primary-custom {
-    background: linear-gradient(135deg, #4facfe, #00f2fe);
-    border: none;
-    color: white;
-    padding: 12px 30px;
-    border-radius: 50px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-}
+/*.btn-primary-custom {*/
+/*    background: linear-gradient(135deg, #4facfe, #00f2fe);*/
+/*    border: none;*/
+/*    color: white;*/
+/*    padding: 12px 30px;*/
+/*    border-radius: 50px;*/
+/*    font-weight: 600;*/
+/*    transition: all 0.3s ease;*/
+/*    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);*/
+/*    text-decoration: none;*/
+/*    display: inline-flex;*/
+/*    align-items: center;*/
+/*}*/
 
-.btn-primary-custom:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
-    color: white;
-}
+/*.btn-primary-custom:hover {*/
+/*    transform: translateY(-3px);*/
+/*    box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);*/
+/*    color: white;*/
+/*}*/
 
-.btn-secondary-custom {
-    background: rgba(79, 172, 254, 0.1);
-    border: 2px solid #4facfe;
-    color: #4facfe;
-    padding: 10px 30px;
-    border-radius: 50px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-}
+/*.btn-secondary-custom {*/
+/*    background: rgba(79, 172, 254, 0.1);*/
+/*    border: 2px solid #4facfe;*/
+/*    color: #4facfe;*/
+/*    padding: 10px 30px;*/
+/*    border-radius: 50px;*/
+/*    font-weight: 600;*/
+/*    transition: all 0.3s ease;*/
+/*    text-decoration: none;*/
+/*    display: inline-flex;*/
+/*    align-items: center;*/
+/*}*/
 
-.btn-secondary-custom:hover {
-    background: #4facfe;
-    color: white;
-    transform: translateY(-3px);
-}
+/*.btn-secondary-custom:hover {*/
+/*    background: #4facfe;*/
+/*    color: white;*/
+/*    transform: translateY(-3px);*/
+/*}*/
 
 .countdown-section {
     background: rgba(255, 255, 255, 0.5);
