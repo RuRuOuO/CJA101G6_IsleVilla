@@ -71,7 +71,7 @@
                         <th>明細編號</th>
                         <th>訂房編號</th>
                         <th>房號</th>
-                        <th>房型編號</th>
+                        <th>房型</th>
                         <th>入住人數</th>
                         <th>購買原價</th>
                         <th>折扣金額</th>
@@ -84,7 +84,7 @@
                             <td th:text="${detail.roomReservationDetailId}"></td>
                             <td th:text="${detail.roomRVOrder.roomReservationId}"></td>
                             <td th:text="${detail.room.roomId}"></td>
-                            <td th:text="${detail.roomType.roomTypeId}"></td>
+                            <td th:text="${detail.roomType.roomTypeName}"></td>
                             <td th:text="${detail.guestCount}"></td>
                             <td th:text="${detail.roomPrice}"></td>
                             <td th:text="${detail.rvDiscountAmount}"></td>
