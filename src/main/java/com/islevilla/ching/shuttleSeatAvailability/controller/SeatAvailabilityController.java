@@ -19,7 +19,7 @@ import com.islevilla.ching.shuttleSeatAvailability.model.SeatAvailability.Shuttl
 import com.islevilla.ching.shuttleSeatAvailability.model.SeatAvailabilityService;
 
 @Controller
-@RequestMapping("/seatavailability")
+@RequestMapping("/backend/seatavailability")
 public class SeatAvailabilityController {
 
 	private final SeatAvailabilityService seatAvailabilityService;
@@ -35,7 +35,7 @@ public class SeatAvailabilityController {
 	public String listSeatAvailability(Model model) {
 		List<SeatAvailability> list = seatAvailabilityService.getAllSeatAvailability();
 		model.addAttribute("seatavailability", list);
-		return "front-end/seatavailability/seatavailability_list";
+		return "back-end/seatavailability/seatavailability_list";
 	}
 
 	// 顯示新增表單
@@ -43,7 +43,7 @@ public class SeatAvailabilityController {
 	public String showAddForm(Model model) {
 		model.addAttribute("seatavailability", new SeatAvailability());
 		model.addAttribute("scheduleList", shuttleService.getAllShuttle());
-		return "front-end/seatavailability/seatavailability_add";
+		return "back-end/seatavailability/seatavailability_add";
 	}
 
 	// 處理提交新增
@@ -75,7 +75,7 @@ public class SeatAvailabilityController {
 		if (seatAvailability != null) {
 			model.addAttribute("seatavailability", seatAvailability);
 //			model.addAttribute("scheduleList", shuttleService.getAllShuttle()); // 雖然這裡用不到但也可保留
-			return "front-end/seatavailability/seatavailability_edit";
+			return "back-end/seatavailability/seatavailability_edit";
 		} else {
 			return "redirect:/seatavailability/list";
 		}
@@ -115,7 +115,7 @@ public class SeatAvailabilityController {
 		model.addAttribute("selectedDate",date);
 		}
 		model.addAttribute("seat",null);
-		return "front-end/seatavailability/seatavailability_getseat";
+		return "back-end/seatavailability/seatavailability_getseat";
 	}
 	
 	//處裡查詢頁面
@@ -146,6 +146,6 @@ public class SeatAvailabilityController {
 	    //帶入查詢結果
 	    model.addAttribute("seat", seat);
 	    
-		return "front-end/seatavailability/seatavailability_getseat";
+		return "back-end/seatavailability/seatavailability_getseat";
 		}
 	}

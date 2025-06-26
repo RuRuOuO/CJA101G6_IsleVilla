@@ -13,7 +13,7 @@ import com.islevilla.ching.shuttleReservation.model.BackShuttleReservation;
 import com.islevilla.ching.shuttleReservation.model.BackShuttleReservationService;
 
 @Controller
-@RequestMapping("/reservation")
+@RequestMapping("/backend/reservation")
 public class BackShuttleReservationController {
 
 	private final BackShuttleReservationService backShuttleReservationService;
@@ -27,7 +27,7 @@ public class BackShuttleReservationController {
 	public String listReservation(Model model) {
 		List<BackShuttleReservation> list = backShuttleReservationService.getAllShuttleReservation();
 		model.addAttribute("shuttleReservationList", list);
-		return "front-end/shuttlereservation/backreservation_list";
+		return "back-end/shuttlereservation/backreservation_list";
 	}
 	
 	//顯示查詢頁面
@@ -36,7 +36,7 @@ public class BackShuttleReservationController {
 		model.addAttribute("allShuttleReservation", backShuttleReservationService.getAllShuttleReservation());
 		model.addAttribute("backShuttleReservation",null); //第一次載入無資料
 //		model.addAttribute("message", "請選擇預約編號進行查詢");
-		return "front-end/shuttlereservation/backreservation_getbackres";
+		return "back-end/shuttlereservation/backreservation_getbackres";
 	}
 	
 	//接收查詢表單結果
@@ -50,7 +50,7 @@ public class BackShuttleReservationController {
 	    model.addAttribute("allShuttleReservation", backShuttleReservationService.getAllShuttleReservation());
 	    model.addAttribute("backShuttleReservation", res); // 查詢到就顯示，沒查到就空白
 
-	    return "front-end/shuttlereservation/backreservation_getbackres";
+	    return "back-end/shuttlereservation/backreservation_getbackres";
 	}
 	
 	

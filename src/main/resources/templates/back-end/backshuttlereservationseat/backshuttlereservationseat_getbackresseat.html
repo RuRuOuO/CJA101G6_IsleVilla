@@ -23,7 +23,7 @@
             <!-- 查詢表單 -->
             <div class="card shadow-sm p-4 mb-3">
                 <form class="row g-3" method="get"
-                    th:action="@{/backshuttlereservationseat/getbackresseat/get}">
+                    th:action="@{/backend/backshuttlereservationseat/getbackresseat/get}">
 
                     <!-- 預約編號 -->
                     <div class="col-12">
@@ -73,8 +73,8 @@
                     <!-- 查詢按鈕 -->
                     <div class="col-12 d-flex gap-2 mt-3">
                         <button type="submit" class="btn btn-primary">查詢</button>
-                        <a th:href="@{/backshuttlereservationseat/getbackresseat}" class="btn btn-secondary">清除查詢</a>
-                        <a th:href="@{/backshuttlereservationseat/list}" class="btn btn-secondary">返回列表</a>
+                        <a th:href="@{/backend/backshuttlereservationseat/getbackresseat}" class="btn btn-secondary">清除查詢</a>
+                        <a th:href="@{/backend/backshuttlereservationseat/list}" class="btn btn-secondary">返回列表</a>
                     </div>
                 </form>
             </div>

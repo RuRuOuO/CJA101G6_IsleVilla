@@ -23,10 +23,10 @@
 			</div>
 
 			<div class="d-flex align-items-center mb-3">
-				<a class="btn btn-primary" th:href="@{/shuttle/add}">
+				<a class="btn btn-primary" th:href="@{/backend/shuttle/add}">
 					<i class="fa-solid fa-plus text-white me-1"></i>新增時段
 				</a>
-				<a class="btn btn-primary ms-2" href="/shuttle/getshuttle">
+				<a class="btn btn-primary ms-2" href="/backend/shuttle/getshuttle">
 					<i class="fa-solid fa-magnifying-glass me-1"></i>查詢時段
 				</a>
 			</div>
@@ -50,11 +50,11 @@
 							<td th:text="${#temporals.format(shuttle.shuttleArrivalTime, 'HH:mm')}">09:00</td>
 							<td>
 								<a class="btn btn-sm btn-primary me-1"
-								   th:href="@{/shuttle/edit/{id}(id=${shuttle.shuttleScheduleId})}">
+								   th:href="@{/backend/shuttle/edit/{id}(id=${shuttle.shuttleScheduleId})}">
 									<i class="fa-solid fa-pen-to-square me-1"></i>編輯
 								</a>
 								<a class="btn btn-sm btn-danger"
-								   th:href="@{/shuttle/delete/{id}(id=${shuttle.shuttleScheduleId})}"
+								   th:href="@{/backend/shuttle/delete/{id}(id=${shuttle.shuttleScheduleId})}"
 								   onclick="return confirm('確定要刪除嗎？');">
 									<i class="fa-solid fa-trash me-1"></i>刪除
 								</a>

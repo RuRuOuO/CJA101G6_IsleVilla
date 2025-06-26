@@ -13,7 +13,7 @@ import com.islevilla.ching.shuttleSchedule.model.ShuttleService;
 import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping("/shuttle")
+@RequestMapping("/backend/shuttle")
 public class ShuttleScheduleController {
 
 	private final ShuttleService shuttleService;
@@ -27,7 +27,7 @@ public class ShuttleScheduleController {
 	public String listShuttles(Model model) {
 		List<ShuttleSchedule> list = shuttleService.getAllShuttle();
 		model.addAttribute("shuttleList", list);
-		return "front-end/shuttle/shuttle_list";
+		return "back-end/shuttle/shuttle_list";
 	}
 
 	// 顯示新增表單
@@ -35,7 +35,7 @@ public class ShuttleScheduleController {
 	public String showAddForm(Model model) {
 		model.addAttribute("shuttleSchedule", new ShuttleSchedule());
 		model.addAttribute("formMode", "add");
-		return "front-end/shuttle/shuttle_add";
+		return "back-end/shuttle/shuttle_add";
 	}
 
 	// 處理新增
@@ -46,18 +46,18 @@ public class ShuttleScheduleController {
 		model.addAttribute("formMode", "add");
 		// 基本欄位格式驗證
 		if (result.hasErrors()) {
-			return "front-end/shuttle/shuttle_add";
+			return "back-end/shuttle/shuttle_add";
 		}
 
 		// 驗證：抵達時間不能早於出發時間
 		if (shuttleSchedule.getShuttleArrivalTime().isBefore(shuttleSchedule.getShuttleDepartureTime())) {
 			result.reject("time.invalid", "抵達時間不得早於出發時間 !");
 			model.addAttribute("formMode", "add");
-			return "front-end/shuttle/shuttle_add";
+			return "back-end/shuttle/shuttle_add";
 		}
 		if (shuttleSchedule.getShuttleArrivalTime().equals(shuttleSchedule.getShuttleDepartureTime())) {
 			result.reject("time.equal", "出發與抵達時間不可相同 !");
-			return "front-end/shuttle/shuttle_add";
+			return "back-end/shuttle/shuttle_add";
 		}
 
 		// 驗證：是否已有相同時間、方向的班次存在
@@ -66,7 +66,7 @@ public class ShuttleScheduleController {
 
 		if (exists) {
 			result.reject("duplicate.schedule", "已有相同的出發與抵達時間 !");
-			return "front-end/shuttle/shuttle_add";
+			return "back-end/shuttle/shuttle_add";
 		}
 		// 通過驗證後儲存
 		shuttleService.addShuttle(shuttleSchedule);
@@ -82,7 +82,7 @@ public class ShuttleScheduleController {
 		}
 		model.addAttribute("shuttleSchedule", shuttle);
 		model.addAttribute("formMode", "edit");
-		return "front-end/shuttle/shuttle_add";
+		return "back-end/shuttle/shuttle_add";
 	}
 
 	// 處理編輯
@@ -93,17 +93,17 @@ public class ShuttleScheduleController {
 		model.addAttribute("formMode", "edit");
 
 		if (result.hasErrors()) {
-			return "front-end/shuttle/shuttle_add";
+			return "back-end/shuttle/shuttle_add";
 		}
 		// 抵達時間不能早於出發時間
 		if (shuttleSchedule.getShuttleArrivalTime().isBefore(shuttleSchedule.getShuttleDepartureTime())) {
 			result.reject("time.invalid", "抵達時間不得早於出發時間 !");
-			return "front-end/shuttle/shuttle_add";
+			return "back-end/shuttle/shuttle_add";
 		}
 
 		if (shuttleSchedule.getShuttleArrivalTime().equals(shuttleSchedule.getShuttleDepartureTime())) {
 			result.reject("time.equal", "出發時間與抵達時間不可相同 !");
-			return "front-end/shuttle/shuttle_add";
+			return "back-end/shuttle/shuttle_add";
 		}
 
 		// 檢查是否有「其他班次」使用相同時間
@@ -113,7 +113,7 @@ public class ShuttleScheduleController {
 
 		if (exists) {
 			result.reject("duplicate.schedule", "已有其他班次使用相同的出發與抵達時間 !");
-			return "front-end/shuttle/shuttle_add";
+			return "back-end/shuttle/shuttle_add";
 		}
 		// 通過驗證後更新
 		shuttleService.updateShuttle(shuttleSchedule);
@@ -132,7 +132,7 @@ public class ShuttleScheduleController {
 	public String showGetOneForm(Model model) {
 		model.addAttribute("allShuttleSchedules", shuttleService.getAllShuttle());
 		model.addAttribute("shuttle", null); // 第一次載入沒有資料
-		return "front-end/shuttle/shuttle_get";
+		return "back-end/shuttle/shuttle_get";
 	}
 
 	// 查詢功能
@@ -165,6 +165,6 @@ public class ShuttleScheduleController {
 	    model.addAttribute("selectedDepartureId", departureId);
 	    model.addAttribute("selectedReturnId", returnId);
 
-	    return "front-end/shuttle/shuttle_get";
+	    return "back-end/shuttle/shuttle_get";
 	}
 }

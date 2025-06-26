@@ -11,7 +11,7 @@ import com.islevilla.ching.seat.model.BackSeat;
 import com.islevilla.ching.seat.model.BackSeatService;
 
 @Controller
-@RequestMapping("/backseat")
+@RequestMapping("/backend/backseat")
 public class BackSeatController {
 	
 	private final BackSeatService backSeatService;
@@ -25,7 +25,7 @@ public class BackSeatController {
 	public String BackSeatList(Model model) {
 		List<BackSeat> list = backSeatService.getAllSeat();
 		model.addAttribute("backSeatList", list);
-		return "front-end/backseat/backseat_list";
+		return "back-end/backseat/backseat_list";
 	}
 
 }

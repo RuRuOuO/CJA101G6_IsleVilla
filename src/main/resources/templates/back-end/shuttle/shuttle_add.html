@@ -15,7 +15,7 @@
       <h2 class="mb-4" th:text="${formMode == 'add'} ? '✏️ 新增接駁時段' : '🛠️ 修改接駁時段'"></h2>
 
       <form
-        th:action="${formMode == 'add'} ? @{/shuttle/add} : @{/shuttle/edit}"
+        th:action="${formMode == 'add'} ? @{/backend/shuttle/add} : @{/backend/shuttle/edit}"
         th:object="${shuttleSchedule}" method="post"
         class="needs-validation" novalidate>
 
@@ -71,7 +71,7 @@
 
         <!-- 送出/取消 -->
         <button type="submit" class="btn btn-primary me-2">送出</button>
-        <a th:href="@{/shuttle/list}" class="btn btn-secondary">取消</a>
+        <a th:href="@{/backend/shuttle/list}" class="btn btn-secondary">取消</a>
       </form>
     </th:block>
   </main>

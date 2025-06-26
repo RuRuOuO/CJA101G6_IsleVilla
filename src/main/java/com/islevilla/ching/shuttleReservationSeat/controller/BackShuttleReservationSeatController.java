@@ -13,7 +13,7 @@ import com.islevilla.ching.shuttleReservationSeat.model.BackShuttleReservationSe
 import com.islevilla.ching.shuttleReservationSeat.model.BackShuttleReservationSeatService;
 
 @Controller
-@RequestMapping("/backshuttlereservationseat")
+@RequestMapping("/backend/backshuttlereservationseat")
 public class BackShuttleReservationSeatController {
 
 	private final BackShuttleReservationSeatService backShuttleReservationSeatService;
@@ -27,7 +27,7 @@ public class BackShuttleReservationSeatController {
 	public String listReservationSeat(Model model) {
 		List<BackShuttleReservationSeat> list = backShuttleReservationSeatService.getAllShuttleReservationSeatDesc();
 		model.addAttribute("shuttleReservationSeatList", list);
-		return "front-end/backshuttlereservationseat/backshuttlereservationseat_list";
+		return "back-end/backshuttlereservationseat/backshuttlereservationseat_list";
 	}
 
 	// 顯示查詢頁面
@@ -67,7 +67,7 @@ public class BackShuttleReservationSeatController {
 		// 預設查詢結果為空
 		model.addAttribute("shuttleReservationSeatList", null);
 
-		return "front-end/backshuttlereservationseat/backshuttlereservationseat_getbackresseat";
+		return "back-end/backshuttlereservationseat/backshuttlereservationseat_getbackresseat";
 	}
 
 	// 單筆查詢
@@ -125,7 +125,7 @@ public class BackShuttleReservationSeatController {
 		model.addAttribute("seatNumberList", seatNumberList);
 		model.addAttribute("shuttleReservationSeatList", list);
 
-		return "front-end/backshuttlereservationseat/backshuttlereservationseat_getbackresseat";
+		return "back-end/backshuttlereservationseat/backshuttlereservationseat_getbackresseat";
 	}
 
 }

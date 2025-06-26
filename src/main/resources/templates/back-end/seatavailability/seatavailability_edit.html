@@ -18,7 +18,7 @@
 		<th:block th:fragment="myContent">
 			<h2 class="mb-4 fw-bold">🛠 編輯座位可用情況</h2>
 
-			<form th:action="@{/seatavailability/edit}"
+			<form th:action="@{/backend/seatavailability/edit}"
 				th:object="${seatavailability}" method="post"
 				class="needs-validation" novalidate>
 				<!-- 隱藏主鍵欄位 -->
@@ -50,7 +50,7 @@
 				<!-- 按鈕區塊 -->
 				<div class="d-flex justify-content-start mt-4">
 					<button type="submit" class="btn btn-primary">更新</button>
-					<a th:href="@{/seatavailability/list}"
+					<a th:href="@{/backend/seatavailability/list}"
 						class="btn btn-secondary ms-3">取消</a>
 				</div>
 			</form>

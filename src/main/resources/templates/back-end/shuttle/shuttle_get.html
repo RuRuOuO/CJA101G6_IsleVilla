@@ -45,7 +45,7 @@
 			<h2 class="mb-4">🔍 接駁班次查詢</h2>
 
 			<!-- 查詢表單 -->
-			<form method="get" th:action="@{/shuttle/getshuttle}"
+			<form method="get" th:action="@{/backend/shuttle/getshuttle}"
 				class="form-vertical">
 
 				<!-- 去程 -->
@@ -77,8 +77,8 @@
 				<!-- 按鈕 -->
 				<div class="button-group">
 					<button type="submit" class="btn btn-primary">查詢</button>
-					<a class="btn btn-secondary" th:href="@{/shuttle/getshuttle}">清除查詢</a>
-					<a class="btn btn-secondary" th:href="@{/shuttle/list}">返回列表</a>
+					<a class="btn btn-secondary" th:href="@{/backend/shuttle/getshuttle}">清除查詢</a>
+					<a class="btn btn-secondary" th:href="@{/backend/shuttle/list}">返回列表</a>
 				</div>
 
 

@@ -17,7 +17,7 @@
 		const scheduleId = document.getElementById("scheduleId").value;
 		const selectedDate = document.getElementById("selectedDate").value;
 		if (scheduleId && selectedDate) {
-			window.location.href = `/seatavailability/get/${scheduleId}/${selectedDate}`;
+			window.location.href = `/backend/seatavailability/get/${scheduleId}/${selectedDate}`;
 		}
 	}
 </script>
@@ -36,7 +36,7 @@
 			<h2 class="mb-4">🔍 剩餘座位查詢</h2>
 
 			<!-- 查詢表單 -->
-			<form id="dateForm" th:action="@{/seatavailability/getseat}"
+			<form id="dateForm" th:action="@{/backend/seatavailability/getseat}"
 				method="get" class="mb-3">
 				<label for="date" class="form-label">選擇日期：</label> <select id="date"
 					name="date" class="form-select" required
@@ -49,7 +49,7 @@
 
 			<!-- 返回列表按鈕 -->
 			<div class="mb-3">
-				<a class="btn btn-secondary" th:href="@{/seatavailability/list}">返回列表</a>
+				<a class="btn btn-secondary" th:href="@{/backend/seatavailability/list}">返回列表</a>
 			</div>
 
 			<!-- 班次選擇 -->

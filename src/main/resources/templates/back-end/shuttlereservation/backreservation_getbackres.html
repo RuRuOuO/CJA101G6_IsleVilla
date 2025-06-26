@@ -24,7 +24,7 @@
 
 			<!-- 查詢表單 -->
 			<!-- 查詢表單 -->
-			<form class="row g-3 mb-3" th:action="@{/reservation/getbackres/get}"
+			<form class="row g-3 mb-3" th:action="@{/backend/reservation/getbackres/get}"
 				method="get">
 
 				<!-- 選擇標籤 -->
@@ -50,8 +50,8 @@
 				<!-- 按鈕組：在選單下方 -->
 				<div class="col-12 d-flex align-items-center gap-3">
 					<button type="submit" class="btn btn-primary">查詢</button>
-					<a class="btn btn-secondary" th:href="@{/reservation/getbackres}">清除查詢</a>
-					<a th:href="@{/reservation/list}" class="btn btn-secondary">
+					<a class="btn btn-secondary" th:href="@{/backend/reservation/getbackres}">清除查詢</a>
+					<a th:href="@{/backend/reservation/list}" class="btn btn-secondary">
 						返回列表 </a>
 				</div>
 

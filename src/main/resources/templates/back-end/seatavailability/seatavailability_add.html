@@ -21,7 +21,7 @@
 			<div class="card shadow-sm border-1 mx-auto"
 				style="max-width: 720px;">
 				<div class="card-body">
-					<form th:action="@{/seatavailability/add}"
+					<form th:action="@{/backend/seatavailability/add}"
 						th:object="${seatavailability}" method="post"
 						class="needs-validation" novalidate>
 
@@ -59,7 +59,7 @@
 						<!-- 按鈕 -->
 						<div class="d-flex justify-content-start mt-4">
 							<button type="submit" class="btn btn-primary">送出</button>
-							<a th:href="@{/seatavailability/list}"
+							<a th:href="@{/backend/seatavailability/list}"
 								class="btn btn-secondary ms-3">取消及返回列表</a>
 						</div>
 					</form>
