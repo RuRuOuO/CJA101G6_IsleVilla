@@ -77,8 +77,7 @@ public class SecurityConfig {
     public SecurityFilterChain employeeFilterChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/backend/**")  // 只處理 /backend/** 路徑
-//                .csrf(csrf -> csrf.disable())
-                
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/backend/auth").permitAll()  // 員工登入頁面
                         .anyRequest().authenticated()  // 其他 backend 路徑需要認證
