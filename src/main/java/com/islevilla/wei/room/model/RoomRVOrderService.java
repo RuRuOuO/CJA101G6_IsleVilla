@@ -15,9 +15,14 @@ public class RoomRVOrderService {
     @Autowired
     private RoomRVOrderRepository roomRVOrderRepository;
 
-    // 查詢全部
+    // 查詢全部 // 分頁
     public Page<RoomRVOrder> getAll(Pageable pageable) {
         return roomRVOrderRepository.findAll(pageable);
+    }
+
+    // 查詢全部
+    public List<RoomRVOrder> findAll() {
+        return roomRVOrderRepository.findAll();
     }
 
     // 用id查詢單筆
