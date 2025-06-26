@@ -62,12 +62,32 @@
                 width: 280px;
                 background-color: #223363;
                 z-index: 1040;
+                display: flex;
+                flex-direction: column;
             }
 
             .content {
                 padding: 20px;
                 margin-left: 280px;
                 min-height: 100vh;
+            }
+
+            .sidebar-menu {
+                flex: 1;
+            }
+
+            .sidebar-user {
+                border-top: 1px solid rgba(255, 255, 255, 0.3);
+                padding-top: 1rem;
+                margin-top: auto;
+            }
+
+            .user-avatar {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 2px solid rgba(255, 255, 255, 0.3);
             }
 
             @media (max-width: 991.98px) {
@@ -132,7 +152,7 @@
             class="border-bottom mb-4"
             style="border-bottom: 1px solid rgba(255, 255, 255, 0.3)"
     ></div>
-    <ul class="list-unstyled ps-0" id="sidebarMenu">
+    <ul class="list-unstyled ps-0 sidebar-menu" id="sidebarMenu">
         <!-- 分類1 -->
         <li class="mb-1">
             <button
@@ -193,6 +213,19 @@
             </div>
         </li>
     </ul>
+    
+    <!-- 用戶資訊和登出按鈕 -->
+    <div class="sidebar-user">
+        <div class="d-flex align-items-center mb-3">
+            <div class="flex-grow-1">
+                <div class="text-white fw-bold" th:text="${#authentication.principal.employeeName}">員工姓名</div>
+                <div class="text-white-50 small" th:text="${#authentication.principal.employeeEmail}">員工信箱</div>
+            </div>
+        </div>
+        <a th:href="@{/backend/logout}" class="btn btn-outline-light btn-sm w-100">
+            <i class="bi bi-box-arrow-right me-2"></i>登出
+        </a>
+    </div>
 </div>
 
 <!-- Sidebar（手機版 Offcanvas） -->
@@ -245,6 +278,19 @@
                 </div>
             </li>
         </ul>
+        
+        <!-- 手機版用戶資訊和登出按鈕 -->
+        <div class="border-top pt-3 mt-3">
+            <div class="d-flex align-items-center mb-3">
+                <div class="flex-grow-1">
+                    <div class="text-primary fw-bold" th:text="${#authentication.principal.employeeName}">員工姓名</div>
+                    <div class="text-muted small" th:text="${#authentication.principal.employeeEmail}">員工信箱</div>
+                </div>
+            </div>
+            <a th:href="@{/backend/logout}" class="btn btn-outline-primary btn-sm w-100">
+                <i class="bi bi-box-arrow-right me-2"></i>登出
+            </a>
+        </div>
     </div>
 </div>
 

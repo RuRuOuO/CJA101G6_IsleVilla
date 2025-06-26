@@ -15,6 +15,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.islevilla.yin.auth.CustomLoginSuccessHandler;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)  // 啟用 @PreAuthorize 註解
@@ -22,11 +25,20 @@ public class SecurityConfig {
 
     @Autowired
     private CustomLoginSuccessHandler customLoginSuccessHandler;
+    
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     // 1) 註冊 PasswordEncoder Bean
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+    
+    // 2) 註冊 AuthenticationManager Bean
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
     }
 
     // 自定義認證失敗處理器
@@ -58,7 +70,7 @@ public class SecurityConfig {
         };
     }
 
-    // 2) SecurityFilterChain
+    // 3) SecurityFilterChain
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -73,6 +85,14 @@ public class SecurityConfig {
                                 "/css/**", "/js/**", "/images/**", // 靜態資源
                                 "/api/**"//放行api測試
                         ).permitAll()
+
+                        // —— 員工相關 API 需要認證 ——
+                        .requestMatchers(
+                                "/backend/employee/get/**",    // 取得員工資料 API
+                                "/backend/employee/photo/**",  // 取得員工照片 API
+                                "/backend/employee/update",    // 更新員工資料 API
+                                "/backend/employee/add"        // 新增員工 API
+                        ).authenticated()
 
                         // —— 其餘 backend 頁面必須登入 ——
                         .requestMatchers("/backend/**").authenticated()
@@ -99,6 +119,9 @@ public class SecurityConfig {
                         .invalidateHttpSession(true)
                         .permitAll()
                 )
+                
+                // 配置 UserDetailsService
+                .userDetailsService(userDetailsService)
         ;
 
         return http.build();

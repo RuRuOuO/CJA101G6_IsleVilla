@@ -124,6 +124,66 @@ public class ProductController {
         }
     }
 
+    //前台-商品詳細頁
+    @GetMapping("/product/detail/{productId}")
+    public String productDetail(@PathVariable Integer productId, Model model) {
+        try {
+            // 獲取商品資料
+            Product product = productService.getProductById(productId);
+            if (product == null) {
+                return "redirect:/product/list"; // 商品不存在時重導向到商品列表
+            }
+
+            // 獲取商品的所有圖片
+            List<ProductPhoto> productPhotos = productPhotoService.getProductPhotosByProductId(productId);
+            List<String> productImageUrls = new ArrayList<>();
+
+            if (productPhotos == null || productPhotos.isEmpty()) {
+                // 如果沒有圖片，使用預設圖片
+                productImageUrls.add("https://dummyimage.com/400x300/");
+            } else {
+                // 將所有圖片轉換為 Base64
+                for (ProductPhoto photo : productPhotos) {
+                    if (photo != null && photo.getProductImage() != null) {
+                        String imageUrl = convertImageToBase64(photo.getProductImage());
+                        productImageUrls.add(imageUrl);
+                    }
+                }
+            }
+
+            // 如果沒有成功轉換的圖片，使用預設圖片
+            if (productImageUrls.isEmpty()) {
+                productImageUrls.add("https://dummyimage.com/400x300/");
+            }
+
+            // 獲取商品分類資訊
+            String categoryName = "未分類";
+            if (product.getProductCategory() != null) {
+                try {
+                    categoryName = product.getProductCategory().getProductCategoryName();
+                    if (categoryName == null || categoryName.trim().isEmpty()) {
+                        categoryName = "未分類";
+                    }
+                } catch (Exception e) {
+                    categoryName = "未分類";
+                }
+            }
+
+            // 將資料添加到模型中
+            model.addAttribute("product", product);
+            model.addAttribute("productImages", productImageUrls);
+            model.addAttribute("categoryName", categoryName);
+            model.addAttribute("mainImage", productImageUrls.get(0));
+
+            return "front-end/product/detailProduct";
+        } catch (Exception e) {
+            // 記錄錯誤並重導向
+            System.err.println("商品詳細頁錯誤: " + e.getMessage());
+            e.printStackTrace();
+            return "redirect:/product/list";
+        }
+    }
+
     //後台-商品列表
     @GetMapping("/backend/product/list")
     @PreAuthorize("hasAuthority('product')")
@@ -204,64 +264,6 @@ public class ProductController {
         }
     }
 
-    //前台-商品詳細頁
-    @GetMapping("/product/detail/{productId}")
-    public String productDetail(@PathVariable Integer productId, Model model) {
-        try {
-            // 獲取商品資料
-            Product product = productService.getProductById(productId);
-            if (product == null) {
-                return "redirect:/product/list"; // 商品不存在時重導向到商品列表
-            }
 
-            // 獲取商品的所有圖片
-            List<ProductPhoto> productPhotos = productPhotoService.getProductPhotosByProductId(productId);
-            List<String> productImageUrls = new ArrayList<>();
-            
-            if (productPhotos == null || productPhotos.isEmpty()) {
-                // 如果沒有圖片，使用預設圖片
-                productImageUrls.add("https://dummyimage.com/400x300/");
-            } else {
-                // 將所有圖片轉換為 Base64
-                for (ProductPhoto photo : productPhotos) {
-                    if (photo != null && photo.getProductImage() != null) {
-                        String imageUrl = convertImageToBase64(photo.getProductImage());
-                        productImageUrls.add(imageUrl);
-                    }
-                }
-            }
-
-            // 如果沒有成功轉換的圖片，使用預設圖片
-            if (productImageUrls.isEmpty()) {
-                productImageUrls.add("https://dummyimage.com/400x300/");
-            }
-
-            // 獲取商品分類資訊
-            String categoryName = "未分類";
-            if (product.getProductCategory() != null) {
-                try {
-                    categoryName = product.getProductCategory().getProductCategoryName();
-                    if (categoryName == null || categoryName.trim().isEmpty()) {
-                        categoryName = "未分類";
-                    }
-                } catch (Exception e) {
-                    categoryName = "未分類";
-                }
-            }
-
-            // 將資料添加到模型中
-            model.addAttribute("product", product);
-            model.addAttribute("productImages", productImageUrls);
-            model.addAttribute("categoryName", categoryName);
-            model.addAttribute("mainImage", productImageUrls.get(0));
-
-            return "front-end/product/detailProduct";
-        } catch (Exception e) {
-            // 記錄錯誤並重導向
-            System.err.println("商品詳細頁錯誤: " + e.getMessage());
-            e.printStackTrace();
-            return "redirect:/product/list";
-        }
-    }
 
 }
