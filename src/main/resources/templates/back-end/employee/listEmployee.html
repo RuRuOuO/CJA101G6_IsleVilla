@@ -178,8 +178,8 @@
                             <label class="form-label">性別 <span class="text-danger">*</span></label>
                             <select class="form-select" name="employeeGender" required>
                                 <option value="">請選擇性別</option>
-                                <option value="1">男</option>
                                 <option value="0">女</option>
+                                <option value="1">男</option>
                             </select>
                             <div class="invalid-feedback">請選擇性別</div>
                         </div>
@@ -309,8 +309,8 @@
                             <label class="form-label">性別 <span class="text-danger">*</span></label>
                             <select class="form-select" id="editEmployeeGender" name="employeeGender" required>
                                 <option value="">請選擇性別</option>
-                                <option value="1">男</option>
                                 <option value="0">女</option>
+                                <option value="1">男</option>
                             </select>
                             <div class="invalid-feedback">請選擇性別</div>
                         </div>
@@ -404,7 +404,7 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-4 text-center mb-3">
-                        <img id="viewEmployeePhoto" src="https://via.placeholder.com/120x120" class="border" style="width:120px;height:120px;object-fit:cover;" alt="員工圖片"/>
+                        <img id="viewEmployeePhoto" src="" class="border" style="width:120px;height:120px;object-fit:cover;display:none;" alt="員工圖片"/>
                     </div>
                     <div class="col-md-8">
                         <table class="table table-borderless mb-0">
@@ -575,13 +575,14 @@ function editEmployee(employeeId) {
         document.getElementById('editDepartmentId').value = employee.department.departmentId;
         document.getElementById('editEmployeeStatus').value = employee.employeeStatus;
         
-        // 新增：自動填入新欄位
+        // 自動填入欄位
         document.getElementById('editEmployeeMobile').value = employee.employeeMobile || '';
         document.getElementById('editEmployeeGender').value = String(employee.employeeGender || '');
         document.getElementById('editEmployeeBirthdate').value = employee.employeeBirthdate || '';
         document.getElementById('editEmployeeHiredate').value = employee.employeeHiredate || '';
         document.getElementById('editEmployeeLeavedate').value = employee.employeeLeavedate || '';
         document.getElementById('editEmployeeAddress').value = employee.employeeAddress || '';
+        
         // 密碼欄位不自動填值
         document.getElementById('editEmployeePassword').value = '';
         document.getElementById('editConfirmPassword').value = '';
@@ -1030,12 +1031,12 @@ addTouchedValidation('[name="confirmPassword"]', function(field, touched) {
 // 手機
 addTouchedValidation('[name="employeeMobile"]', function(field, touched) {
     if (!touched) return;
-    if (isValidMobile(field.value)) {
-        field.classList.remove('is-invalid');
-        field.classList.add('is-valid');
+    if (isValidMobile(this.value)) {
+        this.classList.remove('is-invalid');
+        this.classList.add('is-valid');
     } else {
-        field.classList.remove('is-valid');
-        field.classList.add('is-invalid');
+        this.classList.remove('is-valid');
+        this.classList.add('is-invalid');
     }
 });
 

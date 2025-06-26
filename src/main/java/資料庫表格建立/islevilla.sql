@@ -863,12 +863,12 @@ CREATE TABLE employee (
 
 INSERT INTO employee (department_id, employee_name, employee_email, employee_address, employee_mobile, employee_password_hash, employee_gender, employee_birthdate, employee_hiredate, employee_leavedate, employee_status)
 VALUES (1, '管理員',		'admin@tibame.com',			'60413 新營士林路4號9樓',		'0900000101',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 0, '1990-12-30', '2023-01-01', NULL, 1), -- 密碼：asd123456
-	   (5, '楊捷',		'jay@tibame.com',			'20869 彰化市育英街12號之0',	'0900000102',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 2, '1978-03-20', '2023-01-15', NULL, 1),
+	   (5, '楊捷',		'jay@tibame.com',			'20869 彰化市育英街12號之0',	'0900000102',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 1, '1978-03-20', '2023-01-15', NULL, 1),
 	   (4, '陳薇淨',		'vivian@tibame.com',		'57698 中壢縣龍山寺巷61號8樓',	'0900000103',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 0, '1985-06-28', '2023-02-01', NULL, 1),
 	   (5, '陳吟瑄',		'blaire@tibame.com',		'769 白沙民富巷8號4樓',		'0900000104',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 0, '1998-01-11', '2023-02-15', NULL, 1),
-	   (4, '詹力臻',		'patty@tibame.com',			'23008 屏東大橋頭街8號之1',	'0900000105',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 2, '1983-04-27', '2023-03-01', NULL, 1),
-	   (4, '曾宸瑩',		'sandy@tibame.com',			'965 臺東自由街3號之5',		'0900000106',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 1, '1988-12-07', '2023-03-15', NULL, 1),
-	   (3, '賴彥儒',		'lai@tibame.com',			'754 桃園天母街8號7樓',		'0900000107',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 2, '1968-11-08', '2023-04-01', NULL, 1),
+	   (4, '詹力臻',		'patty@tibame.com',			'23008 屏東大橋頭街8號之1',	'0900000105',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 0, '1983-04-27', '2023-03-01', NULL, 1),
+	   (4, '曾宸瑩',		'sandy@tibame.com',			'965 臺東自由街3號之5',		'0900000106',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 0, '1988-12-07', '2023-03-15', NULL, 1),
+	   (3, '賴彥儒',		'lai@tibame.com',			'754 桃園天母街8號7樓',		'0900000107',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 1, '1968-11-08', '2023-04-01', NULL, 1),
 	   (3, '王人慶',		'nick@tibame.com',			'479 雲林縣中山巷63號1樓',	'0900000108',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 1, '1978-06-23', '2023-04-15', NULL, 1),
 	   (2, '客服員工',	'service@tibame.com',		'729 古坑縣頂福州巷193號之5', 	'0900000109',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 0, '2004-01-17', '2023-05-01', NULL, 1),
 	   (2, '停職員工',	'suspension@xiang.com',		'729 古坑縣頂福州巷193號之5',	'0900000110',	'$2b$12$Qn0bN5vspTLVv4LOUtfla.Jm2kLI0vXRngb7817UDSfwHa1W3TqnW', 0, '2004-01-17', '2023-05-01', NULL, 2),
