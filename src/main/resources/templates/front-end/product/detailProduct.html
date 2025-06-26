@@ -1,10 +1,225 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>detailProduct</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title th:text="${product.productName} + ' | 微嶼 | Isle Villa'">微嶼 | Isle Villa</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+    <style>
+        .product-image {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            background: white;
+            margin-bottom: 15px;
+        }
+        .product-image.small {
+            padding: 10px;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        .product-image.small:hover {
+            border-color: #bfa100;
+        }
+        .product-image.small.active {
+            border-color: #bfa100;
+            background-color: #f8f9fa;
+        }
+        .quantity-control {
+            gap: 10px;
+        }
+        .quantity-control input {
+            width: 60px;
+            text-align: center;
+        }
+        .shipping-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .feature-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .feature-list li {
+            margin-bottom: 10px;
+            padding: 8px 0;
+        }
+        .product-details {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        .main-product-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .thumbnail-image {
+            max-width: 100%;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        .thumbnail-image:hover {
+            opacity: 0.8;
+        }
+        .thumbnail-image.active {
+            border: 2px solid #bfa100;
+        }
+    </style>
 </head>
 <body>
+<!-- ===== 載入Header ===== -->
+<div th:replace="~{fragments/fragments :: header}"></div>
 
+<!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
+<!-- Main Content Area -->
+<main class="container mt-5 mb-5">
+    <!-- 麵包屑導航 -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/product}">購物商城</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/product/list}">商品列表</a></li>
+            <li class="breadcrumb-item" th:if="${categoryName != null and categoryName != ''}">
+                <span th:text="${categoryName}">商品分類</span>
+            </li>
+            <li class="breadcrumb-item active" th:text="${product.productName}">商品名稱</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- 商品圖片 -->
+        <div class="col-md-6">
+            <div class="product-image">
+                <img th:src="${mainImage}" th:alt="${product.productName}" class="main-product-image" id="mainImage">
+            </div>
+            <div class="row" th:if="${#lists.size(productImages) > 1}">
+                <div class="col-3" th:each="image, iterStat : ${productImages}">
+                    <div class="product-image small" th:classappend="${iterStat.first} ? 'active' : ''">
+                        <img th:src="${image}" th:alt="${product.productName}" class="thumbnail-image" 
+                             th:attr="onclick='changeMainImage(\'' + ${image} + '\', this)'">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 商品資訊 -->
+        <div class="col-md-6">
+            <h1 class="display-5" th:text="${product.productName}">商品名稱</h1>
+
+            <div class="h2 mb-3" th:text="'NT$ ' + ${#numbers.formatDecimal(product.productPrice, 0, 'COMMA', 0, 'POINT')}">NT$ 價格</div>
+
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">數量</label>
+                    <div class="quantity-control d-flex align-items-center">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="decrease">-</button>
+                        <input type="number" id="quantity" value="1" min="1" th:max="${product.productQuantity}" class="form-control">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="increase">+</button>
+                    </div>
+                    <small class="text-muted" th:text="|庫存: ${product.productQuantity} 件|">庫存數量</small>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex mb-3">
+                <form th:action="@{/addToCart}" method="post" class="d-inline">
+                    <input type="hidden" name="productId" th:value="${product.productId}" />
+                    <input type="hidden" name="quantity" id="formQuantity" value="1" />
+                    <button type="submit" class="btn btn-primary btn-lg" id="add-to-cart">
+                        <i class="fas fa-shopping-cart me-2"></i>加入購物車
+                    </button>
+                </form>
+            </div>
+
+            <div class="shipping-info">
+                <h6><i class="bi bi-truck"></i> 運送資訊</h6>
+                <p class="mb-0">飯店櫃檯自取｜宅配1-3個工作天到貨</p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 商品描述 -->
+    <div class="product-details">
+        <h3 class="pb-2 mb-3">商品介紹</h3>
+        <div class="row">
+            <div class="col-md-12">
+                <p th:text="${product.productDescription}">
+                    商品詳細描述
+                </p>
+            </div>
+        </div>
+    </div>
+</main>
+<!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
+
+<!-- ========== 載入Footer ========== -->
+<div th:replace="~{fragments/fragments :: footer}"></div>
+
+<script>
+    // 數量控制
+    const quantityInput = document.getElementById('quantity');
+    const formQuantityInput = document.getElementById('formQuantity');
+    const decreaseBtn = document.getElementById('decrease');
+    const increaseBtn = document.getElementById('increase');
+    const addToCartBtn = document.getElementById('add-to-cart');
+
+    // 同步表單數量
+    function syncQuantity() {
+        formQuantityInput.value = quantityInput.value;
+    }
+
+    decreaseBtn.addEventListener('click', () => {
+        if (quantityInput.value > 1) {
+            quantityInput.value = parseInt(quantityInput.value) - 1;
+            syncQuantity();
+        }
+    });
+
+    increaseBtn.addEventListener('click', () => {
+        const maxQuantity = parseInt(quantityInput.getAttribute('max'));
+        if (quantityInput.value < maxQuantity) {
+            quantityInput.value = parseInt(quantityInput.value) + 1;
+            syncQuantity();
+        }
+    });
+
+    // 數量輸入驗證
+    quantityInput.addEventListener('change', () => {
+        const maxQuantity = parseInt(quantityInput.getAttribute('max'));
+        if (quantityInput.value < 1) {
+            quantityInput.value = 1;
+        } else if (quantityInput.value > maxQuantity) {
+            quantityInput.value = maxQuantity;
+        }
+        syncQuantity();
+    });
+
+    // 切換主圖片
+    function changeMainImage(imageSrc, element) {
+        document.getElementById('mainImage').src = imageSrc;
+        
+        // 移除所有 active 類別
+        document.querySelectorAll('.thumbnail-image').forEach(img => {
+            img.parentElement.classList.remove('active');
+        });
+        
+        // 添加 active 類別到當前點擊的圖片
+        element.parentElement.classList.add('active');
+    }
+
+    // 初始化同步數量
+    syncQuantity();
+</script>
 </body>
 </html>
