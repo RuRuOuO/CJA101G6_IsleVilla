@@ -2,25 +2,83 @@
 
 @charset "UTF-8";
 /* 全域設定 */
+
 body {
-    font-family: 'Microsoft JhengHei', 'Segoe UI', sans-serif;
+font-family: 'Microsoft JhengHei', 'Segoe UI', 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     background-attachment: fixed;
+    min-height: 100vh;
+}
+
+/* 主要內容區域 */
+main {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* 頁面標題美化 */
+.text-center h1 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+.text-center h1 i {
+    color: #667eea;
+    -webkit-text-fill-color: #667eea;
+    text-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+}
+
+/* 表單標籤美化 */
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.form-label i {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 6px;
+    margin-right: 0.5rem;
+    font-size: 0.875rem;
 }
 
 /* 表單控制項增強 */
 .form-control, .form-select {
-    transition: all 0.3s ease;
-    border-width: 2px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(5px);
 }
 
 .form-control:focus, .form-select:focus {
     transform: translateY(-2px);
-    box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+    box-shadow: 
+        0 0 0 0.25rem rgba(102, 126, 234, 0.25),
+        0 8px 25px rgba(102, 126, 234, 0.15);
     border-color: #667eea;
+    background: #fff;
 }
 
 .form-control:hover, .form-select:hover {
-    border-color: #a8b3f0;
+    border-color: #b8c5f2;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
 
 /* 按鈕增強效果 */
@@ -33,29 +91,43 @@ body {
 }
 
 .btn:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
 }
 
 .btn-primary {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    color: white;
 }
 
 .btn-primary:hover {
     background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.6);
+    color: white;
 }
 
+.btn-outline-secondary {
+    border: 2px solid #6c757d;
+    color: #6c757d;
+    background: transparent;
+}
 .btn-outline-secondary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+    background: #6c757d;
+    color: white;
+    box-shadow: 0 6px 20px rgba(108, 117, 125, 0.3);
+}
+/* 小按鈕樣式 */
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border-radius: 8px;
 }
 
 /* 表格設定 */
 .table {
-    table-layout: auto;
-    width: 100%;
+    margin-bottom: 0;
+    border-radius: 12px;
+    overflow: hidden;
 }
 
 .table td, .table th {
@@ -64,7 +136,14 @@ body {
 }
 
 .table-responsive {
-    overflow-x: auto;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin: 2rem 0;
+    overflow: hidden;
 }
 
 /* 狀態指示器 */

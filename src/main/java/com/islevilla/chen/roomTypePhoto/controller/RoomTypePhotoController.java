@@ -20,6 +20,8 @@ import com.islevilla.chen.roomTypePhoto.model.RoomTypePhoto;
 import com.islevilla.chen.roomTypePhoto.model.RoomTypePhotoService;
 import com.islevilla.chen.util.map.RoomTypeName;
 
+import jakarta.validation.Valid;
+
 @Controller
 @RequestMapping("/backend/roomTypePhoto")
 public class RoomTypePhotoController {
@@ -66,16 +68,16 @@ public String showSelectPage(Model model) {
 		    System.out.println("查詢完成，找到 " + searchResult.size() + " 筆資料");
 		    return "back-end/roomTypePhoto/searchRoomTypePhoto";
 	    }
-}	    
+	    
 ////顯示searchRoomTypePhoto網頁
 //@GetMapping("/searchRoomTypePhoto")
-//public String getOne(@RequestParam("roomTypePhotoId") String roomTypePhotoIdStr, 
-//                    Model model, RedirectAttributes redirectAttributes) {
+//public String showSearchRoomTypePhoto(@Valid@ModelAttribute("roomTypePhoto") RoomTypePhoto roomTypePhoto, 
+//									Model model) {
 //    
 //    List<String> errorMsg = new ArrayList<>();
 //    
 //    // 驗證輸入
-//    if (roomTypePhotoIdStr == null || roomTypePhotoIdStr.trim().isEmpty()) {
+//    if (roomTypePhoto.getRoomTypePhotoId() == null || roomTypePhotoIdStr.trim().isEmpty()) {
 //        errorMsg.add("沒輸入數字，請輸入圖片編號");
 //    }
 //    
@@ -93,7 +95,7 @@ public String showSelectPage(Model model) {
 //        return "redirect:/room-type-photo/select";
 //    }
 //}
-//}
+}
 //	        
 //	        // 查詢資料
 //	        Optional<RoomTypePhoto> photoOpt = roomTypePhotoService.getOne(roomTypePhotoId);

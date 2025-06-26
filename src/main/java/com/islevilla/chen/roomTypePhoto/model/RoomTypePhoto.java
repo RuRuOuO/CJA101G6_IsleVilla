@@ -41,5 +41,7 @@ public class RoomTypePhoto implements java.io.Serializable {
 	@Column(name = "room_type_photo")
 	private Byte[] roomTypePhoto;
 
+    @Column(name = "display_order")
+    private Integer displayOrder;
 
 }
