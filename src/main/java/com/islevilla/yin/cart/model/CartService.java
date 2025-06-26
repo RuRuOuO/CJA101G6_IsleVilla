@@ -5,6 +5,8 @@ import com.islevilla.yin.product.model.ProductService;
 import redis.clients.jedis.Jedis;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.islevilla.yin.productphoto.ProductPhotoService;
+import com.islevilla.yin.productphoto.ProductPhoto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +17,9 @@ public class CartService {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private ProductPhotoService productPhotoService;
 
     private String getCartKey(String userId) {
         return "cart:" + userId;
@@ -43,8 +48,13 @@ public class CartService {
                 if (product != null) {
                     int subtotal = product.getProductPrice() * quantity;
                     totalAmount += subtotal;
+                    String imageUrl = "/img/product/default.png";
+                    ProductPhoto photo = productPhotoService.getFirstProductPhotoByProductId(productId);
+                    if (photo != null) {
+                        imageUrl = "/product/photo/" + productId;
+                    }
                     cartItems.add(new CartDTO(productId, product.getProductName(),
-                            product.getProductPrice(), quantity, subtotal));
+                            product.getProductPrice(), quantity, subtotal, imageUrl));
                 }
             }
         }
