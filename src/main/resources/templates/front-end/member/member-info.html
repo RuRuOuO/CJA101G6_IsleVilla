@@ -6,6 +6,165 @@
     <title>微嶼 | Isle Villa</title>
     <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            padding-top: 55px; /* 配合 fixed navbar */
+        }
+        .member-photo {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #dee2e6;
+            transition: all 0.3s ease;
+        }
+        .member-photo:hover {
+            border-color: #6c757d;
+            transform: scale(1.05);
+        }
+        .info-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        .info-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+        }
+        .info-item {
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+        }
+        .info-item:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.95em;
+            display: inline-block;
+            min-width: 100px;
+        }
+        .info-value {
+            color: #6c757d;
+            font-size: 0.95em;
+        }
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 8px;
+        }
+        .status-0 { 
+            background-color: #fff3cd; 
+            color: #856404; 
+            border: 1px solid #ffeaa7;
+        }
+        .status-1 { 
+            background-color: #d4edda; 
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status-2 { 
+            background-color: #f8d7da; 
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .btn-edit {
+            background-color: #212529;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .btn-edit:hover {
+            background-color: #495057;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(33, 37, 41, 0.2);
+            color: white;
+        }
+        .edit-form {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #495057;
+            box-shadow: 0 0 0 0.2rem rgba(73, 80, 87, 0.25);
+        }
+        .form-select {
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            padding: 12px 15px;
+        }
+        .btn-primary {
+            background-color: #212529;
+            border-color: #212529;
+            border-radius: 8px;
+            padding: 12px 25px;
+            font-weight: 500;
+        }
+        .btn-primary:hover {
+            background-color: #495057;
+            border-color: #495057;
+        }
+        .btn-secondary {
+            border-radius: 8px;
+            padding: 12px 25px;
+            font-weight: 500;
+        }
+        .card-title {
+            color: #212529;
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-family: 'Noto Serif TC', serif;
+        }
+        .text-danger {
+            color: #dc3545 !important;
+        }
+        .form-text {
+            font-size: 0.875em;
+            color: #6c757d;
+        }
+        .invalid-feedback {
+            display: block;
+            font-size: 0.875em;
+            color: #dc3545;
+            margin-top: 0.25rem;
+        }
+        @media (max-width: 768px) {
+            .info-card {
+                padding: 20px;
+            }
+            .edit-form {
+                padding: 20px;
+            }
+            .member-photo {
+                width: 120px;
+                height: 120px;
+            }
+        }
+    </style>
 </head>
 <body>
 <!-- ===== 載入Header ===== -->
@@ -19,7 +178,180 @@
             <!-- 右側內容區 -->
             <div class="col-md-9">
                 <!-- //////////////////// 會員頁面內容放這裡 //////////////////// -->
+				<!-- 個人資訊展示區域 -->
+                <div id="memberInfoDisplay" th:if="${member != null}">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="mb-0">個人資訊</h3>
+                        <button type="button" class="btn btn-edit" onclick="toggleEditMode()">
+                            <i class="fas fa-edit me-2"></i>編輯資料
+                        </button>
+                    </div>
 
+                    <div class="row">
+                        <!-- 左側：大頭照 -->
+                        <div class="col-md-4 text-center mb-4">
+                            <div class="info-card">
+                                <img th:if="${member.memberPhoto != null}" 
+                                     th:src="@{/member/photo/{memberId}(memberId=${member.memberId})}"
+                                     alt="會員照片" class="member-photo mb-3">
+                                <img th:unless="${member.memberPhoto != null}"
+                                     src="https://images.unsplash.com/photo-1603736087997-5daec6092347?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                     alt="預設照片" class="member-photo mb-3">
+                                <h5 th:text="${member.memberName}">會員姓名</h5>
+                                <span class="status-badge" 
+                                      th:classappend="${'status-' + member.memberStatus}"
+                                      th:text="${member.memberStatus == 0 ? '未驗證' : (member.memberStatus == 1 ? '已驗證' : '停用')}">
+                                    狀態
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- 右側：詳細資訊 -->
+                        <div class="col-md-8">
+                            <div class="info-card">
+                                <h5 class="card-title"><i class="fas fa-user me-2"></i>基本資料</h5>
+                                
+                                <div class="info-item">
+                                    <span class="info-label">會員編號：</span>
+                                    <span class="info-value" th:text="${member.memberId}">編號</span>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <span class="info-label">電子信箱：</span>
+                                    <span class="info-value" th:text="${member.memberEmail}">電子信箱</span>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <span class="info-label">姓名：</span>
+                                    <span class="info-value" th:text="${member.memberName}">姓名</span>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <span class="info-label">生日：</span>
+                                    <span class="info-value" th:text="${#temporals.format(member.memberBirthdate, 'yyyy年MM月dd日')}">生日</span>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <span class="info-label">性別：</span>
+                                    <span class="info-value" 
+                                          th:text="${member.memberGender == 0 ? '男生' : (member.memberGender == 1 ? '女生' : '其他')}">性別</span>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <span class="info-label">電話：</span>
+                                    <span class="info-value" th:text="${member.memberPhone}">電話</span>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <span class="info-label">地址：</span>
+                                    <span class="info-value" th:text="${member.memberAddress}">地址</span>
+                                </div>
+                            </div>
+
+                            <div class="info-card">
+                                <h5 class="card-title"><i class="fas fa-clock me-2"></i>帳戶資訊</h5>
+                                
+                                <div class="info-item">
+                                    <span class="info-label">註冊時間：</span>
+                                    <span class="info-value" th:text="${#temporals.format(member.memberCreatedAt, 'yyyy年MM月dd日 HH:mm')}">註冊時間</span>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <span class="info-label">最後更新：</span>
+                                    <span class="info-value" th:text="${#temporals.format(member.memberUpdatedAt, 'yyyy年MM月dd日 HH:mm')}">更新時間</span>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <span class="info-label">最後登入：</span>
+                                    <span class="info-value" th:text="${#temporals.format(member.memberLastLoginTime, 'yyyy年MM月dd日 HH:mm')}">登入時間</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 個人資訊編輯區域 -->
+                <div id="memberInfoEdit" style="display: none;" th:if="${member != null}">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="mb-0">編輯個人資訊</h3>
+                        <button type="button" class="btn btn-secondary" onclick="toggleEditMode()">
+                            <i class="fas fa-times me-2"></i>取消編輯
+                        </button>
+                    </div>
+
+                    <form class="edit-form" th:action="@{/member/update}" method="post" enctype="multipart/form-data" th:object="${member}">
+                        <input type="hidden" th:field="*{memberId}">
+                        <input type="hidden" th:field="*{memberCreatedAt}">
+                        <input type="hidden" th:field="*{memberLastLoginTime}">
+                        <input type="hidden" th:field="*{memberStatus}">
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="memberName" class="form-label">姓名 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="memberName" th:field="*{memberName}" required>
+                                <div class="invalid-feedback">請輸入您的姓名</div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="memberEmail" class="form-label">電子信箱 <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="memberEmail" th:field="*{memberEmail}" required readonly>
+                                <small class="form-text text-muted">電子信箱無法修改</small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="memberBirthdate" class="form-label">生日 <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="memberBirthdate"
+									   th:field="*{memberBirthdate}"
+									   required>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="memberGender" class="form-label">性別 <span class="text-danger">*</span></label>
+                                <select class="form-select" id="memberGender" th:field="*{memberGender}" required>
+                                    <option value="">請選擇性別</option>
+                                    <option value="0">男生</option>
+                                    <option value="1">女生</option>
+                                    <option value="2">其他</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="memberPhone" class="form-label">電話 <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" id="memberPhone" th:field="*{memberPhone}" required>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="memberPhoto" class="form-label">大頭照</label>
+                                <input type="file" class="form-control" id="memberPhoto" name="photoFile" accept="image/*">
+                                <small class="form-text text-muted">支援 JPG、PNG 格式</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="memberAddress" class="form-label">地址 <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="memberAddress" th:field="*{memberAddress}" rows="3" required></textarea>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="button" class="btn btn-secondary me-2" onclick="toggleEditMode()">取消</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>儲存變更
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 如果沒有會員資料 -->
+                <div th:if="${member == null}" class="text-center py-5">
+                    <i class="fas fa-user-times fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">找不到會員資料</h4>
+                    <p class="text-muted">請重新登入或聯繫客服人員</p>
+                    <a href="/member/login" class="btn btn-primary">重新登入</a>
+                </div>
                 <!-- //////////////////// 會員頁面內容放這裡 //////////////////// -->
             </div>
         </div>
@@ -27,5 +359,49 @@
 </main>
 <!-- ========== 載入Footer ========== -->
 <footer th:replace="~{fragments/fragments :: footer}"></footer>
+<script>
+    function toggleEditMode() {
+        const displayDiv = document.getElementById('memberInfoDisplay');
+        const editDiv = document.getElementById('memberInfoEdit');
+        
+        if (displayDiv.style.display === 'none') {
+            displayDiv.style.display = 'block';
+            editDiv.style.display = 'none';
+        } else {
+            displayDiv.style.display = 'none';
+            editDiv.style.display = 'block';
+        }
+    }
+
+    // 表單驗證 (使用Bootstrap 5的驗證)
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            const forms = document.getElementsByClassName('edit-form');
+            Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+
+    // 照片預覽功能
+    document.getElementById('memberPhoto').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // 可以在這裡添加照片預覽功能
+                console.log('照片已選擇:', file.name);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
 </body>
 </html>

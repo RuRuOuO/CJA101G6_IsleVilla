@@ -6,9 +6,13 @@ import java.time.LocalDateTime;
 import java.time.Period;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -357,6 +361,57 @@ public class MembersController {
 	@GetMapping("/member/logout-success")
 	public String showLogoutSuccessPage(Model model) {
 		return "front-end/member/member-logout-success";
+	}
+	
+	// 前台渲染會員資料
+	@GetMapping("/member/info")
+	public String memberInfo(HttpSession session, Model model) {
+		// 檢查是否已登入
+	    Members member = (Members) session.getAttribute("member");
+ 		if (member == null) {
+ 			// 如果沒有登入，直接跳轉到登入頁面
+ 			System.out.println("找不到登入紀錄，即將跳轉到登入頁面......");
+ 			return "redirect:/member/login";
+ 		}
+ 		System.out.println("生日型別：" + member.getMemberBirthdate().getClass());
+ 		System.out.println("生日內容：" + member.getMemberBirthdate());
+	    model.addAttribute("member", member);
+	    return "front-end/member/member-info";
+	}
+	
+	// 更新會員資訊
+	@PostMapping("/member/update")
+	public String updateMember(@ModelAttribute Members member, 
+	                          @RequestParam("photoFile") MultipartFile photoFile,
+	                          HttpSession session,
+	                          RedirectAttributes redirectAttributes) {
+		
+		try {
+	        // 處理照片上傳
+	        if (!photoFile.isEmpty()) {
+	            member.setMemberPhoto(photoFile.getBytes());
+	        }
+	        
+	        membersService.updateMember(member);
+	        redirectAttributes.addFlashAttribute("successMessage", "資料更新成功！");
+	    } catch (Exception e) {
+	        redirectAttributes.addFlashAttribute("errorMessage", "資料更新失敗：" + e.getMessage());
+	    }
+	    // 更新邏輯
+	    session.setAttribute("member", membersService.getOneMember(member.getMemberId())); // 更新 session 中的會員資料
+	    return "redirect:/member/info";
+	}
+
+	@GetMapping("/member/photo/{memberId}")
+	public ResponseEntity<byte[]> getMemberPhoto(@PathVariable Integer memberId) {
+	    // 照片顯示邏輯
+		Members member = membersService.getOneMember(memberId);
+	    if (member != null && member.getMemberPhoto() != null) {
+	        return ResponseEntity.ok()
+	                .contentType(MediaType.IMAGE_JPEG)
+	                .body(member.getMemberPhoto());
+	    }
+	    return ResponseEntity.notFound().build();
 	}
 
 	// ----------------------------工具方法---------------------------- //

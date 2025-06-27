@@ -12,11 +12,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.islevilla.lai.members.model.Members;
+import com.islevilla.lai.members.model.MembersRepository;
+import com.islevilla.lai.members.model.MembersService;
 import com.islevilla.wei.room.model.RoomRVOrder;
 import com.islevilla.wei.room.model.RoomRVOrderRepository;
 
 @Service
 public class ShuttleRVFrontEndService {
+	
+	@Autowired
+	private MembersRepository membersRepository;
 	
 	@Autowired
 	private RoomRVOrderRepository roomRVOrderRepository;
@@ -225,5 +230,58 @@ public class ShuttleRVFrontEndService {
         summary.setSelectedSeats(selectedSeats);
         
         return summary;
+    }
+    
+    /**
+     * 建立正式預約
+     */
+    @Transactional
+    public Integer createReservation(Integer reservationRequestId) {
+        TempShuttleRVRequest request = tempShuttleRVRequestRepository.findById(reservationRequestId)
+            .orElseThrow(() -> new RuntimeException("預約請求不存在"));
+        
+        // 再次驗證座位可用性
+        List<SeatDTO> seats = getSeatsWithAvailability(request.getSelectedScheduleId(), request.getShuttleDate());
+        List<Integer> selectedSeatIds = request.getSelectedSeatIdsList();
+        
+        for (Integer seatId : selectedSeatIds) {
+            SeatDTO seat = seats.stream()
+                .filter(s -> s.getSeatId().equals(seatId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("座位不存在"));
+            
+            if (seat.isOccupied()) {
+                throw new RuntimeException("座位 " + seat.getSeatNumber() + " 已被其他人預約");
+            }
+        }
+        
+        // 建立接駁預約記錄
+        ShuttleReservation reservation = new ShuttleReservation();
+        
+        Members members = membersRepository.findById(request.getMemberId()).orElseThrow(() -> new RuntimeException("找不到會員"));
+        RoomRVOrder roomRVOrder = roomRVOrderRepository.findById(request.getRoomReservationId()).orElseThrow(() -> new RuntimeException("找不到訂房編號"));
+        reservation.setMembers(members);
+        reservation.setRoomRVOrder(roomRVOrder);
+        reservation.setShuttleDate(request.getShuttleDate());
+        ShuttleSchedule shuttleSchedule = shuttleScheduleRepository.findById(request.getSelectedScheduleId()).orElseThrow(() -> new RuntimeException("找不到接駁班次"));
+        reservation.setShuttleSchedule(shuttleSchedule);
+        reservation.setShuttleDirection(request.getShuttleDirection());
+        reservation.setShuttleNumber(request.getShuttleNumber());
+        reservation.setShuttleReservationStatus(1); // 正常狀態
+        
+        reservation = shuttleRVRepository.save(reservation);
+        
+        // 建立座位預約記錄
+        for (Integer seatId : selectedSeatIds) {
+            ShuttleReservationSeat reservationSeat = new ShuttleReservationSeat();
+            reservationSeat.setShuttleReservationId(reservation.getShuttleReservationId());
+            reservationSeat.setSeatId(seatId);
+            shuttleRVSeatRepository.save(reservationSeat);
+        }
+        
+        // 清理暫存的預約請求
+        tempShuttleRVRequestRepository.delete(request);
+        
+        return reservation.getShuttleReservationId();
     }
 }
