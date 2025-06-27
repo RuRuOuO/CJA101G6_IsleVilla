@@ -30,44 +30,12 @@ public class OperationLogController {
     private EmployeeService employeeService;
 
     /**
-     * 顯示操作日誌列表（支援搜尋和分頁）
+     * 顯示操作日誌列表（一次查詢所有資料，供DataTables前端分頁排序）
      */
     @GetMapping("/list")
-    public String listOperationLogs(
-            @RequestParam(required = false) Integer employeeId,
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate,
-            @RequestParam(required = false) String operationDate,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            Model model) {
-
-        // 將查詢參數組成 map
-        Map<String, String[]> paramMap = new HashMap<>();
-        if (employeeId != null) paramMap.put("employeeId", new String[]{employeeId.toString()});
-        if (keyword != null && !keyword.isEmpty()) paramMap.put("logDescription", new String[]{keyword});
-        if (operationDate != null && !operationDate.isEmpty()) paramMap.put("operationTime", new String[]{operationDate});
-        if (startDate != null && !startDate.isEmpty()) paramMap.put("startDate", new String[]{startDate});
-        if (endDate != null && !endDate.isEmpty()) paramMap.put("endDate", new String[]{endDate});
-
-        List<OperationLog> operationLogs;
-        Page<OperationLog> pageResult = null;
-        if (!paramMap.isEmpty()) {
-            pageResult = operationLogService.getAllWithPagination(paramMap, page, size);
-            operationLogs = pageResult.getContent();
-        } else {
-            pageResult = operationLogService.getOperationLogsWithPagination(page, size);
-            operationLogs = pageResult.getContent();
-        }
-        model.addAttribute("currentPage", pageResult.getNumber());
-        model.addAttribute("totalPages", pageResult.getTotalPages());
-        model.addAttribute("totalElements", pageResult.getTotalElements());
-
-        // 獲取所有員工（用於搜尋下拉選單）
+    public String listOperationLogs(Model model) {
+        List<OperationLog> operationLogs = operationLogService.getAllOperationLogs();
         List<Employee> employees = employeeService.getAllEmployees();
-
-        // 統計資訊
         long todayCount = operationLogService.getTodayOperationCount();
         long totalCount = operationLogService.getTotalOperationCount();
 
@@ -75,11 +43,6 @@ public class OperationLogController {
         model.addAttribute("employees", employees);
         model.addAttribute("todayCount", todayCount);
         model.addAttribute("totalCount", totalCount);
-        model.addAttribute("searchEmployeeId", employeeId);
-        model.addAttribute("searchKeyword", keyword);
-        model.addAttribute("searchOperationDate", operationDate);
-        model.addAttribute("searchStartDate", startDate);
-        model.addAttribute("searchEndDate", endDate);
 
         return "back-end/operation-log/list";
     }

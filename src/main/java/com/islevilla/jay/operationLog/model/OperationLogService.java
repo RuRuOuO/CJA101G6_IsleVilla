@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -207,5 +208,14 @@ public class OperationLogService {
         }
         Pageable pageable = PageRequest.of(page, size, Sort.by("operationTime").descending());
         return new org.springframework.data.domain.PageImpl<>(list, pageable, total);
+    }
+
+    // 每個月一號凌晨2點自動清理一年前的日誌
+    @Scheduled(cron = "0 0 2 1 * ?")
+    @Transactional
+    public void autoCleanupOldLogs() {
+        LocalDate oneYearAgo = LocalDate.now().minusYears(1);
+        cleanupOldLogs(oneYearAgo);
+        System.out.println("[OperationLog] 已自動清理 " + oneYearAgo + " 之前的日誌");
     }
 } 

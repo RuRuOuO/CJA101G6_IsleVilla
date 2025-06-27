@@ -126,7 +126,6 @@
                             <th>員工姓名</th>
                             <th style="width: 150px;">操作時間</th>
                             <th>操作描述</th>
-                            <th>操作</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -135,41 +134,14 @@
                             <td th:text="${log.employee.employeeName}">員工姓名</td>
                             <td th:text="${#temporals.format(log.operationTime, 'yyyy-MM-dd HH:mm:ss')}">2025-01-01 12:00:00</td>
                             <td th:text="${log.logDescription}">操作描述</td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <a th:href="@{/backend/operation-log/detail/{id}(id=${log.operationLogId})}" 
-                                       class="btn btn-sm btn-info btn-action">
-                                        <i class="fas fa-eye"></i> 詳情
-                                    </a>
-                                    <button type="button" class="btn btn-sm btn-danger btn-action" 
-                                            th:onclick="'deleteLog(' + ${log.operationLogId} + ')'">
-                                        <i class="fas fa-trash"></i> 刪除
-                                    </button>
-                                </div>
-                            </td>
                         </tr>
                         <tr th:if="${#lists.isEmpty(operationLogs)}">
-                            <td colspan="5" class="text-center text-muted">沒有找到操作日誌記錄</td>
+                            <td th:each="i : ${#numbers.sequence(1,4)}" class="text-center text-muted">
+                                <span th:if="${i == 2}">沒有找到操作日誌記錄</span>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
-            </div>
-            <!-- 分頁 -->
-            <div th:if="${currentPage != null}" class="pagination-container">
-                <nav aria-label="操作日誌分頁">
-                    <ul class="pagination">
-                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                            <a class="page-link" th:href="@{/backend/operation-log/list(page=${currentPage - 1})}">上一頁</a>
-                        </li>
-                        <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
-                            th:classappend="${pageNum == currentPage} ? 'active'">
-                            <a class="page-link" th:href="@{/backend/operation-log/list(page=${pageNum})}" th:text="${pageNum + 1}">1</a>
-                        </li>
-                        <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                            <a class="page-link" th:href="@{/backend/operation-log/list(page=${currentPage + 1})}">下一頁</a>
-                        </li>
-                    </ul>
-                </nav>
             </div>
         </div>
     </th:block>
@@ -226,21 +198,21 @@
         }
     });
 
-    // DataTable排序與分頁功能
+    // DataTables不跳alert
+    $.fn.dataTable.ext.errMode = 'none';
     $(function(){
         $('#operationLogTable').DataTable({
             dom: "t<'d-flex justify-content-center my-3'p>",
-            paging: false, // 關閉 DataTables 分頁
             pagingType: 'simple_numbers',
             lengthChange: false,
             info: false,
-            order: [], // 預設不排序
             language: {
                 paginate: {
                     previous: '上一頁',
                     next:     '下一頁'
                 }
             },
+            // 若有操作欄可加: columnDefs: [ { orderable: false, targets: -1 } ],
             drawCallback: function(){
                 var $pg = $('#operationLogTable_wrapper .pagination');
                 $pg.find('li.disabled a, li.active a')

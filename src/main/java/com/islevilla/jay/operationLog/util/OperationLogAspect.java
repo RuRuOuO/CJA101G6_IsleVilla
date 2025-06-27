@@ -45,9 +45,32 @@ public class OperationLogAspect {
     @Pointcut("@annotation(org.springframework.web.bind.annotation.GetMapping) && execution(* *..*delete*(..))")
     public void getDeleteMethods() {}
 
-    @AfterReturning("postCreateMethods()")
-    public void logCreate(JoinPoint joinPoint) {
-        logByType(joinPoint, "新增");
+    @AfterReturning(pointcut = "postCreateMethods()", returning = "result")
+    public void logCreate(JoinPoint joinPoint, Object result) {
+        boolean shouldLog = false;
+
+        // 1. 處理 String 回傳
+        if (result instanceof String str) {
+            if (str.startsWith("redirect:") || "success".equalsIgnoreCase(str) || str.contains("新增成功")) {
+                shouldLog = true;
+            }
+        }
+
+        // 2. 處理 ResponseEntity 回傳
+        if (result instanceof org.springframework.http.ResponseEntity<?> response) {
+            if (response.getStatusCode().is2xxSuccessful()) {
+                Object body = response.getBody();
+                if (body instanceof String bodyStr) {
+                    if (bodyStr.contains("成功") || bodyStr.equalsIgnoreCase("success")) {
+                        shouldLog = true;
+                    }
+                }
+            }
+        }
+
+        if (shouldLog) {
+            logByType(joinPoint, "新增");
+        }
     }
 
     @AfterReturning("putMappingMethods()")
