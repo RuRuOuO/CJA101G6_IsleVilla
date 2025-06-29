@@ -1,4 +1,4 @@
-package com.islevilla.jay.dashboard;
+package com.islevilla.jay.dashboard.model;
 
 import com.islevilla.chen.room.model.Room;
 import org.springframework.data.jpa.repository.JpaRepository;

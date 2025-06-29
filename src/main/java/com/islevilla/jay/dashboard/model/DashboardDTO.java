@@ -1,4 +1,4 @@
-package com.islevilla.jay.dashboard;
+package com.islevilla.jay.dashboard.model;
 
 import java.util.List;
 import com.islevilla.jay.productOrder.model.ProductOrder;

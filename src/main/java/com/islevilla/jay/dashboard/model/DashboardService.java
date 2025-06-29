@@ -1,16 +1,12 @@
-package com.islevilla.jay.dashboard;
+package com.islevilla.jay.dashboard.model;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.islevilla.jay.dashboard.DashboardDTO;
 import com.islevilla.jay.productOrder.model.ProductOrder;
 import com.islevilla.jay.productOrder.model.ProductOrderRepository;
 import com.islevilla.wei.room.model.RoomRVOrder;
-import com.islevilla.chen.room.model.RoomRepository;
-import com.islevilla.chen.room.model.Room;
-import com.islevilla.jay.dashboard.DashboardRoomRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

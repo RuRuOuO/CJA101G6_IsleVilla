@@ -1,5 +1,7 @@
-package com.islevilla.jay.dashboard;
+package com.islevilla.jay.dashboard.controller;
 
+import com.islevilla.jay.dashboard.model.DashboardDTO;
+import com.islevilla.jay.dashboard.model.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
