@@ -15,7 +15,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.islevilla.yin.auth.CustomLoginSuccessHandler;
+import com.islevilla.jay.operationLog.controller.CustomLoginSuccessHandler;
+import com.islevilla.jay.operationLog.controller.CustomLogoutSuccessHandler;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -29,6 +30,9 @@ public class SecurityConfig {
     
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    private CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
     // 1) 註冊 PasswordEncoder Bean
     @Bean
@@ -95,6 +99,7 @@ public class SecurityConfig {
                 
                 .logout(logout -> logout
                         .logoutUrl("/backend/logout")
+                        .logoutSuccessHandler(customLogoutSuccessHandler) // 註冊自訂登出 Handler
                         .logoutSuccessUrl("/backend/auth?logout")
                         .invalidateHttpSession(true)
                         .permitAll()
