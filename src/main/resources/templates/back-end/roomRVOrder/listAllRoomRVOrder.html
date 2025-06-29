@@ -16,111 +16,289 @@
 
 <main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
     <th:block th:fragment="myContent">
-        <!-- //////////////////// 頁面內容放在這個card裡面(外框已經有加card和container，直接放入table和標題即可)//////////////////// -->
-        <div class="d-flex justify-content-center align-items-center">
-            <div class="py-5 container">
-                <h2 class="section-title text-center mb-5">訂單一覽</h2>
-                <table class="table shadow-sm">
-                    <thead class="table-secondary">
+        <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+        <!-- 卡片標題與新增按鈕 -->
+        <div class="card-header bg-transparent border-0 pt-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0 fw-bold">
+                    <i class="bi bi-house-door me-2"></i>訂房一覽
+                </h4>
+                <!--                <button-->
+                <!--                        class="btn btn-success"-->
+                <!--                        data-bs-toggle="modal"-->
+                <!--                        data-bs-target="#addEmployeeModal"-->
+                <!--                >-->
+                <!--                    <i class="bi bi-plus-circle me-2"></i>新增員工-->
+                <!--                </button>-->
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <input type="text" id="orderSearchInput" class="form-control" placeholder="搜尋 訂房編號 或 會員編號">
+            </div>
+            <div class="col-md-3">
+                <select id="orderStatusFilter" class="form-select">
+                    <option value="">全部狀態</option>
+                    <option value="訂單成立">訂單成立</option>
+                    <option value="已入住">已入住</option>
+                    <option value="已退房">已退房</option>
+                    <option value="申請取消">申請取消</option>
+                    <option value="確認取消">確認取消</option>
+                </select>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="roomRVTable" class="table table-hover">
+                    <thead>
                     <tr>
                         <th>訂房編號</th>
                         <th>會員編號</th>
                         <th>訂單日期</th>
-                        <th>訂單狀態</th>
+                        <th>狀態</th>
                         <th>入住日期</th>
                         <th>退房日期</th>
                         <th>優惠專案</th>
-                        <th>備註</th>
+                        <!--                            <th>實際入住時間</th>-->
+                        <!--                            <th>實際退房時間</th>-->
                         <th>總金額</th>
-                        <th>折扣金額</th>
-                        <th>實付金額</th>
-                        <th>明細</th>
-                        <th>取消</th>
+                        <th>操作</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <th:block th:each="order:${orderList}">
-                        <tr>
-                            <td>
-                                <span class="order-id" th:text="${order.roomReservationId}"></span>
-                            </td>
-                            <td>
-                                <span class="member-id" th:text="${order.members.memberId}"></span>
-                            </td>
-                            <td>
-                                <span class="date-text"
-                                      th:text="${#temporals.format(order.roomOrderDate, 'yyyy-MM-dd')}"></span>
-                            </td>
-                            <td>
-                                        <span th:switch="${order.roomOrderStatus}" class="status-badge">
-                                            <span th:case="'0'" class="status-badge status-0">訂單成立</span>
-                                            <span th:case="'1'" class="status-badge status-1">已付款</span>
-                                            <span th:case="'2'" class="status-badge status-2">已完成</span>
-                                            <span th:case="'3'" class="status-badge status-3">取消確認中</span>
-                                            <span th:case="'4'" class="status-badge status-4">已取消</span>
-                                            <span th:case="'*'" class="status-badge status-0">未知</span>
-                                        </span>
-                            </td>
-                            <td>
-                                <span class="date-text"
-                                      th:text="${#temporals.format(order.checkInDate, 'yyyy-MM-dd')}"></span>
-                            </td>
-                            <td>
-                                <span class="date-text"
-                                      th:text="${#temporals.format(order.checkOutDate, 'yyyy-MM-dd')}"></span>
-                            </td>
-                            <td>
-                                        <span th:if="${order.promotion != null}"
-                                              class="promotion-tag"
-                                              th:text="${order.promotion.roomPromotionId}"></span>
-                                <span th:unless="${order.promotion != null}"
-                                      class="no-promotion">無</span>
-                            </td>
-                            <td>
-                                <span class="remark-text" th:text="${order.remark}" th:title="${order.remark}"></span>
-                            </td>
-                            <td>
-                                <span class="amount-text"
-                                      th:text="${#numbers.formatDecimal(order.roomTotalAmount, 0, 'COMMA', 0, 'POINT')} + ' 元'"></span>
-                            </td>
-                            <td>
-                                <span class="text-danger fw-bold"
-                                      th:text="${#numbers.formatDecimal(order.rvDiscountAmount, 0, 'COMMA', 0, 'POINT')} + ' 元'"></span>
-                            </td>
-                            <td>
-                                <span class="amount-text fs-6"
-                                      th:text="${#numbers.formatDecimal(order.rvPaidAmount, 0, 'COMMA', 0, 'POINT')} + ' 元'"></span>
-                            </td>
-                            <td>
-                                <a class="btn btn-dark"
-                                   th:href="@{'/backend/room/reservation/order/' + ${order.roomReservationId}}">
-                                    <!--                                        <i class="fas fa-eye me-1"></i>-->
-                                    明細
-                                </a>
-                            </td>
-                            <td>
-                                <form th:action="@{'/backend/room/reservation/order/'+${order.roomReservationId} +'/cancel'}"
-                                      method="post"
-                                      th:if="${order.roomOrderStatus=='3'}"
-                                      class="d-inline">
-                                    <button type="submit" class="btn btn-danger"
-                                            onclick="return confirm('確定取消訂單？')">
-<!--                                        <i class="fas fa-times me-1"></i>-->
-                                        取消
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    </th:block>
+                    <tr th:each="order : ${orderList}" th:if="${orderList != null}">
+                        <td th:text="${order.roomReservationId}">1001</td>
+                        <td th:text="${order.members.memberId}">M001</td>
+                        <td th:text="${#temporals.format(order.roomOrderDate, 'yyyy-MM-dd HH:mm')}">2024-01-15
+                            14:30
+                        </td>
+                        <td>
+                        <span th:switch="${order.roomOrderStatus}">
+                            <span th:case="0" class="badge bg-success">訂單成立</span>
+                            <span th:case="1" class="badge bg-primary">已入住</span>
+                            <span th:case="2" class="badge bg-secondary">已退房</span>
+                            <span th:case="3" class="badge bg-warning">申請取消</span>
+                            <span th:case="4" class="badge bg-danger">確認取消</span>
+                            <span th:case="'*'" class="badge bg-dark">未知</span>
+                        </span>
+                        </td>
+                        <td th:text="${#temporals.format(order.checkInDate, 'yyyy-MM-dd')}">2024-01-20</td>
+                        <td th:text="${#temporals.format(order.checkOutDate, 'yyyy-MM-dd')}">2024-01-22</td>
+                        <!--                            <td th:text="${order.actualCheckInDate != null ? #temporals.format(order.actualCheckInDate, 'yyyy-MM-dd HH:mm') : '-'}">-</td>-->
+                        <!--                            <td th:text="${order.actualCheckOutDate != null ? #temporals.format(order.actualCheckOutDate, 'yyyy-MM-dd HH:mm') : '-'}">-</td>-->
+                        <td th:text="${order.promotion != null ? order.promotion.roomPromotionTitle : '-'}">
+                            -
+                        </td>
+                        <td th:text="'$' + ${order.rvPaidAmount}">$3000</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <!-- 查看詳情按鈕 -->
+                                <button type="button"
+                                        class="btn btn-sm btn-info view-detail-btn"
+                                        th:data-order-id="${order.roomReservationId}"
+                                        title="查看詳情">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+
+                                <!-- 申請取消按鈕 -->
+                                <button th:if="${order.roomOrderStatus == 3}"
+                                        type="button"
+                                        class="btn btn-sm btn-danger cancel-btn"
+                                        th:data-order-id="${order.roomReservationId}"
+                                        title="確認取消">
+                                    <!-- <i class="bi bi-house-check"></i>-->
+                                    <i class="fas fa-times me-1"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${orderList == null or #lists.isEmpty(orderList)}">
+                        <td colspan="10" class="text-center text-muted">目前沒有訂單資料</td>
+                    </tr>
                     </tbody>
                 </table>
-                <!-- ========== 載入分頁 ========== -->
-                <th:block
-                        th:replace="~{fragments/fragments :: paginationFragment(currentPage=${currentPage}, totalPages=${totalPages}, pageURL=${pageURL})}"/>
             </div>
+        </div>
+
+        <!-- 操作結果提示 -->
+        <div th:if="${message}" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+            <i class="bi bi-check-circle"></i>
+            <span th:text="${message}">操作成功</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+            <i class="bi bi-exclamation-triangle"></i>
+            <span th:text="${error}">操作失敗</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
         <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
     </th:block>
 </main>
+
+<!-- 訂單詳情模態視窗 -->
+<div class="modal fade" id="orderDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">訂單詳情</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="orderDetailContent">
+                <!-- 詳情內容將透過AJAX載入 -->
+                <div class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">載入中...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 確認操作模態視窗 -->
+<div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalTitle">確認操作</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="confirmModalBody">
+                您確定要執行此操作嗎？
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="confirmAction">確認</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // 入住按鈕事件
+        document.querySelectorAll('.cancel-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const orderId = this.getAttribute('data-order-id');
+                showConfirmModal('取消訂單', `確定取消訂單 #${orderId} 嗎？`, function () {
+                    submitAction(`/backend/room-reservation/${orderId}/cancel`, orderId);
+                });
+            });
+        });
+
+        // 查看詳情按鈕事件
+        document.querySelectorAll('.view-detail-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const orderId = this.getAttribute('data-order-id');
+                showOrderDetail(orderId);
+            });
+        });
+
+        // 表單驗證
+        document.getElementById('checkinForm').addEventListener('submit', function (e) {
+            const orderId = document.getElementById('checkinOrderId').value;
+            if (!orderId || orderId <= 0) {
+                e.preventDefault();
+                alert('請輸入有效的訂房編號');
+            }
+        });
+
+        document.getElementById('checkoutForm').addEventListener('submit', function (e) {
+            const orderId = document.getElementById('checkoutOrderId').value;
+            if (!orderId || orderId <= 0) {
+                e.preventDefault();
+                alert('請輸入有效的訂房編號');
+            }
+        });
+    });
+
+    function showConfirmModal(title, message, confirmCallback) {
+        document.getElementById('confirmModalTitle').textContent = title;
+        document.getElementById('confirmModalBody').textContent = message;
+
+        const confirmButton = document.getElementById('confirmAction');
+        confirmButton.onclick = function () {
+            confirmCallback();
+            bootstrap.Modal.getInstance(document.getElementById('confirmModal')).hide();
+        };
+
+        new bootstrap.Modal(document.getElementById('confirmModal')).show();
+    }
+
+    function submitAction(action, orderId) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = action;
+
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'roomRVOrderId';
+        input.value = orderId;
+
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    function showOrderDetail(orderId) {
+        const modal = new bootstrap.Modal(document.getElementById('orderDetailModal'));
+        document.getElementById('orderDetailContent').innerHTML = '';
+        fetch(`/backend/order-detail/${orderId}`)
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('orderDetailContent').innerHTML = html;
+            });
+
+        modal.show();
+    }
+
+    // 自動隱藏alert訊息
+    setTimeout(function () {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            if (alert.classList.contains('show')) {
+                bootstrap.Alert.getOrCreateInstance(alert).close();
+            }
+        });
+    }, 5000);
+
+    // 初始化DataTable
+    $(document).ready(function () {
+        const table = $('#roomRVTable').DataTable({
+            dom: "t<'d-flex justify-content-center my-3'p>",
+            pagingType: 'simple_numbers',
+            lengthChange: false,
+            info: false,
+            language: {
+                paginate: {
+                    previous: '上一頁',
+                    next: '下一頁'
+                }
+            },
+            drawCallback: function () {
+                const $pg = $('#roomRVTable_wrapper .pagination');
+                $pg.find('li.disabled a, li.active a').each(function () {
+                    const txt = $(this).text();
+                    $(this).replaceWith(
+                        $('<span/>').addClass('page-link').text(txt)
+                    );
+                });
+            }
+        });
+
+        // 自訂搜尋（訂單編號或會員編號）
+        $('#orderSearchInput').on('keyup', function () {
+            table.columns([0, 1]).search(this.value).draw();
+        });
+
+        // 狀態篩選
+        $('#orderStatusFilter').on('change', function () {
+            const status = this.value;
+            table.column(3).search(status).draw();
+        });
+    });
+</script>
 </body>
 </html>

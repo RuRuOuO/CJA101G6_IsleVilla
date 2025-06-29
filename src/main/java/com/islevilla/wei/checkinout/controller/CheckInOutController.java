@@ -31,13 +31,4 @@ public class CheckInOutController {
         }
         return "back-end/check-in-out/check-in-out-list";
     }
-
-    @GetMapping("/backend/order-detail/{id}")
-    public String getOrderDetail(@PathVariable Integer id, Model model) {
-        List<RoomRVDetail> detailList = roomRVDetailService.getDetailsByRoomRVOrderId(id);
-        RoomRVOrder orderList = roomRVOrderService.getById(id);
-        model.addAttribute("orderList", orderList);
-        model.addAttribute("detailList", detailList);
-        return "fragments/roomRV :: roomRVOrder";
-    }
 }

@@ -4,112 +4,52 @@
     <meta charset="UTF-8"/>
     <meta content="width=device-width, initial-scale=1" name="viewport"/>
     <title>微嶼 | Isle Villa | 佳評如潮</title>
-    <!-- ===== 載入統一樣式 ===== -->
+    <!-- 載入 Bootstrap 樣式 -->
     <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
-    <style>
-        .review-card {
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        }
-
-        .review-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
-        }
-
-        .rating-stars {
-            color: #ffc107;
-        }
-
-        .rating-item {
-            font-size: 0.9rem;
-        }
-
-        .review-text {
-            line-height: 1.6;
-        }
-
-        .suggestion-text {
-            background-color: #f8f9fa;
-            border-left: 4px solid #17a2b8;
-            padding: 0.75rem;
-            margin: 0.5rem 0;
-            border-radius: 0 4px 4px 0;
-        }
-
-        .review-date {
-            color: #6c757d;
-            font-size: 0.875rem;
-        }
-
-        .review-image {
-            max-height: 300px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-
-        .page-title {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .rating-badge {
-            background: linear-gradient(45deg, #ff6b6b, #ffa500);
-            color: white;
-            border: none;
-        }
-
-        .category-ratings {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 1rem;
-        }
-    </style>
 </head>
 <body>
-<!-- ===== 載入Header ===== -->
+<!-- Header 區塊 -->
 <div th:replace="~{fragments/fragments :: header}"></div>
 
 <div class="container my-5">
     <!-- 頁面標題 -->
-    <div class="text-center mb-5">
-        <h1 class="display-6 fw-bold page-title mb-3">顧客評價</h1>
-        <p class="lead text-muted">來自入住旅客的真實分享</p>
+    <div class="text-center mb-4">
+        <h1 class="mb-4">顧客評價</h1>
+        <p><i class="fa-solid fa-thumbs-up me-2"></i>來自入住旅客的真實分享</p>
     </div>
 
     <!-- 評價列表 -->
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div id="reviewsList">
-                <!-- 評價將在這裡動態載入 -->
-            </div>
-
-            <!-- 載入狀態 -->
-            <div class="text-center py-5" id="loading">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">載入中...</span>
+    <section class="py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div id="reviewsList">
+                    <!-- 動態載入的評價卡片 -->
                 </div>
-                <p class="mt-2 text-muted">載入評價中...</p>
-            </div>
 
-            <!-- 無評價提示 -->
-            <div class="text-center py-5" id="noReviews" style="display: none;">
-                <div class="text-muted">
-                    <i class="bi bi-chat-left-text display-1 mb-3 text-secondary"></i>
-                    <h4>暫無評價</h4>
-                    <p>目前還沒有公開的顧客評價，請稍後再來查看</p>
+                <!-- 載入狀態 -->
+                <div class="text-center py-5" id="loading">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">載入中...</span>
+                    </div>
+                    <p class="mt-2 text-muted">載入評價中...</p>
+                </div>
+
+                <!-- 無評價提示 -->
+                <div class="text-center py-5 d-none" id="noReviews">
+                    <div class="text-muted">
+                        <i class="bi bi-chat-left-text display-1 mb-3 text-secondary"></i>
+                        <h4>暫無評價</h4>
+                        <p>目前還沒有公開的顧客評價，請稍後再來查看</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 </div>
 
-<!-- ========== 載入Footer ========== -->
+<!-- Footer 區塊 -->
 <div th:replace="~{fragments/fragments :: footer}"></div>
 
 <script>
-    // 評分項目對應表
     const ratingCategories = {
         fbShuttleRating: {name: '接駁服務', icon: 'bi-bus-front'},
         fbReceptionRating: {name: '櫃台服務', icon: 'bi-person-check'},
@@ -120,12 +60,11 @@
         fbWebsiteRating: {name: '網站使用', icon: 'bi-globe'}
     };
 
-    // 生成星星評分HTML
     function generateStars(rating) {
         let stars = '';
         for (let i = 1; i <= 5; i++) {
             if (i <= rating) {
-                stars += '<i class="bi bi-star-fill rating-stars"></i>';
+                stars += '<i class="bi bi-star-fill text-warning"></i>';
             } else {
                 stars += '<i class="bi bi-star text-muted"></i>';
             }
@@ -133,29 +72,28 @@
         return stars;
     }
 
-    // 生成分類評分HTML
     function generateCategoryRatings(review) {
         let ratingsHtml = '';
         for (const [key, category] of Object.entries(ratingCategories)) {
             const rating = review[key];
             if (rating) {
                 ratingsHtml += `
-                        <div class="col-6 col-md-4 mb-2">
-                            <div class="d-flex align-items-center rating-item">
-                                <i class="${category.icon} me-2 text-primary"></i>
-                                <span class="me-2 text-muted">${category.name}</span>
-                                <div class="ms-auto">
-                                    ${generateStars(rating)}
-                                </div>
+                    <div class="col-6 col-md-4 mb-2">
+                        <div class="d-flex align-items-center">
+                            <i class="${category.icon} me-2 text-primary"></i>
+                            <span class="me-2 text-muted">${category.name}</span>
+                            <div class="ms-auto">
+                                ${generateStars(rating)}
                             </div>
                         </div>
-                    `;
+                    </div>
+                    </section>
+                `;
             }
         }
         return ratingsHtml;
     }
 
-    // 創建評價卡片
     function createReviewCard(review) {
         const reviewDate = new Date(review.fbCreatedAt).toLocaleDateString('zh-TW', {
             year: 'numeric',
@@ -168,78 +106,61 @@
         const hasCompliment = review.fbCompliment && review.fbCompliment.trim() !== '';
 
         return `
-                <div class="card review-card shadow-sm border-0 mb-4">
-                    <div class="card-body p-4">
-                        <!-- 評價標題區 -->
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div class="d-flex align-items-center">
-                                <span class="badge rating-badge fs-6 me-3">
-                                    ${generateStars(review.fbOverallRating)} ${review.fbOverallRating}
-                                </span>
-                                ${review.fbRecommend === 1 ? '<span class="badge bg-success">推薦</span>' : ''}
-                                ${review.fbRevisit === 1 ? '<span class="badge bg-info ms-1">會再訪</span>' : ''}
-                            </div>
-                            <small class="review-date">
-                                <i class="bi bi-calendar3 me-1"></i>${reviewDate}
-                            </small>
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="d-flex align-items-center">
+                            <span class="badge text-dark fs-6 me-3">
+                                ${generateStars(review.fbOverallRating)} ${review.fbOverallRating}
+                            </span>
+                            ${review.fbRecommend === 1 ? '<span class="badge bg-success">推薦</span>' : ''}
+                            ${review.fbRevisit === 1 ? '<span class="badge bg-info ms-1">會再訪</span>' : ''}
                         </div>
+                        <small class="text-muted">
+                            <i class="bi bi-calendar3 me-1"></i>${reviewDate}
+                        </small>
+                    </div>
 
-                        <!-- 好評內容 -->
-                        ${hasCompliment ? `
+                    ${hasCompliment ? `
                         <div class="mb-3">
-                            <h6 class="text-success mb-2">
-                                <i class="bi bi-heart-fill me-1"></i>好評分享
-                            </h6>
-                            <p class="review-text text-dark mb-0">${review.fbCompliment}</p>
-                        </div>
-                        ` : ''}
+                            <h6 class="text-success mb-2"><i class="bi bi-heart-fill me-1"></i>好評分享</h6>
+                            <p class="mb-0 lh-base text-dark">${review.fbCompliment}</p>
+                        </div>` : ''}
 
-                        <!-- 建議內容 -->
-                        ${hasSuggestion ? `
+                    ${hasSuggestion ? `
                         <div class="mb-3">
-                            <h6 class="text-info mb-2">
-                                <i class="bi bi-lightbulb me-1"></i>改進建議
-                            </h6>
-                            <div class="suggestion-text">
+                            <h6 class="text-info mb-2"><i class="bi bi-lightbulb me-1"></i>改進建議</h6>
+                            <div class="bg-light border-start border-info border-4 rounded ps-3 py-2">
                                 <p class="mb-0 text-dark">${review.fbSuggestion}</p>
                             </div>
-                        </div>
-                        ` : ''}
+                        </div>` : ''}
 
-                        <!-- 顧客分享圖片 -->
-                        ${hasImage ? `
+                    ${hasImage ? `
                         <div class="mb-3">
-                            <h6 class="text-primary mb-2">
-                                <i class="bi bi-camera me-1"></i>顧客分享
-                            </h6>
+                            <h6 class="text-primary mb-2"><i class="bi bi-camera me-1"></i>顧客分享</h6>
                             <img src="data:image/jpeg;base64,${review.fbImageBase64}"
                                  alt="顧客分享圖片"
-                                 class="img-fluid review-image w-100">
-                        </div>
-                        ` : ''}
+                                 class="img-fluid rounded w-100"
+                                 style="object-fit: cover; max-height: 300px;">
+                        </div>` : ''}
 
-                        <!-- 各項評分 -->
-                        <div class="category-ratings mt-4">
-                            <h6 class="text-muted mb-3">
-                                <i class="bi bi-bar-chart me-1"></i>各項評分
-                            </h6>
-                            <div class="row">
-                                ${generateCategoryRatings(review)}
-                            </div>
-                        </div>
-
-                        <!-- 訂單資訊 -->
-                        <div class="mt-3 pt-3 border-top">
-                            <small class="text-muted">
-                                <i class="bi bi-receipt me-1"></i>訂單編號：${review.roomReservationId}
-                            </small>
+                    <div class="bg-light rounded p-3 mt-4">
+                        <h6 class="text-muted mb-3"><i class="bi bi-bar-chart me-1"></i>各項評分</h6>
+                        <div class="row">
+                            ${generateCategoryRatings(review)}
                         </div>
                     </div>
+
+                    <div class="mt-3 pt-3 border-top">
+                        <small class="text-muted">
+                            <i class="bi bi-receipt me-1"></i>訂單編號：${review.roomReservationId}
+                        </small>
+                    </div>
                 </div>
-            `;
+            </div>
+        `;
     }
 
-    // 載入評價資料
     function loadReviews() {
         fetch('/api/feedbacks/public')
             .then(response => {
@@ -253,16 +174,13 @@
                 const loading = document.getElementById('loading');
                 const noReviews = document.getElementById('noReviews');
 
-                loading.style.display = 'none';
+                loading.classList.add("d-none");
 
                 if (data && data.length > 0) {
-                    // 確保資料按日期排序（由新到舊）
                     data.sort((a, b) => new Date(b.fbCreatedAt) - new Date(a.fbCreatedAt));
-
-                    const reviewsHtml = data.map(review => createReviewCard(review)).join('');
-                    reviewsList.innerHTML = reviewsHtml;
+                    reviewsList.innerHTML = data.map(createReviewCard).join('');
                 } else {
-                    noReviews.style.display = 'block';
+                    noReviews.classList.remove("d-none");
                 }
             })
             .catch(error => {
@@ -270,16 +188,14 @@
                 const loading = document.getElementById('loading');
                 const noReviews = document.getElementById('noReviews');
 
-                loading.style.display = 'none';
-                noReviews.style.display = 'block';
+                loading.classList.add("d-none");
+                noReviews.classList.remove("d-none");
 
-                // 更新錯誤訊息
                 document.querySelector('#noReviews h4').textContent = '載入失敗';
                 document.querySelector('#noReviews p').textContent = '無法載入評價資料，請稍後再試';
             });
     }
 
-    // 頁面載入完成後執行
     document.addEventListener('DOMContentLoaded', function () {
         loadReviews();
     });

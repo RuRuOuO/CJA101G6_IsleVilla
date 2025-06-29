@@ -51,6 +51,10 @@ public class RoomRVController {
         if (!orderList.isEmpty()) {
             model.addAttribute("orderList", orderList);
         }
+        List<RoomRVDetail> detailList = roomRVDetailService.getDetailsByRoomRVOrderId(orderList.get(0).getRoomReservationId());
+        if (!orderList.isEmpty()) {
+            model.addAttribute("detailList", detailList);
+        }
         return "front-end/member/member-room-list";
     }
 
@@ -60,10 +64,6 @@ public class RoomRVController {
         // 查詢訂單
         List<RoomRVOrder> orderList = List.of(roomRVOrderService.getById(id));
         model.addAttribute("orderList", orderList);
-        // 查詢訂單明細
-        List<RoomRVDetail> detailList = roomRVDetailService.getDetailsByRoomRVOrderId(orderList.get(0).getRoomReservationId());
-        model.addAttribute("detailList", detailList);
-
         return "front-end/member/member-room-detail";
     }
 
@@ -75,41 +75,44 @@ public class RoomRVController {
     }
 
     // 後台取消訂單
-    @PostMapping("/backend/room/reservation/order/{id}/cancel")
+    @PostMapping("/backend/room-reservation/{id}/cancel")
     public String cancelOrderBack(@PathVariable Integer id) {
         roomRVOrderService.cancelOrderBack(id);
-        return "redirect:/backend/room/reservation/order/list";
+        return "redirect:/backend/room-reservation/list";
     }
 
-    // 後台顯示全部訂單
-    @GetMapping("/backend/room-reservation/list")
-    public String roomRVOrderList(
-            // @RequestParam 從網址參數中取值，defaultValue設定預設值
-            @RequestParam(defaultValue = "0") int page, // 頁碼從0開始
-            @RequestParam(defaultValue = "10") int size, // 每頁10筆訂單
-            Model model,
-            HttpServletRequest request) {
-        // 建立分頁物件、設定頁碼、每頁筆數、排序方式
-        Pageable pageable = PageRequest.of(page, size, Sort.by("roomOrderDate").descending());
-        Page<RoomRVOrder> roomRVOrderPage = roomRVOrderService.getAll(pageable);
-        // 透過 request 取得目前 URL
-        String requestUrl = request.getRequestURI();
-        PageUtil.ModelWithPage(roomRVOrderPage, model, page, "orderList", request);
+//    // 後台顯示全部訂單 // pagable
+//    @GetMapping("/backend/room-reservation/list")
+//    public String roomRVOrderList(
+//            // @RequestParam 從網址參數中取值，defaultValue設定預設值
+//            @RequestParam(defaultValue = "0") int page, // 頁碼從0開始
+//            @RequestParam(defaultValue = "10") int size, // 每頁10筆訂單
+//            Model model,
+//            HttpServletRequest request) {
+//        // 建立分頁物件、設定頁碼、每頁筆數、排序方式
+//        Pageable pageable = PageRequest.of(page, size, Sort.by("roomOrderDate").descending());
+//        Page<RoomRVOrder> roomRVOrderPage = roomRVOrderService.getAll(pageable);
+//        // 透過 request 取得目前 URL
+//        String requestUrl = request.getRequestURI();
+//        PageUtil.ModelWithPage(roomRVOrderPage, model, page, "orderList", request);
+//
+//        return "back-end/roomRVOrder/listAllRoomRVOrder";
+//    }
 
+    // 後台顯示全部訂單 // 使用前端分頁
+    @GetMapping("/backend/room-reservation/list")
+    public String roomRVOrderList(Model model) {
+        List<RoomRVOrder> orderList = roomRVOrderService.findAll();
+        model.addAttribute("orderList", orderList);
         return "back-end/roomRVOrder/listAllRoomRVOrder";
     }
 
-    // 後台顯示訂單明細
-    @GetMapping("/backend/room/reservation/order/{id}")
-    public String getOneRoomRVOrder(@PathVariable("id") Integer id, Model model) {
-        // 訂單
+    @GetMapping("/backend/order-detail/{id}")
+    public String getOrderDetail(@PathVariable Integer id, Model model) {
+        List<RoomRVDetail> detailList = roomRVDetailService.getDetailsByRoomRVOrderId(id);
         RoomRVOrder orderList = roomRVOrderService.getById(id);
         model.addAttribute("orderList", orderList);
-        // 訂單明細
-        List<RoomRVDetail> detailList = roomRVDetailService.getDetailsByRoomRVOrderId(id);
         model.addAttribute("detailList", detailList);
-
-        return "back-end/roomRVOrder/listOneRoomRVOrder";
+        return "fragments/roomRV :: roomRVOrder";
     }
-
 }

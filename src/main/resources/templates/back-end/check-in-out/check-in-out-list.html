@@ -64,40 +64,40 @@
             </div>
         </div>
 
-        <!-- 訂單查詢功能 -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <i class="bi bi-search"></i> 訂單查詢
-            </div>
-            <div class="card-body">
-                <form th:action="@{/admin/search-order}" method="get" class="row g-3">
-                    <div class="col-md-4">
-                        <label for="searchOrderId" class="form-label">訂房編號</label>
-                        <input type="number" class="form-control" id="searchOrderId" name="orderId"
-                               th:value="${searchOrderId}" placeholder="輸入訂房編號">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="searchStatus" class="form-label">訂單狀態</label>
-                        <select class="form-select" id="searchStatus" name="status" th:value="${searchStatus}">
-                            <option value="">全部狀態</option>
-                            <option value="0" th:selected="${searchStatus == '0'}">成立</option>
-                            <option value="1" th:selected="${searchStatus == '1'}">已入住</option>
-                            <option value="2" th:selected="${searchStatus == '2'}">已退房</option>
-                            <option value="3" th:selected="${searchStatus == '3'}">申請取消</option>
-                            <option value="4" th:selected="${searchStatus == '4'}">確認取消</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary me-2">
-                            <i class="bi bi-search"></i> 查詢
-                        </button>
-                        <a href="/admin/checkin-checkout" class="btn btn-outline-secondary">
-                            <i class="bi bi-arrow-clockwise"></i> 重置
-                        </a>
-                    </div>
-                </form>
-            </div>
-        </div>
+<!--        &lt;!&ndash; 訂單查詢功能 &ndash;&gt;-->
+<!--        <div class="card mb-4">-->
+<!--            <div class="card-header">-->
+<!--                <i class="bi bi-search"></i> 訂單查詢-->
+<!--            </div>-->
+<!--            <div class="card-body">-->
+<!--                <form th:action="@{/admin/search-order}" method="get" class="row g-3">-->
+<!--                    <div class="col-md-4">-->
+<!--                        <label for="searchOrderId" class="form-label">訂房編號</label>-->
+<!--                        <input type="number" class="form-control" id="searchOrderId" name="orderId"-->
+<!--                               th:value="${searchOrderId}" placeholder="輸入訂房編號">-->
+<!--                    </div>-->
+<!--                    <div class="col-md-4">-->
+<!--                        <label for="searchStatus" class="form-label">訂單狀態</label>-->
+<!--                        <select class="form-select" id="searchStatus" name="status" th:value="${searchStatus}">-->
+<!--                            <option value="">全部狀態</option>-->
+<!--                            <option value="0" th:selected="${searchStatus == '0'}">成立</option>-->
+<!--                            <option value="1" th:selected="${searchStatus == '1'}">已入住</option>-->
+<!--                            <option value="2" th:selected="${searchStatus == '2'}">已退房</option>-->
+<!--                            <option value="3" th:selected="${searchStatus == '3'}">申請取消</option>-->
+<!--                            <option value="4" th:selected="${searchStatus == '4'}">確認取消</option>-->
+<!--                        </select>-->
+<!--                    </div>-->
+<!--                    <div class="col-md-4 d-flex align-items-end">-->
+<!--                        <button type="submit" class="btn btn-primary me-2">-->
+<!--                            <i class="bi bi-search"></i> 查詢-->
+<!--                        </button>-->
+<!--                        <a href="/admin/checkin-checkout" class="btn btn-outline-secondary">-->
+<!--                            <i class="bi bi-arrow-clockwise"></i> 重置-->
+<!--                        </a>-->
+<!--                    </div>-->
+<!--                </form>-->
+<!--            </div>-->
+<!--        </div>-->
 
         <!-- 訂單列表 -->
         <div class="card">
@@ -200,8 +200,6 @@
         <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
     </th:block>
 </main>
-</div>
-</div>
 
 <!-- 訂單詳情模態視窗 -->
 <div class="modal fade" id="orderDetailModal" tabindex="-1">
