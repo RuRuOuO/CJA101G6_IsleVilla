@@ -20,7 +20,7 @@ public interface RoomRVOrderRepository extends JpaRepository<RoomRVOrder, Intege
 
     // 接駁預約：驗證會員和訂房資料(去程)
     @Query("SELECT rro FROM RoomRVOrder rro WHERE rro.roomReservationId = :roomReservationId " +
-            "AND rro.members.memberId = :memberId AND rro.roomOrderStatus = 2 " +
+            "AND rro.members.memberId = :memberId AND rro.roomOrderStatus = 0 " +
             "AND :shuttleDate = DATE(rro.checkInDate)")
     Optional<RoomRVOrder> validateMemberAndRoomReservationOutward(
             @Param("memberId") Integer memberId,
@@ -29,7 +29,7 @@ public interface RoomRVOrderRepository extends JpaRepository<RoomRVOrder, Intege
 
     // 接駁預約：驗證會員和訂房資料(回程)
     @Query("SELECT rro FROM RoomRVOrder rro WHERE rro.roomReservationId = :roomReservationId " +
-            "AND rro.members.memberId = :memberId AND rro.roomOrderStatus = 2 " +
+            "AND rro.members.memberId = :memberId AND rro.roomOrderStatus = 0 " +
             "AND :shuttleDate = DATE(rro.checkOutDate)")
     Optional<RoomRVOrder> validateMemberAndRoomReservationReturn(
             @Param("memberId") Integer memberId,
