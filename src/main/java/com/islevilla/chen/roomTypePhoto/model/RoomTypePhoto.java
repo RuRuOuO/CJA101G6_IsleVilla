@@ -34,7 +34,6 @@ public class RoomTypePhoto implements java.io.Serializable {
 	@ManyToOne
 	@JoinColumn(name = "room_type_id", referencedColumnName = "room_type_id", nullable = false)
 	@NotNull(message = "房型編號: 請勿空白")
-	@Min(value=1, message="房型編號:格式錯誤，請輸入數字")
 	private RoomType roomType; 
 	
 	@Lob

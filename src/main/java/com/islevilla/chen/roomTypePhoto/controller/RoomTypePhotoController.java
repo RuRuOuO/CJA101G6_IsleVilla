@@ -126,9 +126,10 @@ public String showAddRoomTypePhoto(Model model) {
 				photoBytes[i] = bytes[i];
 			}
 			
+	        // 新增照片時，displayOrder預設為null，讓Service自動設為最後一個
 	        roomTypePhotoService.addRoomTypePhoto(roomTypePhoto.getRoomType().getRoomTypeId(), 
 	        										photoBytes, 
-										        	roomTypePhoto.getDisplayOrder());
+										        	null);
 
 			System.out.println("房型照片新增成功");
 			model.addAttribute("successMessage", "房型照片新增成功！");
@@ -159,9 +160,10 @@ public String showUpdateRoomTypePhoto(@PathVariable Integer roomTypePhotoId, Mod
 	model.addAttribute("roomTypeList", roomTypeList); 
     return "/back-end/roomTypePhoto/updateRoomTypePhoto";
 }
+
 	@PostMapping("/updateRoomTypePhoto")
 	public String updateRoomTypePhoto(@ModelAttribute("roomTypePhoto") RoomTypePhoto roomTypePhoto,
-									@RequestParam(value = "roomTypePhoto", required = false) MultipartFile file,
+									@RequestParam(value = "photoFile", required = false) MultipartFile file,
 									Model model) {
 	    // 房型下拉選單選項
 	    List<RoomType> roomTypeList = roomTypeName.getRoomTypeNameList();

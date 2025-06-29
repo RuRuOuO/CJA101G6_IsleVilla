@@ -66,9 +66,6 @@
 							th:src="@{'/backend/roomTypePhoto/image/' + ${roomTypePhoto.roomTypePhotoId}}"
 							alt="目前照片" class="card-img-top"
 							style="height: 150px; object-fit: cover;">
-						<div class="card-body p-2">
-							<small class="text-muted">目前照片</small>
-						</div>
 					</div>
 				</div>
 
@@ -89,7 +86,7 @@
 					<label for="roomTypePhoto" class="form-label"> <i
 						class="bi bi-camera me-1"></i>更新照片
 					</label> <input type="file" class="form-control form-control-lg"
-						id="roomTypePhoto" name="roomTypePhoto"
+						id="roomTypePhoto" name="photoFile"
 						accept=".jpg,.jpeg,.png,.gif"
 						onchange="previewImage(this); validatePhoto(this);">
 					<div class="form-text">留空則保持原有照片，支援格式：JPG、PNG、GIF，檔案大小請勿超過
@@ -102,9 +99,6 @@
 						<div class="card" style="width: 200px;">
 							<img id="previewImg" alt="新照片預覽" class="card-img-top"
 								style="height: 150px; object-fit: cover;">
-							<div class="card-body p-2">
-								<small class="text-muted">新照片預覽</small>
-							</div>
 						</div>
 					</div>
 				</div>

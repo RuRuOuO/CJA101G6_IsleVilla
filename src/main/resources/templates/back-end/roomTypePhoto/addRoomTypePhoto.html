@@ -76,12 +76,12 @@
 				</div>
 
 				<div class="mb-4">
-					<label for="displayOrder" class="form-label"> <i
-						class="bi bi-list-ol me-1"></i>顯示順序
-					</label> <input type="number" class="form-control form-control-lg"
-						id="displayOrder" th:field="*{displayOrder}"
-						placeholder="請輸入顯示順序（留空將自動排序）" min="1">
-					<div class="form-text">數字越小排序越前面，留空將自動設為最後一個</div>
+					<div class="alert alert-info d-flex align-items-center" role="alert">
+						<i class="bi bi-info-circle me-2"></i>
+						<div>
+							<strong>顯示順序說明：</strong>新增的照片將自動排在最後一個位置。如需調整順序，請到照片列表頁面進行排序。
+						</div>
+					</div>
 				</div>
 
 				<div class="d-grid gap-2 d-md-flex justify-content-md-end">
