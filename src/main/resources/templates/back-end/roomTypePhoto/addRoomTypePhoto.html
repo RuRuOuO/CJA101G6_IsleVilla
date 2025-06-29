@@ -1,25 +1,106 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>微嶼 | Isle Villa 後台首頁</title>
-    <!-- ===== 載入統一樣式 ===== -->
-    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>微嶼 | Isle Villa 後台首頁</title>
+<!-- ===== 載入統一樣式 ===== -->
+<th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+<link href="/css/roomTypePhoto.css" rel="stylesheet">
 </head>
 <body>
-<!-- ===== 載入sidebar ===== -->
-<!-- 插入手機版側邊欄 -->
-<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
-<!-- 插入桌面版側邊欄 -->
-<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+	<!-- ===== 載入sidebar ===== -->
+	<!-- 插入手機版側邊欄 -->
+	<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+	<!-- 插入桌面版側邊欄 -->
+	<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+	<main
+		th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+		<th:block th:fragment="myContent">
+			
+			<div class="text-center py-4 ">
+				<h1 class="h3 mb-0">
+					<i class="bi bi-image-alt me-2"></i>新增房型照片
+				</h1>
+			</div>
 
-<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
-    <th:block th:fragment="myContent">
-        <!-- //////////////////// 頁面內容放在這個card裡面(外框已經有加card和container，直接放入table和標題即可)//////////////////// -->
-        
-        <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
-    </th:block>
-</main>
+			<div class="alert alert-info d-flex align-items-center mb-4"
+				role="alert">
+				<i class="bi bi-info-circle me-2"></i>
+				<div>
+					<strong>提示：</strong>請選擇房型並上傳照片，照片格式支援 JPG、PNG、GIF。
+				</div>
+			</div>
+			<div th:if="${successMessage}" class="alert alert-success"
+				id="successMessage" role="alert">
+				<span th:text="${successMessage}"></span>
+			</div>
+			<div th:if="${errorMessage}" class="alert alert-error"
+				id="errorMessage" role="alert">
+				<ul class="mb-0">
+					<li th:each="msg : ${errorMessage}" th:text="${msg}"></li>
+				</ul>
+			</div>
+
+			<form id="roomTypePhotoForm" th:action="@{/backend/roomTypePhoto/addRoomTypePhoto}" th:object="${roomTypePhoto}" method="post" enctype="multipart/form-data" novalidate>
+				<div class="mb-3">
+					<label for="roomTypeId" class="form-label"> <i
+						class="bi bi-house me-1"></i>房型 *
+					</label> <select th:field="*{roomType.roomTypeId}" id="roomTypeId"
+						class="form-select form-select-lg" required>
+						<option value="">請選擇房型</option>
+						<option th:each="roomType : ${roomTypeList}"
+							th:value="${roomType.roomTypeId}"
+							th:text="${roomType.roomTypeName}"></option>
+					</select>
+					<div class="invalid-feedback">請選擇房型</div>
+				</div>
+
+				<div class="mb-3">
+					<label for="roomTypePhoto" class="form-label">
+                           <i class="bi bi-camera me-1"></i>房型照片 *
+                       </label>
+                       <input 
+                           type="file" 
+                           class="form-control form-control-lg" 
+                           id="roomTypePhoto" 
+                           name="roomTypePhoto" 
+                           accept=".jpg,.jpeg,.png,.gif" 
+                           required
+                           onchange="validatePhoto(this)"
+                       >
+                       <div class="form-text">支援格式：JPG、PNG、GIF，檔案大小請勿超過 5MB</div>
+                       <div class="invalid-feedback">
+                           請選擇要上傳的照片
+                       </div>
+				</div>
+
+				<div class="mb-4">
+					<label for="displayOrder" class="form-label"> <i
+						class="bi bi-list-ol me-1"></i>顯示順序
+					</label> <input type="number" class="form-control form-control-lg"
+						id="displayOrder" th:field="*{displayOrder}"
+						placeholder="請輸入顯示順序（留空將自動排序）" min="1">
+					<div class="form-text">數字越小排序越前面，留空將自動設為最後一個</div>
+				</div>
+
+				<div class="d-grid gap-2 d-md-flex justify-content-md-end">
+					<a th:href="@{/backend/roomTypePhoto/listAllRoomTypePhoto}"
+						class="btn btn-secondary btn-sm"> <i
+						class="bi bi-arrow-left me-1"></i>返回列表
+					</a>
+					<button type="button" class="btn btn-outline-secondary btn-lg px-4"
+						onclick="resetForm()">
+						<i class="bi bi-arrow-clockwise me-1"></i>重置
+					</button>
+					<button type="submit" class="btn btn-primary btn-lg px-4">
+						<i class="bi bi-plus-circle me-1"></i>新增照片
+					</button>
+				</div>
+			</form>
+		</th:block>
+	</main>
+    <!-- JS -->
+    <script src="/js/roomTypePhoto.js"></script>
 </body>
 </html>

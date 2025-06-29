@@ -2,8 +2,8 @@
 document.addEventListener('DOMContentLoaded', function() {
 	const form = document.getElementById('roomTypePhotoForm');
 	const roomTypePhotoIdInput = document.getElementById('roomTypePhotoId');
-	const roomTypeSelect = document.getElementById('roomType');
-//	const roomStatusSelect = document.getElementById('roomStatus');
+	const roomTypeSelect = document.getElementById('roomTypeId');
+
 
 	// 表單提交處理
 	if(form){
@@ -17,8 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				const formData = new FormData(form);
 				const roomData = {
 					roomTypePhotoId: parseInt(formData.get('roomTypePhotoId')),
-					roomType: parseInt(formData.get('roomType')),
-//					roomStatus: parseInt(formData.get('roomStatus'))
+					roomTypeId: parseInt(formData.get('roomTypeId')),
 				};
 	
 				// 自定義驗證
@@ -32,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 		
 		
-		// 即時驗證 - 房行照片ID
+		// 即時驗證 - 房型照片ID
 		if(roomTypePhotoIdInput) {
 			roomTypePhotoIdInput.addEventListener('input', function() {
 				validateNumberInput(this);
@@ -46,12 +45,6 @@ document.addEventListener('DOMContentLoaded', function() {
 			});
 		}
 
-		// 即時驗證 - 房間狀態
-//		if(roomStatusSelect) {
-//			roomStatusSelect.addEventListener('change', function() {
-//				validateSelectInput(this);
-//			});
-//		}
 	}	
 		// 數字輸入驗證
 		function validateNumberInput(input) {
@@ -84,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		// 自定義資料驗證 加判斷驗證模式條件
 		function validateRoomData(roomData) {
 			const validateMode = form.getAttribute('data-validate-mode'); // 'loose' 或 'strict'
-			const { roomTypePhotoId, roomType } = roomData; //, roomStatus
+			const { roomTypePhotoId, roomTypeId } = roomData; //, roomStatus
 
 			// 驗證條件不同的情況下：
 			if (validateMode === 'strict') {
@@ -92,22 +85,17 @@ document.addEventListener('DOMContentLoaded', function() {
 			        showErrorAlert('房型圖片ID必須是大於0的整數！');
 			        return false;
 			    }
-			    if (isNaN(roomType) || roomType < 0) {
+			    if (isNaN(roomTypeId) || roomTypeId < 0) {
 			        showErrorAlert('請選擇房型！');
 			        return false;
 			    }
-//			    if (isNaN(roomStatus) || roomStatus < 0) {
-//			        showErrorAlert('請選擇房間狀態！');
-//			        return false;
-//			    }
 			    return true;
 			} else {
 			    // loose 模式：只需填一個條件
-			    const hasRoomTypePhotoId = roomTypePhotoId && !isNaN(roomId) && roomTypePhotoId > 0;
-			    const hasRoomType = !isNaN(roomType) && roomType > 0;
-//			    const hasRoomStatus = !isNaN(roomStatus) && roomStatus >= 0;
-			    
-			    if (!hasRoomTypePhotoId && !hasRoomType) {
+			    const hasRoomTypePhotoId = roomTypePhotoId && !isNaN(roomTypePhotoId) && roomTypePhotoId > 0;
+			    const hasRoomTypeId = !isNaN(roomTypeId) && roomTypeId > 0;
+				
+			    if (!hasRoomTypePhotoId && !hasRoomTypeId) {
 			        showErrorAlert('請至少輸入一個查詢條件');
 			        return false;
 			    }
@@ -142,32 +130,81 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 });
 
+// 照片預覽功能
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('newImagePreview');
+            const previewImg = document.getElementById('previewImg');
+            if (preview && previewImg) {
+                previewImg.src = e.target.result;
+                preview.style.display = 'block';
+            }
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
 
-// 返回頁面函數（全域函數，供HTML onclick使用）
-function goSelect() {
-    window.location.href = '/back-end/roomTypePhoto/selectRoomTypePhoto'
+// 原有的照片預覽功能（用於模態框）
+function previewImageModal(photoId) {
+    var img = document.querySelector('img[data-photo-id="' + photoId + '"]');
+    if (img) {
+        var modal = new bootstrap.Modal(document.getElementById('imageModal'));
+        document.getElementById('modalImage').src = img.src;
+        modal.show();
+    }
 }
-function goAdd() {
-    window.location.href = '/back-end/roomTypePhoto/addRoomTypePhoto'
-}
-function goUpdate() {
-    window.location.href = '/back-end/roomTypePhoto/updateRoomTypePhoto'
-}
-function goSearch() {
-    window.location.href = '/back-end/roomTypePhoto/searchRoomTypePhoto'
-}
-function goListAll() {
-    window.location.href = '/back-end/roomTypePhoto/listAllRoomTypePhoto'
-}
+
+function validatePhoto(input) {
+            const file = input.files[0];
+            const errorDiv = input.parentElement.querySelector('.invalid-feedback'); // 找到 invalid-feedback div
+            
+            if (file) {
+                // 檢查檔案類型
+                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                if (!allowedTypes.includes(file.type)) {
+                    input.setCustomValidity('只支援 JPG、PNG、GIF 格式的圖片');
+                    input.classList.add('is-invalid');
+                    input.classList.remove('is-valid');
+                    if (errorDiv) errorDiv.textContent = '只支援 JPG、PNG、GIF 格式的圖片';
+                    return false;
+                }
+                
+                // 檢查檔案大小 (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    const fileSize = (file.size / (1024 * 1024)).toFixed(1);
+                    input.setCustomValidity(`圖片檔案大小不能超過 5MB，目前檔案大小：${fileSize}MB`);
+                    input.classList.add('is-invalid');
+                    input.classList.remove('is-valid');
+                    if (errorDiv) errorDiv.textContent = `圖片檔案大小不能超過 5MB，目前檔案大小：${fileSize}MB`;
+                    return false;
+                }
+                
+                // 檔案驗證通過
+                input.setCustomValidity('');
+                input.classList.remove('is-invalid');
+                input.classList.add('is-valid');
+                return true;
+            } else {
+                // 沒有選擇檔案
+                input.setCustomValidity('請選擇要上傳的照片');
+                input.classList.remove('is-valid', 'is-invalid');
+                errorDiv.textContent = '請選擇要上傳的照片';
+            }
+        }
+
 // 重置表單函數（全域函數，供HTML onclick使用）
 function resetForm() {
-	const form = document.getElementById('roomForm');
+	const form = document.getElementById('roomTypePhotoForm');
 	console.log("重置表單");
 
 	// 直接清空欄位值
-	document.getElementById('roomTypePhotoId').value = '';
-	document.getElementById('roomType').value = '';
-//	document.getElementById('roomStatus').value = '';
+	const roomTypePhotoIdInput = document.getElementById('roomTypePhotoId');
+	const roomTypeInput = document.getElementById('roomTypeId');
+	
+	if (roomTypePhotoIdInput) roomTypePhotoIdInput.value = '';
+	if (roomTypeInput) roomTypeInput.value = '';
 
 	// 移除Bootstrap驗證類別
 	form.classList.remove('was-validated');
@@ -197,5 +234,5 @@ function resetForm() {
 	}
 
 	// 聚焦到第一個輸入框
-	document.getElementById('roomTypePhotoId').focus();
+	if (roomTypePhotoIdInput) roomTypePhotoIdInput.focus();
 }

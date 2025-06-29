@@ -20,7 +20,7 @@
 		<th:block th:fragment="myContent">
 			<div class=" text-center py-4 ">
 				<h1 class="h3 mb-0">
-					<i class="bi bi-house-add me-2"></i>圖片查詢結果
+					<i class="bi bi-house-add me-2"></i>查詢房型圖片結果
 				</h1>
 			</div>
 			<div class="table-responsive">
@@ -36,36 +36,33 @@
 					</thead>
 					<tbody>
 						<tr th:each="rtp : ${searchResult}">
-							<td th:text="${rtp.roomTpyePhotoId}">房型圖片ID</td>
+							<td th:text="${rtp.roomTypePhotoId}">房型圖片ID</td>
 							<td th:text="${rtp.roomType.roomTypeName}">房型</td>
-							<td th:text="${rtp.roomTpyePhoto}">圖片</td>
-							<td>
-								<a th:href="@{/backend/roomTypePhoto/updateRoomTypePhoto/{roomTpyePhotoId}(roomTpyePhotoId=${rtp.roomTpyePhotoId})}"
-									class="btn btn-primary btn-sm"> 
-									<i class="bi bi-pencil"></i>修改
-								</a>
-							</td>
-							<td>
-								<a th:href="@{/backend/roomTypePhoto/deleteRoomTypePhoto/{roomTpyePhotoId}(roomTpyePhotoId=${rtp.roomTpyePhotoId})}"
-									class="btn btn-primary btn-sm"> 
-									<i class="bi bi-pencil"></i> 刪除
-								</a>
-							</td>
+							<td th:text="${rtp.roomTypePhoto}">圖片</td>
+							<td><a
+								th:href="@{/backend/roomTypePhoto/updateRoomTypePhoto/{roomTypePhotoId}(roomTypePhotoId=${rtp.roomTypePhotoId})}"
+								class="btn btn-primary btn-sm"> <i class="bi bi-pencil"></i>修改
+							</a></td>
+							<td><a
+								th:href="@{/backend/roomTypePhoto/deleteRoomTypePhoto/{roomTypePhotoId}(roomTypePhotoId=${rtp.roomTypePhotoId})}"
+								class="btn btn-primary btn-sm"> <i class="bi bi-trash"></i>
+									刪除
+							</a></td>
 						</tr>
 					</tbody>
 				</table>
 
 				<div class="d-grid gap-2 d-md-flex justify-content-md-end">
-					<a th:href="@{/backend/room/listAllRoomTypePhoto}"
-						class="btn btn-primary btn-sm"> 
-						<i class="bi bi-arrow-left me-1"></i>回到總覽頁面
+					<a th:href="@{/backend/roomTypePhoto/selectRoomTypePhoto}"
+						class="btn btn-primary btn-sm"> <i
+						class="bi bi-arrow-left me-1"></i>回到查詢頁面
 					</a>
 				</div>
 			</div>
 
-			<!-- JS -->
-			<script src="/js/roomTypePhoto.js"></script>
 		</th:block>
 	</main>
+	<!-- JS -->
+	<script src="/js/roomTypePhoto.js"></script>
 </body>
 </html>

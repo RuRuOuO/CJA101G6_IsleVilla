@@ -29,7 +29,7 @@ public class RoomTypePhotoInterfaceImpl implements RoomTypePhotoInterface{
 	            jpql.append(" AND rtp.roomTypePhotoId = :roomTypePhotoId");  // ⚠️ 注意這裡要看你的關聯命名
 	        }
 	        if (roomTypeId != null) {
-	            jpql.append(" AND rtp.roomTypeId = :roomTypeId");
+	        	jpql.append(" AND rtp.roomType.roomTypeId = :roomTypeId");
 	        }
 
 	        // 建立一個 JPA 查詢物件，這個查詢會回傳「Room 實體」的清單

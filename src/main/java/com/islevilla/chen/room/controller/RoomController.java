@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.naming.directory.SearchResult;
 
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -22,6 +25,7 @@ import com.islevilla.chen.util.exception.BusinessException;
 import com.islevilla.chen.util.map.RoomTypeName;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/backend/room")
@@ -64,12 +68,21 @@ public String showAddRoom(Model model) {
 	
 //處理網頁送出的請求
 	@PostMapping("/addRoom")
-	public String addRoom(@ModelAttribute("room") Room room, Model model) {
+	public String addRoom(@Valid @ModelAttribute("room") Room room, BindingResult result, Model model) {
 		// 房型下拉選單選項
 	    List<RoomType> roomTypeList=roomTypeName.getRoomTypeNameList();
 	    
 		model.addAttribute("roomTypeList", roomTypeList); 
 		model.addAttribute("roomStatusMap", roomStatusMap); 
+		
+		// 後端驗證
+		if (result.hasErrors()) {
+			List<String> errorMessages = result.getFieldErrors().stream() 			 //取得錯誤資料集合
+												.map(FieldError::getDefaultMessage)  //把每個錯誤轉成訊息
+										        .collect(Collectors.toList());		 //收集成一個清單
+			model.addAttribute("errorMessage", errorMessages);
+			return "back-end/room/addRoom";
+		}
 		
 		try {
 	        roomService.addRoom(room);
@@ -79,7 +92,9 @@ public String showAddRoom(Model model) {
 			return "back-end/room/addRoom";
 	    } catch (BusinessException e) {
 	        // 統一處理例外，顯示給使用者
-	        model.addAttribute("errorMessage", e.getMessage());
+	        List<String> errorMessages = new ArrayList<>();
+	        errorMessages.add(e.getMessage());
+	        model.addAttribute("errorMessage", errorMessages);
 	        return "/back-end/room/addRoom";
 	    }
 	}
@@ -188,7 +203,9 @@ public String showUpdateRoom(@PathVariable Integer roomId, Model model) {
 }
 
 	@PostMapping("/updateRoom")
-	public String updateRoom(@ModelAttribute("room") Room room, Model model) {
+	public String updateRoom(@Valid @ModelAttribute("room") Room room, 
+							BindingResult result,
+							Model model) {
 	    List<String> errorMessages = new ArrayList<>();
 		
 	    // 房型下拉選單選項
@@ -197,6 +214,15 @@ public String showUpdateRoom(@PathVariable Integer roomId, Model model) {
 	    model.addAttribute("roomTypeList", roomTypeList); 
 		model.addAttribute("roomStatusMap", roomStatusMap); 
 		
+		// 後端驗證
+		if (result.hasErrors()) {
+			errorMessages = result.getFieldErrors().stream() 			 //取得錯誤資料集合
+												.map(FieldError::getDefaultMessage)  //把每個錯誤轉成訊息
+										        .collect(Collectors.toList());		 //收集成一個清單
+			model.addAttribute("errorMessage", errorMessages);
+			return "back-end/room/addRoom";
+		}
+				
 		//檢查房型ID是否存在（避免外鍵錯誤）
 		if(roomTypeService.findById(room.getRoomTypeId()) == null) {
 			errorMessages.add("房型ID不存在，請重新輸入");

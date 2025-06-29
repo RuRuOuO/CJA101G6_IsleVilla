@@ -1,6 +1,10 @@
 package com.islevilla.chen.roomTypePhoto.controller;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -11,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.islevilla.chen.room.model.Room;
@@ -18,6 +23,7 @@ import com.islevilla.chen.roomType.model.RoomType;
 import com.islevilla.chen.roomType.model.RoomTypeService;
 import com.islevilla.chen.roomTypePhoto.model.RoomTypePhoto;
 import com.islevilla.chen.roomTypePhoto.model.RoomTypePhotoService;
+import com.islevilla.chen.util.exception.BusinessException;
 import com.islevilla.chen.util.map.RoomTypeName;
 
 import jakarta.validation.Valid;
@@ -44,211 +50,230 @@ public String showSelectPage(Model model) {
     return "/back-end/roomTypePhoto/selectRoomTypePhoto";
 }
 	    @PostMapping("/selectRoomTypePhoto")
-	    public String selectRoomTypePhoto(@ModelAttribute("roomTypePhoto") RoomTypePhoto roomTypePhoto, Model model) {
-	    	List<String> errorMessage = new ArrayList<>();
-	    	List<RoomTypePhoto> searchResult = roomTypePhotoService.compoundQuery(roomTypePhoto.getRoomTypePhotoId(), roomTypePhoto.getRoomType().getRoomTypeId());
-	    	if (searchResult.isEmpty()) {
-	            errorMessage.add("查無符合條件的房間資料");
-	        }
-	        
-	        // 房型下拉選單選項
-		    List<RoomType> roomTypeList=roomTypeName.getRoomTypeNameList();
-		    // 創建房型名稱對應表（查詢結果需要顯示房型名稱）
-		    Map<Integer, String> roomTypeNameMap=roomTypeName.getRoomTypeNameMap();
-		    // 將結果傳遞給頁面
-		    model.addAttribute("searchResult", searchResult);
-		    model.addAttribute("roomTypeList", roomTypeList);
-		    model.addAttribute("roomTypeNameMap", roomTypeNameMap);
-		    
-		    if (!errorMessage.isEmpty()) {
-		        model.addAttribute("errorMessage", errorMessage);
-		        return "/back-end/roomTypePhoto/selectRoomTypePhoto";
+		public String selectRoomTypePhotoPage(@RequestParam(required = false) Integer roomTypePhotoId,
+					                        @RequestParam(required = false) Integer roomTypeId,
+					                        Model model) {
+	    	try {
+		    	List<RoomTypePhoto> searchResult = roomTypePhotoService.compoundQuery(roomTypePhotoId,roomTypeId);
+		    	System.out.println("查詢完成，找到 " + searchResult.size() + " 筆資料");
+			    // 創建房型名稱對應表（查詢結果需要顯示房型名稱）
+			    Map<Integer, String> roomTypeNameMap=roomTypeName.getRoomTypeNameMap();
+			    // 將結果傳遞給頁面
+			    model.addAttribute("searchResult", searchResult);
+			    model.addAttribute("roomTypeNameMap", roomTypeNameMap);
+			    return "back-end/roomTypePhoto/searchRoomTypePhoto";
+	    	}catch(BusinessException e) {
+		    	// 房型下拉選單選項
+			    List<RoomType> roomTypeList=roomTypeName.getRoomTypeNameList();
+			    model.addAttribute("roomTypeList", roomTypeList);
+		    	model.addAttribute("errorMessage", e.getMessage());
+		    	return "/back-end/roomTypePhoto/selectRoomTypePhoto";
 		    }
-		    
-		    System.out.println("查詢完成，找到 " + searchResult.size() + " 筆資料");
-		    return "back-end/roomTypePhoto/searchRoomTypePhoto";
 	    }
-	    
-////顯示searchRoomTypePhoto網頁
-//@GetMapping("/searchRoomTypePhoto")
-//public String showSearchRoomTypePhoto(@Valid@ModelAttribute("roomTypePhoto") RoomTypePhoto roomTypePhoto, 
-//									Model model) {
-//    
-//    List<String> errorMsg = new ArrayList<>();
-//    
-//    // 驗證輸入
-//    if (roomTypePhoto.getRoomTypePhotoId() == null || roomTypePhotoIdStr.trim().isEmpty()) {
-//        errorMsg.add("沒輸入數字，請輸入圖片編號");
-//    }
-//    
-//    if (!errorMsg.isEmpty()) {
-//        redirectAttributes.addFlashAttribute("errorMsg", errorMsg);
-//        return "redirect:/room-type-photo/select";
-//    }
-//    
-//    Integer roomTypePhotoId;
-//    try {
-//        roomTypePhotoId = Integer.valueOf(roomTypePhotoIdStr);
-//    } catch (NumberFormatException e) {
-//        errorMsg.add("輸入不是數字格式，請重新輸入");
-//        redirectAttributes.addFlashAttribute("errorMsg", errorMsg);
-//        return "redirect:/room-type-photo/select";
-//    }
-//}
+
+// 顯示所有照片
+@GetMapping("/listAllRoomTypePhoto")
+public String showListAllRoomTypePhoto(Model model) {
+	List<RoomTypePhoto> roomTypePhotoList = roomTypePhotoService.findAll();
+    Map<Integer, String> roomTypeNameMap = roomTypeName.getRoomTypeNameMap();
+    
+    model.addAttribute("roomTypePhotoList", roomTypePhotoList); 
+    model.addAttribute("roomTypeNameMap", roomTypeNameMap);
+    return "/back-end/roomTypePhoto/listAllRoomTypePhoto";
 }
-//	        
-//	        // 查詢資料
-//	        Optional<RoomTypePhoto> photoOpt = roomTypePhotoService.getOne(roomTypePhotoId);
-//	        if (!photoOpt.isPresent()) {
-//	            errorMsg.add("查無此資料");
-//	            redirectAttributes.addFlashAttribute("errorMsg", errorMsg);
-//	            return "redirect:/room-type-photo/select";
-//	        }
-//	        
-//	        model.addAttribute("rtpVO", photoOpt.get());
-//	        return "room_type_photo/list_getOne";
-//	    }
-//	    
-//	    @GetMapping("/getByRoomTypeId")
-//	    public String getByRoomTypeId(@RequestParam("roomTypeId") Integer roomTypeId, Model model) {
-//	        Set<RoomTypePhoto> photoSet = roomTypePhotoService.findByRoomTypeId(roomTypeId);
-//	        model.addAttribute("RoomTypePhotoVOSet", photoSet);
-//	        return "room_type_photo/list_getOne";
-//	    }
-//	    
-//	    @GetMapping("/getOneForUpdate")
-//	    public String getOneForUpdate(@RequestParam("roomTypePhotoId") Integer roomTypePhotoId, 
-//	                                 Model model, RedirectAttributes redirectAttributes) {
-//	        
-//	        List<String> errorMsg = new ArrayList<>();
-//	        Optional<RoomTypePhoto> photoOpt = roomTypePhotoService.getOne(roomTypePhotoId);
-//	        
-//	        if (!photoOpt.isPresent()) {
-//	            errorMsg.add("查無此資料");
-//	            redirectAttributes.addFlashAttribute("errorMsg", errorMsg);
-//	            return "redirect:/room-type-photo/select";
-//	        }
-//	        
-//	        model.addAttribute("rtpVO", photoOpt.get());
-//	        return "room_type_photo/update_input";
-//	    }
-	    
-//	    @GetMapping("/showImage")
-//	    public ResponseEntity<byte[]> showImage(@RequestParam("roomTypePhotoId") Integer roomTypePhotoId) {
-//	        Optional<RoomTypePhoto> photoOpt = roomTypePhotoService.getOne(roomTypePhotoId);
-//	        
-//	        if (photoOpt.isPresent() && photoOpt.get().getRoomTypePhoto() != null) {
-//	            byte[] photo = photoOpt.get().getRoomTypePhoto();
-//	            HttpHeaders headers = new HttpHeaders();
-//	            headers.setContentType(MediaType.IMAGE_JPEG);
-//	            return new ResponseEntity<>(photo, headers, HttpStatus.OK);
-//	        }
-//	        
-//	        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//	    }
-//	    
-//	    @PostMapping("/update")
-//	    public String update(@RequestParam("roomTypePhotoId") Integer roomTypePhotoId,
-//	                        @RequestParam("roomTypeId") String roomTypeIdStr,
-//	                        @RequestParam("roomTypePhoto") MultipartFile file,
-//	                        Model model, RedirectAttributes redirectAttributes) throws IOException {
-//	        
-//	        List<String> errorMsg = new ArrayList<>();
-//	        
-//	        // 驗證房型ID
-//	        Integer roomTypeId = null;
-//	        if (roomTypeIdStr == null || roomTypeIdStr.trim().isEmpty()) {
-//	            errorMsg.add("房型圖片編號: 請勿空白");
-//	        } else {
-//	            try {
-//	                roomTypeId = Integer.valueOf(roomTypeIdStr);
-//	                Set<RoomTypePhoto> photoSet = roomTypePhotoService.findByRoomTypeId(roomTypeId);
-//	                if (photoSet.isEmpty()) {
-//	                    errorMsg.add("查無此房型圖片");
-//	                }
-//	            } catch (NumberFormatException e) {
-//	                errorMsg.add("房型圖片編號: 只能是數字");
-//	                roomTypeId = 0;
-//	            }
-//	        }
-//	        
-//	        // 處理圖片
-//	        byte[] photo;
-//	        if (!file.isEmpty()) {
-//	            photo = file.getBytes();
-//	        } else {
-//	            // 如果沒有上傳新圖片，保持原有圖片
-//	            Optional<RoomTypePhoto> existingPhoto = roomTypePhotoService.getOne(roomTypePhotoId);
-//	            photo = existingPhoto.map(RoomTypePhoto::getRoomTypePhoto).orElse(null);
-//	        }
-//	        
-//	        RoomTypePhoto roomTypePhoto = new RoomTypePhoto(roomTypePhotoId, roomTypeId, photo);
-//	        
-//	        if (!errorMsg.isEmpty()) {
-//	            model.addAttribute("rtpVO", roomTypePhoto);
-//	            model.addAttribute("errorMsg", errorMsg);
-//	            return "room_type_photo/update_input";
-//	        }
-//	        
-//	        // 更新資料
-//	        RoomTypePhoto updatedPhoto = roomTypePhotoService.update(roomTypePhotoId, roomTypeId, photo);
-//	        model.addAttribute("rtpVO", updatedPhoto);
-//	        return "room_type_photo/list_getOne";
-//	    }
-//	    
-//	    @GetMapping("/add")
-//	    public String showAddPage() {
-//	        return "room_type_photo/add";
-//	    }
-//	    
-//	    @PostMapping("/insert")
-//	    public String insert(@RequestParam("roomTypeId") String roomTypeIdStr,
-//	                        @RequestParam("roomTypePhoto") MultipartFile file,
-//	                        Model model, RedirectAttributes redirectAttributes) throws IOException {
-//	        
-//	        List<String> errorMsg = new ArrayList<>();
-//	        
-//	        // 驗證房型ID
-//	        Integer roomTypeId = null;
-//	        if (roomTypeIdStr == null || roomTypeIdStr.trim().isEmpty()) {
-//	            errorMsg.add("房型圖片編號: 請勿空白");
-//	        } else {
-//	            try {
-//	                roomTypeId = Integer.valueOf(roomTypeIdStr);
-//	                Set<RoomTypePhoto> photoSet = roomTypePhotoService.findByRoomTypeId(roomTypeId);
-//	                if (photoSet.isEmpty()) {
-//	                    errorMsg.add("查無此房型圖片");
-//	                }
-//	            } catch (NumberFormatException e) {
-//	                errorMsg.add("房型圖片編號: 只能是數字");
-//	                roomTypeId = 0;
-//	            }
-//	        }
-//	        
-//	        // 處理圖片
-//	        byte[] photo = file.getBytes();
-//	        RoomTypePhoto roomTypePhoto = new RoomTypePhoto(null, roomTypeId, photo);
-//	        
-//	        if (!errorMsg.isEmpty()) {
-//	            model.addAttribute("rtpVO", roomTypePhoto);
-//	            model.addAttribute("errorMsg", errorMsg);
-//	            return "room_type_photo/add";
-//	        }
-//	        
-//	        // 新增資料
-//	        roomTypePhotoService.add(roomTypeId, photo);
-//	        return "redirect:/room-type-photo/listAll";
-//	    }
-//	    
-//	    @PostMapping("/delete")
-//	    public String delete(@RequestParam("roomTypePhotoId") Integer roomTypePhotoId) {
-//	        roomTypePhotoService.delete(roomTypePhotoId);
-//	        return "redirect:/room-type-photo/listAll";
-//	    }
-//	    
-//	    @GetMapping("/listAll")
-//	    public String listAll(Model model) {
-//	        List<RoomTypePhoto> photos = roomTypePhotoService.getAll();
-//	        model.addAttribute("photos", photos);
-//	        return "room_type_photo/listAll";
-//	    }
+
+
+//顯示AddRoomTypePhoto網頁
+@GetMapping("/addRoomTypePhoto")
+public String showAddRoomTypePhoto(Model model) {
+	RoomTypePhoto roomTypePhoto = new RoomTypePhoto();
+	List<RoomType> roomTypeList = roomTypeName.getRoomTypeNameList();
+ 
+	System.out.println("進入新增房型照片頁面");
+	model.addAttribute("roomTypePhoto", roomTypePhoto); 
+	model.addAttribute("roomTypeList", roomTypeList); 
+	return "/back-end/roomTypePhoto/addRoomTypePhoto";
+}
+
+	//處理網頁送出的請求
+	@PostMapping("/addRoomTypePhoto")
+	public String addRoomTypePhoto(@ModelAttribute("roomTypePhoto") RoomTypePhoto roomTypePhoto,@RequestParam("roomTypePhoto") MultipartFile file, Model model) {
+		
+	    List<RoomType> roomTypeList = roomTypeName.getRoomTypeNameList();
+		model.addAttribute("roomTypeList", roomTypeList); 
+		
+		try {
+		     // 檢查檔案大小（5MB = 5*1024*1024 bytes）
+	        long maxSize = 5 * 1024 * 1024; // 5MB
+			if (file.getSize() > maxSize) {
+				throw new BusinessException("檔案大小不能超過 5MB!");
+			}
+			
+			// 檢查檔案格式
+			String contentType = file.getContentType();
+			List<String> allowedTypes = Arrays.asList(
+				"image/jpeg", "image/jpg", "image/png", "image/gif"
+			);
+			if (contentType == null || !allowedTypes.contains(contentType.toLowerCase())) {
+				throw new BusinessException("不支援的檔案格式，請上傳 JPG、PNG 或 GIF 格式的圖片");
+			}
+			
+			//將MultipartFile 轉換為Byte[] 陣列
+			byte[] bytes = file.getBytes();
+			Byte[] photoBytes = new Byte[bytes.length];  //包裝型別陣列
+			
+			for (int i = 0; i < bytes.length; i++) {
+				photoBytes[i] = bytes[i];
+			}
+			
+	        roomTypePhotoService.addRoomTypePhoto(roomTypePhoto.getRoomType().getRoomTypeId(), 
+	        										photoBytes, 
+										        	roomTypePhoto.getDisplayOrder());
+
+			System.out.println("房型照片新增成功");
+			model.addAttribute("successMessage", "房型照片新增成功！");
+			model.addAttribute("roomTypePhoto", roomTypePhoto); 
+			return "back-end/roomTypePhoto/addRoomTypePhoto";
+	    } catch (BusinessException e) {
+	        model.addAttribute("errorMessage", e.getMessage());
+	        return "/back-end/roomTypePhoto/addRoomTypePhoto";
+	    }catch (IOException e) {
+	        model.addAttribute("errorMessage", "檔案處理失敗，請重新上傳");
+	        return "/back-end/roomTypePhoto/addRoomTypePhoto";
+	    }
+	}
+	
+//顯示UpdateRoomTypePhoto網頁
+@GetMapping("/updateRoomTypePhoto/{roomTypePhotoId}")
+public String showUpdateRoomTypePhoto(@PathVariable Integer roomTypePhotoId, Model model) {
+    System.out.println("要修改的房型照片ID: " + roomTypePhotoId);
+	
+	// 房型下拉選單選項
+    List<RoomType> roomTypeList = roomTypeName.getRoomTypeNameList();
+
+    // 根據 roomTypePhotoId 查詢房型照片資料
+    RoomTypePhoto roomTypePhoto = roomTypePhotoService.findById(roomTypePhotoId);
+    // 將房型照片資料傳給前端頁面
+    System.out.println("進入修改頁面");
+    model.addAttribute("roomTypePhoto", roomTypePhoto);
+	model.addAttribute("roomTypeList", roomTypeList); 
+    return "/back-end/roomTypePhoto/updateRoomTypePhoto";
+}
+	@PostMapping("/updateRoomTypePhoto")
+	public String updateRoomTypePhoto(@ModelAttribute("roomTypePhoto") RoomTypePhoto roomTypePhoto,
+									@RequestParam(value = "roomTypePhoto", required = false) MultipartFile file,
+									Model model) {
+	    // 房型下拉選單選項
+	    List<RoomType> roomTypeList = roomTypeName.getRoomTypeNameList();
+	    model.addAttribute("roomTypeList", roomTypeList); 
+		
+		try {
+			// 只有在有上傳更新檔案時才檢查和處理檔案
+			// 如果沒有新檔案，照片欄位保持原本的值，不會被覆蓋
+			if (file != null && !file.isEmpty()) {
+				 // 檢查檔案大小（5MB = 5*1024*1024 bytes）
+		        long maxSize = 5 * 1024 * 1024; // 5MB
+				if (file.getSize() > maxSize) {
+					throw new BusinessException("檔案大小不能超過 5MB!");
+				}
+				
+				// 檢查檔案格式
+				String contentType = file.getContentType();
+				List<String> allowedTypes = Arrays.asList(
+					"image/jpeg", "image/jpg", "image/png", "image/gif"
+				);
+				if (contentType == null || !allowedTypes.contains(contentType.toLowerCase())) {
+					throw new BusinessException("不支援的檔案格式，請上傳 JPG、PNG 或 GIF 格式的圖片");
+				}
+				
+				//將MultipartFile 轉換為Byte[] 陣列
+				byte[] bytes = file.getBytes();
+				Byte[] photoBytes = new Byte[bytes.length];  //包裝型別陣列
+				//byte ➜ Byte（自動裝箱）
+				for (int i = 0; i < bytes.length; i++) {
+					photoBytes[i] = bytes[i];
+				}
+				roomTypePhoto.setRoomTypePhoto(photoBytes);
+			}
+			
+			roomTypePhotoService.updateRoomTypePhoto(roomTypePhoto);
+			System.out.println("房型照片更新成功");
+			model.addAttribute("successMessage", "房型照片更新成功！");
+			return "redirect:/backend/roomTypePhoto/listAllRoomTypePhoto";
+		} catch (BusinessException e) {
+			model.addAttribute("errorMessage", e.getMessage());
+			return "/back-end/roomTypePhoto/updateRoomTypePhoto";
+		} catch (IOException e) {
+	        model.addAttribute("errorMessage", "檔案處理失敗，請重新上傳");
+	        return "/back-end/roomTypePhoto/updateRoomTypePhoto";
+	    }
+	}
+	
+	//更新顯示順序
+	@PostMapping("/updateDisplayOrder")
+	public String updateDisplayOrder(@RequestParam Integer roomTypePhotoId, 
+									@RequestParam Integer newDisplayOrder,
+									RedirectAttributes redirectAttr) {
+		roomTypePhotoService.updateDisplayOrder(roomTypePhotoId, newDisplayOrder);
+		return "redirect:/backend/roomTypePhoto/listAllRoomTypePhoto";
+	}
+
+// 刪除房型照片
+@GetMapping("/deleteRoomTypePhoto/{roomTypePhotoId}")
+public String deleteRoomTypePhoto(@PathVariable Integer roomTypePhotoId, 
+						   @RequestHeader(value = "Referer", required = false) String referer,
+						   RedirectAttributes redirectAttr) {
+	try {
+		roomTypePhotoService.deleteRoomTypePhoto(roomTypePhotoId);
+		System.out.println("房型照片刪除成功，ID: " + roomTypePhotoId);
+		redirectAttr.addFlashAttribute("successMessage", "房型照片刪除成功！");
+	} catch (BusinessException e) {
+		redirectAttr.addFlashAttribute("errorMessage", e.getMessage());
+	}
+	
+	// 如果有來源頁面，則返回來源頁面，否則返回列表頁面
+	if (referer != null && !referer.isEmpty()) {
+		return "redirect:" + referer;
+	} else {
+		return "redirect:/backend/roomTypePhoto/listAllRoomTypePhoto";
+	}
+}
+
+//顯示房型照片
+@GetMapping("/image/{roomTypePhotoId}")
+public ResponseEntity<byte[]> getRoomTypePhotoImage(@PathVariable Integer roomTypePhotoId) {
+	try {
+	     RoomTypePhoto roomTypePhoto = roomTypePhotoService.findById(roomTypePhotoId);
+	     if (roomTypePhoto != null && roomTypePhoto.getRoomTypePhoto() != null) {
+	         // 將 Byte[] 轉換為 byte[]
+	         Byte[] photoBytes = roomTypePhoto.getRoomTypePhoto();
+	         byte[] imageBytes = new byte[photoBytes.length];
+	         for (int i = 0; i < photoBytes.length; i++) {
+	             imageBytes[i] = photoBytes[i];
+	         }
+	         
+	         return ResponseEntity.ok()
+	                 .header("Content-Type", "image/png") // 預設為jpeg，實際應根據檔案類型判斷
+	                 .body(imageBytes);
+	     }else{
+	    	// 找不到，回傳預設圖片
+	    	 InputStream defaultImageStream = getClass().getResourceAsStream("/static/img/roomTypePhoto/noPicture.png");
+		    if (defaultImageStream != null) {
+		        byte[] defaultImageBytes = defaultImageStream.readAllBytes();
+		        return ResponseEntity.ok()
+		                .header("Content-Type", "image/*")
+		                .body(defaultImageBytes);
+		    } else {
+		        // 如果連預設圖片都找不到，返回錯誤訊息
+		        return ResponseEntity.ok()
+		                .header("Content-Type", "text/plain; charset=UTF-8")
+		                .body("找不到預設圖片，請聯絡管理員".getBytes(StandardCharsets.UTF_8));
+		    }
+	     }
+     }catch (Exception e) {
+		 return ResponseEntity.ok()
+	             .header("Content-Type", "text/plain; charset=UTF-8")
+	             .body("找不到預設圖片，請聯絡管理員".getBytes(StandardCharsets.UTF_8));
+     }
+} 
+}
