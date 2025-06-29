@@ -115,8 +115,9 @@
                             <th>狀態</th>
                             <th>入住日期</th>
                             <th>退房日期</th>
-                            <th>實際入住時間</th>
-                            <th>實際退房時間</th>
+                            <th>優惠專案</th>
+                            <!--                            <th>實際入住時間</th>-->
+                            <!--                            <th>實際退房時間</th>-->
                             <th>總金額</th>
                             <th>操作</th>
                         </tr>
@@ -139,10 +140,9 @@
                             </td>
                             <td th:text="${#temporals.format(order.checkInDate, 'yyyy-MM-dd')}">2024-01-20</td>
                             <td th:text="${#temporals.format(order.checkOutDate, 'yyyy-MM-dd')}">2024-01-22</td>
-                            <td th:text="${order.actualCheckInDate != null ? #temporals.format(order.actualCheckInDate, 'yyyy-MM-dd HH:mm') : '-'}">
-                                -
-                            </td>
-                            <td th:text="${order.actualCheckOutDate != null ? #temporals.format(order.actualCheckOutDate, 'yyyy-MM-dd HH:mm') : '-'}">
+                            <!--                            <td th:text="${order.actualCheckInDate != null ? #temporals.format(order.actualCheckInDate, 'yyyy-MM-dd HH:mm') : '-'}">-</td>-->
+                            <!--                            <td th:text="${order.actualCheckOutDate != null ? #temporals.format(order.actualCheckOutDate, 'yyyy-MM-dd HH:mm') : '-'}">-</td>-->
+                            <td th:text="${order.promotion != null ? order.promotion.roomPromotionTitle : '-'}">
                                 -
                             </td>
                             <td th:text="'$' + ${order.rvPaidAmount}">$3000</td>
@@ -205,7 +205,7 @@
 
 <!-- 訂單詳情模態視窗 -->
 <div class="modal fade" id="orderDetailModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">訂單詳情</h5>
@@ -321,22 +321,12 @@
 
     function showOrderDetail(orderId) {
         const modal = new bootstrap.Modal(document.getElementById('orderDetailModal'));
-
-        // 這裡可以透過AJAX載入詳細資訊
-        // 目前先顯示基本資訊
-        document.getElementById('orderDetailContent').innerHTML = `
-                <div class="row">
-                    <div class="col-md-6">
-                        <h6>訂單基本資訊</h6>
-                        <p><strong>訂房編號:</strong> ${orderId}</p>
-                        <p><strong>查詢時間:</strong> ${new Date().toLocaleString()}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <h6>操作說明</h6>
-                        <p>詳細資訊需要後端提供對應的API接口</p>
-                    </div>
-                </div>
-            `;
+        document.getElementById('orderDetailContent').innerHTML = '';
+        fetch(`/admin/order-detail/${orderId}`)
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('orderDetailContent').innerHTML = html;
+            });
 
         modal.show();
     }

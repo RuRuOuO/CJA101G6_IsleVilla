@@ -118,42 +118,48 @@
                     <!--                            <i class="bi bi-box-arrow-in-right"></i> 登出-->
                     <!--                        </a>-->
                     <!--                    </div>-->
-                    <div th:if="${session.member!=null}" class="dropdown">
-                        <button class="btn btn-dark dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                            <!--                            <i class="bi bi-person-circle"></i>-->
-                            <span>歡迎回來，</span><span
-                                th:text="${session.member.memberName}"></span><span>！</span>
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li class="px-3 py-2 d-flex align-items-center">
-                                <img th:src="${session.member.memberPhoto != null} ? ${session.member.memberPhoto} : ${'https://images.unsplash.com/photo-1603736087997-5daec6092347?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'}"
-                                     alt="頭像"
-                                     class="rounded-circle me-2"
-                                     style="width: 40px; height: 40px; object-fit: cover;">
-                                <div>
-                                    <div class="fw-bold" th:text="${session.member.memberName}">王小明</div>
-                                    <div class="text-muted small" th:text="${session.member.memberEmail}">
-                                        ming@email.com
+                    <div class="d-flex align-items-center gap-2" th:if="${session.member!=null}">
+                        <a th:href="@{/cart}" class="text-dark">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                        </a>
+                        &nbsp;
+                        <div th:if="${session.member!=null}" class="dropdown">
+                            <button class="btn btn-dark dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                <!--                            <i class="bi bi-person-circle"></i>-->
+                                <span>歡迎回來，</span><span
+                                    th:text="${session.member.memberName}"></span><span>！</span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li class="px-3 py-2 d-flex align-items-center">
+                                    <img th:src="${session.member.memberPhoto != null} ? ${session.member.memberPhoto} : ${'https://images.unsplash.com/photo-1603736087997-5daec6092347?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'}"
+                                         alt="頭像"
+                                         class="rounded-circle me-2"
+                                         style="width: 40px; height: 40px; object-fit: cover;">
+                                    <div>
+                                        <div class="fw-bold" th:text="${session.member.memberName}">王小明</div>
+                                        <div class="text-muted small" th:text="${session.member.memberEmail}">
+                                            ming@email.com
+                                        </div>
                                     </div>
-                                </div>
-                            </li>
-                            <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" th:href="@{/member/room/list}">住宿訂單</a></li>
-                            <li><a class="dropdown-item" href="#">接駁訂單</a></li>
-                            <li><a class="dropdown-item" href="#">購物車</a></li>
-                            <li>
+                                </li>
                                 <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="#">會員資訊</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" th:href="@{/member/logout}">
-                                <!--                                <i class="fa-solid fa-arrow-right-from-bracket"></i>-->
-                                登出</a></li>
-                        </ul>
+                                </li>
+                                <li><a class="dropdown-item" th:href="@{/member/room/list}">住宿訂單</a></li>
+                                <li><a class="dropdown-item" href="#">接駁訂單</a></li>
+                                <li><a class="dropdown-item" href="#">購物車</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="#">會員資訊</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" th:href="@{/member/logout}">
+                                    <!--                                <i class="fa-solid fa-arrow-right-from-bracket"></i>-->
+                                    登出</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>

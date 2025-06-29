@@ -64,6 +64,11 @@ public class CheckInOutService {
             if (rv.getRoomOrderStatus() != 1) { // 訂單狀態非「已入住」
                 throw new IllegalStateException("訂單狀態非「已入住」，無法退房");
             }
+            // 更新訂單狀態為已退房
+            rv.setRoomOrderStatus(2); // 2: 已退房
+            rv.setActualCheckOutDate(LocalDateTime.now()); // 設定實際退房時間
+            roomRVOrderService.updateRoomRVOrder(rv);
+
             // 更新房間狀態為待清潔
             updateRoomStatusToCleaning(roomRVOrderId);
 
