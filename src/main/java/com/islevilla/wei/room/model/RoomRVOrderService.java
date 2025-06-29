@@ -26,6 +26,11 @@ public class RoomRVOrderService {
         return roomRVOrderRepository.findAll();
     }
 
+    // 查詢全部且按日期排序
+    public List<RoomRVOrder> getAllOrders() {
+        return roomRVOrderRepository.findAllByOrderByRoomOrderDateDesc();
+    }
+
     // 查詢可操作(成立或入住中)的訂單
     public List<RoomRVOrder> getOperableOrders() {
         return roomRVOrderRepository.findByRoomOrderStatusIn(Arrays.asList(0, 1));

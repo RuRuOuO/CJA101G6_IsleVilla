@@ -23,16 +23,16 @@ public class CheckInOutController {
     private RoomRVDetailService roomRVDetailService;
 
     // 後台checkIn頁面
-    @GetMapping("/backend/checkInOut/dashboard")
+    @GetMapping("/backend/check-in-out/list")
     public String checkInOutDashboard(Model model) {
         List<RoomRVOrder> orderList = roomRVOrderService.getOperableOrders();
         if (!orderList.isEmpty()) {
             model.addAttribute("orderList", orderList);
         }
-        return "back-end/check-in-out/dashboard";
+        return "back-end/check-in-out/check-in-out-list";
     }
 
-    @GetMapping("/admin/order-detail/{id}")
+    @GetMapping("/backend/order-detail/{id}")
     public String getOrderDetail(@PathVariable Integer id, Model model) {
         List<RoomRVDetail> detailList = roomRVDetailService.getDetailsByRoomRVOrderId(id);
         RoomRVOrder orderList = roomRVOrderService.getById(id);

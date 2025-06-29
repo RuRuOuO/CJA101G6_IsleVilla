@@ -27,4 +27,6 @@ public interface FeedbackService_interface {
     List<RoomRVOrderDTO> getAvailableOrders(Members member);
 
     boolean saveFeedback(FeedbackFormDTO dto, Members loginMember);
+
+    List<Feedback> findPublicAndActiveFeedbacks();
 }

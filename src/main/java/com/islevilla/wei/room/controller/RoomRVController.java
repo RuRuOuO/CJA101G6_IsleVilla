@@ -82,7 +82,7 @@ public class RoomRVController {
     }
 
     // 後台顯示全部訂單
-    @GetMapping("/backend/room/reservation/order/list")
+    @GetMapping("/backend/room-reservation/list")
     public String roomRVOrderList(
             // @RequestParam 從網址參數中取值，defaultValue設定預設值
             @RequestParam(defaultValue = "0") int page, // 頁碼從0開始

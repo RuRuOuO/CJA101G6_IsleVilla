@@ -322,7 +322,7 @@
     function showOrderDetail(orderId) {
         const modal = new bootstrap.Modal(document.getElementById('orderDetailModal'));
         document.getElementById('orderDetailContent').innerHTML = '';
-        fetch(`/admin/order-detail/${orderId}`)
+        fetch(`/backend/order-detail/${orderId}`)
             .then(res => res.text())
             .then(html => {
                 document.getElementById('orderDetailContent').innerHTML = html;

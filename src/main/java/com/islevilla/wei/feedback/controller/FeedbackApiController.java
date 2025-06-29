@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -51,6 +52,14 @@ public class FeedbackApiController {
         Members loginMember = (Members) session.getAttribute("member");
         boolean success = feedbackService.saveFeedback(dto, loginMember);
         return success ? ResponseEntity.ok().build() : ResponseEntity.badRequest().body("提交失敗");
+    }
+
+    @GetMapping("/feedbacks/public")
+    public List<FeedbackDetailDTO> getPublicFeedbacks() {
+        List<Feedback> feedbackList = feedbackService.findPublicAndActiveFeedbacks();
+        return feedbackList.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     // 使用ModelMapper

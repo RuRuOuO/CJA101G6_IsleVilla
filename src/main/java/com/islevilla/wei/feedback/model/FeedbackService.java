@@ -60,6 +60,11 @@ public class FeedbackService implements FeedbackService_interface {
         }).collect(Collectors.toList());
     }
 
+    @Override
+    public List<Feedback> findPublicAndActiveFeedbacks() {
+        return feedbackRepository.findByFbPublicAndFbStatus(1, 1);
+    }
+
 //    // 根據訂房編號查詢feedback
 //    @Override
 //    public Optional<Feedback> findByRoomRvId(Integer roomReservationId) {
