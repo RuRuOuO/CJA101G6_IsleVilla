@@ -133,10 +133,12 @@
                                      style="width: 40px; height: 40px; object-fit: cover;">
                                 <div>
                                     <div class="fw-bold" th:text="${session.member.memberName}">王小明</div>
-                                    <div class="text-muted small" th:text="${session.member.memberEmail}">ming@email.com</div>
+                                    <div class="text-muted small" th:text="${session.member.memberEmail}">
+                                        ming@email.com
+                                    </div>
                                 </div>
                             </li>
-                                <hr class="dropdown-divider">
+                            <hr class="dropdown-divider">
                             </li>
                             <li><a class="dropdown-item" th:href="@{/member/room/list}">住宿訂單</a></li>
                             <li><a class="dropdown-item" href="#">接駁訂單</a></li>
@@ -175,6 +177,10 @@
         <a class="nav-link text-reset text-decoration-none" th:href="@{/product-order/memOrders}"
            th:classappend="${activeTab == 'product'}?'active'">
             購物訂單
+        </a>
+        <a class="nav-link text-reset text-decoration-none" th:href="@{/member/feedback/list}"
+           th:classappend="${activeTab == 'feedback'}?'active'">
+            問卷專區
         </a>
         <a class="nav-link text-reset text-decoration-none" th:href="@{/member/info}"
            th:classappend="${activeTab == 'info'}?'active'">

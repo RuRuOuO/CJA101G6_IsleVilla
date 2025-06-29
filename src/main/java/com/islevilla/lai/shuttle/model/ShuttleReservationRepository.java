@@ -14,8 +14,10 @@ import com.islevilla.wei.room.model.RoomRVOrder;
 @Repository
 public interface ShuttleReservationRepository extends JpaRepository<ShuttleReservation, Integer> {
 
-	// 根據會員ID查詢預約記錄
+	// 根據會員查詢預約記錄
 	List<ShuttleReservation> findByMembers(Members member);
+	
+	List<ShuttleReservation> findByMembers_MemberId(Integer memberId);
 
 	// 根據訂房ID查詢預約記錄
 	List<ShuttleReservation> findByRoomRVOrder(RoomRVOrder roomRVOrder);

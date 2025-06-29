@@ -6,98 +6,179 @@
     <title>微嶼 | Isle Villa</title>
     <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+    <style>
+        .cart-card {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            border-radius: 1rem;
+            margin-bottom: 1.5rem;
+            border: none;
+        }
+        .cart-card .card-body {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+        }
+        .cart-product-img {
+            width: 90px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+            background: #f8f9fa;
+        }
+        .cart-product-info {
+            flex: 1 1 200px;
+            min-width: 0;
+        }
+        .cart-product-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .cart-product-price {
+            color: #bfa100;
+            font-weight: bold;
+        }
+        .cart-qty-group {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .cart-qty-group input[type="text"] {
+            width: 48px;
+            text-align: center;
+            border-radius: 0.4rem;
+        }
+        .cart-subtotal {
+            font-weight: bold;
+            color: #333;
+            min-width: 80px;
+            text-align: right;
+        }
+        .cart-remove-btn {
+            color: #dc3545;
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            transition: color 0.2s;
+        }
+        .cart-remove-btn:hover {
+            color: #a71d2a;
+        }
+        .cart-total-box {
+            background: #f8f9fa;
+            border-radius: 0.7rem;
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .cart-total-label {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        .cart-total-amount {
+            font-size: 1.3rem;
+            color: #bfa100;
+            font-weight: bold;
+        }
+        .cart-action-btns {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        @media (max-width: 600px) {
+            .cart-card .card-body {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .cart-subtotal {
+                text-align: left;
+            }
+        }
+        .empty-cart-box {
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #bbb;
+        }
+        .empty-cart-box i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+    </style>
 </head>
 <body>
 <!-- ===== 載入Header ===== -->
 <div th:replace="~{fragments/fragments :: header}"></div>
-
-<!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
 <main>
-    <div class="container mt-5">
-        <h2 class="mb-4"> 購物車</h2>
-
-        <table class="table table-striped table-hover align-middle">
-            <thead class="table-dark">
-            <tr>
-                <th>商品名稱</th>
-                <th class="text-end">單價</th>
-                <th class="text-end">數量</th>
-                <th class="text-end">小計</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="item : ${cartItems}">
-                <td th:text="${item.productName}"></td>
-                <td class="text-end">NT$ <span th:text="${item.productPrice}"></span></td>
-                <td class="text-end">
-                    <!-- 減少數量按鈕 -->
-                    <button type="button" class="btn btn-outline-secondary btn-sm"
-                            th:data-product-id="${item.productId}" onclick="updateQuantity(event, -1)">-
-                    </button>
-
-                    <!-- 顯示商品數量 -->
-                    <input th:id="'quantity-' + ${item.productId}" type="text" name="quantity"
-                           th:value="${item.quantity}" class="form-control d-inline" style="width: 60px;" readonly/>
-
-                    <!-- 增加數量按鈕 -->
-                    <button type="button" class="btn btn-outline-secondary btn-sm"
-                            th:data-product-id="${item.productId}" onclick="updateQuantity(event, 1)">+
-                    </button>
-
-                    <!-- 提交表單更新數量 -->
-                    <form th:id="'updateForm-' + ${item.productId}" th:action="@{/updateQuantity}" method="post"
-                          class="d-inline">
+    <div class="container mt-5 mb-5">
+        <h2 class="mb-4">購物車</h2>
+        <!-- 空購物車提示 -->
+        <div th:if="${#lists.isEmpty(cartItems)}" class="empty-cart-box">
+            <i class="bi bi-cart-x"></i>
+            <h4>購物車是空的</h4>
+            <p>快去選購你喜歡的商品吧！</p>
+            <a th:href="@{/product}" class="btn btn-primary mt-2"><i class="bi bi-bag-plus me-1"></i>前往商品頁</a>
+        </div>
+        <!-- 購物車內容 -->
+        <div th:if="${!#lists.isEmpty(cartItems)}">
+            <div th:each="item : ${cartItems}" class="card cart-card">
+                <div class="card-body">
+                    <img th:src="${item.productImageUrl}" class="cart-product-img me-3" alt="商品圖片"/>
+                    <div class="cart-product-info">
+                        <div class="cart-product-name" th:text="${item.productName}"></div>
+                        <div class="cart-product-price">NT$ <span th:text="${item.productPrice}"></span></div>
+                    </div>
+                    <div class="cart-qty-group ms-auto">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" th:data-product-id="${item.productId}" onclick="updateQuantity(event, -1)"><i class="bi bi-dash"></i></button>
+                        <input th:id="'quantity-' + ${item.productId}" type="text" name="quantity" th:value="${item.quantity}" class="form-control d-inline" readonly/>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" th:data-product-id="${item.productId}" onclick="updateQuantity(event, 1)"><i class="bi bi-plus"></i></button>
+                        <form th:id="'updateForm-' + ${item.productId}" th:action="@{/updateQuantity}" method="post" class="d-inline">
+                            <input type="hidden" name="productId" th:value="${item.productId}"/>
+                            <input type="hidden" name="quantity" th:value="${item.quantity}"/>
+                        </form>
+                    </div>
+                    <div class="cart-subtotal ms-4">NT$ <span th:text="${item.subtotal}"></span></div>
+                    <form th:action="@{/removeFromCart}" method="post" class="ms-3">
                         <input type="hidden" name="productId" th:value="${item.productId}"/>
-                        <input type="hidden" name="quantity" th:value="${item.quantity}"/>
+                        <button type="submit" class="cart-remove-btn" title="刪除"><i class="bi bi-trash"></i></button>
                     </form>
-                </td>
-                <td class="text-end">NT$ <span th:text="${item.subtotal}"></span></td>
-                <td class="text-end">
-                    <form th:action="@{/removeFromCart}" method="post" class="d-inline">
-                        <input type="hidden" name="productId" th:value="${item.productId}"/>
-                        <button type="submit" class="btn btn-sm btn-danger">刪除</button>
-                    </form>
-                </td>
-            </tr>
-            </tbody>
-            <tfoot>
-            <tr class="table-light">
-                <td colspan="3" class="text-end"><strong>總金額：</strong></td>
-                <td class="text-end">
-                    <strong>NT$ <span th:text="${totalAmount}"></span></strong>
-                </td>
-            </tr>
-            </tfoot>
-        </table>
-
-        <!-- 結帳按鈕（目前是空白，稍後可以擴充） -->
-        <a th:href="@{/checkout(redirect='/cart')}" class="btn btn-success">結帳</a>
-        <a th:href="@{/product}" class="btn btn-secondary ms-2">繼續購物</a>
+                </div>
+            </div>
+            <!-- 總金額區塊 -->
+            <div class="cart-total-box d-flex justify-content-between align-items-center">
+                <span class="cart-total-label">總金額：</span>
+                <span class="cart-total-amount">NT$ <span th:text="${totalAmount}"></span></span>
+            </div>
+            <!-- 行動按鈕 -->
+            <div class="cart-action-btns mb-3">
+                <a th:href="@{/checkout(redirect='/cart')}" class="btn btn-success btn-lg"><i class="bi bi-credit-card me-1"></i>結帳</a>
+                <a th:href="@{/product}" class="btn btn-outline-primary btn-lg"><i class="bi bi-arrow-left me-1"></i>繼續購物</a>
+                <form th:action="@{/clearCart}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-outline-danger btn-lg"><i class="bi bi-trash me-1"></i>清空購物車</button>
+                </form>
+            </div>
+        </div>
     </div>
 </main>
-
-<!-- 佔位元素 -->
 <div style="height: 55px"></div>
-<!-- ========== 載入Footer ========== -->
 <div th:replace="~{fragments/fragments :: footer}"></div>
-
 <script>
     // 更新商品數量
     function updateQuantity(event, change) {
-        var productId = event.target.getAttribute("data-product-id");
+        var productId = event.target.closest('button').getAttribute("data-product-id");
         var quantityInput = document.getElementById("quantity-" + productId);
         var newQuantity = parseInt(quantityInput.value) + change;
-
-        // 確保數量不小於1
-        if (newQuantity < 1) {
-            newQuantity = 1;
-        }
-
+        if (newQuantity < 1) newQuantity = 1;
         quantityInput.value = newQuantity;
         var form = document.getElementById("updateForm-" + productId);
-        form.quantity.value = newQuantity;  // 更新表單中的數量欄位
-        form.submit();  // 提交表單以更新數量
+        form.quantity.value = newQuantity;
+        form.submit();
     }
 </script>
 </body>
