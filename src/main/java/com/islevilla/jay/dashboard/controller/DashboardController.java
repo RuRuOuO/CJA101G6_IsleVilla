@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
-public class DashBoardController {
+public class DashboardController {
 
     @Autowired
     private DashboardService dashboardService;
