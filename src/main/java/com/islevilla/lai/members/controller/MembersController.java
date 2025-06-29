@@ -6,9 +6,13 @@ import java.time.LocalDateTime;
 import java.time.Period;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,21 +37,29 @@ public class MembersController {
 
 	// 顯示登入頁面
 	@GetMapping("/member/login")
-	public String showLoginPage(HttpSession session) {
+	public String showLoginPage(@RequestParam(value = "redirect", required = false) String redirect, 
+	                           HttpSession session, Model model) {
 		// 如果用戶已經登入，重定向到首頁
 		if (session.getAttribute("member") != null) {
 			System.out.println("目前已經登入！\n目前登入中的會員：" + ((Members) session.getAttribute("member")).getMemberName());
 			return "redirect:/";
 		}
 		System.out.println("進入登入頁面");
+		
+		// 將redirect參數傳遞給登入頁面
+		if (redirect != null && !redirect.isEmpty()) {
+			model.addAttribute("redirect", redirect);
+		}
+		
 		return "front-end/member/member-login";
 	}
 
 	// 處理登入請求
 	@PostMapping("/member/login")
 	public String login(@RequestParam("memberEmail") String email, @RequestParam("memberPassword") String password,
-			@RequestParam(value = "rememberMe", required = false) boolean rememberMe, HttpSession session,
-			RedirectAttributes redirectAttributes) {
+			@RequestParam(value = "rememberMe", required = false) boolean rememberMe,
+			@RequestParam(value = "redirect", required = false) String redirect,
+			HttpSession session, RedirectAttributes redirectAttributes) {
 
 		try {
 			// 驗證電子信箱格式
@@ -70,20 +82,25 @@ public class MembersController {
 				// 登入成功，將會員資訊存入session
 				session.setAttribute("member", member);
 				System.out.println("session.getAttribute: " + session.getAttribute("member"));
-
+				
 				// 如果選擇記住我，設定較長的session timeout（可選）
-//                if (rememberMe) {
-//                    session.setMaxInactiveInterval(30 * 24 * 60 * 60); // 30天
-//                } else {
-//                    session.setMaxInactiveInterval(8 * 60 * 60); // 8小時
-//                }
+//		                if (rememberMe) {
+//              		      session.setMaxInactiveInterval(30 * 24 * 60 * 60); // 30天
+//                		} else {
+//		                    session.setMaxInactiveInterval(8 * 60 * 60); // 8小時
+//		                }
 
 				// 更新最後登入時間
 				membersService.updateMemberLastLoginTime(member.getMemberId(), LocalDateTime.now());
 
 				redirectAttributes.addFlashAttribute("success", "登入成功！歡迎回來");
 
-				return "redirect:/";
+				// 檢查是否有redirect參數，如果有就重定向到指定頁面
+				if (redirect != null && !redirect.isEmpty()) {
+					return "redirect:" + redirect;
+				} else {
+					return "redirect:/";
+				}
 
 			} else {
 				redirectAttributes.addFlashAttribute("error", "電子信箱或密碼錯誤");
@@ -344,6 +361,57 @@ public class MembersController {
 	@GetMapping("/member/logout-success")
 	public String showLogoutSuccessPage(Model model) {
 		return "front-end/member/member-logout-success";
+	}
+	
+	// 前台渲染會員資料
+	@GetMapping("/member/info")
+	public String memberInfo(HttpSession session, Model model) {
+		// 檢查是否已登入
+	    Members member = (Members) session.getAttribute("member");
+ 		if (member == null) {
+ 			// 如果沒有登入，直接跳轉到登入頁面
+ 			System.out.println("找不到登入紀錄，即將跳轉到登入頁面......");
+ 			return "redirect:/member/login";
+ 		}
+ 		System.out.println("生日型別：" + member.getMemberBirthdate().getClass());
+ 		System.out.println("生日內容：" + member.getMemberBirthdate());
+	    model.addAttribute("member", member);
+	    return "front-end/member/member-info";
+	}
+	
+	// 更新會員資訊
+	@PostMapping("/member/update")
+	public String updateMember(@ModelAttribute Members member, 
+	                          @RequestParam("photoFile") MultipartFile photoFile,
+	                          HttpSession session,
+	                          RedirectAttributes redirectAttributes) {
+		
+		try {
+	        // 處理照片上傳
+	        if (!photoFile.isEmpty()) {
+	            member.setMemberPhoto(photoFile.getBytes());
+	        }
+	        
+	        membersService.updateMember(member);
+	        redirectAttributes.addFlashAttribute("successMessage", "資料更新成功！");
+	    } catch (Exception e) {
+	        redirectAttributes.addFlashAttribute("errorMessage", "資料更新失敗：" + e.getMessage());
+	    }
+	    // 更新邏輯
+	    session.setAttribute("member", membersService.getOneMember(member.getMemberId())); // 更新 session 中的會員資料
+	    return "redirect:/member/info";
+	}
+
+	@GetMapping("/member/photo/{memberId}")
+	public ResponseEntity<byte[]> getMemberPhoto(@PathVariable Integer memberId) {
+	    // 照片顯示邏輯
+		Members member = membersService.getOneMember(memberId);
+	    if (member != null && member.getMemberPhoto() != null) {
+	        return ResponseEntity.ok()
+	                .contentType(MediaType.IMAGE_JPEG)
+	                .body(member.getMemberPhoto());
+	    }
+	    return ResponseEntity.notFound().build();
 	}
 
 	// ----------------------------工具方法---------------------------- //

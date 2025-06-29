@@ -1,14 +1,22 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>新增最新消息</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>微嶼 | Isle Villa 後台首頁</title>
     <!-- ===== 載入統一樣式 ===== -->
-    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
 </head>
 <body>
-<main>
-    <div class="container py-5">
+<!-- ===== 載入sidebar ===== -->
+<!-- 插入手機版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+<!-- 插入桌面版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+
+<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+    <th:block th:fragment="myContent">
+        <!-- //////////////////// 頁面內容放在這個card裡面(外框已經有加card和container，直接放入table和標題即可)//////////////////// -->
         <h2 class="mb-4">新增最新消息</h2>
         <a class="btn btn-secondary mb-4" th:href="@{/backend/news/list}">← 回到消息列表</a>
 
@@ -27,8 +35,7 @@
             <!-- 內容 -->
             <div class="col-12">
                 <label for="newsContent" class="form-label">內容</label>
-                <textarea id="newsContent" th:field="*{newsContent}" onclick="hideContent('newsContent.errors')"
-                          class="form-control" rows="4"></textarea>
+                <textarea id="newsContent" th:field="*{newsContent}" maxlength="1000" rows="4" class="form-control"></textarea>
                 <span class="text-danger" id="newsContent.errors" th:if="${#fields.hasErrors('newsContent')}"
                       th:errors="*{newsContent}"></span>
             </div>
@@ -52,6 +59,18 @@
                     <option value="0">下架</option>
                 </select>
             </div>
+            <!-- 對應優惠專案-->
+            <div class="col-12">
+                <label for="promotion">對應優惠專案</label>
+                <select id="promotion" name="promotion.roomPromotionId" class="form-control">
+                    <option value="">無</option>
+                    <th:block th:each="promotion : ${promotionList}">
+                        <option th:value="${promotion.roomPromotionId}"
+                                th:text="${promotion.roomPromotionTitle}">
+                        </option>
+                    </th:block>
+                </select>
+            </div>
 
             <!-- 按鈕 -->
             <div class="col-12 d-flex gap-3">
@@ -59,9 +78,9 @@
                 <button type="reset" onclick="resetForm()" class="btn btn-outline-secondary">重設表單</button>
             </div>
         </form>
-    </div>
+        <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+    </th:block>
 </main>
-
 <script type="text/javascript">
     // 清除提示信息
     function hideContent(elementId) {

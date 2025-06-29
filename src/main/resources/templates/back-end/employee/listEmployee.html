@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>員工管理</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+</head>
+<body>
+<!-- ===== 載入sidebar ===== -->
+<!-- 插入手機版側邊欄 -->
+<th:block th:replace="~{fragments/backFragments :: mobileSidebar}"></th:block>
+<!-- 插入桌面版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+
+<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+    <th:block th:fragment="myContent">
+        <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+        <!-- 卡片標題與新增按鈕 -->
+        <div class="card-header bg-transparent border-0 pt-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0 fw-bold">
+                    <i class="bi bi-people me-2"></i>員工管理
+                </h4>
+                <button
+                        class="btn btn-success"
+                        data-bs-toggle="modal"
+                        data-bs-target="#addEmployeeModal"
+                >
+                    <i class="bi bi-plus-circle me-2"></i>新增員工
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- 搜尋與篩選 -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="searchInput" placeholder="搜尋員工姓名、編號" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="departmentFilter">
+                        <option value="">全部部門</option>
+                        <option th:each="dept : ${departments}" 
+                                th:value="${dept.departmentId}" 
+                                th:text="${dept.departmentName}"
+                                th:selected="${dept.departmentId != null and dept.departmentId == selectedDepartmentId}">
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="statusFilter">
+                        <option value="">全部狀態</option>
+                        <option value="1" th:selected="${selectedStatus != null and selectedStatus == 1}">在職</option>
+                        <option value="0" th:selected="${selectedStatus != null and selectedStatus == 0}">離職</option>
+                        <option value="2" th:selected="${selectedStatus != null and selectedStatus == 2}">停職</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 員工表格 -->
+            <div class="table-responsive">
+                <table class="table table-hover" id="employeeTable">
+                    <thead>
+                    <tr>
+                        <th>編號</th>
+                        <th>姓名</th>
+                        <th>部門</th>
+                        <th>信箱</th>
+                        <th>手機</th>
+                        <th>狀態</th>
+                        <th>權限</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="employee : ${employees}">
+                        <td th:text="${employee.employeeId}">員工編號</td>
+                        <td th:text="${employee.employeeName}">姓名</td>
+                        <td th:text="${employee.department != null ? employee.department.departmentName : ''}">部門</td>
+                        <td th:text="${employee.employeeEmail}">信箱</td>
+                        <td th:text="${employee.employeeMobile}">手機</td>
+                        <td>
+                            <span th:if="${employee.employeeStatus == 1}" class="badge bg-success">在職</span>
+                            <span th:if="${employee.employeeStatus == 0}" class="badge bg-danger">離職</span>
+                            <span th:if="${employee.employeeStatus == 2}" class="badge bg-warning">停職</span>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-wrap gap-1">
+                                <span th:if="${employee.permissions != null}" 
+                                      th:each="permission : ${employee.permissions}" 
+                                      class="badge bg-info text-white small"
+                                      th:text="${permission.permissionName}">
+                                    權限
+                                </span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <button class="btn btn-sm btn-primary" th:attr="onclick='editEmployee(' + ${employee.employeeId} + ')'">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-info" th:attr="onclick='viewEmployee(' + ${employee.employeeId} + ')'">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+    </div></th:block>
+</main>
+
+<!-- 新增員工 Modal -->
+<div class="modal fade" id="addEmployeeModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-person-plus me-2"></i>新增員工
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addEmployeeForm" novalidate enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">員工姓名 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="employeeName" required>
+                            <div class="invalid-feedback">請輸入員工姓名</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">員工信箱 <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" name="employeeEmail" required>
+                            <div class="invalid-feedback">請輸入有效的信箱格式</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">密碼 <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" name="employeePassword" required minlength="6">
+                            <div class="invalid-feedback">密碼至少需要6個字元</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">確認密碼 <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" name="confirmPassword" required minlength="6">
+                            <div class="invalid-feedback">請確認密碼</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">部門 <span class="text-danger">*</span></label>
+                            <select class="form-select" name="departmentId" required>
+                                <option value="">請選擇部門</option>
+                                <option th:each="dept : ${departments}" 
+                                        th:value="${dept.departmentId}" 
+                                        th:text="${dept.departmentName}">
+                                </option>
+                            </select>
+                            <div class="invalid-feedback">請選擇部門</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">手機號碼 <span class="text-danger">*</span></label>
+                            <input type="tel" class="form-control" name="employeeMobile" required pattern="^09\d{8}$">
+                            <div class="invalid-feedback">請輸入正確的手機號碼格式（09開頭，共10位數字）</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">性別 <span class="text-danger">*</span></label>
+                            <select class="form-select" name="employeeGender" required>
+                                <option value="">請選擇性別</option>
+                                <option value="0">女</option>
+                                <option value="1">男</option>
+                            </select>
+                            <div class="invalid-feedback">請選擇性別</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">生日 <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" name="employeeBirthdate" required>
+                            <div class="invalid-feedback">請選擇生日</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">到職日 <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" name="employeeHiredate" id="employeeHiredate" required>
+                            <div class="invalid-feedback">請選擇到職日</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">員工狀態 <span class="text-danger">*</span></label>
+                            <select class="form-select" name="employeeStatus" required>
+                                <option value="">請選擇狀態</option>
+                                <option value="1">在職</option>
+                                <option value="0">離職</option>
+                                <option value="2">停職</option>
+                            </select>
+                            <div class="invalid-feedback">請選擇員工狀態</div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">地址 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="employeeAddress" required>
+                        <div class="invalid-feedback">請輸入地址</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">員工照片</label>
+                        <input type="file" class="form-control" name="employeePhoto" accept="image/*" onchange="previewEmployeePhoto(this, 'addEmployeePhotoPreview')">
+                        <div class="mt-2">
+                            <img id="addEmployeePhotoPreview" src="" style="width:120px;height:120px;object-fit:cover;display:none;" alt="預覽"/>
+                        </div>
+                    </div>
+                    
+                    <!-- 權限設定區塊 -->
+                    <div class="mb-3">
+                        <label class="form-label">權限設定 <span class="text-danger">*</span></label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check" th:each="permission : ${permissions}">
+                                    <input class="form-check-input" type="checkbox" 
+                                           th:name="permissions" 
+                                           th:value="${permission.permissionName}"
+                                           th:id="'permission_' + ${permission.permissionId}">
+                                    <label class="form-check-label" 
+                                           th:for="'permission_' + ${permission.permissionId}"
+                                           th:text="${permission.permissionDescription}">
+                                        權限描述
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="invalid-feedback">請至少選擇一個權限</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-success" onclick="saveEmployee()">
+                    <i class="bi bi-check-circle me-2"></i>新增員工
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 編輯員工 Modal -->
+<div class="modal fade" id="editEmployeeModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-pencil me-2"></i>編輯員工資料
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editEmployeeForm" novalidate enctype="multipart/form-data">
+                    <input type="hidden" id="editEmployeeId" name="employeeId">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">員工姓名 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="editEmployeeName" name="employeeName" required>
+                            <div class="invalid-feedback">請輸入員工姓名</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">員工信箱 <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="editEmployeeEmail" name="employeeEmail" required>
+                            <div class="invalid-feedback">請輸入有效的信箱格式</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">部門 <span class="text-danger">*</span></label>
+                            <select class="form-select" id="editDepartmentId" name="departmentId" required>
+                                <option value="">請選擇部門</option>
+                                <option th:each="dept : ${departments}" 
+                                        th:value="${dept.departmentId}" 
+                                        th:text="${dept.departmentName}">
+                                </option>
+                            </select>
+                            <div class="invalid-feedback">請選擇部門</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">員工狀態 <span class="text-danger">*</span></label>
+                            <select class="form-select" id="editEmployeeStatus" name="employeeStatus" required>
+                                <option value="">請選擇狀態</option>
+                                <option value="1">在職</option>
+                                <option value="0">離職</option>
+                                <option value="2">停職</option>
+                            </select>
+                            <div class="invalid-feedback">請選擇員工狀態</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">手機號碼 <span class="text-danger">*</span></label>
+                            <input type="tel" class="form-control" id="editEmployeeMobile" name="employeeMobile" required pattern="^09\d{8}$">
+                            <div class="invalid-feedback">請輸入正確的手機號碼格式（09開頭，共10位數字）</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">性別 <span class="text-danger">*</span></label>
+                            <select class="form-select" id="editEmployeeGender" name="employeeGender" required>
+                                <option value="">請選擇性別</option>
+                                <option value="0">女</option>
+                                <option value="1">男</option>
+                            </select>
+                            <div class="invalid-feedback">請選擇性別</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">生日 <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="editEmployeeBirthdate" name="employeeBirthdate" required>
+                            <div class="invalid-feedback">請選擇生日</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">到職日 <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="editEmployeeHiredate" name="employeeHiredate" required>
+                            <div class="invalid-feedback">請選擇到職日</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">離職日期</label>
+                            <input type="date" class="form-control" id="editEmployeeLeavedate" name="employeeLeavedate" disabled>
+                            <div class="invalid-feedback">請選擇離職日期</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">地址 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="editEmployeeAddress" name="employeeAddress" required>
+                            <div class="invalid-feedback">請輸入地址</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">密碼</label>
+                            <input type="password" class="form-control" id="editEmployeePassword" name="employeePassword" minlength="6" placeholder="如需修改請輸入新密碼，否則留空">
+                            <div class="invalid-feedback">密碼至少需要6個字元</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">確認密碼</label>
+                            <input type="password" class="form-control" id="editConfirmPassword" name="confirmPassword" minlength="6" placeholder="請再次輸入新密碼">
+                            <div class="invalid-feedback">請確認密碼</div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">員工照片</label>
+                        <input type="file" class="form-control" name="employeePhoto" accept="image/*" onchange="previewEmployeePhoto(this, 'editEmployeePhotoPreview')">
+                        <div class="mt-2">
+                            <img id="editEmployeePhotoPreview" src="" style="width:120px;height:120px;object-fit:cover;display:none;" alt="預覽"/>
+                        </div>
+                    </div>
+                    
+                    <!-- 權限設定區塊 -->
+                    <div class="mb-3">
+                        <label class="form-label">權限設定 <span class="text-danger">*</span></label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check" th:each="permission : ${permissions}">
+                                    <input class="form-check-input" type="checkbox" 
+                                           th:name="permissions" 
+                                           th:value="${permission.permissionName}"
+                                           th:id="'edit_permission_' + ${permission.permissionId}">
+                                    <label class="form-check-label" 
+                                           th:for="'edit_permission_' + ${permission.permissionId}"
+                                           th:text="${permission.permissionDescription}">
+                                        權限描述
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="invalid-feedback">請至少選擇一個權限</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveEmployeeEdit()">
+                    <i class="bi bi-check-circle me-2"></i>儲存變更
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 員工詳細資料 Modal -->
+<div class="modal fade" id="viewEmployeeModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-eye me-2"></i>員工詳細資料
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4 text-center mb-3">
+                        <img id="viewEmployeePhoto" src="" class="border" style="width:120px;height:120px;object-fit:cover;display:none;" alt="員工圖片"/>
+                    </div>
+                    <div class="col-md-8">
+                        <table class="table table-borderless mb-0">
+                            <tbody>
+                                <tr><th>編號</th><td id="viewEmployeeId"></td></tr>
+                                <tr><th>姓名</th><td id="viewEmployeeName"></td></tr>
+                                <tr><th>性別</th><td id="viewEmployeeGender"></td></tr>
+                                <tr><th>部門</th><td id="viewEmployeeDepartment"></td></tr>
+                                <tr><th>信箱</th><td id="viewEmployeeEmail"></td></tr>
+                                <tr><th>手機</th><td id="viewEmployeeMobile"></td></tr>
+                                <tr><th>生日</th><td id="viewEmployeeBirthdate"></td></tr>
+                                <tr><th>到職日</th><td id="viewEmployeeHiredate"></td></tr>
+                                <tr><th>離職日</th><td id="viewEmployeeLeavedate"></td></tr>
+                                <tr><th>地址</th><td id="viewEmployeeAddress"></td></tr>
+                                <tr><th>狀態</th><td id="viewEmployeeStatus"></td></tr>
+                                <tr><th>權限</th><td id="viewEmployeePermissions"></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== 載入統一的 JavaScript ===== -->
+<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
+
+<script>
+// 員工搜尋功能
+document.getElementById('searchInput').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const table = $('#employeeTable').DataTable();
+    
+    // 自定義搜尋函數，只搜尋編號（第0欄）和名字（第2欄）
+    $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+        const employeeId = data[0].toLowerCase(); // 編號欄位
+        const employeeName = data[2].toLowerCase(); // 名字欄位
+        
+        return employeeId.includes(searchTerm) || employeeName.includes(searchTerm);
+    });
+    
+    // 清除之前的搜尋結果
+    table.draw();
+    
+    // 移除自定義搜尋函數
+    $.fn.dataTable.ext.search.pop();
+});
+
+// 部門篩選功能
+document.getElementById('departmentFilter').addEventListener('change', function() {
+    const departmentId = this.value;
+    const statusFilter = document.getElementById('statusFilter').value;
+    const url = new URL(window.location);
+    
+    if (departmentId) {
+        url.searchParams.set('departmentId', departmentId);
+    } else {
+        url.searchParams.delete('departmentId');
+    }
+    
+    if (statusFilter) {
+        url.searchParams.set('status', statusFilter);
+    } else {
+        url.searchParams.delete('status');
+    }
+    
+    window.location.href = url.toString();
+});
+
+// 狀態篩選功能
+document.getElementById('statusFilter').addEventListener('change', function() {
+    const status = this.value;
+    const departmentFilter = document.getElementById('departmentFilter').value;
+    const url = new URL(window.location);
+    
+    if (status) {
+        url.searchParams.set('status', status);
+    } else {
+        url.searchParams.delete('status');
+    }
+    
+    if (departmentFilter) {
+        url.searchParams.set('departmentId', departmentFilter);
+    } else {
+        url.searchParams.delete('departmentId');
+    }
+    
+    window.location.href = url.toString();
+});
+
+// 清空新增員工表單
+function clearAddEmployeeForm() {
+    const form = document.getElementById('addEmployeeForm');
+    form.reset();
+    
+    // 設定入職日為今天
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('employeeHiredate').value = today;
+    
+    // 清除所有權限 checkbox
+    const permissionCheckboxes = form.querySelectorAll('input[name="permissions"]');
+    permissionCheckboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+}
+
+// 新增員工
+function saveEmployee() {
+    const form = document.getElementById('addEmployeeForm');
+    form.classList.remove('was-validated');
+    if (!form.checkValidity()) {
+        form.classList.add('was-validated');
+        return;
+    }
+    const formData = new FormData(form);
+    // 驗證密碼
+    const password = formData.get('employeePassword');
+    const confirmPassword = formData.get('confirmPassword');
+    if (password !== confirmPassword) {
+        showFieldError(form.querySelector('[name="confirmPassword"]'), '密碼與確認密碼不一致！');
+        return;
+    }
+    if (password.length < 6) {
+        showFieldError(form.querySelector('[name="employeePassword"]'), '密碼至少需要6個字元！');
+        return;
+    }
+    // 權限
+    const selectedPermissions = [];
+    form.querySelectorAll('input[name="permissions"]:checked').forEach(cb => selectedPermissions.push(cb.value));
+    if (selectedPermissions.length === 0) {
+        showFieldError(form.querySelector('.form-check'), '請至少選擇一個權限');
+        return;
+    }
+    formData.set('permissions', JSON.stringify(selectedPermissions));
+    fetch('/backend/employee/add', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())
+    .then(result => {
+        if (result === 'success') {
+            alert('員工新增成功！');
+            location.reload();
+        } else {
+            alert('新增失敗：' + result);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('新增失敗，請稍後再試');
+    });
+}
+
+// 編輯員工
+function editEmployee(employeeId) {
+    // 取得員工資料
+    fetch(`/backend/employee/get/${employeeId}`)
+    .then(response => response.json())
+    .then(employee => {
+        // 填入表單資料
+        document.getElementById('editEmployeeId').value = employee.employeeId;
+        document.getElementById('editEmployeeName').value = employee.employeeName;
+        document.getElementById('editEmployeeEmail').value = employee.employeeEmail;
+        document.getElementById('editDepartmentId').value = employee.department.departmentId;
+        document.getElementById('editEmployeeStatus').value = employee.employeeStatus;
+        
+        // 自動填入欄位
+        document.getElementById('editEmployeeMobile').value = employee.employeeMobile || '';
+        document.getElementById('editEmployeeGender').value = (employee.employeeGender !== null && employee.employeeGender !== undefined) ? String(employee.employeeGender) : '';
+        document.getElementById('editEmployeeBirthdate').value = employee.employeeBirthdate || '';
+        document.getElementById('editEmployeeHiredate').value = employee.employeeHiredate || '';
+        document.getElementById('editEmployeeLeavedate').value = employee.employeeLeavedate || '';
+        document.getElementById('editEmployeeAddress').value = employee.employeeAddress || '';
+        
+        // 密碼欄位不自動填值
+        document.getElementById('editEmployeePassword').value = '';
+        document.getElementById('editConfirmPassword').value = '';
+        
+        // 根據員工狀態控制離職日期欄位
+        const leavedateField = document.getElementById('editEmployeeLeavedate');
+        if (employee.employeeStatus === 0) { // 離職狀態
+            leavedateField.disabled = false;
+        } else {
+            leavedateField.disabled = true;
+            leavedateField.value = '';
+        }
+        
+        // 清除所有權限 checkbox
+        const permissionCheckboxes = document.querySelectorAll('#editEmployeeForm input[name="permissions"]');
+        permissionCheckboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        
+        // 設定員工現有的權限
+        if (employee.permissions) {
+            employee.permissions.forEach(permission => {
+                const checkbox = document.querySelector(`#editEmployeeForm input[value="${permission.permissionName}"]`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                }
+            });
+        }
+        
+        // 設定預覽圖片
+        const photoPreview = document.getElementById('editEmployeePhotoPreview');
+        if (employee.employeePhoto && employee.employeePhoto.length > 0) {
+            photoPreview.src = `/backend/employee/photo/${employee.employeeId}`;
+            photoPreview.style.display = 'block';
+        } else {
+            photoPreview.style.display = 'none';
+        }
+        
+        // 顯示 modal
+        const modal = new bootstrap.Modal(document.getElementById('editEmployeeModal'));
+        modal.show();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('取得員工資料失敗');
+    });
+}
+
+// 儲存員工編輯
+function saveEmployeeEdit() {
+    const form = document.getElementById('editEmployeeForm');
+    form.classList.remove('was-validated');
+    if (!form.checkValidity()) {
+        form.classList.add('was-validated');
+        return;
+    }
+    const formData = new FormData(form);
+    // 權限
+    const selectedPermissions = [];
+    form.querySelectorAll('input[name="permissions"]:checked').forEach(cb => selectedPermissions.push(cb.value));
+    if (selectedPermissions.length === 0) {
+        showFieldError(form.querySelector('.form-check'), '請至少選擇一個權限');
+        return;
+    }
+    formData.set('permissions', JSON.stringify(selectedPermissions));
+    fetch('/backend/employee/update', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())
+    .then(result => {
+        if (result === 'success') {
+            alert('員工資料更新成功！');
+            location.reload();
+        } else {
+            alert('更新失敗：' + result);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('更新失敗，請稍後再試');
+    });
+}
+
+// 顯示欄位錯誤的函數
+function showFieldError(field, message) {
+    field.classList.add('is-invalid');
+    const feedback = field.parentNode.querySelector('.invalid-feedback');
+    if (feedback) {
+        feedback.textContent = message;
+    }
+}
+
+// 清除欄位錯誤的函數
+function clearFieldError(field) {
+    field.classList.remove('is-invalid');
+    field.classList.remove('is-valid');
+}
+
+// 驗證信箱格式
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+// 驗證手機號碼格式
+function isValidMobile(mobile) {
+    const mobileRegex = /^09\d{8}$/;
+    return mobileRegex.test(mobile);
+}
+
+// 即時驗證功能
+document.addEventListener('DOMContentLoaded', function() {
+    // 員工姓名驗證
+    document.querySelectorAll('[name="employeeName"], #editEmployeeName').forEach(field => {
+        field.addEventListener('input', function() {
+            if (this.value.trim().length > 0) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            } else {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+            }
+        });
+    });
+
+    // 員工信箱驗證
+    document.querySelectorAll('[name="employeeEmail"], #editEmployeeEmail').forEach(field => {
+        field.addEventListener('input', function() {
+            if (isValidEmail(this.value)) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            } else {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+            }
+        });
+    });
+
+    // 密碼驗證
+    document.querySelectorAll('[name="employeePassword"]').forEach(field => {
+        field.addEventListener('input', function() {
+            if (this.value.length >= 6) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            } else {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+            }
+        });
+    });
+
+    // 確認密碼驗證
+    document.querySelectorAll('[name="confirmPassword"]').forEach(field => {
+        field.addEventListener('input', function() {
+            const password = document.querySelector('[name="employeePassword"]').value;
+            if (this.value === password && this.value.length >= 6) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            } else {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+            }
+        });
+    });
+
+    // 手機號碼驗證
+    document.querySelectorAll('[name="employeeMobile"]').forEach(field => {
+        field.addEventListener('input', function() {
+            if (isValidMobile(this.value)) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            } else {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+            }
+        });
+    });
+
+    // 地址驗證
+    document.querySelectorAll('[name="employeeAddress"]').forEach(field => {
+        field.addEventListener('input', function() {
+            if (this.value.trim().length > 0) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            } else {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+            }
+        });
+    });
+
+    // 部門驗證
+    document.querySelectorAll('[name="departmentId"], #editDepartmentId').forEach(field => {
+        field.addEventListener('change', function() {
+            if (this.value !== '') {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            } else {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+            }
+        });
+    });
+
+    // 性別驗證
+    document.querySelectorAll('[name="employeeGender"]').forEach(field => {
+        field.addEventListener('change', function() {
+            if (this.value !== '') {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            } else {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+            }
+        });
+    });
+
+    // 生日驗證
+    document.querySelectorAll('[name="employeeBirthdate"]').forEach(field => {
+        field.addEventListener('change', function() {
+            if (this.value !== '') {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            } else {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+            }
+        });
+    });
+
+    // 到職日驗證
+    document.querySelectorAll('[name="employeeHiredate"]').forEach(field => {
+        field.addEventListener('change', function() {
+            if (this.value !== '') {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            } else {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+            }
+        });
+    });
+
+    // 員工狀態驗證
+    document.querySelectorAll('[name="employeeStatus"], #editEmployeeStatus').forEach(field => {
+        field.addEventListener('change', function() {
+            if (this.value !== '') {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            } else {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+            }
+            
+            // 控制離職日期欄位（僅在編輯表單中）
+            if (this.id === 'editEmployeeStatus') {
+                const leavedateField = document.getElementById('editEmployeeLeavedate');
+                if (this.value === '0') { // 離職狀態
+                    leavedateField.disabled = false;
+                } else {
+                    leavedateField.disabled = true;
+                    leavedateField.value = '';
+                }
+            }
+        });
+    });
+
+    // 權限驗證
+    document.querySelectorAll('input[name="permissions"]').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const form = this.closest('form');
+            const checkedPermissions = form.querySelectorAll('input[name="permissions"]:checked');
+            const permissionContainer = form.querySelector('.form-check').parentNode;
+            
+            if (checkedPermissions.length > 0) {
+                permissionContainer.classList.remove('is-invalid');
+                permissionContainer.classList.add('is-valid');
+            } else {
+                permissionContainer.classList.remove('is-valid');
+                permissionContainer.classList.add('is-invalid');
+            }
+        });
+    });
+
+    // 新增員工 Modal 打開時清空表單
+    const addEmployeeModal = document.getElementById('addEmployeeModal');
+    addEmployeeModal.addEventListener('show.bs.modal', function() {
+        clearAddEmployeeForm();
+    });
+    
+    // 初始化 DataTables
+    $('#employeeTable').DataTable({
+        dom: "t<'d-flex justify-content-center my-3'p>",
+        pagingType: 'simple_numbers',  // 上一頁 | 1 2 3 | 下一頁
+        lengthChange: false,           // 隐藏「每頁幾筆」下拉
+        info: false,                   // 隐藏 table info
+        language: {
+            paginate: {
+                previous: '上一頁',
+                next:     '下一頁'
+            }
+        },
+        drawCallback: function(){
+            var $pg = $('#employeeTable_wrapper .pagination');
+            $pg.find('li.disabled a, li.active a')
+                .each(function(){
+                    var txt = $(this).text();
+                    $(this).replaceWith(
+                        $('<span/>').addClass('page-link').text(txt)
+                    );
+                });
+        }
+    });
+});
+
+// 瀏覽員工詳細資料
+function viewEmployee(employeeId) {
+    fetch(`/backend/employee/get/${employeeId}`)
+        .then(response => response.json())
+        .then(employee => {
+            document.getElementById('viewEmployeeId').textContent = employee.employeeId;
+            document.getElementById('viewEmployeeName').textContent = employee.employeeName;
+            document.getElementById('viewEmployeeGender').textContent = employee.employeeGender == 1 ? '男' : '女';
+            document.getElementById('viewEmployeeDepartment').textContent = employee.department ? employee.department.departmentName : '';
+            document.getElementById('viewEmployeeEmail').textContent = employee.employeeEmail;
+            document.getElementById('viewEmployeeMobile').textContent = employee.employeeMobile;
+            document.getElementById('viewEmployeeBirthdate').textContent = employee.employeeBirthdate || '';
+            document.getElementById('viewEmployeeHiredate').textContent = employee.employeeHiredate || '';
+            document.getElementById('viewEmployeeLeavedate').textContent = employee.employeeLeavedate || '';
+            document.getElementById('viewEmployeeAddress').textContent = employee.employeeAddress;
+            let statusText = '';
+            if (employee.employeeStatus == 1) statusText = '在職';
+            else if (employee.employeeStatus == 0) statusText = '離職';
+            else if (employee.employeeStatus == 2) statusText = '停職';
+            document.getElementById('viewEmployeeStatus').textContent = statusText;
+            // 權限
+            let permHtml = '';
+            if (employee.permissions) {
+                permHtml = employee.permissions.map(p => `<span class='badge bg-info text-white me-1'>${p.permissionName}</span>`).join('');
+            }
+            document.getElementById('viewEmployeePermissions').innerHTML = permHtml;
+            // 照片
+            const viewPhoto = document.getElementById('viewEmployeePhoto');
+            if (employee.employeePhoto && employee.employeePhoto.length > 0) {
+                viewPhoto.src = `/backend/employee/photo/${employee.employeeId}`;
+                viewPhoto.style.display = 'block';
+            } else {
+                viewPhoto.style.display = 'none';
+            }
+            // 顯示 modal
+            const modal = new bootstrap.Modal(document.getElementById('viewEmployeeModal'));
+            modal.show();
+        })
+        .catch(error => {
+            alert('取得員工資料失敗');
+        });
+}
+
+// 員工圖片預覽與檔案大小檢查
+function previewEmployeePhoto(input, previewId) {
+    const file = input.files[0];
+    const preview = document.getElementById(previewId);
+    if (file) {
+        if (file.size > 5 * 1024 * 1024) { // 5MB
+            alert('圖片大小不可超過 5MB！');
+            input.value = '';
+            preview.style.display = 'none';
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    } else {
+        preview.style.display = 'none';
+    }
+}
+
+// 優化即時驗證：只有用戶輸入過才顯示 is-valid
+function addTouchedValidation(selector, validateFn) {
+    document.querySelectorAll(selector).forEach(field => {
+        let touched = false;
+        field.addEventListener('input', function() {
+            touched = true;
+            validateFn(this, touched);
+        });
+        field.addEventListener('change', function() {
+            touched = true;
+            validateFn(this, touched);
+        });
+    });
+}
+
+// 姓名
+addTouchedValidation('[name="employeeName"], #editEmployeeName', function(field, touched) {
+    if (!touched) return;
+    if (field.value.trim().length > 0) {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+    } else {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+    }
+});
+
+// 信箱
+addTouchedValidation('[name="employeeEmail"], #editEmployeeEmail', function(field, touched) {
+    if (!touched) return;
+    if (isValidEmail(field.value)) {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+    } else {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+    }
+});
+
+// 密碼
+addTouchedValidation('[name="employeePassword"]', function(field, touched) {
+    if (!touched) return;
+    if (field.value.length >= 6) {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+    } else {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+    }
+});
+
+// 確認密碼
+addTouchedValidation('[name="confirmPassword"]', function(field, touched) {
+    if (!touched) return;
+    const password = document.querySelector('[name="employeePassword"]').value;
+    if (field.value === password && field.value.length >= 6) {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+    } else {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+    }
+});
+
+// 手機
+addTouchedValidation('[name="employeeMobile"]', function(field, touched) {
+    if (!touched) return;
+    if (isValidMobile(this.value)) {
+        this.classList.remove('is-invalid');
+        this.classList.add('is-valid');
+    } else {
+        this.classList.remove('is-valid');
+        this.classList.add('is-invalid');
+    }
+});
+
+// 地址
+addTouchedValidation('[name="employeeAddress"]', function(field, touched) {
+    if (!touched) return;
+    if (field.value.trim().length > 0) {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+    } else {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+    }
+});
+
+// 部門
+addTouchedValidation('[name="departmentId"], #editDepartmentId', function(field, touched) {
+    if (!touched) return;
+    if (field.value !== '') {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+    } else {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+    }
+});
+
+// 性別
+addTouchedValidation('[name="employeeGender"]', function(field, touched) {
+    if (!touched) return;
+    if (field.value !== '') {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+    } else {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+    }
+});
+
+// 生日
+addTouchedValidation('[name="employeeBirthdate"]', function(field, touched) {
+    if (!touched) return;
+    if (field.value !== '') {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+    } else {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+    }
+});
+
+// 到職日
+addTouchedValidation('[name="employeeHiredate"]', function(field, touched) {
+    if (!touched) return;
+    if (field.value !== '') {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+    } else {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+    }
+});
+
+// 員工狀態
+addTouchedValidation('[name="employeeStatus"], #editEmployeeStatus', function(field, touched) {
+    if (!touched) return;
+    if (field.value !== '') {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+    } else {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+    }
+});
+
+// 權限
+addTouchedValidation('input[name="permissions"]', function(field, touched) {
+    if (!touched) return;
+    const form = field.closest('form');
+    const checkedPermissions = form.querySelectorAll('input[name="permissions"]:checked');
+    const permissionContainer = form.querySelector('.form-check').parentNode;
+    
+    if (checkedPermissions.length > 0) {
+        permissionContainer.classList.remove('is-invalid');
+        permissionContainer.classList.add('is-valid');
+    } else {
+        permissionContainer.classList.remove('is-valid');
+        permissionContainer.classList.add('is-invalid');
+    }
+});
+</script>
+</body>
+</html>

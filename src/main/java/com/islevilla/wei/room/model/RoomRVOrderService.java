@@ -14,8 +14,6 @@ import java.util.Optional;
 public class RoomRVOrderService {
     @Autowired
     private RoomRVOrderRepository roomRVOrderRepository;
-    @Autowired
-    private MembersRepository membersRepository;
 
     // 查詢全部
     public Page<RoomRVOrder> getAll(Pageable pageable) {
@@ -28,19 +26,31 @@ public class RoomRVOrderService {
         return roomRVOrder.orElse(null);
     }
 
-    //
+    // 用會員id查詢該會員所有訂單
     public List<RoomRVOrder> getRoomRVOrderByMember(Members member) {
         return roomRVOrderRepository.findByMembers(member);
     }
 
-    // 用會員id查詢該會員所有訂單
-    public List<RoomRVOrder> getRoomRVOrderByMemberId(Integer memberId) {
-        // 先取得 Members 物件
-        Optional<Members> optionalMember = membersRepository.findById(memberId);
-        if (optionalMember.isEmpty()) {
-            return List.of(); // 回傳空清單避免 NullPointerException
+    // 更新訂單
+    public void updateRoomRVOrder(RoomRVOrder roomRVOrder) {
+        roomRVOrderRepository.save(roomRVOrder);
+    }
+
+    // 取消訂單
+    public void cancelOrderFront(Integer orderId) {
+        RoomRVOrder order = getById(orderId);
+        if (order != null) {
+            order.setRoomOrderStatus(3);
+            updateRoomRVOrder(order);
         }
-        Members member = optionalMember.get();
-        return roomRVOrderRepository.findByMembers(member);
+    }
+
+    // 取消訂單
+    public void cancelOrderBack(Integer orderId) {
+        RoomRVOrder order = getById(orderId);
+        if (order != null) {
+            order.setRoomOrderStatus(4);
+            updateRoomRVOrder(order);
+        }
     }
 }

@@ -79,6 +79,24 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: white;
+            padding: 10px 30px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #5a6268;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
         .card {
             border: none;
             border-radius: 12px;
@@ -103,14 +121,29 @@
     <main class="container py-5">
         <h1 class="section-title text-center mb-5">訂單詳情</h1>
 
+        <!-- 按鈕區域移到上方 -->
+        <div class="text-center mb-4">
+            <button onclick="goBack()" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>回上一頁
+            </button>
+        </div>
+
         <div class="card">
             <div class="card-body">
                 <div class="order-info">
                     <p class="lead">訂單編號：<span th:text="${order.productOrderId}"></span></p>
                     <p class="lead">訂單日期：<span th:text="${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm:ss')}"></span></p>
-                    <p class="lead">訂單金額：<span th:text="${order.productOrderAmount}"></span></p>
-                    <p class="lead">折扣金額：<span th:text="${order.discountAmount}"></span></p>
-                    <p class="lead">實付金額：<span th:text="${order.productPaidAmount}"></span></p>
+                    <p class="lead">訂單狀態：<span th:text="${order.orderStatus == 0 ? '訂單成立' : (order.orderStatus == 1 ? '配送中' : '已完成')}"></span></p>
+                    <p class="lead">付款方式：<span th:text="${order.paymentMethod == 0 ? '信用卡' : '現金付款'}"></span></p>
+                    <p class="lead">配送方式：<span th:text="${order.shippingMethod == 0 ? '宅配' : '飯店自取'}"></span></p>
+                    <p class="lead">聯絡人姓名：<span th:text="${order.contactName}"></span></p>
+                    <p class="lead">聯絡人電話：<span th:text="${order.contactPhone}"></span></p>
+                    <p class="lead">聯絡人地址：<span th:text="${order.contactAddress}"></span></p>
+                    <p class="lead" th:if="${order.note != null && order.note != ''}">訂單備註：<span th:text="${order.note}"></span></p>
+                    <p class="lead" th:if="${order.coupon != null}">使用優惠券：<span th:text="${order.coupon.couponCode}"></span></p>
+                    <p class="lead">訂單金額：<span>NT$ <span th:text="${order.productOrderAmount}"></span></span></p>
+                    <p class="lead">折扣金額：<span>NT$ <span th:text="${order.discountAmount}"></span></span></p>
+                    <p class="lead">實付金額：<span>NT$ <span th:text="${order.productPaidAmount}"></span></span></p>
                 </div>
 
                 <div class="table-responsive">
@@ -125,7 +158,7 @@
                         </thead>
                         <tbody>
                             <tr th:each="detail : ${orderDetails}">
-                                <td th:text="${detail.productName.productName}"></td>
+                                <td th:text="${detail.productOrderName}"></td>
                                 <td th:text="${detail.productOrderQuantity}"></td>
                                 <td th:text="${detail.productOrderPrice}"></td>
                                 <td th:text="${detail.productOrderQuantity * detail.productOrderPrice}"></td>
@@ -135,11 +168,10 @@
                 </div>
             </div>
         </div>
-
-        <div class="text-center mt-4">
-            <button onclick="goBack()" class="btn btn-back">回上一頁</button>
-        </div>
     </main>
+
+    <!-- ========== 載入Footer ========== -->
+    <div th:replace="~{fragments/fragments :: footer}"></div>
 
     <script>
         function goBack() {

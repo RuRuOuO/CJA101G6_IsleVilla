@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -13,7 +13,7 @@
             <li th:each="msg : ${errorMessages}" th:text="${msg}"></li>
         </ul>
     </div>
-    <form th:action="@{/coupon/add}" th:object="${coupon}" method="post">
+    <form th:action="@{/backend/coupon/add}" th:object="${coupon}" method="post">
         <div class="form-group">
             <label for="couponCode">優惠券代碼</label>
             <input type="text" class="form-control" id="couponCode" th:field="*{couponCode}" required>
@@ -37,10 +37,10 @@
 
             <!-- <input type="date" class="form-control" id="endDate"
                    th:field="*{endDate}" th:value="${endDateStr}" required> -->
-        </div>
+        <!-- </div>
         <button type="submit" class="btn btn-success">新增</button>
-        <a href="/coupon/list" class="btn btn-secondary">返回列表</a>
+        <a href="/backend/coupon/list" class="btn btn-secondary">返回列表</a>
     </form>
 </div>
 </body>
-</html> 
+</html>  --> -->

@@ -5,83 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>會員登入</title>
     <!-- ===== 載入統一樣式 ===== -->
-	<th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
     <link href="/css/member-auth.css" rel="stylesheet">
 </head>
 <body>
-	<!-- ===== 載入Header ===== -->
-	<div th:replace="~{fragments/fragments :: header}"></div>
-    <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center">
-        <div class="row w-100">
-            <div class="col-12 col-md-6 col-lg-4 mx-auto">
-                <div class="card shadow-lg border-0 rounded-4">
-                    <div class="card-body p-5">
-                        <div class="text-center mb-4">
-                            <h2 class="fw-bold text-primary">會員登入</h2>
-                            <p class="text-muted">歡迎回來！請輸入您的帳號密碼</p>
+<!-- ===== 載入Header ===== -->
+<div th:replace="~{fragments/fragments :: header}"></div>
+<div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center py-4">
+    <div class="row w-100">
+        <div class="col-12 col-md-6 col-lg-4 mx-auto">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold">會員登入</h2>
+                        <p class="text-muted">歡迎回來！請輸入您的帳號密碼</p>
+                    </div>
+
+                    <!-- 錯誤訊息顯示 -->
+                    <div th:if="${error}" class="alert alert-danger" role="alert">
+                        <span th:text="${error}"></span>
+                    </div>
+
+                    <!-- 成功訊息顯示 -->
+                    <div th:if="${success}" class="alert alert-success" role="alert">
+                        <span th:text="${success}"></span>
+                    </div>
+
+                    <form th:action="@{/member/login}" method="post" id="loginForm">
+                        <!-- 隱藏的redirect欄位 -->
+                        <input type="hidden" name="redirect" th:value="${redirect}">
+
+                        <div class="mb-3">
+                            <label for="memberEmail" class="form-label">電子信箱</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                <input type="email" class="form-control" id="memberEmail" name="memberEmail"
+                                       placeholder="請輸入電子信箱" required>
+                            </div>
+                            <div class="invalid-feedback" id="emailError"></div>
                         </div>
 
-                        <!-- 錯誤訊息顯示 -->
-                        <div th:if="${error}" class="alert alert-danger" role="alert">
-                            <span th:text="${error}"></span>
+                        <div class="mb-3">
+                            <label for="memberPassword" class="form-label">密碼</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" class="form-control" id="memberPassword" name="memberPassword"
+                                       placeholder="請輸入密碼" required>
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                    <i class="fas fa-eye" id="toggleIcon"></i>
+                                </button>
+                            </div>
+                            <div class="invalid-feedback" id="passwordError"></div>
                         </div>
 
-                        <!-- 成功訊息顯示 -->
-                        <div th:if="${success}" class="alert alert-success" role="alert">
-                            <span th:text="${success}"></span>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe">
+                            <label class="form-check-label" for="rememberMe">記住我</label>
                         </div>
-                        
-                        <form th:action="@{/member/login}" method="post" id="loginForm">
-                            <div class="mb-3">
-                                <label for="memberEmail" class="form-label">電子信箱</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                                    <input type="email" class="form-control" id="memberEmail" name="memberEmail" 
-                                           placeholder="請輸入電子信箱" required>
-                                </div>
-                                <div class="invalid-feedback" id="emailError"></div>
-                            </div>
 
-                            <div class="mb-3">
-                                <label for="memberPassword" class="form-label">密碼</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                    <input type="password" class="form-control" id="memberPassword" name="memberPassword" 
-                                           placeholder="請輸入密碼" required>
-                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                                        <i class="fas fa-eye" id="toggleIcon"></i>
-                                    </button>
-                                </div>
-                                <div class="invalid-feedback" id="passwordError"></div>
-                            </div>
+                        <div class="d-grid mb-3">
+                            <button type="submit" class="btn btn-primary btn-lg">登入</button>
+                        </div>
 
-                            <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe">
-                                <label class="form-check-label" for="rememberMe">記住我</label>
-                            </div>
-
-                            <div class="d-grid mb-3">
-                                <button type="submit" class="btn btn-primary btn-lg">登入</button>
-                            </div>
-
-                            <div class="text-center">
-                                <a href="/member/forgot-password" class="text-decoration-none">忘記密碼？</a>
-                            </div>
-                        </form>
-
-                        <hr class="my-4">
-                        
                         <div class="text-center">
-                            <p class="mb-0">還沒有帳號？ <a href="/member/register" class="text-decoration-none fw-bold">立即註冊</a></p>
+                            <a href="/member/forgot-password" class="text-decoration-none">忘記密碼？</a>
                         </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <div class="text-center">
+                        <p class="mb-0">還沒有帳號？ <a href="/member/register"
+                                                       class="text-decoration-none fw-bold">立即註冊</a></p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <script src="/js/member-auth.js"></script>
-    <!-- ========== 載入Footer及Bootstrap JS ========== -->
-	<div th:replace="~{fragments/fragments :: footer}"></div>
+<script src="/js/member-auth.js"></script>
+<!-- ========== 載入Footer及Bootstrap JS ========== -->
+<div th:replace="~{fragments/fragments :: footer}"></div>
 </body>
 </html>

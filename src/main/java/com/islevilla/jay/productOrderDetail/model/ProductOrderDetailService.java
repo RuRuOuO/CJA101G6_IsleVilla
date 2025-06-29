@@ -26,8 +26,6 @@ public class ProductOrderDetailService {
         // 更新訂單明細資訊
         existingOrderDetail.setProductOrderPrice(orderDetail.getProductOrderPrice());
         existingOrderDetail.setProductOrderQuantity(orderDetail.getProductOrderQuantity());
-        existingOrderDetail.setProductName(orderDetail.getProductName());
-
         repository.save(existingOrderDetail);
     }
 

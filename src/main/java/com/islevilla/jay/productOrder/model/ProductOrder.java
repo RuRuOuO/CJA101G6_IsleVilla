@@ -1,5 +1,6 @@
 package com.islevilla.jay.productOrder.model;
 
+// import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.islevilla.jay.coupon.model.Coupon;
 import com.islevilla.jay.productOrderDetail.model.ProductOrderDetail;
 import com.islevilla.lai.members.model.Members;
@@ -54,6 +55,9 @@ public class ProductOrder {
     @Column(name = "contact_phone", length = 20)
     @NotEmpty(message = "聯絡人電話不能為空")
     private String contactPhone;
+
+    @Column(name = "note", length = 50)
+    private String note;
 
     @Column(name = "product_order_status", nullable = false)
     private Byte orderStatus;
@@ -155,6 +159,14 @@ public class ProductOrder {
 
     public void setContactPhone(String contactPhone) {
         this.contactPhone = contactPhone;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 
     public Byte getOrderStatus() {

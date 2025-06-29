@@ -69,7 +69,7 @@
     </style>
 </head>
 <body>
-<!-- ===== 載入Header ===== -->
+===== 載入Header =====
 <div th:replace="~{fragments/fragments :: header}"></div>
 <main>
     <div class="container py-5">
@@ -82,6 +82,13 @@
                 <!-- //////////////////// 會員頁面內容放這裡 //////////////////// -->
                 <h1 class="section-title text-center mb-5">歷史訂單</h1>
 
+                <!-- 錯誤訊息顯示區域 -->
+                <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <span th:text="${errorMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <table id="example" class="display" style="width: 100%">
@@ -89,8 +96,8 @@
                             <tr>
                                 <th>訂單編號</th>
                                 <th>訂單日期</th>
-                                <th>優惠券</th>
                                 <th>訂單金額</th>
+                                <th>優惠券</th>
                                 <th>折扣金額</th>
                                 <th>實付金額</th>
                                 <th>付款方式</th>
@@ -101,32 +108,42 @@
                             </thead>
 
                             <tbody id="tdArea">
-                            <th:block th:each="order : ${memOrderList}">
-                                <tr>
-                                    <td th:text="${order.productOrderId}"></td>
-                                    <td th:text="${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm')}"></td>
-                                    <td th:text="${order.coupon != null ? order.coupon.couponCode : '無'}"></td>
-                                    <td th:text="${order.productOrderAmount}"></td>
-                                    <td th:text="${order.discountAmount}"></td>
-                                    <td th:text="${order.productPaidAmount}"></td>
-                                    <td th:text="${order.paymentMethod}" class="paymentMethod"></td>
-                                    <td th:text="${order.shippingMethod}" class="shippingMethod"></td>
-                                    <td th:text="${order.orderStatus}" class="orderStatus"></td>
-                                    <td>
-                                        <form th:action="@{/product-order/checkoutResult}" method="get">
-                                            <input type="hidden" name="orderNo" th:value="${order.productOrderId}">
-                                            <button class="btn btn-primary">查看詳情</button>
-                                        </form>
-                                    </td>
-                                </tr>
+                            <th:block th:if="${#lists.isEmpty(memOrderList) == false}">
+                            <!-- <th:block th:if="${memOrderList != null and !memOrderList.empty}"> -->
+                                <th:block th:each="order : ${memOrderList}">
+                                    <tr th:if="${order != null}">
+                                        <td th:text="${order.productOrderId != null ? order.productOrderId : 'N/A'}"></td>
+                                        <td th:text="${order.orderTime != null ? #temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm') : 'N/A'}"></td>
+                                        <td th:text="${order.productOrderAmount != null ? order.productOrderAmount : 'N/A'}"></td>
+                                        <!-- <td th:text="${order.coupon != null and order.coupon.couponCode != null ? order.coupon.couponCode : '無'}"></td> -->
+                                        <td th:if="${order.coupon != null}" th:text="${order.coupon.couponCode}"></td>
+                                        <td th:unless="${order.coupon != null}">無</td>                                        
+                                        <td th:text="${order.discountAmount != null ? order.discountAmount : 'N/A'}"></td>
+                                        <td th:text="${order.productPaidAmount != null ? order.productPaidAmount : 'N/A'}"></td>
+                                        <td th:text="${order.paymentMethod != null ? order.paymentMethod : 'N/A'}" class="paymentMethod"></td>
+                                        <td th:text="${order.shippingMethod != null ? order.shippingMethod : 'N/A'}" class="shippingMethod"></td>
+                                        <td th:text="${order.orderStatus != null ? order.orderStatus : 'N/A'}" class="orderStatus"></td>
+                                        <td>
+                                            <form th:action="@{/product-order/memberOrderDetail}" method="get" th:if="${order.productOrderId != null}">
+                                                <input type="hidden" name="orderNo" th:value="${order.productOrderId}">
+                                                <button class="btn btn-primary">查看詳情</button>
+                                            </form>
+                                            <span th:if="${order.productOrderId == null}" class="text-muted">無法查看</span>
+                                        </td>
+                                    </tr>
+                                </th:block>
                             </th:block>
+                            <tr th:if="${memOrderList == null or memOrderList.empty}">
+                                <td colspan="10" class="text-center text-muted">暫無訂單資料</td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
                 <div class="text-center mt-4">
-                    <button onclick="goBack()" class="btn btn-success">回上一頁</button>
+                    <a href="/product" class="btn btn-success me-2">繼續購物</a>
+                    <a href="/" class="btn btn-primary">回首頁</a>
                 </div>
                 <!-- //////////////////// 會員頁面內容放這裡 //////////////////// -->
             </div>
@@ -138,35 +155,51 @@
 <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
 <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
 
-<script>
-    $(document).ready(function () {
-        $('#example').DataTable({
-            "lengthMenu": [10, 20, 50],
-            "searching": false,
-            "paging": true,
-            "ordering": true,
-            "language": {
-                "processing": "處理中...",
-                "loadingRecords": "載入中...",
-                "lengthMenu": "顯示 _MENU_ 筆結果",
-                "zeroRecords": "沒有符合的結果",
-                "info": "顯示第 _START_ 至 _END_ 筆結果，共<font color=red> _TOTAL_ </font>筆",
-                "infoEmpty": "顯示第 0 至 0 筆結果，共 0 筆",
-                "infoFiltered": "(從 _MAX_ 筆結果中過濾)",
-                "infoPostFix": "",
-                "search": "搜尋:",
-                "paginate": {
-                    "first": "第一頁",
-                    "previous": "上一頁",
-                    "next": "下一頁",
-                    "last": "最後一頁"
-                },
-                "aria": {
-                    "sortAscending": ": 升冪排列",
-                    "sortDescending": ": 降冪排列"
-                }
+<script th:inline="javascript">
+     $(document).ready(function () {
+        try {
+            // 檢查表格是否存在資料
+            var table = $('#example');
+            var tbody = table.find('tbody');
+            var rows = tbody.find('tr');
+            
+            console.log('表格行數:', rows.length);
+            
+            // 只有在有資料時才初始化 DataTable
+            if (rows.length > 0 && !rows.first().find('td').text().includes('暫無訂單資料')) {
+                $('#example').DataTable({
+                    "lengthMenu": [10, 20, 50],
+                    "searching": false,
+                    "paging": true,
+                    "ordering": true,
+                    "language": {
+                        "processing": "處理中...",
+                        "loadingRecords": "載入中...",
+                        "lengthMenu": "顯示 _MENU_ 筆結果",
+                        "zeroRecords": "沒有符合的結果",
+                        "info": "顯示第 _START_ 至 _END_ 筆結果，共<font color=red> _TOTAL_ </font>筆",
+                        "infoEmpty": "顯示第 0 至 0 筆結果，共 0 筆",
+                        "infoFiltered": "(從 _MAX_ 筆結果中過濾)",
+                        "infoPostFix": "",
+                        "search": "搜尋:",
+                        "paginate": {
+                            "first": "第一頁",
+                            "previous": "上一頁",
+                            "next": "下一頁",
+                            "last": "最後一頁"
+                        },
+                        "aria": {
+                            "sortAscending": ": 升冪排列",
+                            "sortDescending": ": 降冪排列"
+                        }
+                    }
+                });
+            } else {
+                console.log('沒有訂單資料，跳過 DataTable 初始化');
             }
-        });
+        } catch (error) {
+            console.error('DataTable 初始化錯誤:', error);
+        }
     });
 
     function goBack() {
@@ -174,48 +207,63 @@
     }
 
     // 訂單狀態轉換
-    var orderStatusElements = document.querySelectorAll(".orderStatus");
-    orderStatusElements.forEach(function (e) {
-        var orderStatus = e.textContent.trim();
-        switch (orderStatus) {
-            case '0':
-                e.textContent = '訂單成立';
-                break;
-            case '1':
-                e.textContent = '配送中';
-                break;
-            case '2':
-                e.textContent = '已取貨';
-                break;
-        }
-    });
+    function convertOrderStatus() {
+        var orderStatusElements = document.querySelectorAll(".orderStatus");
+        orderStatusElements.forEach(function (e) {
+            var orderStatus = e.textContent.trim();
+            switch (orderStatus) {
+                case '0':
+                    e.textContent = '訂單成立';
+                    break;
+                case '1':
+                    e.textContent = '配送中';
+                    break;
+                case '2':
+                    e.textContent = '已完成';
+                    break;
+            }
+        });
+    }
 
     // 付款方式轉換
-    var paymentMethodElements = document.querySelectorAll(".paymentMethod");
-    paymentMethodElements.forEach(function (e) {
-        var paymentMethod = e.textContent.trim();
-        switch (paymentMethod) {
-            case '0':
-                e.textContent = '信用卡';
-                break;
-            case '1':
-                e.textContent = '現金付款';
-                break;
-        }
-    });
+    function convertPaymentMethod() {
+        var paymentMethodElements = document.querySelectorAll(".paymentMethod");
+        paymentMethodElements.forEach(function (e) {
+            var paymentMethod = e.textContent.trim();
+            switch (paymentMethod) {
+                case '0':
+                    e.textContent = '信用卡';
+                    break;
+                case '1':
+                    e.textContent = '現金付款';
+                    break;
+            }
+        });
+    }
 
     // 配送方式轉換
-    var shippingMethodElements = document.querySelectorAll(".shippingMethod");
-    shippingMethodElements.forEach(function (e) {
-        var shippingMethod = e.textContent.trim();
-        switch (shippingMethod) {
-            case '0':
-                e.textContent = '宅配';
-                break;
-            case '1':
-                e.textContent = '飯店自取';
-                break;
-        }
+    function convertShippingMethod() {
+        var shippingMethodElements = document.querySelectorAll(".shippingMethod");
+        shippingMethodElements.forEach(function (e) {
+            var shippingMethod = e.textContent.trim();
+            switch (shippingMethod) {
+                case '0':
+                    e.textContent = '宅配';
+                    break;
+                case '1':
+                    e.textContent = '飯店自取';
+                    break;
+            }
+        });
+    }
+
+    // 頁面載入完成後執行轉換
+    $(document).ready(function() {
+        setTimeout(function() {
+            convertOrderStatus();
+            convertPaymentMethod();
+            convertShippingMethod();
+        }, 100);
     });
 </script>
 </body>

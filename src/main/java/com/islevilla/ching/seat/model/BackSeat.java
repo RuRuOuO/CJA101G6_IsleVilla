@@ -1,0 +1,41 @@
+package com.islevilla.ching.seat.model;
+
+import java.util.List;
+
+import com.islevilla.ching.shuttleReservationSeat.model.BackShuttleReservationSeat;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Data;
+
+@Entity
+@Table(name = "seat")
+@Data
+public class BackSeat {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "seat_id")
+	private Integer seatId;
+
+	@Column(name = "seat_number", nullable = false, length = 10)
+	@NotBlank(message = "請輸入座號")
+	@Size(max = 10, message = "座號長度不能超過10個字")
+	private String seatNumber;
+
+	@Column(name = "seat_status", nullable = false)
+	@NotNull(message = "請選擇座位狀態")
+	private Integer seatStatus; // 0:故障 1:正常
+	
+	// 一對多
+	@OneToMany(mappedBy = "seat")
+    private List<BackShuttleReservationSeat> shuttleReservationSeat;
+}
+

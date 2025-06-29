@@ -36,6 +36,10 @@ public class ProductService {
     public List<Product> getProductByProductCategoryId(Integer productCategoryId) {
         return productRepository.findByProductCategoryProductCategoryId(productCategoryId);
     }
-
-
+    public List<Product> getProductByStatus(Byte status) {
+        return productRepository.findByProductStatus(status);
+    }
+    public List<Product> getProductByCategoryIdAndStatus(Integer categoryId, Byte status) {
+        return productRepository.findByProductCategoryProductCategoryIdAndProductStatus(categoryId, status);
+    }
 }

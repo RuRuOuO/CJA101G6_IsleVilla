@@ -87,14 +87,14 @@
                             顧客服務
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">交通資訊</a></li>
+                            <li><a class="dropdown-item" th:href="@{/transportation}">交通資訊</a></li>
                             <li><a class="dropdown-item" href="#">天氣資訊</a></li>
                             <li><a class="dropdown-item" href="#">線上客服</a></li>
-                            <li><a class="dropdown-item" href="#">常見Q&A</a></li>
+                            <li><a class="dropdown-item" th:href="@{/faq}">常見Q&A</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item divider align-self-center px-1">|</li>
-                    <li class="nav-item">
+                    <li th:if="${session.member!=null}" class="nav-item divider align-self-center px-1">|</li>
+                    <li th:if="${session.member!=null}" class="nav-item">
                         <a
                                 class="nav-link"
                                 th:href="@{/member/room/list}"
@@ -103,9 +103,58 @@
                     </li>
                 </ul>
                 <div>
-                    <li class="btn btn-dark">
-                        <a class="nav-link" th:href="@{/member/login}"><i class="bi bi-box-arrow-in-right"></i> 會員登入</a>
-                    </li>
+                    <div th:unless="${session.member!=null}">
+                        <a class="btn btn-outline-dark" th:href="@{/member/login}">
+                            <!--                            <i class="fa-solid fa-arrow-right-to-bracket"></i>-->
+                            &nbsp;會員登入&nbsp;
+                        </a>
+                        <a class="btn btn-dark" th:href="@{/member/register}">
+                            <!--                            <i class="fa-solid fa-plus"></i>-->
+                            &nbsp;免費註冊&nbsp;
+                        </a>
+                    </div>
+                    <!--                    <div th:if="${session.member!=null}">-->
+                    <!--                        <a class="btn btn-dark" th:href="@{/member/logout}">-->
+                    <!--                            <i class="bi bi-box-arrow-in-right"></i> 登出-->
+                    <!--                        </a>-->
+                    <!--                    </div>-->
+                    <div th:if="${session.member!=null}" class="dropdown">
+                        <button class="btn btn-dark dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            <!--                            <i class="bi bi-person-circle"></i>-->
+                            <span>歡迎回來，</span><span
+                                th:text="${session.member.memberName}"></span><span>！</span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li class="px-3 py-2 d-flex align-items-center">
+                                <img th:src="${session.member.memberPhoto != null} ? ${session.member.memberPhoto} : ${'https://images.unsplash.com/photo-1603736087997-5daec6092347?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'}"
+                                     alt="頭像"
+                                     class="rounded-circle me-2"
+                                     style="width: 40px; height: 40px; object-fit: cover;">
+                                <div>
+                                    <div class="fw-bold" th:text="${session.member.memberName}">王小明</div>
+                                    <div class="text-muted small" th:text="${session.member.memberEmail}">
+                                        ming@email.com
+                                    </div>
+                                </div>
+                            </li>
+                            <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" th:href="@{/member/room/list}">住宿訂單</a></li>
+                            <li><a class="dropdown-item" href="#">接駁訂單</a></li>
+                            <li><a class="dropdown-item" href="#">購物車</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#">會員資訊</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" th:href="@{/member/logout}">
+                                <!--                                <i class="fa-solid fa-arrow-right-from-bracket"></i>-->
+                                登出</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -117,16 +166,24 @@
 <!-- ===== 側邊欄 開始 ===== -->
 <div class="col-md-3 mb-4" th:fragment="memberSidebar">
     <div class="nav flex-column nav-pills" id="memberTabs" role="tablist" aria-orientation="vertical">
-        <a class="nav-link" th:href="@{/member/room/list}" th:classappend="${activeTab == 'room'} ? ' active'">
+        <a class="nav-link text-reset text-decoration-none" th:href="@{/member/room/list}"
+           th:classappend="${activeTab == 'room'} ? ' active'">
             住宿訂單
         </a>
-        <a class="nav-link" th:href="@{/member/shuttle/list}" th:classappend="${activeTab == 'shuttle'} ? 'active'">
+        <a class="nav-link text-reset text-decoration-none" th:href="@{/member/shuttle/list}"
+           th:classappend="${activeTab == 'shuttle'} ? 'active'">
             接駁訂單
         </a>
-        <a class="nav-link" th:href="@{/member/product/list}" th:classappend="${activeTab == 'product'}?'active'">
+        <a class="nav-link text-reset text-decoration-none" th:href="@{/product-order/memOrders}"
+           th:classappend="${activeTab == 'product'}?'active'">
             購物訂單
         </a>
-        <a class="nav-link" th:href="@{/member/info}" th:classappend="${activeTab == 'info'}?'active'">
+        <a class="nav-link text-reset text-decoration-none" th:href="@{/member/feedback/list}"
+           th:classappend="${activeTab == 'feedback'}?'active'">
+            問卷專區
+        </a>
+        <a class="nav-link text-reset text-decoration-none" th:href="@{/member/info}"
+           th:classappend="${activeTab == 'info'}?'active'">
             會員資訊
         </a>
     </div>
@@ -163,7 +220,7 @@
 </nav>
 <!-- ===== 分頁按鈕 Fragment 結束 ===== -->
 <!-- ===== 統一Footer開始 ===== -->
-<footer class="footer bg-secondary text-light py-5 justify-content-center" th:fragment="footer">
+<footer class="footer bg-light py-5 justify-content-center shadow-sm" th:fragment="footer">
     <a class="btn btn-dark booking-fixed-btn" href="#booking"> 立即預訂 </a>
     <div class="container">
         <div class="row">

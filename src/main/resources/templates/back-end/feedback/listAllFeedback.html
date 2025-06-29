@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>微嶼 | Isle Villa 後台首頁</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+</head>
+<body>
+<!-- ===== 載入sidebar ===== -->
+<!-- 插入手機版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+<!-- 插入桌面版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+
+<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+    <th:block th:fragment="myContent">
+        <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+        <h2 class="mb-4">顧客評價一覽</h2>
+        <table class="table table-hover table-bordered align-middle text-center">
+            <thead class="table-dark">
+            <tr>
+                <th>編號</th>
+                <th>訂單編號</th>
+                <th>整體評價</th>
+                <th>推薦</th>
+                <th>再訪</th>
+                <th>公開</th>
+                <th>狀態</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="feedbackTableBody"></tbody>
+        </table>
+
+        <!-- 詳情 Modal -->
+        <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="feedbackModalLabel">評價詳情</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="關閉"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>好評：</strong><span id="fbCompliment"></span></p>
+                        <p><strong>建議：</strong><span id="fbSuggestion"></span></p>
+                        <p><strong>填寫時間：</strong><span id="fbCreatedAt"></span></p>
+                        <p><strong>更新時間：</strong><span id="fbUpdatedAt"></span></p>
+                        <p><strong>接駁服務：</strong><span id="fbShuttleRating"></span></p>
+                        <p><strong>櫃台服務：</strong><span id="fbReceptionRating"></span></p>
+                        <p><strong>房間品質：</strong><span id="fbRoomRating"></span></p>
+                        <p><strong>設施：</strong><span id="fbFacilityRating"></span></p>
+                        <p><strong>環境：</strong><span id="fbEnvRating"></span></p>
+                        <p><strong>性價比：</strong><span id="fbValueRating"></span></p>
+                        <p><strong>網站使用：</strong><span id="fbWebsiteRating"></span></p>
+                        <p><strong>圖片：</strong></p>
+                        <img id="fbImage" src="" alt="顧客上傳圖片" class="img-fluid border rounded">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+    </th:block>
+</main>
+<!-- Bootstrap & JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    fetch('/api/feedbacks')
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.getElementById('feedbackTableBody');
+            const modal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+
+            data.forEach((fb, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+            <td>${fb.fbId}</td>
+            <td>${fb.roomReservationId}</td>
+            <td>${fb.fbOverallRating} ★</td>
+            <td>${fb.fbRecommend === 1 ? '推薦' : '不推薦'}</td>
+            <td>${fb.fbRevisit === 1 ? '會再訪' : '不會'}</td>
+            <td>${fb.fbPublic === 1 ? '公開' : '不公開'}</td>
+            <td>${fb.fbStatus === 1 ? '上架' : '下架'}</td>
+            <td>
+              <button class="btn btn-sm btn-primary" data-index="${index}">查看詳情</button>
+            </td>
+          `;
+                tbody.appendChild(tr);
+
+                // 綁定按鈕事件
+                tr.querySelector('button').addEventListener('click', () => {
+                    document.getElementById('fbCompliment').textContent = fb.fbCompliment || '無';
+                    document.getElementById('fbSuggestion').textContent = fb.fbSuggestion || '無';
+                    document.getElementById('fbCreatedAt').textContent = new Date(fb.fbCreatedAt).toLocaleString();
+                    document.getElementById('fbUpdatedAt').textContent = new Date(fb.fbUpdatedAt).toLocaleString();
+                    document.getElementById('fbShuttleRating').textContent = fb.fbShuttleRating + ' ★';
+                    document.getElementById('fbReceptionRating').textContent = fb.fbReceptionRating + ' ★';
+                    document.getElementById('fbRoomRating').textContent = fb.fbRoomRating + ' ★';
+                    document.getElementById('fbFacilityRating').textContent = fb.fbFacilityRating + ' ★';
+                    document.getElementById('fbEnvRating').textContent = fb.fbEnvRating + ' ★';
+                    document.getElementById('fbValueRating').textContent = fb.fbValueRating + ' ★';
+                    document.getElementById('fbWebsiteRating').textContent = fb.fbWebsiteRating + ' ★';
+                    document.getElementById('fbImage').src = fb.fbImageBase64 || '';
+                    modal.show();
+                });
+            });
+        });
+</script>
+</body>
+</html>
