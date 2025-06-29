@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>微嶼 | 訂房資料填寫</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+</head>
+<body>
+<!-- ===== 載入Header ===== -->
+<div th:replace="~{fragments/fragments :: header}"></div>
+
+<main>
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow">
+                    <div class="card-header bg-dark text-white">
+                        <h4 class="mb-0"><i class="bi bi-person-check"></i> 訂房資料填寫</h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- 訂房摘要 -->
+                        <div class="alert alert-info">
+                            <h6><i class="bi bi-info-circle"></i> 訂房摘要</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>入住日期：</strong><span id="summary-checkin">-</span><br>
+                                    <strong>退房日期：</strong><span id="summary-checkout">-</span><br>
+                                    <strong>住宿夜數：</strong><span id="summary-nights">-</span>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>成人人數：</strong><span id="summary-adults">-</span><br>
+                                    <strong>孩童人數：</strong><span id="summary-children">-</span><br>
+                                    <strong>總價：</strong><span id="summary-total" class="text-primary">-</span> 元
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 選擇的房型 -->
+                        <div class="mb-4">
+                            <h6><i class="bi bi-house"></i> 選擇的房型</h6>
+                            <div id="selected-rooms-summary">
+                                <!-- 房型會動態插入這裡 -->
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 訂房人資料 -->
+                        <form id="booking-form" action="/booking/submit" method="post">
+                            <input type="hidden" name="paymentMethod" value="creditCard" />
+                            <h6><i class="bi bi-person"></i> 訂房人資料</h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="guestName" class="form-label">姓名 <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="guestName" name="guestName" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="guestPhone" class="form-label">電話 <span class="text-danger">*</span></label>
+                                    <input type="tel" class="form-control" id="guestPhone" name="guestPhone" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="guestEmail" class="form-label">Email <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control" id="guestEmail" name="guestEmail" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="guestIdNumber" class="form-label">身分證字號 <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="guestIdNumber" name="guestIdNumber" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="guestAddress" class="form-label">地址</label>
+                                <input type="text" class="form-control" id="guestAddress" name="guestAddress">
+                            </div>
+
+                            <hr>
+
+                            <!-- 特殊需求 -->
+                            <h6><i class="bi bi-chat-text"></i> 特殊需求</h6>
+                            <div class="mb-3">
+                                <label for="specialRequests" class="form-label">備註</label>
+                                <textarea class="form-control" id="specialRequests" name="specialRequests" rows="3" placeholder="如有特殊需求請在此說明..."></textarea>
+                            </div>
+
+                            <hr>
+
+                            <!-- 信用卡資訊 -->
+                            <h6><i class="bi bi-credit-card"></i> 信用卡資訊</h6>
+                            <div class="mb-3">
+                                <label for="cardNumber" class="form-label">信用卡號碼 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                                <div class="invalid-feedback" id="cardNumberInvalid">請輸入正確的信用卡號碼</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="cardExpiry" class="form-label">有效期限 <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="cardExpiry" name="cardExpiry" placeholder="MM/YY" maxlength="5" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="cardCVV" class="form-label">CVV <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="cardCVV" name="cardCVV" placeholder="123" maxlength="4" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cardHolder" class="form-label">持卡人姓名 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="cardHolder" name="cardHolder" placeholder="請輸入英文姓名，例如：John Smith" required>
+                                <div class="form-text">請輸入與信用卡上完全一致的英文姓名</div>
+                            </div>
+
+                            <!-- 同意條款 -->
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                                    <label class="form-check-label" for="agreeTerms">
+                                        我已閱讀並同意 <a href="#" target="_blank">訂房條款</a> 和 <a href="#" target="_blank">隱私政策</a>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- 按鈕 -->
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-secondary" onclick="history.back()">
+                                    <i class="bi bi-arrow-left"></i> 返回修改
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-circle"></i> 確認預訂
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- ========== 載入Footer ========== -->
+<div th:replace="~{fragments/fragments :: footer}"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('訂房資料填寫頁面載入完成');
+        
+        // 從 sessionStorage 取得訂房資料
+        const bookingData = JSON.parse(sessionStorage.getItem('bookingData') || '{}');
+        
+        // 填入訂房摘要
+        if (bookingData.checkin) {
+            document.getElementById('summary-checkin').textContent = bookingData.checkin;
+        }
+        if (bookingData.checkout) {
+            document.getElementById('summary-checkout').textContent = bookingData.checkout;
+        }
+        if (bookingData.adults) {
+            document.getElementById('summary-adults').textContent = bookingData.adults;
+        }
+        if (bookingData.children) {
+            document.getElementById('summary-children').textContent = bookingData.children;
+        }
+        if (bookingData.totalPrice) {
+            document.getElementById('summary-total').textContent = bookingData.totalPrice;
+        }
+        
+        // 計算住宿夜數
+        if (bookingData.checkin && bookingData.checkout) {
+            const checkin = new Date(bookingData.checkin);
+            const checkout = new Date(bookingData.checkout);
+            const nights = Math.ceil((checkout - checkin) / (1000 * 60 * 60 * 24));
+            document.getElementById('summary-nights').textContent = nights;
+        }
+        
+        // 顯示選擇的房型
+        if (bookingData.selectedRooms && bookingData.selectedRooms.length > 0) {
+            const roomsContainer = document.getElementById('selected-rooms-summary');
+            bookingData.selectedRooms.forEach(room => {
+                const roomDiv = document.createElement('div');
+                roomDiv.className = 'p-2 bg-light rounded mb-2';
+                roomDiv.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${room.name}</strong>
+                            <div class="text-muted">${room.price} 元</div>
+                        </div>
+                    </div>
+                `;
+                roomsContainer.appendChild(roomDiv);
+            });
+        }
+        
+        // Luhn 演算法驗證信用卡號
+        function luhnCheck(cardNumber) {
+            let arr = (cardNumber + '').replace(/\D/g, '').split('').reverse().map(x => parseInt(x));
+            let sum = 0;
+            for (let i = 0; i < arr.length; i++) {
+                let val = arr[i];
+                if (i % 2 === 1) {
+                    val *= 2;
+                    if (val > 9) val -= 9;
+                }
+                sum += val;
+            }
+            return sum % 10 === 0;
+        }
+
+        document.getElementById('booking-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 基本驗證
+            const guestName = document.getElementById('guestName').value.trim();
+            const guestPhone = document.getElementById('guestPhone').value.trim();
+            const guestEmail = document.getElementById('guestEmail').value.trim();
+            const guestIdNumber = document.getElementById('guestIdNumber').value.trim();
+            
+            if (!guestName || !guestPhone || !guestEmail || !guestIdNumber) {
+                alert('請填寫所有必填欄位');
+                return;
+            }
+            
+            // Luhn 演算法驗證信用卡號
+            const cardNumberInput = document.getElementById('cardNumber');
+            const cardNumber = cardNumberInput.value.replace(/\s+/g, '');
+            const cardNumberInvalid = document.getElementById('cardNumberInvalid');
+            let valid = true;
+
+            if (!luhnCheck(cardNumber)) {
+                cardNumberInput.classList.add('is-invalid');
+                cardNumberInvalid.style.display = 'block';
+                valid = false;
+            } else {
+                cardNumberInput.classList.remove('is-invalid');
+                cardNumberInvalid.style.display = 'none';
+            }
+
+            if (!valid) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+            
+            // 送出表單
+            this.submit();
+        });
+    });
+</script>
+</body>
+</html>

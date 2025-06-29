@@ -46,7 +46,7 @@ public class PromotionController {
             return "back-end/promotion/update_promotion_input";
         }
         promotionSvc.updatePromotion(promotion);
-        return "back-end/promotion/listOnePromotion";
+        return "redirect:/promotion/listAll";
     }
 
     @GetMapping("/listAll")

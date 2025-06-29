@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>微嶼 | 訂房成功</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+</head>
+<body>
+<!-- ===== 載入Header ===== -->
+<div th:replace="~{fragments/fragments :: header}"></div>
+
+<main>
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card shadow text-center">
+                    <div class="card-body py-5">
+                        <div class="mb-4">
+                            <i class="bi bi-check-circle text-success" style="font-size: 4rem;"></i>
+                        </div>
+                        <h3 class="text-success mb-3">訂房成功！</h3>
+                        <p class="text-muted mb-4" th:text="${message}">我們會盡快與您聯繫確認。</p>
+                        
+                        <div class="alert alert-info">
+                            <h6><i class="bi bi-info-circle"></i> 後續流程</h6>
+                            <ul class="list-unstyled mb-0 text-start">
+                                <li><i class="bi bi-clock"></i> 我們會在 24 小時內與您聯繫確認</li>
+                                <li><i class="bi bi-envelope"></i> 確認信會發送到您的 Email</li>
+                                <li><i class="bi bi-phone"></i> 如有疑問請撥打服務專線</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <a href="/" class="btn btn-primary me-2">
+                                <i class="bi bi-house"></i> 返回首頁
+                            </a> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- ========== 載入Footer ========== -->
+<div th:replace="~{fragments/fragments :: footer}"></div>
+
+<script>
+// 清除 sessionStorage 中的訂房資料
+sessionStorage.removeItem('bookingData');
+</script>
+</body>
+</html> 
