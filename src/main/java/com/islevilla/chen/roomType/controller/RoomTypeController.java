@@ -14,6 +14,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -90,17 +91,6 @@ public String showListRoomType(
 }
 	
 
-//顯示修改房型網頁
-@GetMapping("/updateRoomType")
-@PreAuthorize("hasAuthority('room')")
-public String showUpdateRoomType(Model model) {
-
-	System.out.println("進入頁面");
-	model.addAttribute("roomType", new RoomType());  
-	model.addAttribute("saleStatusMap", saleStatusMap);  //下拉選單
-	return "/back-end/roomType/updateRoomType";
-}
-
 	//修改房型處理
 	@PostMapping("/updateRoomType/{roomTypeId}")
 	@PreAuthorize("hasAuthority('room')")
@@ -119,7 +109,7 @@ public String showUpdateRoomType(Model model) {
 			model.addAttribute("roomType",roomType);  
 			model.addAttribute("saleStatusMap", saleStatusMap);  //下拉選單
 			model.addAttribute("errorMessage", errorMessages);
-			return "back-end/roomType/updateRoomType";
+			return "back-end/roomType/listRoomType";
 		}
 		try {
 			roomTypeService.updateRoomType(roomType);
@@ -128,17 +118,6 @@ public String showUpdateRoomType(Model model) {
 		}
 		return "/back-end/roomType/listRoomType";
 	}
-
-//顯示新增房型網頁
-@GetMapping("/addRoomType")
-@PreAuthorize("hasAuthority('room')")
-public String showAddRoomType(Model model) {
-
-	System.out.println("進入頁面");
-	model.addAttribute("roomType", new RoomType());  
-	model.addAttribute("saleStatusMap", saleStatusMap);  //下拉選單
-	return "/back-end/roomType/addRoomType";
-}
 
 	//新增房型處理
 	@PostMapping("/addRoomType")
@@ -156,11 +135,27 @@ public String showAddRoomType(Model model) {
 			model.addAttribute("roomType",roomType);  
 			model.addAttribute("saleStatusMap", saleStatusMap);  //下拉選單
 			model.addAttribute("errorMessage", errorMessages);
-			return "back-end/roomType/updateRoomType";
+			return "back-end/roomType/listRoomType";
 		}
 		
 		try {
 			roomTypeService.addRoomType(roomType);
+		}catch(BusinessException e){
+			model.addAttribute("errorMessage", e.getMessage());
+		}
+		return "/back-end/roomType/listRoomType";
+	}
+	
+	//刪除房型處理
+	@PostMapping("/deleteRoomType/{roomTypeId}")
+	@PreAuthorize("hasAuthority('room')")
+	public String addRoomType(@PathVariable Integer roomTypeId, 
+								Model model,
+								RedirectAttributes redirectAttributes) {
+		System.out.println("進入頁面");
+		
+		try {
+			roomTypeService.deleteRoomType(roomTypeId);
 		}catch(BusinessException e){
 			model.addAttribute("errorMessage", e.getMessage());
 		}
