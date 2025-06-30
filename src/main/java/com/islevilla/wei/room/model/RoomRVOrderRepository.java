@@ -1,6 +1,7 @@
 package com.islevilla.wei.room.model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,4 +47,17 @@ public interface RoomRVOrderRepository extends JpaRepository<RoomRVOrder, Intege
     List<RoomRVOrder> findByMembersAndRoomOrderStatus(Members members, Integer status);
 
     List<RoomRVOrder> findAllByOrderByRoomOrderDateDesc();
+
+    // 查詢條件：該會員的訂單中，實際退房時間在過去一個月內，且訂單狀態為已退房
+    @Query("SELECT r FROM RoomRVOrder r WHERE " +
+            "r.members.memberId = :memberId AND " +
+            "r.roomOrderStatus = :status AND " +
+            "r.actualCheckOutDate IS NOT NULL AND " +
+            "r.actualCheckOutDate >= :oneMonthAgo " +
+            "ORDER BY r.actualCheckOutDate DESC")
+    List<RoomRVOrder> findEligibleOrdersForFeedback(
+            @Param("memberId") Integer memberId,
+            @Param("oneMonthAgo") LocalDateTime oneMonthAgo,
+            @Param("status") Integer status
+    );
 }

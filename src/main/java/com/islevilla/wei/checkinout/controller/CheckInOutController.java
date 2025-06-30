@@ -36,12 +36,12 @@ public class CheckInOutController {
         try {
             boolean success = checkInOutService.checkIn(orderId);
             if (success) {
-                redirectAttributes.addAttribute("message", "訂單 #" + orderId + " 辦理入住成功");
+                redirectAttributes.addFlashAttribute("message", "訂單 #" + orderId + " 辦理入住成功");
             } else {
-                redirectAttributes.addAttribute("error", "訂單 #" + orderId + " 辦理入住失敗");
+                redirectAttributes.addFlashAttribute("error", "訂單 #" + orderId + " 辦理入住失敗");
             }
         } catch (Exception e) {
-            redirectAttributes.addAttribute("error", "辦理入住失敗: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "辦理入住失敗: " + e.getMessage());
         }
         return "redirect:/backend/check-in-out/list";
     }
@@ -52,12 +52,12 @@ public class CheckInOutController {
         try {
             boolean success = checkInOutService.checkOut(orderId);
             if (success) {
-                redirectAttributes.addAttribute("message", "訂單 #" + orderId + " 辦理退房成功");
+                redirectAttributes.addFlashAttribute("message", "訂單 #" + orderId + " 辦理退房成功");
             } else {
-                redirectAttributes.addAttribute("error", "訂單 #" + orderId + " 辦理退房失敗");
+                redirectAttributes.addFlashAttribute("error", "訂單 #" + orderId + " 辦理退房失敗");
             }
         } catch (Exception e) {
-            redirectAttributes.addAttribute("error", "辦理退房失敗: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "辦理退房失敗: " + e.getMessage());
         }
         return "redirect:/backend/check-in-out/list";
     }
