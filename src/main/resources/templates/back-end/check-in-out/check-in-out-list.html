@@ -23,17 +23,20 @@
 
         <!-- 快速操作區域 -->
         <div class="row mb-4">
+            <!-- 入住區塊 -->
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header bg-success text-white">
                         <i class="bi bi-house-check"></i> 辦理入住
                     </div>
                     <div class="card-body">
-                        <form th:action="@{/admin/checkin}" method="post" id="checkinForm">
+                        <form id="checkinForm" method="post"
+                              th:action="@{/backend/room-reservation/{orderId}/checkin(orderId=${checkinOrderId})}"
+                              onsubmit="return confirmCheckin();">
                             <div class="mb-3">
                                 <label for="checkinOrderId" class="form-label">訂房編號</label>
-                                <input type="number" class="form-control" id="checkinOrderId" name="roomRVOrderId"
-                                       placeholder="請輸入訂房編號" required>
+                                <input type="number" class="form-control" id="checkinOrderId" name="checkinOrderId"
+                                       placeholder="請輸入訂房編號" required oninput="updateCheckinAction(this.value)">
                             </div>
                             <button type="submit" class="btn btn-success w-100">
                                 <i class="bi bi-check-circle"></i> 確認入住
@@ -43,17 +46,20 @@
                 </div>
             </div>
 
+            <!-- 退房區塊 -->
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header bg-warning text-dark">
                         <i class="bi bi-house-x"></i> 辦理退房
                     </div>
                     <div class="card-body">
-                        <form th:action="@{/admin/checkout}" method="post" id="checkoutForm">
+                        <form id="checkoutForm" method="post"
+                              th:action="@{/backend/room-reservation/{orderId}/checkout(orderId=${checkoutOrderId})}"
+                              onsubmit="return confirmCheckout();">
                             <div class="mb-3">
                                 <label for="checkoutOrderId" class="form-label">訂房編號</label>
-                                <input type="number" class="form-control" id="checkoutOrderId" name="roomRVOrderId"
-                                       placeholder="請輸入訂房編號" required>
+                                <input type="number" class="form-control" id="checkoutOrderId" name="checkoutOrderId"
+                                       placeholder="請輸入訂房編號" required oninput="updateCheckoutAction(this.value)">
                             </div>
                             <button type="submit" class="btn btn-warning w-100">
                                 <i class="bi bi-x-circle"></i> 確認退房
@@ -63,41 +69,6 @@
                 </div>
             </div>
         </div>
-
-<!--        &lt;!&ndash; 訂單查詢功能 &ndash;&gt;-->
-<!--        <div class="card mb-4">-->
-<!--            <div class="card-header">-->
-<!--                <i class="bi bi-search"></i> 訂單查詢-->
-<!--            </div>-->
-<!--            <div class="card-body">-->
-<!--                <form th:action="@{/admin/search-order}" method="get" class="row g-3">-->
-<!--                    <div class="col-md-4">-->
-<!--                        <label for="searchOrderId" class="form-label">訂房編號</label>-->
-<!--                        <input type="number" class="form-control" id="searchOrderId" name="orderId"-->
-<!--                               th:value="${searchOrderId}" placeholder="輸入訂房編號">-->
-<!--                    </div>-->
-<!--                    <div class="col-md-4">-->
-<!--                        <label for="searchStatus" class="form-label">訂單狀態</label>-->
-<!--                        <select class="form-select" id="searchStatus" name="status" th:value="${searchStatus}">-->
-<!--                            <option value="">全部狀態</option>-->
-<!--                            <option value="0" th:selected="${searchStatus == '0'}">成立</option>-->
-<!--                            <option value="1" th:selected="${searchStatus == '1'}">已入住</option>-->
-<!--                            <option value="2" th:selected="${searchStatus == '2'}">已退房</option>-->
-<!--                            <option value="3" th:selected="${searchStatus == '3'}">申請取消</option>-->
-<!--                            <option value="4" th:selected="${searchStatus == '4'}">確認取消</option>-->
-<!--                        </select>-->
-<!--                    </div>-->
-<!--                    <div class="col-md-4 d-flex align-items-end">-->
-<!--                        <button type="submit" class="btn btn-primary me-2">-->
-<!--                            <i class="bi bi-search"></i> 查詢-->
-<!--                        </button>-->
-<!--                        <a href="/admin/checkin-checkout" class="btn btn-outline-secondary">-->
-<!--                            <i class="bi bi-arrow-clockwise"></i> 重置-->
-<!--                        </a>-->
-<!--                    </div>-->
-<!--                </form>-->
-<!--            </div>-->
-<!--        </div>-->
 
         <!-- 訂單列表 -->
         <div class="card">
@@ -116,8 +87,8 @@
                             <th>入住日期</th>
                             <th>退房日期</th>
                             <th>優惠專案</th>
-                            <!--                            <th>實際入住時間</th>-->
-                            <!--                            <th>實際退房時間</th>-->
+                            <!-- <th>實際入住時間</th> -->
+                            <!-- <th>實際退房時間</th> -->
                             <th>總金額</th>
                             <th>操作</th>
                         </tr>
@@ -130,18 +101,18 @@
                                 14:30
                             </td>
                             <td>
-                                            <span th:switch="${order.roomOrderStatus}">
-                                                <span th:case="0" class="badge bg-primary">成立</span>
-                                                <span th:case="1" class="badge bg-success">已入住</span>
-                                                <span th:case="2" class="badge bg-secondary">已退房</span>
-                                                <span th:case="3" class="badge bg-warning">申請取消</span>
-                                                <span th:case="4" class="badge bg-danger">確認取消</span>
-                                            </span>
+                                <span th:switch="${order.roomOrderStatus}">
+                                    <span th:case="0" class="badge bg-primary">成立</span>
+                                    <span th:case="1" class="badge bg-success">已入住</span>
+                                    <span th:case="2" class="badge bg-secondary">已退房</span>
+                                    <span th:case="3" class="badge bg-warning">申請取消</span>
+                                    <span th:case="4" class="badge bg-danger">確認取消</span>
+                                </span>
                             </td>
                             <td th:text="${#temporals.format(order.checkInDate, 'yyyy-MM-dd')}">2024-01-20</td>
                             <td th:text="${#temporals.format(order.checkOutDate, 'yyyy-MM-dd')}">2024-01-22</td>
-                            <!--                            <td th:text="${order.actualCheckInDate != null ? #temporals.format(order.actualCheckInDate, 'yyyy-MM-dd HH:mm') : '-'}">-</td>-->
-                            <!--                            <td th:text="${order.actualCheckOutDate != null ? #temporals.format(order.actualCheckOutDate, 'yyyy-MM-dd HH:mm') : '-'}">-</td>-->
+                            <!-- <td th:text="${order.actualCheckInDate != null ? #temporals.format(order.actualCheckInDate, 'yyyy-MM-dd HH:mm') : '-'}">-</td>-->
+                            <!-- <td th:text="${order.actualCheckOutDate != null ? #temporals.format(order.actualCheckOutDate, 'yyyy-MM-dd HH:mm') : '-'}">-</td>-->
                             <td th:text="${order.promotion != null ? order.promotion.roomPromotionTitle : '-'}">
                                 -
                             </td>
@@ -157,22 +128,26 @@
                                     </button>
 
                                     <!-- 入住按鈕 -->
-                                    <button th:if="${order.roomOrderStatus == 0}"
-                                            type="button"
-                                            class="btn btn-sm btn-success checkin-btn"
-                                            th:data-order-id="${order.roomReservationId}"
-                                            title="辦理入住">
-                                        <i class="bi bi-house-check"></i>
-                                    </button>
+                                    <form th:action="@{/backend/room-reservation/{orderId}/checkin(orderId=${order.roomReservationId})}"
+                                          method="post" th:if="${order.roomOrderStatus==0}" class="d-inline">
+                                        <button type="submit"
+                                                class="btn btn-sm btn-success"
+                                                title="辦理入住"
+                                                onclick="return confirm('確定為訂單 #'+this.form.action.split('/').pop()+'辦理入住？');">
+                                            <i class="bi bi-house-check"></i>
+                                        </button>
+                                    </form>
 
                                     <!-- 退房按鈕 -->
-                                    <button th:if="${order.roomOrderStatus == 1}"
-                                            type="button"
-                                            class="btn btn-sm btn-warning checkout-btn"
-                                            th:data-order-id="${order.roomReservationId}"
-                                            title="辦理退房">
-                                        <i class="bi bi-house-x"></i>
-                                    </button>
+                                    <form th:action="@{/backend/room-reservation/{orderId}/checkout(orderId=${order.roomReservationId})}"
+                                          method="post" th:if="${order.roomOrderStatus==1}" class="d-inline">
+                                        <button type="submit"
+                                                class="btn btn-sm btn-warning"
+                                                title="辦理退房"
+                                                onclick="return confirm('確定為訂單 #'+this.form.action.split('/').pop()+'辦理退房？');">
+                                            <i class="bi bi-house-x"></i>
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>
@@ -210,7 +185,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="orderDetailContent">
-                <!-- 詳情內容將透過AJAX載入 -->
+                <!-- 詳情內容透過AJAX載入 -->
                 <div class="text-center">
                     <div class="spinner-border" role="status">
                         <span class="visually-hidden">載入中...</span>
@@ -243,25 +218,8 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // 入住按鈕事件
-        document.querySelectorAll('.checkin-btn').forEach(button => {
-            button.addEventListener('click', function () {
-                const orderId = this.getAttribute('data-order-id');
-                showConfirmModal('辦理入住', `確定要為訂單 #${orderId} 辦理入住嗎？`, function () {
-                    submitAction('/admin/checkin', orderId);
-                });
-            });
-        });
-
-        // 退房按鈕事件
-        document.querySelectorAll('.checkout-btn').forEach(button => {
-            button.addEventListener('click', function () {
-                const orderId = this.getAttribute('data-order-id');
-                showConfirmModal('辦理退房', `確定要為訂單 #${orderId} 辦理退房嗎？`, function () {
-                    submitAction('/admin/checkout', orderId);
-                });
-            });
-        });
+        updateCheckinAction(document.getElementById('checkinOrderId').value);
+        updateCheckoutAction(document.getElementById('checkoutOrderId').value);
 
         // 查看詳情按鈕事件
         document.querySelectorAll('.view-detail-btn').forEach(button => {
@@ -270,51 +228,25 @@
                 showOrderDetail(orderId);
             });
         });
-
-        // 表單驗證
-        document.getElementById('checkinForm').addEventListener('submit', function (e) {
-            const orderId = document.getElementById('checkinOrderId').value;
-            if (!orderId || orderId <= 0) {
-                e.preventDefault();
-                alert('請輸入有效的訂房編號');
-            }
-        });
-
-        document.getElementById('checkoutForm').addEventListener('submit', function (e) {
-            const orderId = document.getElementById('checkoutOrderId').value;
-            if (!orderId || orderId <= 0) {
-                e.preventDefault();
-                alert('請輸入有效的訂房編號');
-            }
-        });
     });
 
-    function showConfirmModal(title, message, confirmCallback) {
-        document.getElementById('confirmModalTitle').textContent = title;
-        document.getElementById('confirmModalBody').textContent = message;
-
-        const confirmButton = document.getElementById('confirmAction');
-        confirmButton.onclick = function () {
-            confirmCallback();
-            bootstrap.Modal.getInstance(document.getElementById('confirmModal')).hide();
-        };
-
-        new bootstrap.Modal(document.getElementById('confirmModal')).show();
+    // 彈出確認操作的視窗
+    function confirmCheckin() {
+        const id = document.getElementById('checkinOrderId').value;
+        if (!id || id <= 0) {
+            alert('請輸入有效的訂房編號');
+            return false;
+        }
+        return confirm(`確定要為訂單 #${id} 辦理入住嗎？`);
     }
 
-    function submitAction(action, orderId) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = action;
-
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'roomRVOrderId';
-        input.value = orderId;
-
-        form.appendChild(input);
-        document.body.appendChild(form);
-        form.submit();
+    function confirmCheckout() {
+        const id = document.getElementById('checkoutOrderId').value;
+        if (!id || id <= 0) {
+            alert('請輸入有效的訂房編號');
+            return false;
+        }
+        return confirm(`確定要為訂單 #${id} 辦理退房嗎？`);
     }
 
     function showOrderDetail(orderId) {
@@ -327,6 +259,24 @@
             });
 
         modal.show();
+    }
+
+    function updateCheckinAction(orderId) {
+        const form = document.getElementById('checkinForm');
+        if (orderId && orderId > 0) {
+            form.action = `/backend/room-reservation/${orderId}/checkin`;
+        } else {
+            form.action = '#'; // 或空字串防止送出錯誤
+        }
+    }
+
+    function updateCheckoutAction(orderId) {
+        const form = document.getElementById('checkoutForm');
+        if (orderId && orderId > 0) {
+            form.action = `/backend/room-reservation/${orderId}/checkout`;
+        } else {
+            form.action = '#';
+        }
     }
 
     // 自動隱藏alert訊息

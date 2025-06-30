@@ -1,15 +1,15 @@
 package com.islevilla.wei.checkinout.controller;
 
 import com.islevilla.wei.checkinout.service.CheckInOutService;
-import com.islevilla.wei.room.model.RoomRVDetail;
-import com.islevilla.wei.room.model.RoomRVDetailService;
 import com.islevilla.wei.room.model.RoomRVOrder;
 import com.islevilla.wei.room.model.RoomRVOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -19,8 +19,6 @@ public class CheckInOutController {
     private CheckInOutService checkInOutService;
     @Autowired
     private RoomRVOrderService roomRVOrderService;
-    @Autowired
-    private RoomRVDetailService roomRVDetailService;
 
     // 後台checkIn頁面
     @GetMapping("/backend/check-in-out/list")
@@ -30,5 +28,37 @@ public class CheckInOutController {
             model.addAttribute("orderList", orderList);
         }
         return "back-end/check-in-out/check-in-out-list";
+    }
+
+    // 入住
+    @PostMapping("/backend/room-reservation/{orderId}/checkin")
+    public String checkIn(@PathVariable Integer orderId, RedirectAttributes redirectAttributes) {
+        try {
+            boolean success = checkInOutService.checkIn(orderId);
+            if (success) {
+                redirectAttributes.addAttribute("message", "訂單 #" + orderId + " 辦理入住成功");
+            } else {
+                redirectAttributes.addAttribute("error", "訂單 #" + orderId + " 辦理入住失敗");
+            }
+        } catch (Exception e) {
+            redirectAttributes.addAttribute("error", "辦理入住失敗: " + e.getMessage());
+        }
+        return "redirect:/backend/check-in-out/list";
+    }
+
+    // 退房
+    @PostMapping("/backend/room-reservation/{orderId}/checkout")
+    public String checkOut(@PathVariable Integer orderId, RedirectAttributes redirectAttributes) {
+        try {
+            boolean success = checkInOutService.checkOut(orderId);
+            if (success) {
+                redirectAttributes.addAttribute("message", "訂單 #" + orderId + " 辦理退房成功");
+            } else {
+                redirectAttributes.addAttribute("error", "訂單 #" + orderId + " 辦理退房失敗");
+            }
+        } catch (Exception e) {
+            redirectAttributes.addAttribute("error", "辦理退房失敗: " + e.getMessage());
+        }
+        return "redirect:/backend/check-in-out/list";
     }
 }
