@@ -1,4 +1,4 @@
-package com.islevilla.ching.seat.model;
+package com.islevilla.ching.shuttleSeat.model;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

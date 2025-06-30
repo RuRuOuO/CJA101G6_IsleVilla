@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>聊天室列表</title>
+    <style>
+        body {
+            font-family: "Noto Sans TC", sans-serif;
+            background-color: #f9f9f9;
+        }
+        h2 {
+            text-align: center;
+            margin-top: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 90%;
+            margin: auto;
+            background-color: white;
+            box-shadow: 0 0 8px rgba(0,0,0,0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #fafafa;
+        }
+        .refresh {
+            display: block;
+            margin: 20px auto;
+            padding: 8px 16px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .refresh:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>聊天室列表</h2>
+
+    <form method="get" th:action="@{/backend/chat/room/list}">
+        <button type="submit" class="refresh">🔄 重新整理</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>聊天室ID</th>
+                <th>會員名稱</th>
+                <th>客服名稱</th>
+                <th>狀態</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:if="${#lists.isEmpty(rooms)}">
+                <td colspan="5">目前沒有聊天室</td>
+            </tr>
+            <tr th:each="room : ${rooms}">
+                <td th:text="${room.chatRoomId}">1</td>
+                <td th:text="${room.memberName}">會員名稱</td>
+                <td th:text="${room.employeeName}">客服名稱</td>
+                <td th:text="${room.chatStatus == 1 ? '進行中' : '已結束'}">進行中</td>
+                <td>
+                    <a th:href="@{/backend/chat/room/{id}(id=${room.chatRoomId})}">
+                        進入聊天室
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>
