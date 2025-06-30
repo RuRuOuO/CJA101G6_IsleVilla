@@ -16,6 +16,7 @@ public interface RoomTypePhotoRepository extends JpaRepository<RoomTypePhoto, In
 	@Query("SELECT rtp FROM RoomTypePhoto rtp WHERE rtp.roomType.roomTypeId = :roomTypeId ORDER BY rtp.displayOrder ASC")
 	public List<RoomTypePhoto> findWithPhotos(@Param("roomTypeId") Integer roomTypeId);
 	
+	//複合查詢
 	public List<RoomTypePhoto> search(Integer roomTypePhotoId, Integer roomTypeId);
 
 	// 刪除特定房型的所有照片

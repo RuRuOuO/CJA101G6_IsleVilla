@@ -10,13 +10,16 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 
 @Entity // Hibernate：這是一個資料表對應的 Java 類別
 @Table(name="room_type") // Hibernate：指定資料表名稱
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Component
@@ -32,7 +35,7 @@ public class RoomType {
 	
 	@Column(name="room_type_code") 
 	@NotBlank(message = "房型代碼: 請勿空白")
-	@Pattern(regexp = "^[(a-zA-Z)]{3}$", message = "房型代碼: 請輸入英文字母,且長度為3")
+	@Pattern(regexp = "^[(a-zA-Z0-9)]{3}$", message = "房型代碼: 請輸入英文字母或數字,且長度為3")
 	private String roomTypeCode;
 	
 	@Column(name="room_type_name")
@@ -42,18 +45,18 @@ public class RoomType {
 	private String roomTypeName;
 	
 	@Column(name="room_type_quantity")
-	@NotNull(message = "房間數量:請輸入數字")
-	@Min(value=1, message = "房間數量:格式錯誤，請輸入數字")
+	@NotNull(message = "房型數量:請輸入數字")
+	@Min(value=0, message = "房型數量:格式錯誤，請輸入數字")
 	private Integer roomTypeQuantity;
 	
 	@Column(name="room_type_capacity")
-	@NotNull(message = "房間容納人數:請輸入數字")
-	@Min(value=1, message = "房間容納人數:格式錯誤，請輸入數字")
+	@NotNull(message = "房型容納人數:請輸入數字")
+	@Min(value=1, message = "房型容納人數:格式錯誤，請輸入數字")
 	private Integer roomTypeCapacity;
 	
 	@Column(name="room_type_content")
 	@NotBlank(message = "房型說明:請勿空白")
-	@Size(max=1000 ,message = "房間說明勿超過1000字")
+	@Size(max=1000 ,message = "房型說明勿超過1000字")
 	private String roomTypeContent;
 	
 	@Column(name="room_type_price")
