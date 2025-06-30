@@ -17,6 +17,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.islevilla.ching.chat.modelDTO.ChatMessageDTO;
+import com.islevilla.ching.chat.modelDTO.ChatRoomDTO;
 import com.islevilla.ching.chat.service.ChatRedisService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class ChatWebSocketHandler extends TextWebSocketHandler {
 
-    // ✔ 每個聊天室對應多個Session
     private static final Map<Integer, List<WebSocketSession>> chatRoomSessions = new ConcurrentHashMap<>();
 
     @Autowired
@@ -36,77 +36,77 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     /** ✔ 建立連線 */
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
-        Integer roomId = getRoomId(session);
+        Integer roomId = getParam(session, "roomId");
         chatRoomSessions.computeIfAbsent(roomId, k -> new ArrayList<>()).add(session);
-        log.info("✅ 用戶 {} 已加入聊天室 {}", session.getId(), roomId);
+        log.info("✅ 用戶 {} 已進入聊天室 {}", session.getId(), roomId);
     }
 
     /** ✔ 接收訊息 */
     @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-        try {
-            Integer roomId = getRoomId(session);
+    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        ChatMessageDTO chatMessage = mapper.readValue(message.getPayload(), ChatMessageDTO.class);
 
-            // ✔ 解析訊息
-            ChatMessageDTO chatMessage = mapper.readValue(message.getPayload(), ChatMessageDTO.class);
-            chatMessage.setMessageTime(System.currentTimeMillis());
-            chatMessage.setIsRead(0);
-
-            // ✔ 儲存到 Redis
-            chatRedisService.saveMessage(roomId, chatMessage);
-
-            // ✔ 廣播到聊天室
-            broadcastToRoom(roomId, chatMessage);
-
-            log.info("📤 廣播訊息到聊天室 {}: {}", roomId, chatMessage.getMessageContent());
-
-        } catch (Exception e) {
-            log.error("❌ 處理訊息發生錯誤", e);
+        if (chatMessage.getMessageContent() == null || chatMessage.getMessageContent().trim().isEmpty()) {
+            session.sendMessage(new TextMessage("❌ 訊息內容不得為空"));
+            return;
         }
+        
+        chatMessage.setMessageTime(System.currentTimeMillis());
+        chatMessage.setIsRead(0);
+
+        Integer roomId = chatMessage.getChatRoomId();
+        Integer senderType = chatMessage.getSenderType();
+
+        // ✔ 取得聊天室
+        ChatRoomDTO room = chatRedisService.getChatRoom(roomId);
+
+        if (room == null) {
+            session.sendMessage(new TextMessage("❌ 聊天室不存在"));
+            return;
+        }
+
+        // ✔ 若聊天室已結束，禁止傳送
+        if (room.getChatStatus() == 0) {
+            session.sendMessage(new TextMessage("❌ 此聊天室已結束，無法傳送訊息。"));
+            return;
+        }
+
+        // ✔ 儲存訊息
+        chatRedisService.saveMessage(roomId, chatMessage);
+        
+   
+
+        // ✔ 廣播
+        List<WebSocketSession> sessions = chatRoomSessions.getOrDefault(roomId, Collections.emptyList());
+        for (WebSocketSession s : sessions) {
+            if (s.isOpen()) {
+                s.sendMessage(new TextMessage(mapper.writeValueAsString(chatMessage)));
+            }
+        }
+
+        log.info("✔ 廣播訊息：{}", chatMessage.getMessageContent());
     }
 
     /** ✔ 關閉連線 */
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        Integer roomId = getRoomId(session);
+        Integer roomId = getParam(session, "roomId");
         chatRoomSessions.getOrDefault(roomId, new ArrayList<>()).remove(session);
-        log.info("❎ 用戶 {} 離開聊天室 {}", session.getId(), roomId);
+        log.info("❌ 用戶 {} 離開聊天室 {}", session.getId(), roomId);
     }
 
-    /** ✔ 廣播訊息到聊天室 */
-    private void broadcastToRoom(Integer roomId, ChatMessageDTO message) {
-        List<WebSocketSession> sessions = chatRoomSessions.getOrDefault(roomId, Collections.emptyList());
-        String jsonMessage;
-        try {
-            jsonMessage = mapper.writeValueAsString(message);
-        } catch (Exception e) {
-            log.error("❌ 訊息序列化失敗", e);
-            return;
-        }
-
-        for (WebSocketSession s : sessions) {
-            if (s.isOpen()) {
-                try {
-                    s.sendMessage(new TextMessage(jsonMessage));
-                } catch (Exception e) {
-                    log.warn("⚠️ 傳送訊息給用戶 {} 失敗", s.getId(), e);
-                }
-            }
-        }
-    }
-
-    /** ✔ 從 URL 查詢參數提取 roomId */
-    private Integer getRoomId(WebSocketSession session) {
+    /** ✔ 從URL參數中提取roomId */
+    private Integer getParam(WebSocketSession session, String key) {
         String uri = Objects.requireNonNull(session.getUri()).toString();
         String[] parts = uri.split("\\?");
         if (parts.length > 1) {
             String[] params = parts[1].split("&");
             for (String param : params) {
-                if (param.startsWith("roomId=")) {
+                if (param.startsWith(key + "=")) {
                     return Integer.parseInt(param.split("=")[1]);
                 }
             }
         }
-        throw new IllegalArgumentException("WebSocket URL 缺少 roomId 參數");
+        throw new IllegalArgumentException("缺少參數：" + key);
     }
 }

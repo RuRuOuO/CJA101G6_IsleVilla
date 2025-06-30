@@ -2,15 +2,16 @@
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>聊天室列表</title>
+    <title>聊天室管理列表</title>
     <style>
         body {
             font-family: "Noto Sans TC", sans-serif;
-            background-color: #f9f9f9;
+            background-color: #f4f6f8;
+            padding: 20px;
         }
         h2 {
             text-align: center;
-            margin-top: 20px;
+            margin-bottom: 20px;
         }
         table {
             border-collapse: collapse;
@@ -21,14 +22,15 @@
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 10px;
+            padding: 12px;
             text-align: center;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #34495e;
+            color: white;
         }
         tr:hover {
-            background-color: #fafafa;
+            background-color: #f9f9f9;
         }
         .refresh {
             display: block;
@@ -39,47 +41,137 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            text-decoration: none;
         }
         .refresh:hover {
             background-color: #2980b9;
+        }
+        .status-open {
+            color: green;
+            font-weight: bold;
+        }
+        .status-close {
+            color: red;
+            font-weight: bold;
+        }
+        .unread-dot {
+            color: red;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        .action-link {
+            color: #3498db;
+            text-decoration: none;
+            margin-right: 8px;
+        }
+        .action-link:hover {
+            text-decoration: underline;
+        }
+        .btn-close, .btn-open {
+            color: white;
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-close {
+            background-color: #e74c3c;
+        }
+        .btn-close:hover {
+            background-color: #c0392b;
+        }
+        .btn-open {
+            background-color: #2ecc71;
+        }
+        .btn-open:hover {
+            background-color: #27ae60;
         }
     </style>
 </head>
 <body>
 
-    <h2>聊天室列表</h2>
+<h2>聊天室管理列表</h2>
 
-    <form method="get" th:action="@{/backend/chat/room/list}">
-        <button type="submit" class="refresh">🔄 重新整理</button>
-    </form>
+<form method="get" th:action="@{/backend/chat/room/list}">
+    <button type="submit" class="refresh">刷新列表</button>
+</form>
 
-    <table>
-        <thead>
-            <tr>
-                <th>聊天室ID</th>
-                <th>會員名稱</th>
-                <th>客服名稱</th>
-                <th>狀態</th>
-                <th>操作</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:if="${#lists.isEmpty(rooms)}">
-                <td colspan="5">目前沒有聊天室</td>
-            </tr>
-            <tr th:each="room : ${rooms}">
-                <td th:text="${room.chatRoomId}">1</td>
-                <td th:text="${room.memberName}">會員名稱</td>
-                <td th:text="${room.employeeName}">客服名稱</td>
-                <td th:text="${room.chatStatus == 1 ? '進行中' : '已結束'}">進行中</td>
-                <td>
-                    <a th:href="@{/backend/chat/room/{id}(id=${room.chatRoomId})}">
-                        進入聊天室
-                    </a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+<table>
+    <thead>
+    <tr>
+        <th>聊天室編號</th>
+        <th>會員名稱</th>
+        <th>客服名稱</th>
+        <th>狀態</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:if="${#lists.isEmpty(rooms)}">
+        <td colspan="5">❗ 目前沒有任何聊天室</td>
+    </tr>
+    <tr th:each="room : ${rooms}">
+        <td th:text="${room.chatRoomId}">1001</td>
+        <td th:text="${room.memberName}">會員名稱</td>
+        <td th:text="${room.employeeName}">客服名稱</td>
+        <td>
+            <span th:if="${room.chatStatus == 1}" class="status-open">進行中</span>
+            <span th:if="${room.chatStatus == 0}" class="status-close">已結束</span>
+        </td>
+        <td>
+            <!-- 進入聊天室 -->
+            <a th:href="@{/backend/chat/room/{id}(id=${room.chatRoomId})}" class="action-link">
+                進入
+            </a>
+
+            <!-- 未讀訊息紅點 -->
+            <span th:if="${room.unreadCount != null and room.unreadCount > 0}" class="unread-dot">
+                🔴 <span th:text="${room.unreadCount}">0</span>
+            </span>
+
+            <!-- 如果聊天室進行中，顯示結束 -->
+            <button th:if="${room.chatStatus == 1}"
+                    class="btn-close"
+                    th:onclick="'closeRoom(' + ${room.chatRoomId} + ')'">
+                結束
+            </button>
+
+            <!-- 如果聊天室已結束，顯示開啟 -->
+            <button th:if="${room.chatStatus == 0}"
+                    class="btn-open"
+                    th:onclick="'openRoom(' + ${room.chatRoomId} + ')'">
+                開啟
+            </button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<script>
+    function closeRoom(roomId) {
+        if (confirm("確定要結束聊天室 " + roomId + " 嗎？")) {
+            fetch(`/api/chat/room/${roomId}/close`, {
+                method: 'POST'
+            }).then(res => res.json())
+              .then(data => {
+                  alert(data.message);
+                  location.reload();
+              });
+        }
+    }
+
+    function openRoom(roomId) {
+        if (confirm("確定要重新開啟聊天室 " + roomId + " 嗎？")) {
+            fetch(`/api/chat/room/${roomId}/open`, {
+                method: 'POST'
+            }).then(res => res.json())
+              .then(data => {
+                  alert(data.message);
+                  location.reload();
+              });
+        }
+    }
+</script>
 
 </body>
 </html>
