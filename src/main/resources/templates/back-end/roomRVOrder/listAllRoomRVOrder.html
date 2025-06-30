@@ -23,13 +23,6 @@
                 <h4 class="card-title mb-0 fw-bold">
                     <i class="bi bi-house-door me-2"></i>訂房一覽
                 </h4>
-                <!--                <button-->
-                <!--                        class="btn btn-success"-->
-                <!--                        data-bs-toggle="modal"-->
-                <!--                        data-bs-target="#addEmployeeModal"-->
-                <!--                >-->
-                <!--                    <i class="bi bi-plus-circle me-2"></i>新增員工-->
-                <!--                </button>-->
             </div>
         </div>
         <div class="row mb-3">
@@ -91,7 +84,7 @@
                         </td>
                         <td th:text="'$' + ${order.rvPaidAmount}">$3000</td>
                         <td>
-                            <div class="btn-group" role="group">
+                            <div>
                                 <!-- 查看詳情按鈕 -->
                                 <button type="button"
                                         class="btn btn-sm btn-info view-detail-btn"
@@ -107,7 +100,7 @@
                                         th:data-order-id="${order.roomReservationId}"
                                         title="確認取消">
                                     <!-- <i class="bi bi-house-check"></i>-->
-                                    <i class="fas fa-times me-1"></i>
+                                    <i class="fas fa-times"></i>
                                 </button>
                             </div>
                         </td>

@@ -3,7 +3,6 @@ package com.islevilla.wei.feedback.model;
 import com.islevilla.lai.members.model.Members;
 import com.islevilla.wei.feedback.dto.FeedbackFormDTO;
 import com.islevilla.wei.feedback.dto.RoomRVOrderDTO;
-import com.islevilla.wei.room.model.RoomRVOrder;
 
 import java.util.List;
 import java.util.Optional;
