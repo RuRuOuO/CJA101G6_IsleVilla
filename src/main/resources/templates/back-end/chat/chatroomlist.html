@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>聊天室管理列表</title>
+<style>
+body {
+	font-family: "Noto Sans TC", sans-serif;
+	background-color: #f4f6f8;
+	padding: 20px;
+}
+
+h2 {
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+table {
+	border-collapse: collapse;
+	width: 90%;
+	margin: auto;
+	background-color: white;
+	box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+	border: 1px solid #ddd;
+	padding: 12px;
+	text-align: center;
+}
+
+th {
+	background-color: #34495e;
+	color: white;
+}
+
+tr:hover {
+	background-color: #f9f9f9;
+}
+
+.button-group {
+	width: 90%;
+	margin: 0 auto 10px auto;
+	text-align: right;
+}
+
+.button-group button {
+	padding: 8px 16px;
+	background-color: #3498db;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 16px;
+	margin-left: 8px;
+}
+
+.button-group button:hover {
+	background-color: #2980b9;
+}
+
+.status-open {
+	color: green;
+	font-weight: bold;
+}
+
+.status-close {
+	color: red;
+	font-weight: bold;
+}
+
+.unread-dot {
+	color: red;
+	font-weight: bold;
+	margin-left: 5px;
+}
+
+.action-link {
+	color: #3498db;
+	text-decoration: none;
+	margin-right: 8px;
+}
+
+.action-link:hover {
+	text-decoration: underline;
+}
+
+.btn-close, .btn-open {
+	color: white;
+	padding: 4px 8px;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.btn-close {
+	background-color: #e74c3c;
+}
+
+.btn-close:hover {
+	background-color: #c0392b;
+}
+
+.btn-open {
+	background-color: #2ecc71;
+}
+
+.btn-open:hover {
+	background-color: #27ae60;
+}
+</style>
+</head>
+
+<body>
+
+	<h2>聊天室管理列表</h2>
+
+	<div class="button-group">
+		<form method="get" th:action="@{/backend/chat/room/list}" style="display:inline;">
+			<button type="submit">刷新列表</button>
+		</form>
+		<button onclick="window.location.href='/backend/dashboard'">返回後台主頁</button>
+	</div>
+
+	<table>
+		<thead>
+			<tr>
+				<th>聊天室編號</th>
+				<th>會員名稱</th>
+				<th>客服名稱</th>
+				<th>狀態</th>
+				<th>未讀</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:if="${#lists.isEmpty(rooms)}">
+				<td colspan="6">❗ 目前沒有任何聊天室</td>
+			</tr>
+
+			<tr th:each="room : ${rooms}" th:attr="data-room-id=${room.chatRoomId}">
+				<td th:text="${room.chatRoomId}">1001</td>
+				<td th:text="${room.memberName}">會員名稱</td>
+				<td th:text="${room.employeeName}">客服名稱</td>
+				<td class="status">
+					<span th:if="${room.chatStatus == 1}" class="status-open">進行中</span>
+					<span th:if="${room.chatStatus == 0}" class="status-close">已結束</span>
+				</td>
+				<td>
+					<span th:text="${room.unreadCount}">0</span>
+					<span th:if="${room.chatStatus == 1 and room.unreadCount != null and room.unreadCount > 0}" class="unread-dot">🔴</span>
+				</td>
+				<td class="actions">
+					<a th:href="@{'/backend/chat/room/' + ${room.chatRoomId}}" class="action-link">進入</a>
+
+					<button th:if="${room.chatStatus == 1}" class="btn-close" onclick="closeRoom([[${room.chatRoomId}]])">結束</button>
+
+					<button th:if="${room.chatStatus == 0}" class="btn-open" onclick="openRoom([[${room.chatRoomId}]])">開啟</button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<script>
+		function closeRoom(roomId) {
+			if (confirm("確定要結束聊天室 " + roomId + " 嗎？")) {
+				fetch(`/api/chat/room/${roomId}/close`, {
+					method: 'POST'
+				})
+				.then(res => res.json())
+				.then(data => {
+					if (data.success) {
+						alert(data.message);
+						updateStatus(roomId, false);
+					} else {
+						alert("❌ " + data.message);
+					}
+				});
+			}
+		}
+
+		function openRoom(roomId) {
+			if (confirm("確定要開啟聊天室 " + roomId + " 嗎？")) {
+				fetch(`/api/chat/room/${roomId}/open`, {
+					method: 'POST'
+				})
+				.then(res => res.json())
+				.then(data => {
+					if (data.success) {
+						alert(data.message);
+						updateStatus(roomId, true);
+					} else {
+						alert("❌ " + data.message);
+					}
+				});
+			}
+		}
+
+		/** ✔ 不刷新更新狀態 */
+		function updateStatus(roomId, isOpen) {
+			const row = document.querySelector(`tr[data-room-id='${roomId}']`);
+			if (!row) return;
+
+			const statusCell = row.querySelector('.status');
+			const actionsCell = row.querySelector('.actions');
+
+			if (isOpen) {
+				statusCell.innerHTML = '<span class="status-open">進行中</span>';
+				actionsCell.innerHTML = `
+					<a href="/backend/chat/room/${roomId}" class="action-link">進入</a>
+					<button class="btn-close" onclick="closeRoom(${roomId})">結束</button>
+				`;
+			} else {
+				statusCell.innerHTML = '<span class="status-close">已結束</span>';
+				actionsCell.innerHTML = `
+					<a href="/backend/chat/room/${roomId}" class="action-link">進入</a>
+					<button class="btn-open" onclick="openRoom(${roomId})">開啟</button>
+				`;
+			}
+		}
+	</script>
+
+</body>
+</html>

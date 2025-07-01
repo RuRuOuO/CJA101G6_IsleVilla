@@ -7,11 +7,15 @@ import org.springframework.stereotype.Component;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name="room_type_availability")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Component
 public class RoomTypeAvailability {
 	private static final long serialVersionUID = 1L;
