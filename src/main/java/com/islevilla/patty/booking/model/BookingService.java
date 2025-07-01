@@ -51,8 +51,8 @@ public class BookingService {
 
         // 1. 找出指定日期區間內所有重疊的訂單
         List<RoomRVOrder> overlappingOrders = bookingRepository.findOverlappingOrders(
-            checkin.atStartOfDay(), 
-            checkout.atStartOfDay()
+            checkin, 
+            checkout
         );
 
         System.out.println("找到重疊訂單數量: " + overlappingOrders.size());
@@ -115,8 +115,8 @@ public class BookingService {
 
         // 1. 找出指定日期區間內所有重疊的訂單
         List<RoomRVOrder> overlappingOrders = bookingRepository.findOverlappingOrders(
-            checkin.atStartOfDay(), 
-            checkout.atStartOfDay()
+            checkin, 
+            checkout
         );
 
         System.out.println("找到重疊訂單數量: " + overlappingOrders.size());
@@ -183,8 +183,8 @@ public class BookingService {
 
         // 1. 找出指定日期區間內所有重疊的訂單
         List<RoomRVOrder> overlappingOrders = bookingRepository.findOverlappingOrders(
-            checkin.atStartOfDay(), 
-            checkout.atStartOfDay()
+            checkin, 
+            checkout
         );
 
         System.out.println("找到重疊訂單數量: " + overlappingOrders.size());
@@ -272,8 +272,8 @@ public class BookingService {
 
         // 1. 找出指定日期區間內所有重疊的訂單
         List<RoomRVOrder> overlappingOrders = bookingRepository.findOverlappingOrders(
-            checkin.atStartOfDay(), 
-            checkout.atStartOfDay()
+            checkin, 
+            checkout
         );
 
         System.out.println("找到重疊訂單數量: " + overlappingOrders.size());

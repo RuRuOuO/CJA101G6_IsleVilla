@@ -31,7 +31,7 @@ public class RoomRVOrder {
 
     @Column(name = "room_order_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @NotNull(message = "請輸入訂單日期")
-    private LocalDateTime roomOrderDate;
+    private LocalDate roomOrderDate;
 
     @Column(name = "room_order_status")
     @NotEmpty(message = "請選擇訂單狀態")
@@ -42,14 +42,14 @@ public class RoomRVOrder {
     private LocalDate checkInDate;
 
     @Column(name = "actual_check_in_date")
-    private LocalDateTime actualCheckInDate;
+    private LocalDate actualCheckInDate;
 
     @Column(name = "check_out_date")
     @NotNull(message = "請選擇住宿結束日期")
     private LocalDate checkOutDate;
 
     @Column(name = "actual_check_out_date")
-    private LocalDateTime actualCheckOutDate;
+    private LocalDate actualCheckOutDate;
 
     @ManyToOne
     @JoinColumn(name = "room_promotion_id")
