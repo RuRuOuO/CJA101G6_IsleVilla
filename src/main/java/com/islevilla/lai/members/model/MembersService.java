@@ -2,10 +2,15 @@ package com.islevilla.lai.members.model;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.SessionFactory;
+//import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.islevilla.lai.util.PasswordConvert;
@@ -19,8 +24,8 @@ public class MembersService {
 	@Autowired
 	private PasswordConvert pc;
 
-	@Autowired
-	private SessionFactory sessionFactory;
+//	@Autowired
+//	private SessionFactory sessionFactory;
 
 	// 新增會員
 	public void addMember(Members member) {
@@ -41,21 +46,32 @@ public class MembersService {
 	}
 
 	// 根據會員編號取得會員
+	// 使用範圍：MembersController、ProductOrderController
 	public Members getOneMember(Integer memberId) {
 		Optional<Members> optional = membersRepository.findById(memberId);
 		return optional.orElse(null); // public T orElse(T other) : 如果值存在就回傳其值，否則回傳other的值
 	}
 
 	// 根據電子信箱取得會員
+	// 使用範圍：無
 	public Members getMemberByEmail(String memberEmail) {
 		Optional<Members> optional = membersRepository.findByMemberEmail(memberEmail);
 		return optional.orElse(null);
 	}
 
 	// 取得所有會員
+	// 使用範圍：ProductOrderNoController、MemberCouponController
 	public List<Members> getAll() {
 		return membersRepository.findAll();
 	}
+	
+	// 分頁查詢所有會員
+    public Page<Members> getAll(int page, int size, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase("desc") ? 
+                   Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return membersRepository.findAll(pageable);
+    }
 
 	// 會員登入驗證
 	public Members authenticateMember(String email, String password) {
@@ -101,10 +117,74 @@ public class MembersService {
 		membersRepository.updateMemberStatus(memberId, memberStatus, LocalDateTime.now());
 		System.out.println("已更新會員狀態: memberId=" + memberId + ", status=" + memberStatus);
 	}
+	
+	// 搜尋會員（根據姓名或email）
+    public Page<Members> searchMembers(String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("memberCreatedAt").descending());
+        if (keyword.contains("@")) {
+            return membersRepository.findByMemberEmailContaining(keyword, pageable);
+        } else {
+            return membersRepository.findByMemberNameContaining(keyword, pageable);
+        }
+    }
+    
+    // 複合條件查詢會員
+    public Page<Members> findMembersWithConditions(String memberName, String memberEmail, 
+                                                  Integer memberStatus, Integer memberGender,
+                                                  int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("memberCreatedAt").descending());
+        return membersRepository.findByMultipleConditions(memberName, memberEmail, 
+                                                         memberStatus, memberGender, pageable);
+    }
+    
+    // 獲取會員總數
+    public long getTotalMembersCount() {
+        return membersRepository.count();
+    }
+    
+    // 獲取會員狀態統計
+    public Map<String, Long> getMemberStatusStatistics() {
+        List<Object[]> results = membersRepository.countByMemberStatus();
+        return results.stream().collect(
+            java.util.stream.Collectors.toMap(
+                arr -> getStatusName((Integer) arr[0]),
+                arr -> (Long) arr[1]
+            )
+        );
+    }
+    
+    // 輔助方法：獲取狀態名稱
+    private String getStatusName(Integer status) {
+        switch (status) {
+            case 0: return "未驗證";
+            case 1: return "已驗證";
+            case 2: return "停用";
+            default: return "未知";
+        }
+    }
 
-	// 驗證會員登入 (舊方法)
-//	public boolean login(String email, String inputPassword) {
-//        Members members = membersRepository.findByEmail(email);
-//        return members != null && pc.passwordVerify(members.getMemberPasswordHash(), inputPassword);
-//    }
+	public List<Members> getMemberByMemberGenderAndMemberStatus(Integer gender, Integer status) {
+		return membersRepository.findByMemberGenderAndMemberStatus(gender, status);
+	}
+
+	public List<Members> getMemberByMemberStatus(Integer status) {
+		return membersRepository.findByMemberStatus(status);
+	}
+
+	public List<Members> getMemberByMemberGender(Integer gender) {
+		// TODO Auto-generated method stub
+		return membersRepository.findByMemberGender(gender);
+	}
+	
+	/**
+     * 關鍵字搜尋會員
+     */
+    public List<Members> searchMembers(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return getAll();
+        }
+        return membersRepository.findByKeyword(keyword.trim());
+    }
+    
+    
 }

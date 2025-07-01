@@ -6,6 +6,22 @@
     <title>微嶼 | Isle Villa 後台首頁</title>
     <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .stat-card {
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .quick-action-btn {
+            transition: all 0.3s;
+        }
+        .quick-action-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
 </head>
 <body>
 <!-- ===== 載入sidebar ===== -->
@@ -16,11 +32,278 @@
 
 <main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
     <th:block th:fragment="myContent">
-        <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
-        <h5 class="card-title">範例標題</h5>
-        <p class="card-text">範例內容</p>
-        <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+        <!-- 歡迎標題 -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="mb-1">歡迎回來！</h4>
+                <p class="text-muted mb-0">今天是 <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy年MM月dd日 EEEE')}">2025年01月01日 星期三</span></p>
+            </div>
+            <div class="text-end">
+                <small class="text-muted">最後更新時間</small><br>
+                <span th:text="${#temporals.format(#temporals.createNow(), 'HH:mm:ss')}">12:00:00</span>
+            </div>
+        </div>
+
+        <!-- 統計卡片區塊 -->
+        <div class="row mb-4">
+            <div class="col-12 col-md-6 mb-3">
+                <div class="card stat-card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-shopping-cart text-primary fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3 text-center">
+                            <h6 class="card-title text-muted mb-1">今日商品訂單</h6>
+                            <h3 class="mb-0 fw-bold text-primary" th:text="${todayProductOrders}">0</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 mb-3">
+                <div class="card stat-card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-bed text-info fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3 text-center">
+                            <h6 class="card-title text-muted mb-1">今日房間訂單</h6>
+                            <h3 class="mb-0 fw-bold text-info" th:text="${todayRoomOrders}">0</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 mb-3">
+                <div class="card stat-card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-dollar-sign text-success fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3 text-center">
+                            <h6 class="card-title text-muted mb-1">今日商品營收</h6>
+                            <h3 class="mb-0 fw-bold text-success" th:text="${'$' + #numbers.formatDecimal(todayProductRevenue, 1, 'COMMA', 0, 'POINT')}">$0</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 mb-3">
+                <div class="card stat-card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-dollar-sign text-warning fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3 text-center">
+                            <h6 class="card-title text-muted mb-1">今日房間營收</h6>
+                            <h3 class="mb-0 fw-bold text-warning" th:text="${'$' + #numbers.formatDecimal(todayRoomRevenue, 1, 'COMMA', 0, 'POINT')}">$0</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 mb-3">
+                <div class="card stat-card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-danger bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-exclamation-triangle text-danger fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3 text-center">
+                            <h6 class="card-title text-muted mb-1">待處理訂單</h6>
+                            <h3 class="mb-0 fw-bold text-danger" th:text="${pendingProductOrders}">0</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 mb-3">
+                <div class="card stat-card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-secondary bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-percent text-secondary fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3 text-center">
+                            <h6 class="card-title text-muted mb-1">住房率</h6>
+                            <h3 class="mb-0 fw-bold text-secondary" th:text="${roomOccupancyRate + '%'}">0%</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 快速操作區塊 -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-transparent border-0">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-bolt text-warning me-2"></i>快速操作
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-lg-2 col-md-4 col-6">
+                                <a href="/backend/product/addProduct" class="btn btn-outline-primary w-100 quick-action-btn">
+                                    <i class="fas fa-plus me-2"></i>新增商品
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-6">
+                                <a href="/backend/news/addNews" class="btn btn-outline-info w-100 quick-action-btn">
+                                    <i class="fas fa-newspaper me-2"></i>發布消息
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-6">
+                                <a href="/backend/coupon/addCoupon" class="btn btn-outline-warning w-100 quick-action-btn">
+                                    <i class="fas fa-ticket-alt me-2"></i>新增優惠券
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-6">
+                                <a href="/backend/product-order/listAllProductOrder" class="btn btn-outline-success w-100 quick-action-btn">
+                                    <i class="fas fa-list me-2"></i>查看訂單
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-6">
+                                <a href="/backend/feedback/listAllFeedback" class="btn btn-outline-secondary w-100 quick-action-btn">
+                                    <i class="fas fa-comments me-2"></i>查看回饋
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-6">
+                                <a href="/backend/member-coupon/listAllMemberCoupon" class="btn btn-outline-danger w-100 quick-action-btn">
+                                    <i class="fas fa-gift me-2"></i>會員優惠券
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 訂單成立的購物訂單 -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <h5 class="card-title mb-0 me-3">
+                                <i class="fas fa-shopping-cart text-success me-2"></i>訂單成立的購物訂單
+                            </h5>
+                            <div class="btn-group" role="group">
+                                <a th:href="@{'/backend/dashboard?tab=confirmed'}" class="btn btn-outline-success btn-sm" th:classappend="${tab}=='confirmed' ? ' active' : ''">已成立訂單</a>
+                                <a th:href="@{'/backend/dashboard?tab=today'}" class="btn btn-outline-primary btn-sm" th:classappend="${tab}=='today' ? ' active' : ''">今日訂單</a>
+                            </div>
+                        </div>
+                        <a href="/backend/product-order/listAllProductOrder" class="btn btn-sm btn-outline-success">查看全部</a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>訂單編號</th>
+                                        <th>客戶</th>
+                                        <th>金額</th>
+                                        <th>時間</th>
+                                    </tr>
+                                </thead>
+                                <tbody th:if="${tab}=='confirmed'">
+                                    <tr th:each="order : ${confirmedProductOrders}">
+                                        <td th:text="${order.productOrderId}">#001</td>
+                                        <td th:text="${order.member.memberName}">客戶姓名</td>
+                                        <td th:text="${'$' + #numbers.formatDecimal(order.productOrderAmount, 1, 'COMMA', 0, 'POINT')}">$1,000</td>
+                                        <td th:text="${#temporals.format(order.orderTime, 'MM/dd HH:mm')}">01/01 12:00</td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(confirmedProductOrders)}">
+                                        <td colspan="4" class="text-center text-muted py-3">暫無訂單成立的購物訂單</td>
+                                    </tr>
+                                </tbody>
+                                <tbody th:if="${tab}=='today'">
+                                    <tr th:each="order : ${todayProductOrderList}">
+                                        <td th:text="${order.productOrderId}">#001</td>
+                                        <td th:text="${order.member.memberName}">客戶姓名</td>
+                                        <td th:text="${'$' + #numbers.formatDecimal(order.productOrderAmount, 1, 'COMMA', 0, 'POINT')}">$1,000</td>
+                                        <td th:text="${#temporals.format(order.orderTime, 'MM/dd HH:mm')}">01/01 12:00</td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(todayProductOrderList)}">
+                                        <td colspan="4" class="text-center text-muted py-3">今日沒有任何訂單</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 今日成立的房間訂單 -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-bed text-info me-2"></i>今日成立的房間訂單
+                        </h5>
+                        <a href="/backend/room/reservation/order/list" class="btn btn-sm btn-outline-info">查看全部</a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>訂房編號</th>
+                                        <th>客戶</th>
+                                        <th>入住日期</th>
+                                        <th>退房日期</th>
+                                        <th>金額</th>
+                                        <th>時間</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="order : ${todayRoomOrdersList}">
+                                        <td th:text="${order.roomReservationId}">#001</td>
+                                        <td th:text="${order.members.memberName}">客戶姓名</td>
+                                        <td th:text="${#temporals.format(order.checkInDate, 'MM/dd')}">01/01</td>
+                                        <td th:text="${#temporals.format(order.checkOutDate, 'MM/dd')}">01/02</td>
+                                        <td th:text="${'$' + #numbers.formatDecimal(order.rvPaidAmount, 1, 'COMMA', 0, 'POINT')}">$2,000</td>
+                                        <td th:text="${#temporals.format(order.roomOrderDate, 'MM/dd HH:mm')}">01/01 12:00</td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(todayRoomOrdersList)}">
+                                        <td colspan="6" class="text-center text-muted py-3">暫無今日成立的房間訂單</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </th:block>
 </main>
+
+<!-- ===== 載入統一的JS ===== -->
+<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
+
+<script>
+// 自動更新時間
+setInterval(function() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('zh-TW');
+    document.querySelector('.text-end span').textContent = timeString;
+}, 1000);
+
+// 頁面載入完成後執行動畫
+$(document).ready(function() {
+    // 統計卡片動畫
+    $('.stat-card').each(function(index) {
+        $(this).css('animation-delay', (index * 0.1) + 's');
+    });
+});
+</script>
 </body>
 </html>

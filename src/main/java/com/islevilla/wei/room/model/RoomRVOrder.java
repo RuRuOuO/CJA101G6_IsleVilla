@@ -34,7 +34,7 @@ public class RoomRVOrder {
     private LocalDateTime roomOrderDate;
 
     @Column(name = "room_order_status")
-    @NotEmpty(message = "請選擇訂單狀態")
+    @NotNull(message = "請選擇訂單狀態")
     private Integer roomOrderStatus;
 
     @Column(name = "check_in_date")

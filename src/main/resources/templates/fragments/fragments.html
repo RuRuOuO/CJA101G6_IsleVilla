@@ -38,12 +38,10 @@
             class="navbar navbar-expand-lg navbar-light fixed-top bg-light shadow-sm"
     >
         <div class="container">
-            <a
-                    class="navbar-brand"
-                    style="font-family: Kaisei HarunoUmi"
-                    th:href="@{/}"
-            >微嶼 Isle Villa</a
-            >
+            <a class="navbar-brand" style="font-family: Kaisei HarunoUmi" th:href="@{/}">
+                <!-- <i class="bi bi-soundwave"></i>&nbsp;-->
+                微嶼 <small style="font-family: Kaisei HarunoUmi">IsleVilla</small>
+            </a>
             <button
                     aria-controls="navbarCollapse"
                     aria-expanded="false"
@@ -65,7 +63,7 @@
                     </li>
                     <li class="nav-item divider align-self-center px-1">|</li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">關於微嶼</a>
+                        <a class="nav-link" th:href="@{/feedback/list}">佳評如潮</a>
                     </li>
                     <li class="nav-item divider align-self-center px-1">|</li>
                     <li class="nav-item">
@@ -97,7 +95,7 @@
                     <li th:if="${session.member!=null}" class="nav-item">
                         <a
                                 class="nav-link"
-                                th:href="@{/member/room/list}"
+                                th:href="@{/member}"
                         >會員專區</a
                         >
                     </li>
@@ -118,42 +116,58 @@
                     <!--                            <i class="bi bi-box-arrow-in-right"></i> 登出-->
                     <!--                        </a>-->
                     <!--                    </div>-->
-                    <div th:if="${session.member!=null}" class="dropdown">
-                        <button class="btn btn-dark dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                            <!--                            <i class="bi bi-person-circle"></i>-->
-                            <span>歡迎回來，</span><span
-                                th:text="${session.member.memberName}"></span><span>！</span>
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li class="px-3 py-2 d-flex align-items-center">
-                                <img th:src="${session.member.memberPhoto != null} ? ${session.member.memberPhoto} : ${'https://images.unsplash.com/photo-1603736087997-5daec6092347?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'}"
-                                     alt="頭像"
-                                     class="rounded-circle me-2"
-                                     style="width: 40px; height: 40px; object-fit: cover;">
-                                <div>
-                                    <div class="fw-bold" th:text="${session.member.memberName}">王小明</div>
-                                    <div class="text-muted small" th:text="${session.member.memberEmail}">
-                                        ming@email.com
+                    <div class="d-flex align-items-center gap-2" th:if="${session.member!=null}">
+                        <a th:href="@{/cart}" class="text-dark">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                        </a>
+                        &nbsp;
+                        <div th:if="${session.member!=null}" class="dropdown">
+                            <button class="btn btn-dark dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                <!--                            <i class="bi bi-person-circle"></i>-->
+                                <span>歡迎回來，</span><span
+                                    th:text="${session.member.memberName}"></span><span>！</span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li class="px-3 py-2 d-flex align-items-center">
+                                    <!-- 有頭像 -->
+                                    <img th:if="${session.member.memberPhoto != null}"
+                                         th:src="@{/member/photo/{memberId}(memberId=${session.member.memberId})}"
+                                         alt="頭像"
+                                         class="rounded-circle me-2"
+                                         style="width: 40px; height: 40px; object-fit: cover;"/>
+
+                                    <!-- 預設圖片 -->
+                                    <img th:unless="${session.member.memberPhoto != null}"
+                                         src="https://images.unsplash.com/photo-1603736087997-5daec6092347?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                         alt="預設頭像"
+                                         class="rounded-circle me-2"
+                                         style="width: 40px; height: 40px; object-fit: cover;"/>
+                                    <div>
+                                        <div class="fw-bold" th:text="${session.member.memberName}">王小明</div>
+                                        <div class="text-muted small" th:text="${session.member.memberEmail}">
+                                            ming@email.com
+                                        </div>
                                     </div>
-                                </div>
-                            </li>
-                            <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" th:href="@{/member/room/list}">住宿訂單</a></li>
-                            <li><a class="dropdown-item" href="#">接駁訂單</a></li>
-                            <li><a class="dropdown-item" href="#">購物車</a></li>
-                            <li>
+                                </li>
                                 <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="#">會員資訊</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" th:href="@{/member/logout}">
-                                <!--                                <i class="fa-solid fa-arrow-right-from-bracket"></i>-->
-                                登出</a></li>
-                        </ul>
+                                </li>
+                                <li><a class="dropdown-item" th:href="@{/member/room/list}">住宿訂單</a></li>
+                                <li><a class="dropdown-item" th:href="@{/member/shuttle/list}">接駁訂單</a></li>
+                                <li><a class="dropdown-item" th:href="@{/product-order/memOrders}">購物訂單</a></li>
+                                <li><a class="dropdown-item" th:href="@{/member/feedback/list}">問卷專區</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" th:href="@{/member/info}">會員資訊</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" th:href="@{/member/logout}">
+                                    <!--                                <i class="fa-solid fa-arrow-right-from-bracket"></i>-->
+                                    登出</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -221,7 +235,7 @@
 <!-- ===== 分頁按鈕 Fragment 結束 ===== -->
 <!-- ===== 統一Footer開始 ===== -->
 <footer class="footer bg-light py-5 justify-content-center shadow-sm" th:fragment="footer">
-    <a class="btn btn-dark booking-fixed-btn" href="#booking"> 立即預訂 </a>
+    <a class="btn btn-dark booking-fixed-btn" th:href="@{/booking}"> 立即預訂 </a>
     <div class="container">
         <div class="row">
             <div class="col-md-6 mb-3">
@@ -235,7 +249,7 @@
             <div class="col-md-6 mb-3">
                 <h5>聯絡我們</h5>
                 <ul class="list-unstyled mt-3">
-                    <li class="mt-1">地址：台灣台北市信義區123號</li>
+                    <li class="mt-1">地址：951台東縣綠島鄉公館66號</li>
                     <li class="mt-1">電話：02-1234-5678</li>
                     <li class="mt-1">傳真：03-25541859</li>
                     <li class="mt-1">信箱：info@islevilla.com</li>

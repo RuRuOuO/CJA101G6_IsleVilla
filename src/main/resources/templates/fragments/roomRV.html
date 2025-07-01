@@ -1,0 +1,257 @@
+<!-- 美化的訂單詳情頁面 - Thymeleaf Fragment -->
+<div th:fragment="roomRVOrder" class="container-fluid p-0">
+    <!-- 訂單概要卡片 -->
+    <div class="row mb-4" th:each="order, iterStat : ${orderList}" th:if="${iterStat.first}">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white d-flex align-items-center">
+                    <i class="bi bi-receipt me-2"></i>
+                    <h5 class="mb-0">訂單概要</h5>
+                    <span class="ms-auto badge bg-light text-primary fs-6" th:text="'#' + ${order.roomReservationId}">
+                        #12345
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <!-- 基本資訊 -->
+                        <div class="col-md-6">
+                            <div class="border-start border-primary border-3 ps-3">
+                                <h6 class="text-primary mb-2">
+                                    <i class="bi bi-person-circle me-1"></i>客戶資訊
+                                </h6>
+                                <p class="mb-1">
+                                    <strong>會員編號：</strong>
+                                    <span class="badge bg-light text-dark"
+                                          th:text="${order.members.memberId}">M001</span>
+                                </p>
+                                <p class="mb-1">
+                                    <strong>訂單日期：</strong>
+                                    <span th:text="${#temporals.format(order.roomOrderDate, 'yyyy-MM-dd HH:mm')}">2024-01-15 14:30</span>
+                                </p>
+                                <p class="mb-0">
+                                    <strong>訂單狀態：</strong>
+                                    <span th:switch="${order.roomOrderStatus}">
+                                        <span th:case="'0'" class="badge bg-info">訂單成立</span>
+                                        <span th:case="'1'" class="badge bg-success">已入住</span>
+                                        <span th:case="'2'" class="badge bg-secondary">已退房</span>
+                                        <span th:case="'3'" class="badge bg-warning">申請取消</span>
+                                        <span th:case="'4'" class="badge bg-danger">已取消</span>
+                                        <span th:case="'*'" class="badge bg-secondary">未知</span>
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- 住宿資訊 -->
+                        <div class="col-md-6">
+                            <div class="border-start border-success border-3 ps-3">
+                                <h6 class="text-success mb-2">
+                                    <i class="bi bi-calendar-check me-1"></i>住宿資訊
+                                </h6>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <small class="text-muted">預定入住</small>
+                                        <p class="mb-1 fw-semibold"
+                                           th:text="${#temporals.format(order.checkInDate,'yyyy-MM-dd')}">
+                                            2024-01-20
+                                        </p>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">預定退房</small>
+                                        <p class="mb-1 fw-semibold"
+                                           th:text="${#temporals.format(order.checkOutDate,'yyyy-MM-dd')}">
+                                            2024-01-22
+                                        </p>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">實際入住</small>
+                                        <p class="mb-1"
+                                           th:text="${order.actualCheckInDate != null ? #temporals.format(order.actualCheckInDate, 'MM-dd HH:mm') : '-'}">
+                                            <span class="text-muted">-</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">實際退房</small>
+                                        <p class="mb-1"
+                                           th:text="${order.actualCheckOutDate != null ? #temporals.format(order.actualCheckOutDate, 'MM-dd HH:mm') : '-'}">
+                                            <span class="text-muted">-</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 金額資訊 -->
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="bg-light rounded p-3">
+                                <div class="row text-center">
+                                    <div class="col-4">
+                                        <div class="border-end">
+                                            <h6 class="text-muted mb-1">總金額</h6>
+                                            <h5 class="mb-0 text-dark"
+                                                th:text="'$' + ${#numbers.formatInteger(order.roomTotalAmount, 0, 'COMMA')}">
+                                                $3,000
+                                            </h5>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="border-end">
+                                            <h6 class="text-muted mb-1">折扣金額</h6>
+                                            <h5 class="mb-0 text-success"
+                                                th:text="'-$' + ${#numbers.formatInteger(order.rvDiscountAmount, 0, 'COMMA')}">
+                                                -$200
+                                            </h5>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <h6 class="text-muted mb-1">實付金額</h6>
+                                        <h5 class="mb-0 text-primary fw-bold"
+                                            th:text="'$' + ${#numbers.formatInteger(order.rvPaidAmount, 0, 'COMMA')}">
+                                            $2,800
+                                        </h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 備註和優惠 -->
+                    <div class="row mt-3"
+                         th:if="${order.remark != null or order.promotion != null or order.cancelReason != null}">
+                        <div class="col-12">
+                            <div class="border-top pt-3">
+                                <div class="row">
+                                    <div class="col-md-4" th:if="${order.promotion != null}">
+                                        <small class="text-muted">優惠專案</small>
+                                        <p class="mb-1">
+                                            <i class="bi bi-tag text-warning me-1"></i>
+                                            <span th:text="${order.promotion.roomPromotionTitle}">優惠專案名稱</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-4" th:if="${order.remark != null}">
+                                        <small class="text-muted">訂房備註</small>
+                                        <p class="mb-1" th:text="${order.remark}">客戶備註內容</p>
+                                    </div>
+                                    <div class="col-md-4" th:if="${order.cancelReason != null}">
+                                        <small class="text-muted">取消理由</small>
+                                        <p class="mb-1 text-danger" th:text="${order.cancelReason}">取消原因</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 房間明細 -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-info text-white d-flex align-items-center">
+                    <i class="bi bi-house-door me-2"></i>
+                    <h5 class="mb-0">房間明細</h5>
+                    <span class="ms-auto badge bg-light text-info" th:text="${#lists.size(detailList)} + ' 間房'">
+                        2 間房
+                    </span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th class="border-0">
+                                    <i class="bi bi-hash text-muted me-1"></i>明細編號
+                                </th>
+                                <th class="border-0">
+                                    <i class="bi bi-door-open text-muted me-1"></i>房號
+                                </th>
+                                <th class="border-0">
+                                    <i class="bi bi-house text-muted me-1"></i>房型
+                                </th>
+                                <th class="border-0">
+                                    <i class="bi bi-people text-muted me-1"></i>入住人數
+                                </th>
+                                <th class="border-0 text-end">
+                                    <i class="bi bi-tag text-muted me-1"></i>原價
+                                </th>
+                                <th class="border-0 text-end">
+                                    <i class="bi bi-percent text-muted me-1"></i>折扣
+                                </th>
+                                <th class="border-0 text-end">
+                                    <i class="bi bi-cash text-muted me-1"></i>實付
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="detail, iterStat : ${detailList}"
+                                th:class="${iterStat.odd} ? 'table-light' : ''">
+                                <td class="fw-semibold">
+                                        <span class="badge bg-outline-secondary"
+                                              th:text="${detail.roomReservationDetailId}">
+                                            D001
+                                        </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white me-2"
+                                             style="width: 30px; height: 30px; font-size: 0.8rem;">
+                                            <span th:text="${detail.room.roomId}">101</span>
+                                        </div>
+                                        <span class="fw-semibold"
+                                              th:text="'房間 ' + ${detail.room.roomId}">房間 101</span>
+                                    </div>
+                                </td>
+                                <td>
+                                        <span class="badge bg-light text-dark border"
+                                              th:text="${detail.roomType.roomTypeName}">
+                                            豪華雙人房
+                                        </span>
+                                </td>
+                                <td>
+                                        <span class="badge bg-info" th:text="${detail.guestCount} + ' 人'">
+                                            2 人
+                                        </span>
+                                </td>
+                                <td class="text-end">
+                                        <span class="text-muted text-decoration-line-through"
+                                              th:text="'$' + ${#numbers.formatInteger(detail.roomPrice, 0, 'COMMA')}">
+                                            $1,500
+                                        </span>
+                                </td>
+                                <td class="text-end">
+                                        <span class="text-success fw-semibold"
+                                              th:text="'-$' + ${#numbers.formatInteger(detail.rvDiscountAmount, 0, 'COMMA')}">
+                                            -$100
+                                        </span>
+                                </td>
+                                <td class="text-end">
+                                        <span class="fw-bold text-primary"
+                                              th:text="'$' + ${#numbers.formatInteger(detail.rvPaidAmount, 0, 'COMMA')}">
+                                            $1,400
+                                        </span>
+                                </td>
+                            </tr>
+                            </tbody>
+                            <tfoot class="table-light">
+                            <tr>
+                                <td colspan="6" class="text-end fw-bold">總計：</td>
+                                <td class="text-end">
+                                        <span class="fw-bold text-primary fs-5"
+                                              th:with="totalAmount=${#aggregates.sum(detailList.![rvPaidAmount])}"
+                                              th:text="'$' + ${#numbers.formatInteger(totalAmount, 0, 'COMMA')}">
+                                            $2,800
+                                        </span>
+                                </td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
