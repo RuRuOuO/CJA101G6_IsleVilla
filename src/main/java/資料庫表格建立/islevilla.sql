@@ -243,7 +243,7 @@ INSERT INTO room_reservation_order (
 
 -- 房型 room_type （詹力臻）
 CREATE TABLE room_type (
-	room_type_id			INT				NOT NULL	PRIMARY KEY,                            -- 房型編號 (PK)
+	room_type_id			INT				AUTO_INCREMENT	PRIMARY KEY,						-- 房型編號 (PK)
 	room_type_code			CHAR(3)			NOT NULL,											-- 房型代碼
 	room_type_name			VARCHAR(10)		NOT NULL,											-- 房型名稱
 	room_type_quantity		INT				NOT NULL,											-- 房間數量
