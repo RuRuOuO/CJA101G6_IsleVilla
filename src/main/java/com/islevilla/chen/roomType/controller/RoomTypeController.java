@@ -80,7 +80,10 @@ public String showListRoomType(
     
 	System.out.println("進入頁面");
 	System.out.println("從資料庫查詢到的 RoomType 筆數: " + roomTypeList.size()); // 檢查筆數
-	model.addAttribute("roomType", new RoomType()); 
+	// 如果 Model 中沒有 roomType 物件，就新增一個空的
+	if (!model.containsAttribute("roomType")) {
+		model.addAttribute("roomType", new RoomType());
+	}
 	model.addAttribute("selectedRoomTypeId", roomTypeId); 
 	model.addAttribute("selectedSaleStatus", saleStatus); 
 	model.addAttribute("roomTypeList", roomTypeList); 
@@ -92,7 +95,7 @@ public String showListRoomType(
 	
 
 	//修改房型處理
-	@PostMapping("/updateRoomType/{roomTypeId}")
+	@PostMapping("/updateRoomType")
 	@PreAuthorize("hasAuthority('room')")
 	public String UpdateRoomType(@Valid @ModelAttribute("roomType")RoomType roomType,
 								BindingResult result,
@@ -109,14 +112,14 @@ public String showListRoomType(
 			model.addAttribute("roomType",roomType);  
 			model.addAttribute("saleStatusMap", saleStatusMap);  //下拉選單
 			model.addAttribute("errorMessage", errorMessages);
-			return "back-end/roomType/listRoomType";
+			return "redirect:/backend/roomType/listRoomType";
 		}
 		try {
 			roomTypeService.updateRoomType(roomType);
 		}catch(BusinessException e){
 			model.addAttribute("errorMessage", e.getMessage());
 		}
-		return "/back-end/roomType/listRoomType";
+		return "redirect:/backend/roomType/listRoomType";
 	}
 
 	//新增房型處理
