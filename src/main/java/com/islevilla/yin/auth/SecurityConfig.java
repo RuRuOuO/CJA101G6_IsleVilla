@@ -1,5 +1,6 @@
 package com.islevilla.yin.auth;
 
+import com.islevilla.jay.operationLog.controller.CustomLogoutSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -16,7 +17,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.islevilla.jay.operationLog.controller.CustomLoginSuccessHandler;
-import com.islevilla.jay.operationLog.controller.CustomLogoutSuccessHandler;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -27,7 +27,7 @@ public class SecurityConfig {
 
     @Autowired
     private CustomLoginSuccessHandler customLoginSuccessHandler;
-    
+
     @Autowired
     private UserDetailsService userDetailsService;
 
@@ -39,7 +39,7 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    
+
     // 2) 註冊 AuthenticationManager Bean
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
@@ -52,8 +52,8 @@ public class SecurityConfig {
         return new AuthenticationFailureHandler() {
             @Override
             public void onAuthenticationFailure(HttpServletRequest request,
-                                              HttpServletResponse response,
-                                              AuthenticationException exception)
+                                                HttpServletResponse response,
+                                                AuthenticationException exception)
                     throws IOException, ServletException {
 
                 String errorMessage = "帳號或密碼錯誤";
@@ -86,7 +86,7 @@ public class SecurityConfig {
                         .requestMatchers("/backend/auth").permitAll()  // 員工登入頁面
                         .anyRequest().authenticated()  // 其他 backend 路徑需要認證
                 )
-                
+
                 .formLogin(form -> form
                         .loginPage("/backend/auth")
                         .loginProcessingUrl("/backend/login/process")
@@ -96,7 +96,7 @@ public class SecurityConfig {
                         .failureHandler(customAuthenticationFailureHandler())
                         .permitAll()
                 )
-                
+
                 .logout(logout -> logout
                         .logoutUrl("/backend/logout")
                         .logoutSuccessHandler(customLogoutSuccessHandler) // 註冊自訂登出 Handler
@@ -104,9 +104,9 @@ public class SecurityConfig {
                         .invalidateHttpSession(true)
                         .permitAll()
                 )
-                
+
                 .userDetailsService(userDetailsService);
-        
+
         return http.build();
     }
 
