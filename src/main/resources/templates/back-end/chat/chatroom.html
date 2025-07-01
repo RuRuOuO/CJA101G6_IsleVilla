@@ -137,7 +137,7 @@ button:hover {
 
 	<div class="container">
 		<!-- ✔ 返回首頁放右上角 -->
-		<button class="back-btn" onclick="goHome()">返回 聊天室列表</button>
+		<button class="back-btn" onclick="gochatlist()">返回 聊天室列表</button>
 		<!-- ✔ 對話框 -->
 		<div id="chat"></div>
 
@@ -151,11 +151,11 @@ button:hover {
 	<script th:inline="javascript">
     const roomId = [[${roomId}]] + "";
         const mySenderId = 9001;
-        const mySenderName = "客服A";
+        const mySenderName = "IsleVilla 客服人員";
 
         document.querySelector("h2 span").innerText = roomId;
 
-        const ws = new WebSocket(`ws://localhost:8080/ws/chat?roomId=${roomId}`);
+        const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/chat?roomId=${roomId}`);
 
         ws.onopen = () => {
             console.log("✅ WebSocket 已連線聊天室", roomId);
@@ -232,8 +232,8 @@ button:hover {
             return `${hh}:${mm}`;
         }
         /** ✔ 返回聊天室選單 */
-        function goHome() {
-            window.location.href = "/backend/chat/room/list";   // ✔ 這裡填你的首頁路徑
+        function gochatlist() {
+            window.location.href = "/backend/chat/room/list";   
         }
     </script>
 

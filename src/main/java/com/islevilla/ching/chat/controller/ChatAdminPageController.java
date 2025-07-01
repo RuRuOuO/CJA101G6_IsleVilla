@@ -1,7 +1,12 @@
 package com.islevilla.ching.chat.controller;
 
+import com.islevilla.ching.chat.modelDTO.ChatMessageDTO;
 import com.islevilla.ching.chat.modelDTO.ChatRoomDTO;
 import com.islevilla.ching.chat.service.ChatRedisService;
+import com.islevilla.yin.employee.model.Employee;
+
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,29 +18,85 @@ import java.util.List;
 @RequestMapping("/backend/chat")
 public class ChatAdminPageController {
 
-    @Autowired
-    private ChatRedisService chatRedisService;
+	@Autowired
+	private ChatRedisService chatRedisService;
 
-    private final Integer EMPLOYEE_ID = 9001;
-    private final String EMPLOYEE_NAME = "客服A";
+	/** ✔ 聊天室列表（含未讀） */
+	@GetMapping("/room/list")
+	public String chatRoomList(HttpSession session, Model model) {
+		Employee employee = (Employee) session.getAttribute("employee");
+		if (employee == null) {
+			return "redirect:/backend/auth";
+		}
 
-    /** ✔ 聊天室列表（含未讀） */
-    @GetMapping("/room/list")
-    public String chatRoomList(Model model) {
-        List<ChatRoomDTO> rooms = chatRedisService.getAllChatRoomsWithUnread(EMPLOYEE_ID);
-        model.addAttribute("rooms", rooms);
-        return "back-end/chat/chatroomlist";
-    }
+		Integer employeeId = employee.getEmployeeId();
+		String employeeName = employee.getEmployeeName();
 
-    /** ✔ 聊天室視窗 */
-    @GetMapping("/room/{id}")
-    public String chatRoomDetail(@PathVariable("id") Integer roomId, Model model) {
-        // ✔ 進入聊天室時清除客服的未讀
-        chatRedisService.clearUnread(roomId, EMPLOYEE_ID);
+		List<ChatRoomDTO> rooms = chatRedisService.getAllChatRoomsWithUnread(employeeId)
+				.stream()
+                .filter(r -> r.getMemberName() != null && !"未知會員".equals(r.getMemberName()))
+                .toList();
+		
+		model.addAttribute("rooms", rooms);
+		model.addAttribute("employeeName", employeeName);
 
-        model.addAttribute("roomId", roomId);
-        model.addAttribute("senderId", EMPLOYEE_ID);
-        model.addAttribute("senderName", EMPLOYEE_NAME);
-        return "back-end/chat/chatroom";
-    }
+		return "back-end/chat/chatroomlist";
+	}
+
+	/** ✔ 聊天室詳細視窗 */
+	@GetMapping("/room/{id}")
+	public String chatRoomDetail(@PathVariable("id") Integer roomId, HttpSession session, Model model) {
+
+		Employee employee = (Employee) session.getAttribute("employee");
+		if (employee == null) {
+			return "redirect:/backend/auth";
+		}
+
+		Integer employeeId = employee.getEmployeeId();
+		String employeeName = employee.getEmployeeName();
+
+		// ✔ 查聊天室資訊
+		ChatRoomDTO room = chatRedisService.getChatRoom(roomId);
+		if (room == null) {
+			model.addAttribute("error", "找不到該聊天室");
+			return "back-end/chat/error";
+		}
+
+		// ✔ 清除未讀
+		chatRedisService.clearUnread(roomId, employeeId);
+
+		// ✔ 查訊息歷史
+		List<ChatMessageDTO> messages = chatRedisService.getMessageHistory(roomId);
+
+		model.addAttribute("room", room);
+		model.addAttribute("messages", messages);
+		model.addAttribute("roomId", roomId);
+		model.addAttribute("senderId", employeeId);
+		model.addAttribute("senderName", employeeName);
+		model.addAttribute("senderType", 1);
+
+		return "back-end/chat/chatroom";
+	}
+
+	/** ✔ 結束聊天室 */
+	@PostMapping("/room/{id}/close")
+	@ResponseBody
+	public String closeChatRoom(@PathVariable("id") Integer roomId, HttpSession session) {
+
+		Employee employee = (Employee) session.getAttribute("employee");
+		if (employee == null) {
+			return "未登入";
+		}
+
+		Integer employeeId = employee.getEmployeeId();
+
+		ChatRoomDTO room = chatRedisService.getChatRoom(roomId);
+		if (room == null) {
+			return "聊天室不存在";
+		}
+
+		chatRedisService.closeChatRoom(roomId);
+		return "聊天室已結束";
+	}
+	
 }
