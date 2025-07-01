@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>微嶼 | Isle Villa 後台首頁</title>
+    <!-- ===== 載入統一樣式 ===== -->
+	<th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+</head>
+<body>
+<!-- ===== 載入sidebar ===== -->
+<!-- 插入手機版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+<!-- 插入桌面版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+
+	<main
+		th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+		<th:block th:fragment="myContent">
+			<!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+			<div class="card-header bg-transparent border-0 pt-4">
+				<div class="d-flex justify-content-between align-items-center">
+					<h4 class="card-title mb-0 fw-bold ">
+						<i class="bi bi-bag me-2"></i>房型管理
+					</h4>
+					<a class="btn btn-success" data-bs-toggle="modal"
+						data-bs-target="#addRoomTypeModel"> <i
+						class="bi bi-plus-circle "></i>新增房型
+					</a>
+				</div>
+			</div>
+
+			<div class="card-body">
+				<!-- 搜尋與篩選 -->
+				<div class="row mb-4">
+					<form id="filterForm" th:action="@{/backend/roomType/listRoomType}" method="get" class="row mb-4">
+		                <div class="me-2">
+		                            <i class="bi bi-search"></i>搜尋功能
+		                </div>
+						<div class="col-md-3">
+							<select class="form-select" name="roomTypeId" id="roomTypeId">
+								<option value="">請選擇房型</option>
+								<option th:each="roomTypeName : ${roomTypeNameList}"
+									th:value="${roomTypeName.roomTypeId}"
+									th:text="${roomTypeName.roomTypeName}"
+									th:selected="${roomTypeName.roomTypeId != null and roomTypeName.roomTypeId == getRoomTypeNameList}">
+								</option>
+							</select>
+						</div>
+						<div class="col-md-3">
+							<select class="form-select" name="roomTypeSaleStatus" id="roomTypeSaleStatus" >
+								<option value="">全部狀態</option>
+								<option th:each="saleStatus : ${saleStatusMap}"
+									th:value="${saleStatus.key}" th:text="${saleStatus.value}"
+									th:selected="${saleStatus.key != null and saleStatus.key == selectedSaleStatus}">
+								</option>
+							</select>
+						</div>
+					</form>
+				</div>
+
+
+				<!-- 房型表格 -->
+				<div class="table-responsive">
+					<table id="roomTypeTable" class="table table-hover">
+						<thead>
+							<tr>
+								<th>房型編號</th>
+								<th>房型名稱</th>
+								<th>房型代碼</th>
+								<th>數量</th>
+								<th>價格</th>
+								<th>狀態</th>
+								<th>修改</th>
+							</tr>
+						</thead>
+						<tbody id="roomTypeTBody">
+							<tr th:each="rt: ${roomTypeList}">
+								<td th:text="${rt.roomTypeId}">房型編號</td>
+								<td th:text="${rt.roomTypeName}">房型名稱</td>
+								<td th:text="${rt.roomTypeCode}">房型代碼</td>
+								<td th:text="${rt.roomTypeQuantity}">數量</td>
+								<td th:text="${rt.roomTypePrice}">價格</td>
+								<td th:text="${saleStatusMap[rt.roomTypeSaleStatus]}">狀態</td>
+								<td>
+									<div class="d-flex gap-2 flex-wrap">
+										<a data-bs-toggle="modal"
+											data-bs-target="#updateRoomTypeModel"
+											class="btn btn-sm btn-primary"
+											th:attr="
+                                     data-id=${rt.roomTypeId},
+                                     data-name=${rt.roomTypeName},
+                                     data-code=${rt.roomTypeCode},
+                                     data-quantity=${rt.roomTypeQuantity},
+                                     data-capacity=${rt.roomTypeCapacity},
+                                     data-content=${rt.roomTypeContent},
+                                     data-price=${rt.roomTypePrice},
+                                     data-status=${rt.roomTypeSaleStatus}
+                                   ">
+											<i class="bi bi-pencil"></i>
+										</a>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</th:block>
+	</main>
+	
+	
+	<!-- 修改房型 -->
+	<div class="modal fade" id="updateRoomTypeModel" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-plus-circle me-2"></i>更新房型資料
+                </h5>
+                <button type="button" class="btn-close btn-close-red" data-bs-dismiss="modal"></button>
+            </div>
+			<!-- 修改表單的錯誤訊息提示區塊 -->
+            <div class="modal-body">
+                <!-- 錯誤訊息提示區塊 -->
+                <div th:if="${updateErrorMessage}" class="alert alert-danger" id="updateErrorMessage" role="alert">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <strong>輸入資料錯誤，請檢查以下項目：</strong>
+                    </div>
+                    <ul class="mb-0">
+                        <li th:each="msg : ${updateErrorMessage}" th:text="${msg}"></li>
+                    </ul>
+                </div>
+            <form th:object="${roomType}" th:action="@{/backend/roomType/updateRoomType}" method="post" id="updateRoomTypeForm" novalidate enctype="multipart/form-data">
+            <div class="modal-body">
+                <input type="hidden" name="roomTypeId" />
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="updateRoomTypeName" class="form-label">房型名稱 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="updateRoomTypeName" th:field="*{roomTypeName}" placeholder="輸入房型名稱" required>
+                        <div class="invalid-feedback">請輸入房型名稱!</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="updateRoomTypeCode" class="form-label">房型代碼 <span class="text-danger">*</span></label>
+                        <input type="text" size=3 class="form-control" id="updateRoomTypeCode" th:field="*{roomTypeCode}" placeholder="輸入房型代碼" required>
+                        <div class="invalid-feedback">請輸入英文字母或數字，且長度為3!</div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="updateRoomTypeContent" class="form-label">房型說明 <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="updateRoomTypeContent" th:field="*{roomTypeContent}" rows="3" required></textarea>
+                    <div class="invalid-feedback">請輸入房型說明，長度不超過1000字!</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="updateRoomTypeQuantity" class="form-label">房型數量 <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="updateRoomTypeQuantity" th:field="*{roomTypeQuantity}" required min="0">
+                        <div class="invalid-feedback">請輸入房型數量，請輸入數字（必須大於等於0）</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="updateRoomTypeCapacity" class="form-label">房型容納人數 <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="updateRoomTypeCapacity" th:field="*{roomTypeCapacity}" required min="1">
+                        <div class="invalid-feedback">請輸入房型容納人數，請輸入數字（必須大於等於1）</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="updateRoomTypePrice" class="form-label">房型價格 <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="updateRoomTypePrice" th:field="*{roomTypePrice}" required min="1">
+                        <div class="invalid-feedback">請輸入房型價格，請輸入數字</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="updateRoomTypeSaleStatus" class="form-label">上下架狀態 <span class="text-danger">*</span></label>
+                        <select class="form-select" id="updateRoomTypeSaleStatus" th:field="*{roomTypeSaleStatus}" required>
+                            <option value="">請選擇狀態</option>
+							<option th:each="saleStatus : ${saleStatusMap}"
+								th:value="${saleStatus.key}" th:text="${saleStatus.value}">
+							</option>
+                        </select>
+                        <div class="invalid-feedback">請選擇上下架狀態</div>
+                    </div>
+                </div>
+
+<!--                 <div class="mb-3"> -->
+<!--                     <label class="form-label">商品圖片（可拖曳）</label> -->
+<!--                     <div id="productPhotoSortArea" class="d-flex flex-wrap gap-2"></div> -->
+<!--                     <input type="file" class="form-control mt-2" id="editProductPhotoInput" accept="image/*" multiple style="max-width:300px;" onchange="addNewProductPhotos(this)"> -->
+<!--                     <small class="text-muted">可拖曳排序，右上角可刪除，點選可新增圖片</small> -->
+<!--                 </div> -->
+<!--             </div> -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-2"></i>儲存
+                </button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+	
+	<!-- 新增房型 -->
+	<div class="modal fade" id="addRoomTypeModel" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-plus-circle me-2"></i>新增房型
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="card-header bg-transparent border-0 pt-4">
+                <div class="d-flex justify-content-between align-items-center">
+
+
+                </div>
+            </div>
+            <form th:object="${roomType}" th:action="@{/backend/roomType/addRoomType}" method="post" id="addRoomTypeForm" novalidate enctype="multipart/form-data">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="addRoomTypeName" class="form-label">房型名稱 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="addRoomTypeName" th:field="*{roomTypeName}" placeholder="輸入房型名稱" required>
+                        <div class="invalid-feedback">請輸入房型名稱!</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="addRoomTypeCode" class="form-label">房型代碼 <span class="text-danger">*</span></label>
+                        <input type="text" size=3 class="form-control" id="addRoomTypeCode" th:field="*{roomTypeCode}" placeholder="輸入房型代碼" required>
+                        <div class="invalid-feedback">請輸入英文字母或數字，且長度為3!</div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="addRoomTypeContent" class="form-label">房型說明 <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="addRoomTypeContent" th:field="*{roomTypeContent}" rows="3" required></textarea>
+                    <div class="invalid-feedback">請輸入房型說明，長度不超過1000字!</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="addRoomTypeQuantity" class="form-label">房型數量 <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="addRoomTypeQuantity" th:field="*{roomTypeQuantity}" required min="0">
+                        <div class="invalid-feedback">請輸入房型數量，請輸入數字（必須大於等於0）</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="addRoomTypeCapacity" class="form-label">房型容納人數 <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="addRoomTypeCapacity" th:field="*{roomTypeCapacity}" required min="1">
+                        <div class="invalid-feedback">請輸入房型容納人數，請輸入數字（必須大於等於1）</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="addRoomTypePrice" class="form-label">房型價格 <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="addRoomTypePrice" th:field="*{roomTypePrice}" required min="1">
+                        <div class="invalid-feedback">請輸入房型價格，請輸入數字</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="addRoomTypeSaleStatus" class="form-label">上下架狀態 <span class="text-danger">*</span></label>
+                        <select class="form-select" id="addRoomTypeSaleStatus" th:field="*{roomTypeSaleStatus}" required>
+                            <option value="">請選擇狀態</option>
+							<option th:each="saleStatus : ${saleStatusMap}"
+								th:value="${saleStatus.key}" th:text="${saleStatus.value}">
+							</option>
+                        </select>
+                        <div class="invalid-feedback">請選擇上下架狀態</div>
+                    </div>
+                </div>
+
+<!--                 <div class="mb-3"> -->
+<!--                     <label class="form-label">商品圖片（可拖曳）</label> -->
+<!--                     <div id="productPhotoSortArea" class="d-flex flex-wrap gap-2"></div> -->
+<!--                     <input type="file" class="form-control mt-2" id="editProductPhotoInput" accept="image/*" multiple style="max-width:300px;" onchange="addNewProductPhotos(this)"> -->
+<!--                     <small class="text-muted">可拖曳排序，右上角可刪除，點選可新增圖片</small> -->
+<!--                 </div> -->
+<!--             </div> -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-2"></i>儲存
+                </button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+<script src="/js/roomType.js"></script>
+	<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
+
+</body>
+</html>
