@@ -26,4 +26,4 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
         }
         response.sendRedirect("/backend/auth?logout");
     }
-} 
+}

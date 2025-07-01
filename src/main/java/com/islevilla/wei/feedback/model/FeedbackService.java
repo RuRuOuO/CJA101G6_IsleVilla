@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -49,22 +51,45 @@ public class FeedbackService implements FeedbackService_interface {
 
     @Override
     public List<RoomRVOrderDTO> getAvailableOrders(Members member) {
-        List<RoomRVOrder> orders = roomRVOrderRepository.findByMembersAndRoomOrderStatus(member, 2);
+        // 計算一個月前的日期
+        LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
 
-        return orders.stream().map(order -> {
-            RoomRVOrderDTO dto = new RoomRVOrderDTO();
-            dto.setRoomReservationId(order.getRoomReservationId());
-            dto.setCheckInDate(order.getCheckInDate());
-            dto.setCheckOutDate(order.getCheckOutDate());
-            return dto;
-        }).collect(Collectors.toList());
+        // 查詢條件：該會員的訂單中，實際退房時間在過去一個月內，且訂單狀態為已退房
+        List<RoomRVOrder> orderList = roomRVOrderRepository.findEligibleOrdersForFeedback(
+                member.getMemberId(),
+                oneMonthAgo,
+                2 // 訂單狀態
+        );
+
+        // 轉換為 DTO 並過濾掉已有評價的訂單
+        // 初始化結果清單
+        List<RoomRVOrderDTO> resultList = new ArrayList<>();
+        for (RoomRVOrder order : orderList) {
+            // 如果該訂單尚未有評價
+            if (!hasExistingFeedback(order.getRoomReservationId())) {
+                // 手動轉換為 DTO
+                RoomRVOrderDTO dto = new RoomRVOrderDTO();
+                dto.setRoomReservationId(order.getRoomReservationId());
+                dto.setCheckInDate(order.getCheckInDate());
+                dto.setCheckOutDate(order.getCheckOutDate());
+                dto.setActualCheckOutDate(order.getActualCheckOutDate());
+
+                resultList.add(dto);
+            }
+        }
+        return resultList;
     }
 
-//    // 根據訂房編號查詢feedback
-//    @Override
-//    public Optional<Feedback> findByRoomRvId(Integer roomReservationId) {
-//        return feedbackRepository.findByRoomRVOrder_RoomReservationId(roomReservationId);
-//    }
+    @Override
+    public boolean hasExistingFeedback(Integer roomReservationId) {
+        // 檢查是否已存在該訂單的評價
+        return feedbackRepository.existsByRoomRVOrder_RoomReservationId(roomReservationId);
+    }
+
+    @Override
+    public List<Feedback> findPublicAndActiveFeedbacks() {
+        return feedbackRepository.findByFbPublicAndFbStatus(1, 1);
+    }
 
     @Override
     public boolean saveFeedback(FeedbackFormDTO dto, Members member) {

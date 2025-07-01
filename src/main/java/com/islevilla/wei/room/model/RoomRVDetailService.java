@@ -12,6 +12,11 @@ public class RoomRVDetailService {
     @Autowired
     private RoomRVOrderService roomRVOrderService;
 
+    // 查詢全部
+    public List<RoomRVDetail> findAll() {
+        return roomRVDetailRepository.findAll();
+    }
+
     // 依照訂單編號查詢出訂單明細
     public List<RoomRVDetail> getDetailsByRoomRVOrderId(Integer roomReservationId) {
         RoomRVOrder roomRVOrder = roomRVOrderService.getById(roomReservationId);

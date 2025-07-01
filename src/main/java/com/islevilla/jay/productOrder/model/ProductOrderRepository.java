@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -57,4 +58,11 @@ public interface ProductOrderRepository extends JpaRepository<ProductOrder, Inte
     List<ProductOrder> findByOthers(Integer productOrderId, Integer memberId, Byte orderStatus);
 
     // List<ProductOrder> findByMember_MemberId(Integer memberId);
+    
+    // Dashboard 相關查詢方法
+    long countByOrderTimeBetween(LocalDateTime startTime, LocalDateTime endTime);
+    
+    List<ProductOrder> findByOrderTimeBetween(LocalDateTime startTime, LocalDateTime endTime);
+    
+    long countByOrderStatus(Byte orderStatus);
 }
