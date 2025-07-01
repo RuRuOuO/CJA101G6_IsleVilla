@@ -40,10 +40,20 @@ public class RoomTypeController{
 	private static final Map<Byte, String> saleStatusMap;
 
 	static {
-				saleStatusMap = new HashMap<>();
+		saleStatusMap = new HashMap<>();
 		saleStatusMap.put((byte)1, "上架中");
 		saleStatusMap.put((byte)0, "下架中");
 	}
+	
+	// 私有方法：準備頁面顯示所需的資料
+	private void prepareModelForView(Model model) {
+		List<RoomType> roomTypeList = roomTypeService.findAll();
+		model.addAttribute("roomTypeList", roomTypeList);
+		model.addAttribute("saleStatusMap", saleStatusMap);
+		model.addAttribute("roomTypeNameList", roomTypeName.getRoomTypeNameList());
+		model.addAttribute("roomTypeName", roomTypeName.getRoomTypeNameMap());
+	}
+	
 	
 //顯示網頁
 @GetMapping("/listRoomType")
@@ -109,15 +119,22 @@ public String showListRoomType(
 			List<String> errorMessages = result.getFieldErrors().stream() 			 //取得錯誤資料集合
 					.map(FieldError::getDefaultMessage)  //把每個錯誤轉成訊息
 					.collect(Collectors.toList());		 //收集成一個清單
-			model.addAttribute("roomType",roomType);  
-			model.addAttribute("saleStatusMap", saleStatusMap);  //下拉選單
-			model.addAttribute("errorMessage", errorMessages);
-			return "redirect:/backend/roomType/listRoomType";
+			// 重新載入頁面所需資料
+			prepareModelForView(model);
+			model.addAttribute("roomType", roomType);
+			model.addAttribute("updateErrorMessage", errorMessages); 
+			return "back-end/roomType/listRoomType";
 		}
 		try {
 			roomTypeService.updateRoomType(roomType);
+			redirectAttributes.addFlashAttribute("successMessage", "房型修改成功！");
 		}catch(BusinessException e){
-			model.addAttribute("errorMessage", e.getMessage());
+			// 重新載入頁面所需資料
+			prepareModelForView(model);
+			model.addAttribute("roomType", roomType);
+			model.addAttribute("updateErrorMessage", List.of(e.getMessage()));
+			
+			return "back-end/roomType/listRoomType";
 		}
 		return "redirect:/backend/roomType/listRoomType";
 	}
@@ -135,34 +152,26 @@ public String showListRoomType(
 			List<String> errorMessages = result.getFieldErrors().stream() 			 //取得錯誤資料集合
 					.map(FieldError::getDefaultMessage)  //把每個錯誤轉成訊息
 					.collect(Collectors.toList());		 //收集成一個清單
-			model.addAttribute("roomType",roomType);  
-			model.addAttribute("saleStatusMap", saleStatusMap);  //下拉選單
-			model.addAttribute("errorMessage", errorMessages);
+			// 重新載入頁面所需資料
+			prepareModelForView(model);
+			model.addAttribute("roomType", roomType);
+			model.addAttribute("addErrorMessage", errorMessages);
+			
 			return "back-end/roomType/listRoomType";
 		}
 		
 		try {
 			roomTypeService.addRoomType(roomType);
+			redirectAttributes.addFlashAttribute("successMessage", "房型新增成功！");
 		}catch(BusinessException e){
-			model.addAttribute("errorMessage", e.getMessage());
+			// 重新載入頁面所需資料
+			prepareModelForView(model);
+			model.addAttribute("roomType", roomType);
+			model.addAttribute("addErrorMessage", List.of(e.getMessage()));
+			
+			return "back-end/roomType/listRoomType";
 		}
-		return "/back-end/roomType/listRoomType";
-	}
-	
-	//刪除房型處理
-	@PostMapping("/deleteRoomType/{roomTypeId}")
-	@PreAuthorize("hasAuthority('room')")
-	public String addRoomType(@PathVariable Integer roomTypeId, 
-								Model model,
-								RedirectAttributes redirectAttributes) {
-		System.out.println("進入頁面");
-		
-		try {
-			roomTypeService.deleteRoomType(roomTypeId);
-		}catch(BusinessException e){
-			model.addAttribute("errorMessage", e.getMessage());
-		}
-		return "/back-end/roomType/listRoomType";
+		return "redirect:/backend/roomType/listRoomType";
 	}
 }
 

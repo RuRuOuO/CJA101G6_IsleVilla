@@ -39,7 +39,6 @@ public class RoomType {
 	private String roomTypeCode;
 	
 	@Column(name="room_type_name")
-	@Size(max=3)
 	@NotBlank(message = "房型名稱: 請勿空白")
 	@Pattern(regexp = "^[(\u4e00-\u9fa5)]{1,10}$", message = "房型名稱: 請輸入中文,且長度必需在1到10之間")
 	private String roomTypeName;

@@ -1,6 +1,7 @@
 package com.islevilla.chen.roomType.model;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -16,6 +17,10 @@ public interface RoomTypeRepository extends JpaRepository<RoomType, Integer>,Roo
 	//在新增及更新功能中，判斷房型名稱是否重複
 	public boolean existsByRoomTypeName(String roomTypeName);
 
+    //用於更新功能時的重複檢查
+    Optional<RoomType> findByRoomTypeCode(String roomTypeCode);
+    Optional<RoomType> findByRoomTypeName(String roomTypeName);
+    
 	//查詢房型上下架狀態
 	public List<RoomType> findByRoomTypeSaleStatus(Byte roomTypeSaleStatus);
 
