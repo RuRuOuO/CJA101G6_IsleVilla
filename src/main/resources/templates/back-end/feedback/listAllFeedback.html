@@ -1,13 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>微嶼 | Isle Villa 後台首頁</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
 </head>
@@ -20,180 +16,153 @@
 
 <main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
     <th:block th:fragment="myContent">
-        <!-- 表格檢視 -->
-        <div id="tableViewContainer" class="table-responsive">
-            <table class="table table-hover align-middle shadow-sm">
-                <thead class="table-dark">
-                <tr>
-                    <th width="60">編號</th>
-                    <th width="100">訂單編號</th>
-                    <th width="100">填寫時間</th>
-                    <th width="80">整體評分</th>
-                    <th width="80">推薦度</th>
-                    <th width="80">再訪意願</th>
-                    <th width="100">公開/狀態</th>
-                    <th width="80">操作</th>
-                </tr>
-                </thead>
-                <tbody>
-                <th:block th:each="fb, iterStat : ${feedbackList}">
-                    <tr class="expandable-row" data-bs-toggle="collapse"
-                        th:data-bs-target="'#details-' + ${iterStat.index}"
-                        th:attr="data-overall=${fb.fbOverallRating}, data-recommend=${fb.fbRecommend}, data-public=${fb.fbPublic}, data-status=${fb.fbStatus}">
-                        <td>
-                            <span class="fw-bold" th:text="${fb.fbId}"></span>
-                            <i class="fas fa-chevron-down ms-2 text-muted"></i>
-                        </td>
-                        <td>
-                            <span class="badge bg-secondary" th:text="${fb.roomRVOrder.roomReservationId}"></span>
-                        </td>
-                        <td>
-                            <small th:text="${#dates.format(fb.fbCreatedAt, 'yyyy-MM-dd')}"></small>
-                        </td>
-                        <td>
-                                <span class="rating-badge"
-                                      th:classappend="${fb.fbOverallRating >= 4 ? 'rating-excellent' : fb.fbOverallRating >= 3 ? 'rating-good' : fb.fbOverallRating >= 2 ? 'rating-average' : 'rating-poor'}"
-                                      th:text="${fb.fbOverallRating} + '★'"></span>
-                        </td>
-                        <td>
-                                <span class="badge"
-                                      th:classappend="${fb.fbRecommend == 1 ? 'bg-success' : 'bg-warning'}"
-                                      th:text="${fb.fbRecommend == 1 ? '推薦' : '不推薦'}"></span>
-                        </td>
-                        <td>
-                                <span class="badge"
-                                      th:classappend="${fb.fbRevisit == 1 ? 'bg-info' : 'bg-secondary'}"
-                                      th:text="${fb.fbRevisit == 1 ? '會再訪' : '不會'}"></span>
-                        </td>
-                        <td>
-                            <div class="d-flex flex-column gap-1">
-                                    <span class="badge"
-                                          th:classappend="${fb.fbPublic == 1 ? 'bg-primary' : 'bg-secondary'}"
-                                          th:text="${fb.fbPublic == 1 ? '公開' : '不公開'}"></span>
-                                <span class="badge"
-                                      th:classappend="${fb.fbStatus == 1 ? 'bg-success' : 'bg-danger'}"
-                                      th:text="${fb.fbStatus == 1 ? '上架' : '下架'}"></span>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="btn-group btn-group-sm">
-                                <button class="btn btn-outline-primary btn-sm" title="編輯">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-outline-danger btn-sm" title="刪除">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <!-- 展開的詳細資訊 -->
-                    <tr class="collapse details-row" th:id="'details-' + ${iterStat.index}">
-                        <td colspan="8" class="p-4">
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <h6 class="text-primary mb-3">
-                                        <i class="fas fa-star me-2"></i>各項評分
-                                    </h6>
-                                    <div class="row g-2">
-                                        <div class="col-6">
-                                            <div class="d-flex justify-content-between">
-                                                <span>接駁服務:</span>
-                                                <span class="rating-badge rating-good"
-                                                      th:text="${fb.fbShuttleRating} + '★'"></span>
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <div class="d-flex justify-content-between">
-                                                <span>櫃台服務:</span>
-                                                <span class="rating-badge rating-good"
-                                                      th:text="${fb.fbReceptionRating} + '★'"></span>
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <div class="d-flex justify-content-between">
-                                                <span>客房品質:</span>
-                                                <span class="rating-badge rating-good"
-                                                      th:text="${fb.fbRoomRating} + '★'"></span>
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <div class="d-flex justify-content-between">
-                                                <span>設備設施:</span>
-                                                <span class="rating-badge rating-good"
-                                                      th:text="${fb.fbFacilityRating} + '★'"></span>
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <div class="d-flex justify-content-between">
-                                                <span>環境品質:</span>
-                                                <span class="rating-badge rating-good"
-                                                      th:text="${fb.fbEnvRating} + '★'"></span>
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <div class="d-flex justify-content-between">
-                                                <span>性價比:</span>
-                                                <span class="rating-badge rating-good"
-                                                      th:text="${fb.fbValueRating} + '★'"></span>
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <div class="d-flex justify-content-between">
-                                                <span>網站體驗:</span>
-                                                <span class="rating-badge rating-good"
-                                                      th:text="${fb.fbWebsiteRating} + '★'"></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <h6 class="text-success mb-3">
-                                        <i class="fas fa-comments me-2"></i>評價內容
-                                    </h6>
-                                    <div class="mb-3">
-                                        <strong class="text-success">好評:</strong>
-                                        <p class="mb-2 text-muted"
-                                           th:text="${fb.fbCompliment != null ? fb.fbCompliment : '無'}"></p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <strong class="text-warning">建議:</strong>
-                                        <p class="mb-2 text-muted"
-                                           th:text="${fb.fbSuggestion != null ? fb.fbSuggestion : '無'}"></p>
-                                    </div>
-                                    <div class="small text-muted">
-                                        <i class="fas fa-clock me-1"></i>
-                                        修改時間: <span
-                                            th:text="${#dates.format(fb.fbUpdatedAt, 'yyyy-MM-dd HH:mm')}"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </th:block>
-                </tbody>
-            </table>
+        <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+        <h2 class="mb-4">顧客評價一覽</h2>
+        <table class="table table-hover table-bordered align-middle text-center">
+            <thead class="table-dark">
+            <tr>
+                <th>編號</th>
+                <th>訂單編號</th>
+                <th>整體評價</th>
+                <th>推薦</th>
+                <th>再訪</th>
+                <th>公開</th>
+                <th>狀態</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="feedbackTableBody"></tbody>
+        </table>
+
+        <!-- 詳情 Modal -->
+        <div aria-hidden="true" aria-labelledby="feedbackModalLabel" class="modal fade" id="feedbackModal"
+             tabindex="-1">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="feedbackModalLabel">評價詳情</h5>
+                        <button aria-label="關閉" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>好評：</strong><span id="fbCompliment"></span></p>
+                        <p><strong>建議：</strong><span id="fbSuggestion"></span></p>
+                        <p><strong>填寫時間：</strong><span id="fbCreatedAt"></span></p>
+                        <p><strong>更新時間：</strong><span id="fbUpdatedAt"></span></p>
+                        <p><strong>接駁服務：</strong><span id="fbShuttleRating"></span></p>
+                        <p><strong>櫃台服務：</strong><span id="fbReceptionRating"></span></p>
+                        <p><strong>房間品質：</strong><span id="fbRoomRating"></span></p>
+                        <p><strong>設施：</strong><span id="fbFacilityRating"></span></p>
+                        <p><strong>環境：</strong><span id="fbEnvRating"></span></p>
+                        <p><strong>性價比：</strong><span id="fbValueRating"></span></p>
+                        <p><strong>網站使用：</strong><span id="fbWebsiteRating"></span></p>
+                        <p><strong>圖片：</strong></p>
+                        <img alt="顧客上傳圖片" class="img-fluid border rounded" id="fbImage" src="">
+                    </div>
+                </div>
+            </div>
         </div>
+        <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
     </th:block>
 </main>
-<!-- Bootstrap JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<!-- Bootstrap & JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // 展開/收起圖示切換
-    document.querySelectorAll('.expandable-row').forEach(row => {
-        row.addEventListener('click', function () {
-            const icon = this.querySelector('.fa-chevron-down');
-            setTimeout(() => {
-                const target = document.querySelector(this.dataset.bsTarget);
-                if (target.classList.contains('show')) {
-                    icon.classList.remove('fa-chevron-down');
-                    icon.classList.add('fa-chevron-up');
-                } else {
-                    icon.classList.remove('fa-chevron-up');
-                    icon.classList.add('fa-chevron-down');
+    fetch('/api/feedbacks')
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.getElementById('feedbackTableBody');
+            const modal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+
+            data.forEach((fb, index) => {
+                const tr = document.createElement('tr');
+
+                // 條件：公開且下架 => 顯示「上架」按鈕；公開且上架 => 顯示「下架」按鈕
+                let actionBtnHtml = '';
+                if (fb.fbPublic === 1) {
+                    if (fb.fbStatus === 1) {
+                        actionBtnHtml = `<button class="btn btn-sm btn-warning toggleStatusBtn" data-id="${fb.fbId}" data-status="0">下架</button>`;
+                    } else {
+                        actionBtnHtml = `<button class="btn btn-sm btn-success toggleStatusBtn" data-id="${fb.fbId}" data-status="1">上架</button>`;
+                    }
                 }
-            }, 50);
+
+                tr.innerHTML = `
+        <td>${fb.fbId}</td>
+        <td>${fb.roomReservationId}</td>
+        <td>${fb.fbOverallRating} ★</td>
+        <td>${fb.fbRecommend === 1 ? '推薦' : '不推薦'}</td>
+        <td>${fb.fbRevisit === 1 ? '會再訪' : '不會'}</td>
+        <td>${fb.fbPublic === 1 ? '公開' : '不公開'}</td>
+        <td class="fbStatusCell">${fb.fbStatus === 1 ? '上架' : '下架'}</td>
+        <td>
+          <button class="btn btn-sm btn-primary viewDetailBtn" data-index="${index}">查看詳情</button>
+          ${actionBtnHtml}
+        </td>
+      `;
+                tbody.appendChild(tr);
+
+                // 查看詳情按鈕事件
+                tr.querySelector('.viewDetailBtn').addEventListener('click', () => {
+                    document.getElementById('fbCompliment').textContent = fb.fbCompliment || '無';
+                    document.getElementById('fbSuggestion').textContent = fb.fbSuggestion || '無';
+                    document.getElementById('fbCreatedAt').textContent = new Date(fb.fbCreatedAt).toLocaleString();
+                    document.getElementById('fbUpdatedAt').textContent = new Date(fb.fbUpdatedAt).toLocaleString();
+                    document.getElementById('fbShuttleRating').textContent = fb.fbShuttleRating + ' ★';
+                    document.getElementById('fbReceptionRating').textContent = fb.fbReceptionRating + ' ★';
+                    document.getElementById('fbRoomRating').textContent = fb.fbRoomRating + ' ★';
+                    document.getElementById('fbFacilityRating').textContent = fb.fbFacilityRating + ' ★';
+                    document.getElementById('fbEnvRating').textContent = fb.fbEnvRating + ' ★';
+                    document.getElementById('fbValueRating').textContent = fb.fbValueRating + ' ★';
+                    document.getElementById('fbWebsiteRating').textContent = fb.fbWebsiteRating + ' ★';
+                    document.getElementById('fbImage').src = fb.fbImageBase64 || '';
+                    modal.show();
+                });
+
+                // 上架/下架按鈕事件
+                const toggleBtn = tr.querySelector('.toggleStatusBtn');
+                if (toggleBtn) {
+                    toggleBtn.addEventListener('click', () => {
+                        const id = toggleBtn.getAttribute('data-id');
+                        const newStatus = parseInt(toggleBtn.getAttribute('data-status'));
+
+                        fetch(`/api/feedbacks/${id}/status`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({status: newStatus})
+                        })
+                            .then(resp => {
+                                if (!resp.ok) throw new Error('狀態更新失敗');
+                                return resp.text();
+                            })
+                            .then(() => {
+                                // 更新狀態欄位文字
+                                tr.querySelector('.fbStatusCell').textContent = newStatus === 1 ? '上架' : '下架';
+
+                                // 更新按鈕文字與 data-status
+                                if (newStatus === 1) {
+                                    toggleBtn.textContent = '下架';
+                                    toggleBtn.classList.remove('btn-success');
+                                    toggleBtn.classList.add('btn-warning');
+                                    toggleBtn.setAttribute('data-status', '0');
+                                } else {
+                                    toggleBtn.textContent = '上架';
+                                    toggleBtn.classList.remove('btn-warning');
+                                    toggleBtn.classList.add('btn-success');
+                                    toggleBtn.setAttribute('data-status', '1');
+                                }
+                            })
+                            .catch(err => {
+                                alert(err.message);
+                            });
+                    });
+                }
+            });
+        })
+        .catch(err => {
+            console.error('載入評價失敗', err);
         });
-    });
 </script>
 </body>
 </html>

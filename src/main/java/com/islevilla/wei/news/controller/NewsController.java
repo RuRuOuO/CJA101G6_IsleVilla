@@ -56,7 +56,7 @@ public class NewsController {
             Model model,
             HttpServletRequest request) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("newsTime").descending());
-        Page<News> newsPage = newsService.getPublished(pageable);
+        Page<News> newsPage = newsService.getAll(pageable);
 
         PageUtil.ModelWithPage(newsPage, model, page, "newsList", request);
 
