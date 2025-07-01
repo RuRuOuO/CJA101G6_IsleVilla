@@ -3,7 +3,6 @@ package com.islevilla.wei.feedback.model;
 import com.islevilla.lai.members.model.Members;
 import com.islevilla.wei.feedback.dto.FeedbackFormDTO;
 import com.islevilla.wei.feedback.dto.RoomRVOrderDTO;
-import com.islevilla.wei.room.model.RoomRVOrder;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,13 +17,12 @@ public interface FeedbackService_interface {
 
     void deleteById(Integer id);
 
-    // 根據訂房編號查詢feedback
-//    Optional<Feedback> findByRoomRvId(Integer roomReservationId);
-
-    // 根據會員查詢訂單
-//    List<RoomRVOrder> getAvailableOrders(Members loginMember);
-
     List<RoomRVOrderDTO> getAvailableOrders(Members member);
 
     boolean saveFeedback(FeedbackFormDTO dto, Members loginMember);
+
+    List<Feedback> findPublicAndActiveFeedbacks();
+
+    // 檢查對應訂單是否已經被評價
+    boolean hasExistingFeedback(Integer roomReservationId);
 }

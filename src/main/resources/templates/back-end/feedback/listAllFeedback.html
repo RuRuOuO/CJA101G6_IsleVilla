@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>微嶼 | Isle Villa 後台首頁</title>
     <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
@@ -35,13 +35,13 @@
         </table>
 
         <!-- 詳情 Modal -->
-        <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel"
-             aria-hidden="true">
+        <div aria-hidden="true" aria-labelledby="feedbackModalLabel" class="modal fade" id="feedbackModal"
+             tabindex="-1">
             <div class="modal-dialog modal-lg modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="feedbackModalLabel">評價詳情</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="關閉"></button>
+                        <button aria-label="關閉" class="btn-close" data-bs-dismiss="modal" type="button"></button>
                     </div>
                     <div class="modal-body">
                         <p><strong>好評：</strong><span id="fbCompliment"></span></p>
@@ -56,7 +56,7 @@
                         <p><strong>性價比：</strong><span id="fbValueRating"></span></p>
                         <p><strong>網站使用：</strong><span id="fbWebsiteRating"></span></p>
                         <p><strong>圖片：</strong></p>
-                        <img id="fbImage" src="" alt="顧客上傳圖片" class="img-fluid border rounded">
+                        <img alt="顧客上傳圖片" class="img-fluid border rounded" id="fbImage" src="">
                     </div>
                 </div>
             </div>
@@ -75,22 +75,34 @@
 
             data.forEach((fb, index) => {
                 const tr = document.createElement('tr');
+
+                // 條件：公開且下架 => 顯示「上架」按鈕；公開且上架 => 顯示「下架」按鈕
+                let actionBtnHtml = '';
+                if (fb.fbPublic === 1) {
+                    if (fb.fbStatus === 1) {
+                        actionBtnHtml = `<button class="btn btn-sm btn-warning toggleStatusBtn" data-id="${fb.fbId}" data-status="0">下架</button>`;
+                    } else {
+                        actionBtnHtml = `<button class="btn btn-sm btn-success toggleStatusBtn" data-id="${fb.fbId}" data-status="1">上架</button>`;
+                    }
+                }
+
                 tr.innerHTML = `
-            <td>${fb.fbId}</td>
-            <td>${fb.roomReservationId}</td>
-            <td>${fb.fbOverallRating} ★</td>
-            <td>${fb.fbRecommend === 1 ? '推薦' : '不推薦'}</td>
-            <td>${fb.fbRevisit === 1 ? '會再訪' : '不會'}</td>
-            <td>${fb.fbPublic === 1 ? '公開' : '不公開'}</td>
-            <td>${fb.fbStatus === 1 ? '上架' : '下架'}</td>
-            <td>
-              <button class="btn btn-sm btn-primary" data-index="${index}">查看詳情</button>
-            </td>
-          `;
+        <td>${fb.fbId}</td>
+        <td>${fb.roomReservationId}</td>
+        <td>${fb.fbOverallRating} ★</td>
+        <td>${fb.fbRecommend === 1 ? '推薦' : '不推薦'}</td>
+        <td>${fb.fbRevisit === 1 ? '會再訪' : '不會'}</td>
+        <td>${fb.fbPublic === 1 ? '公開' : '不公開'}</td>
+        <td class="fbStatusCell">${fb.fbStatus === 1 ? '上架' : '下架'}</td>
+        <td>
+          <button class="btn btn-sm btn-primary viewDetailBtn" data-index="${index}">查看詳情</button>
+          ${actionBtnHtml}
+        </td>
+      `;
                 tbody.appendChild(tr);
 
-                // 綁定按鈕事件
-                tr.querySelector('button').addEventListener('click', () => {
+                // 查看詳情按鈕事件
+                tr.querySelector('.viewDetailBtn').addEventListener('click', () => {
                     document.getElementById('fbCompliment').textContent = fb.fbCompliment || '無';
                     document.getElementById('fbSuggestion').textContent = fb.fbSuggestion || '無';
                     document.getElementById('fbCreatedAt').textContent = new Date(fb.fbCreatedAt).toLocaleString();
@@ -105,7 +117,51 @@
                     document.getElementById('fbImage').src = fb.fbImageBase64 || '';
                     modal.show();
                 });
+
+                // 上架/下架按鈕事件
+                const toggleBtn = tr.querySelector('.toggleStatusBtn');
+                if (toggleBtn) {
+                    toggleBtn.addEventListener('click', () => {
+                        const id = toggleBtn.getAttribute('data-id');
+                        const newStatus = parseInt(toggleBtn.getAttribute('data-status'));
+
+                        fetch(`/api/feedbacks/${id}/status`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({status: newStatus})
+                        })
+                            .then(resp => {
+                                if (!resp.ok) throw new Error('狀態更新失敗');
+                                return resp.text();
+                            })
+                            .then(() => {
+                                // 更新狀態欄位文字
+                                tr.querySelector('.fbStatusCell').textContent = newStatus === 1 ? '上架' : '下架';
+
+                                // 更新按鈕文字與 data-status
+                                if (newStatus === 1) {
+                                    toggleBtn.textContent = '下架';
+                                    toggleBtn.classList.remove('btn-success');
+                                    toggleBtn.classList.add('btn-warning');
+                                    toggleBtn.setAttribute('data-status', '0');
+                                } else {
+                                    toggleBtn.textContent = '上架';
+                                    toggleBtn.classList.remove('btn-warning');
+                                    toggleBtn.classList.add('btn-success');
+                                    toggleBtn.setAttribute('data-status', '1');
+                                }
+                            })
+                            .catch(err => {
+                                alert(err.message);
+                            });
+                    });
+                }
             });
+        })
+        .catch(err => {
+            console.error('載入評價失敗', err);
         });
 </script>
 </body>
