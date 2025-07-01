@@ -21,48 +21,34 @@ public class ChatMemberPageController {
     @Autowired
     private ChatRedisService chatRedisService;
 
-    /** ✔ 點擊「線上客服」 → 建立聊天室 → 跳轉聊天室頁 */
+    // 點擊線上客服 -> 建立聊天室 -> 跳轉聊天室頁 
     @GetMapping("/start")
     public String startChat(HttpSession session, Model model) {
-        // ✔ 從Session中取得會員資訊
+        // 從Session中取得會員資訊
         Members member = (Members) session.getAttribute("member");
         if (member == null) {
-            return "redirect:/member/login";  // 尚未登入 → 返回會員登入頁
+            return "redirect:/member/login";  // 未登入 返回會員登入
         }
 
-     // ✔ 從Session中取得客服資訊，如果沒有 → 指派預設客服
-        Employee employee = (Employee) session.getAttribute("employee");
-
-        Integer employeeId;
-        String employeeName;
-
-        if (employee != null) {
-            employeeId = employee.getEmployeeId();
-            employeeName = employee.getEmployeeName();
-        } else {
-            // ✔ 預設客服
-            employeeId = 9001;
-            employeeName = "IsleVilla 客服人員";
-        }
-
+        // 會員資訊
         Integer memberId = member.getMemberId();
         String memberName = member.getMemberName();
 
-        // ✔ 使用 getOrCreateChatRoom（自動判斷是否已有聊天室）
-        ChatRoomDTO room = chatRedisService.createChatRoom(
+        ChatRoomDTO room = chatRedisService.getOrCreateChatRoom(
                 memberId, memberName,
-                employeeId, employeeName
+                null,null // 不指定客服
         );
 
-        // ✔ 進入聊天室 → 清除會員端的未讀
-        chatRedisService.clearUnread(room.getChatRoomId(), memberId);
+        // 進入聊天室就清除會員端的未讀
+        chatRedisService.clearUnreadForMember(room.getChatRoomId());
 
-        // ✔ 傳遞參數給前端頁面
+        // 傳遞參數給前端頁面
+        model.addAttribute("room", room);             
         model.addAttribute("roomId", room.getChatRoomId());
         model.addAttribute("senderId", memberId);
         model.addAttribute("senderName", memberName);
-        model.addAttribute("senderType", 0);  // ✔ 會員身份
-
+        model.addAttribute("senderType", 0);       // 0 = 會員  
+        
         return "front-end/customer/onlineservice";
     }
 }

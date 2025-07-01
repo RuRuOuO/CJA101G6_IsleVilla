@@ -19,7 +19,7 @@ import com.islevilla.ching.chat.modelDTO.ChatRoomDTO;
 public class ChatRoomQueryService {
 
     @Autowired
-    @Qualifier("redisStringTemplate")
+    @Qualifier("redisStringTemplatedDb1")
     private RedisTemplate<String, String> redisStr;
     
     @Autowired

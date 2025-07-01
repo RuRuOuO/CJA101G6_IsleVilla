@@ -5,135 +5,135 @@
 <title>客服聊天室</title>
 <style>
 body {
-    font-family: "Noto Sans TC", sans-serif;
-    background-color: #f9f9f9;
-    padding: 20px;
+	font-family: "Noto Sans TC", sans-serif;
+	background-color: #f9f9f9;
+	padding: 20px;
 }
 
 h2 {
-    margin-bottom: 1rem;
-    text-align: center;
+	margin-bottom: 1rem;
+	text-align: center;
 }
 
 .container {
-    position: relative;
-    max-width: 600px;
-    margin: auto;
+	position: relative;
+	max-width: 600px;
+	margin: auto;
 }
 
 .back-btn {
-    position: absolute;
-    top: -40px;
-    right: 0;
-    padding: 6px 12px;
-    background-color: #f39c12;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+	position: absolute;
+	top: -40px;
+	right: 0;
+	padding: 6px 12px;
+	background-color: #f39c12;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
 }
 
 .back-btn:hover {
-    background-color: #e67e22;
+	background-color: #e67e22;
 }
 
 #chat {
-    border: 1px solid #ccc;
-    width: 100%;
-    height: 500px;
-    overflow-y: auto;
-    padding: 10px;
-    background: white;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+	border: 1px solid #ccc;
+	width: 100%;
+	height: 500px;
+	overflow-y: auto;
+	padding: 10px;
+	background: white;
+	margin-bottom: 10px;
+	border-radius: 8px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .msg {
-    margin-bottom: 10px;
-    display: flex;
-    max-width: 80%;
+	margin-bottom: 10px;
+	display: flex;
+	max-width: 80%;
 }
 
 .msg.left {
-    justify-content: flex-start;
+	justify-content: flex-start;
 }
 
 .msg.right {
-    justify-content: flex-end;
-    margin-left: auto;
+	justify-content: flex-end;
+	margin-left: auto;
 }
 
 .bubble {
-    padding: 10px 14px;
-    border-radius: 12px;
-    background-color: #e6f0fa;
-    position: relative;
-    word-break: break-word;
-    max-width: 100%;
-    display: inline-block;
+	padding: 10px 14px;
+	border-radius: 12px;
+	background-color: #e6f0fa;
+	position: relative;
+	word-break: break-word;
+	max-width: 100%;
+	display: inline-block;
 }
 
 .left .bubble {
-    background-color: #e6f0fa;
+	background-color: #e6f0fa;
 }
 
 .right .bubble {
-    background-color: #d4edda;
+	background-color: #d4edda;
 }
 
 .bubble .name {
-    font-weight: bold;
-    display: block;
-    margin-bottom: 3px;
-    color: #3498db;
+	font-weight: bold;
+	display: block;
+	margin-bottom: 3px;
+	color: #3498db;
 }
 
 .right .bubble .name {
-    color: #2ecc71;
+	color: #2ecc71;
 }
 
 .bubble .time {
-    font-size: 0.7rem;
-    color: #999;
-    display: block;
-    margin-top: 4px;
-    text-align: right;
-    position: static;   /* ❌ 取消絕對定位 */
+	font-size: 0.7rem;
+	color: #999;
+	display: block;
+	margin-top: 4px;
+	text-align: right;
+	position: static; 
 }
+
 .input-area {
-    display: flex;
-    gap: 10px;
-    box-sizing: border-box;
+	display: flex;
+	gap: 10px;
+	box-sizing: border-box;
 }
 
 input[type="text"] {
-    flex: 1;
-    padding: 8px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+	flex: 1;
+	padding: 8px;
+	font-size: 16px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
 }
 
 button {
-    padding: 8px 16px;
-    background-color: #3498db;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+	padding: 8px 16px;
+	background-color: #3498db;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
 }
 
 button:hover {
-    background-color: #2980b9;
+	background-color: #2980b9;
 }
 </style>
 </head>
 <body>
 
-	<h2>
-		客服回應系統 | 編號 : <span th:text="${roomId}">0</span>
-	</h2>
+	<h2>與會員 [[${room.memberName}]] 連線中 | 編號
+	<span th:text="${roomId}">0</span></h2>
 
 	<div class="container">
 		<!-- ✔ 返回首頁放右上角 -->
@@ -143,99 +143,113 @@ button:hover {
 
 		<!-- ✔ 輸入框和發送按鈕 對齊對話框 -->
 		<div class="input-area">
-			<input id="msg" type="text" placeholder="輸入訊息..." />
+			<input id="msg" type="text" placeholder="輸入訊息..."
+				onkeydown="handleKey(event)" />
 			<button onclick="sendMessage()">送出</button>
 		</div>
 	</div>
 
 	<script th:inline="javascript">
-    const roomId = [[${roomId}]] + "";
-        const mySenderId = 9001;
-        const mySenderName = "IsleVilla 客服人員";
+const roomId = [[${roomId}]];
+const senderId = [[${senderId}]];
+const senderName = '[[${senderName}]]';
+const senderType = [[${senderType}]];  // ✔ 客服 → 1
+const chatStatus = [[${room.chatStatus}]];  // ✔ 狀態
 
-        document.querySelector("h2 span").innerText = roomId;
+console.log("🟥 客服聊天室 | roomId=", roomId, "senderId=", senderId, "senderName=", senderName);
 
-        const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/chat?roomId=${roomId}`);
+// WebSocket連線
+const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/chat?roomId=${roomId}`);
 
-        ws.onopen = () => {
-            console.log("✅ WebSocket 已連線聊天室", roomId);
-        };
+ws.onopen = () => console.log("✅ WebSocket 已連線聊天室", roomId);
+ws.onclose = () => console.log("❌ WebSocket 已關閉");
+ws.onerror = err => console.error("❌ WebSocket 錯誤", err);
 
-        ws.onmessage = (event) => {
-            const msg = JSON.parse(event.data);
-            const isMe = msg.senderId === mySenderId;
-            renderMessage(isMe, msg.senderName, msg.messageContent, msg.messageTime);
-        };
+ws.onmessage = event => {
+    const msg = JSON.parse(event.data);
+    const isMe = msg.senderId === senderId;
+    renderMessage(isMe, msg.senderName, msg.messageContent, msg.messageTime);
+};
 
-        ws.onclose = () => {
-            console.log("❌ WebSocket 已關閉");
-        };
+// 拉取歷史訊息
+window.onload = () => {
+    fetch(`/api/chat/room/${roomId}/history`)
+        .then(res => res.json())
+        .then(history => {
+            history.forEach(msg => {
+                const isMe = msg.senderId === senderId;
+                renderMessage(isMe, msg.senderName, msg.messageContent, msg.messageTime);
+            });
+        });
+};
 
-        ws.onerror = (err) => {
-            console.error("❌ WebSocket 錯誤", err);
-        };
+// 發送訊息
+function sendMessage() {
+    if (chatStatus === 0) {
+        alert("⚠️ 此聊天室已結束，無法發送訊息");
+        return;
+    }
 
-        /** ✔ 頁面加載時拉取歷史訊息 */
-        window.onload = () => {
-            fetch(`/api/chat/room/${roomId}/history`)
-                .then(res => res.json())
-                .then(history => {
-                    history.forEach(msg => {
-                        const isMe = msg.senderId === mySenderId;
-                        renderMessage(isMe, msg.senderName, msg.messageContent, msg.messageTime);
-                    });
-                });
-        };
+    const input = document.getElementById("msg");
+    const content = input.value.trim();
+    if (!content) return;
 
-        /** ✔ 發送訊息 */
-        function sendMessage() {
-            const input = document.getElementById("msg");
-            const content = input.value.trim();
-            if (!content) return;
+    const data = {
+        chatRoomId: roomId,
+        senderType: senderType,
+        senderId: senderId,
+        senderName: senderName,
+        messageContent: content
+    };
 
-            const data = {
-                chatRoomId: roomId,
-                senderType: 1,       // 1 = 客服
-                senderId: mySenderId,
-                senderName: mySenderName,
-                messageContent: content
-            };
+    ws.send(JSON.stringify(data));
+    input.value = "";
+    console.log("🟨 發送訊息", data);
+}
 
-            ws.send(JSON.stringify(data));
-            input.value = "";
-        }
+// 渲染訊息
+function renderMessage(isMe, sender, content, timeMillis) {
+    const div = document.createElement("div");
+    div.className = "msg " + (isMe ? "right" : "left");
 
-        /** ✔ 渲染訊息 */
-        function renderMessage(isMe, sender, content, timeMillis) {
-            const chat = document.getElementById("chat");
-            const div = document.createElement("div");
-            div.className = "msg " + (isMe ? "right" : "left");
+    const timeStr = timeMillis ? formatTime(timeMillis) : formatTime(Date.now());
 
-            const timeStr = timeMillis ? formatTime(timeMillis) : formatTime(Date.now());
+    // 客服名字統一
+    const displayName = isMe ? 'IsleVilla 客服' : sender;
 
-            div.innerHTML = `
-                <div class="bubble">
-                    <span class="name">${sender}</span>
-                    <span class="content">${content}</span>
-                    <span class="time">${timeStr}</span>
-                </div>
-            `;
-            chat.appendChild(div);
-            chat.scrollTop = chat.scrollHeight;
-        }
+    div.innerHTML = `
+        <div class="bubble">
+            <span class="name">${displayName}</span>
+            <span class="content">${content}</span>
+            <span class="time">${timeStr}</span>
+        </div>
+    `;
+    const chat = document.getElementById("chat");
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+}
 
-        /** ✔ 格式化時間 */
-        function formatTime(timestamp) {
-            const date = new Date(timestamp);
-            const hh = date.getHours().toString().padStart(2, '0');
-            const mm = date.getMinutes().toString().padStart(2, '0');
-            return `${hh}:${mm}`;
-        }
-        /** ✔ 返回聊天室選單 */
-        function gochatlist() {
-            window.location.href = "/backend/chat/room/list";   
-        }
-    </script>
+// 格式化時間
+function formatTime(timestamp) {
+    const date = new Date(timestamp);
+    const hh = date.getHours().toString().padStart(2, '0');
+    const mm = date.getMinutes().toString().padStart(2, '0');
+    return `${hh}:${mm}`;
+}
+
+// 返回聊天室列表
+function gochatlist() {
+    window.location.href = "/backend/chat/room/list";
+}
+
+// Enter發送
+function handleKey(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        sendMessage();
+    }
+}
+</script>
 
 </body>
 </html>

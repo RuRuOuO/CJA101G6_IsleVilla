@@ -148,89 +148,103 @@ button:hover {
 		</div>
 	</div>
 
-	<script th:inline="javascript">
-    const roomId = [[${roomId}]];
-    const mySenderId = [[${senderId}]];
-    const mySenderName = [[${senderName}]];
-    const senderType = [[${senderType}]];
+<script th:inline="javascript">
+const roomId = [[${roomId}]];
+const senderId = [[${senderId}]];
+const senderName = '[[${senderName}]]';
+const senderType = [[${senderType}]];  // ✔ 會員 → 0
+const chatStatus = [[${room.chatStatus}]];  // ✔ 狀態
 
-    const chat = document.getElementById("chat");
-    const roomDisplay = document.getElementById("roomDisplay");
-    roomDisplay.innerText = roomId;
+console.log("🟦 會員聊天室 | roomId=", roomId, "senderId=", senderId, "senderName=", senderName);
 
-    const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/chat?roomId=${roomId}`);
+// WebSocket連線
+const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/chat?roomId=${roomId}`);
 
-    ws.onopen = () => console.log("✅ WebSocket 已連線聊天室", roomId);
-    ws.onclose = () => console.log("❌ WebSocket 已關閉");
-    ws.onerror = err => console.error("❌ WebSocket 錯誤", err);
+ws.onopen = () => console.log("✅ WebSocket 已連線聊天室", roomId);
+ws.onclose = () => console.log("❌ WebSocket 已關閉");
+ws.onerror = err => console.error("❌ WebSocket 錯誤", err);
 
-    ws.onmessage = event => {
-        const msg = JSON.parse(event.data);
-        const isMe = msg.senderId === mySenderId;
-        renderMessage(isMe, msg.senderName, msg.messageContent, msg.messageTime);
-    };
+ws.onmessage = event => {
+    const msg = JSON.parse(event.data);
+    const isMe = msg.senderId === senderId;
+    renderMessage(isMe, msg.senderName, msg.messageContent, msg.messageTime);
+};
 
-    window.onload = () => {
-        fetch(`/api/chat/room/${roomId}/history`)
-            .then(res => res.json())
-            .then(history => {
-                history.forEach(msg => {
-                    const isMe = msg.senderId === mySenderId;
-                    renderMessage(isMe, msg.senderName, msg.messageContent, msg.messageTime);
-                });
+// 拉取歷史訊息
+window.onload = () => {
+    fetch(`/api/chat/room/${roomId}/history`)
+        .then(res => res.json())
+        .then(history => {
+            history.forEach(msg => {
+                const isMe = msg.senderId === senderId;
+                renderMessage(isMe, msg.senderName, msg.messageContent, msg.messageTime);
             });
+        });
+};
+
+// 發送訊息
+function sendMessage() {
+    if (chatStatus === 0) {
+        alert("⚠️ 此聊天室已結束，無法發送訊息");
+        return;
+    }
+
+    const input = document.getElementById("msg");
+    const content = input.value.trim();
+    if (!content) return;
+
+    const data = {
+        chatRoomId: roomId,
+        senderType: senderType,
+        senderId: senderId,
+        senderName: senderName,
+        messageContent: content
     };
 
-    function sendMessage() {
-        const input = document.getElementById("msg");
-        const content = input.value.trim();
-        if (!content) return;
+    ws.send(JSON.stringify(data));
+    input.value = "";
+    console.log("🟩 發送訊息", data);
+}
 
-        const data = {
-            chatRoomId: roomId,
-            senderType: senderType,  //從後端傳入
-            senderId: mySenderId,
-            senderName: mySenderName,
-            messageContent: content
-        };
+// 渲染訊息
+function renderMessage(isMe, sender, content, timeMillis) {
+    const div = document.createElement("div");
+    div.className = "msg " + (isMe ? "right" : "left");
 
-        ws.send(JSON.stringify(data));
-        input.value = "";
+    const timeStr = timeMillis ? formatTime(timeMillis) : formatTime(Date.now());
+
+    div.innerHTML = `
+        <div class="bubble">
+            <span class="name">${sender}</span>
+            <span class="content">${content}</span>
+            <span class="time">${timeStr}</span>
+        </div>
+    `;
+    const chat = document.getElementById("chat");
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+}
+
+// 格式化時間
+function formatTime(timestamp) {
+    const date = new Date(timestamp);
+    const hh = date.getHours().toString().padStart(2, '0');
+    const mm = date.getMinutes().toString().padStart(2, '0');
+    return `${hh}:${mm}`;
+}
+
+// 返回首頁
+function goHome() {
+    window.location.href = "/";
+}
+
+// Enter發送
+function handleKey(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        sendMessage();
     }
-
-    function handleKey(event) {
-        if (event.key === "Enter") {
-            sendMessage();
-        }
-    }
-
-    function renderMessage(isMe, sender, content, timeMillis) {
-        const div = document.createElement("div");
-        div.className = "msg " + (isMe ? "right" : "left");
-
-        const timeStr = timeMillis ? formatTime(timeMillis) : formatTime(Date.now());
-
-        div.innerHTML = `
-            <div class="bubble">
-                <span class="name">${sender}</span>
-                <span class="content">${content}</span>
-                <span class="time">${timeStr}</span>
-            </div>
-        `;
-        chat.appendChild(div);
-        chat.scrollTop = chat.scrollHeight;
-    }
-
-    function formatTime(timestamp) {
-        const date = new Date(timestamp);
-        const hh = date.getHours().toString().padStart(2, '0');
-        const mm = date.getMinutes().toString().padStart(2, '0');
-        return `${hh}:${mm}`;
-    }
-
-    function goHome() {
-        window.location.href = "/";  // ✔ 請根據你的首頁修改
-    }
+}
 </script>
 
 </body>
