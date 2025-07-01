@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>會員管理 - 系統管理</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet"> -->
+    <style>
+        .status-badge-0 {
+            background-color: #ffc107;
+        }
+
+        .status-badge-1 {
+            background-color: #198754;
+        }
+
+        .status-badge-2 {
+            background-color: #dc3545;
+        }
+
+        .member-photo {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+        }
+
+        .stats-card {
+            border-left: 4px solid;
+        }
+
+        .stats-card-primary {
+            border-left-color: #0d6efd;
+        }
+
+        .stats-card-success {
+            border-left-color: #198754;
+        }
+
+        .stats-card-warning {
+            border-left-color: #ffc107;
+        }
+
+        .stats-card-danger {
+            border-left-color: #dc3545;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ===== 載入sidebar ===== -->
+    <!-- 插入手機版側邊欄 -->
+    <div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+    <!-- 插入桌面版側邊欄 -->
+    <div th:replace="~{fragments/backFragments :: sidebar}"></div>
+    <main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+        <th:block th:fragment="myContent">
+            <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+            <div class="container-fluid py-4">
+                <!-- 頁面標題 -->
+                <div class="row mb-4">
+                    <div class="col">
+                        <h2><i class="bi bi-people-fill"></i> 會員帳號管理</h2>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/backend/dashboard">後台首頁</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">會員帳號管理</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- 統計卡片 -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card stats-card stats-card-primary">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="card-title text-muted mb-2">總會員數</h6>
+                                        <h3 class="mb-0" th:text="${totalMembers}">0</h3>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="bi bi-people text-primary fs-2"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stats-card stats-card-success">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="card-title text-muted mb-2">已驗證</h6>
+                                        <h3 class="mb-0" th:text="${statusStats['停用'] ?: 0}">0</h3>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="bi bi-x-circle text-danger fs-2"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 操作區域 -->
+                <div class="row mb-4">
+                    <div class="col-md-8">
+                        <!-- 搜尋和篩選 -->
+                        <form method="get" th:action="@{/backend/member/management}" class="row g-3">
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" name="search" th:value="${search}"
+                                        placeholder="搜尋姓名或信箱...">
+                                    <button class="btn btn-outline-secondary" type="submit">
+                                        <i class="bi bi-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" name="status" onchange="this.form.submit()">
+                                    <option value="">所有狀態</option>
+                                    <option value="0" th:selected="${status == 0}">未驗證</option>
+                                    <option value="1" th:selected="${status == 1}">已驗證</option>
+                                    <option value="2" th:selected="${status == 2}">停用</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" name="gender" onchange="this.form.submit()">
+                                    <option value="">所有性別</option>
+                                    <option value="0" th:selected="${gender == 0}">男生</option>
+                                    <option value="1" th:selected="${gender == 1}">女生</option>
+                                    <option value="2" th:selected="${gender == 2}">其它</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <a th:href="@{/backend/member}" class="btn btn-secondary w-100">
+                                    <i class="bi bi-arrow-clockwise"></i> 重置
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <button type="button" class="btn btn-success" onclick="batchUpdateStatus(1)">
+                            <i class="bi bi-check-circle"></i> 批量驗證
+                        </button>
+                        <button type="button" class="btn btn-danger" onclick="batchUpdateStatus(2)">
+                            <i class="bi bi-x-circle"></i> 批量停用
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 提示訊息 -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle-fill"></i> <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${warning}" class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill"></i> <span th:text="${warning}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-x-circle-fill"></i> <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- 會員列表 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">會員列表</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>
+                                            <input type="checkbox" id="selectAll" class="form-check-input">
+                                        </th>
+                                        <th>照片</th>
+                                        <th>
+                                            <a th:href="@{/backend/member(sortBy='memberName', sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}, search=${search}, status=${status}, gender=${gender})}"
+                                                class="text-decoration-none">
+                                                姓名
+                                                <i class="bi bi-arrow-up"
+                                                    th:if="${sortBy == 'memberName' && sortDir == 'asc'}"></i>
+                                                <i class="bi bi-arrow-down"
+                                                    th:if="${sortBy == 'memberName' && sortDir == 'desc'}"></i>
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a th:href="@{/backend/member(sortBy='memberEmail', sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}, search=${search}, status=${status}, gender=${gender})}"
+                                                class="text-decoration-none">
+                                                電子信箱
+                                                <i class="bi bi-arrow-up"
+                                                    th:if="${sortBy == 'memberEmail' && sortDir == 'asc'}"></i>
+                                                <i class="bi bi-arrow-down"
+                                                    th:if="${sortBy == 'memberEmail' && sortDir == 'desc'}"></i>
+                                            </a>
+                                        </th>
+                                        <th>電話</th>
+                                        <th>性別</th>
+                                        <th>狀態</th>
+                                        <th>
+                                            <a th:href="@{/backend/member(sortBy='memberCreatedAt', sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}, search=${search}, status=${status}, gender=${gender})}"
+                                                class="text-decoration-none">
+                                                註冊時間
+                                                <i class="bi bi-arrow-up"
+                                                    th:if="${sortBy == 'memberCreatedAt' && sortDir == 'asc'}"></i>
+                                                <i class="bi bi-arrow-down"
+                                                    th:if="${sortBy == 'memberCreatedAt' && sortDir == 'desc'}"></i>
+                                            </a>
+                                        </th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="member : ${membersPage.content}">
+                                        <td>
+                                            <input type="checkbox" class="form-check-input member-checkbox"
+                                                th:value="${member.memberId}">
+                                        </td>
+                                        <td>
+                                            <img th:if="${member.memberPhoto != null}"
+                                                th:src="@{'data:image/jpeg;base64,' + ${T(java.util.Base64).getEncoder().encodeToString(member.memberPhoto)}}"
+                                                class="rounded-circle member-photo" alt="會員照片">
+                                            <div th:unless="${member.memberPhoto != null}"
+                                                class="rounded-circle member-photo bg-secondary d-flex align-items-center justify-content-center">
+                                                <i class="bi bi-person text-white"></i>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold" th:text="${member.memberName}"></div>
+                                            <small class="text-muted"
+                                                th:text="${#temporals.format(member.memberBirthdate, 'yyyy/MM/dd')}"></small>
+                                        </td>
+                                        <td th:text="${member.memberEmail}"></td>
+                                        <td th:text="${member.memberPhone}"></td>
+                                        <td>
+                                            <span th:switch="${member.memberGender}">
+                                                <span th:case="0" class="badge bg-primary">男生</span>
+                                                <span th:case="1" class="badge bg-info">女生</span>
+                                                <span th:case="2" class="badge bg-secondary">其它</span>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <select class="form-select form-select-sm status-select"
+                                                th:data-member-id="${member.memberId}"
+                                                onchange="updateMemberStatus(this)">
+                                                <option value="0" th:selected="${member.memberStatus == 0}">未驗證</option>
+                                                <option value="1" th:selected="${member.memberStatus == 1}">已驗證</option>
+                                                <option value="2" th:selected="${member.memberStatus == 2}">停用</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted"
+                                                th:text="${#temporals.format(member.memberCreatedAt, 'yyyy/MM/dd HH:mm')}"></small>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a th:href="@{/backend/member/view/{id}(id=${member.memberId})}"
+                                                    class="btn btn-sm btn-outline-info" title="查看">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <a th:href="@{/backend/member/edit/{id}(id=${member.memberId})}"
+                                                    class="btn btn-sm btn-outline-primary" title="編輯">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                                    onclick="deleteMember(this)" th:data-member-id="${member.memberId}"
+                                                    th:data-member-name="${member.memberName}" title="刪除">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${membersPage.empty}">
+                                        <td colspan="9" class="text-center py-4">
+                                            <i class="bi bi-inbox text-muted fs-1"></i>
+                                            <p class="text-muted mt-2">沒有找到符合條件的會員</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 分頁 -->
+                <nav th:if="${membersPage.totalPages > 1}" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${membersPage.first} ? 'disabled'">
+                            <a class="page-link"
+                                th:href="@{/backend/member(page=0, size=${pageSize}, sortBy=${sortBy}, sortDir=${sortDir}, search=${search}, status=${status}, gender=${gender})}">
+                                <i class="bi bi-chevron-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item" th:classappend="${membersPage.first} ? 'disabled'">
+                            <a class="page-link"
+                                th:href="@{/backend/member(page=${currentPage - 1}, size=${pageSize}, sortBy=${sortBy}, sortDir=${sortDir}, search=${search}, status=${status}, gender=${gender})}">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+
+                        <li class="page-item"
+                            th:each="i : ${#numbers.sequence(T(java.lang.Math).max(0, currentPage - 2), T(java.lang.Math).min(membersPage.totalPages - 1, currentPage + 2))}"
+                            th:classappend="${i == currentPage} ? 'active'">
+                            <a class="page-link"
+                                th:href="@{/backend/member(page=${i}, size=${pageSize}, sortBy=${sortBy}, sortDir=${sortDir}, search=${search}, status=${status}, gender=${gender})}"
+                                th:text="${i + 1}"></a>
+                        </li>
+
+                        <li class="page-item" th:classappend="${membersPage.last} ? 'disabled'">
+                            <a class="page-link"
+                                th:href="@{/backend/member(page=${currentPage + 1}, size=${pageSize}, sortBy=${sortBy}, sortDir=${sortDir}, search=${search}, status=${status}, gender=${gender})}">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item" th:classappend="${membersPage.last} ? 'disabled'">
+                            <a class="page-link"
+                                th:href="@{/backend/member(page=${membersPage.totalPages - 1}, size=${pageSize}, sortBy=${sortBy}, sortDir=${sortDir}, search=${search}, status=${status}, gender=${gender})}">
+                                <i class="bi bi-chevron-double-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="text-center mt-2">
+                        <small class="text-muted">
+                            顯示第 <span th:text="${currentPage * pageSize + 1}"></span> 到
+                            <span th:text="${T(java.lang.Math).min(((currentPage + 1) * pageSize).longValue(), membersPage.totalElements)}"></span>
+                            筆，
+                            共 <span th:text="${membersPage.totalElements}"></span> 筆記錄
+                        </small>
+                    </div>
+                </nav>
+            </div>
+
+            <!-- 刪除確認 Modal -->
+            <div class="modal fade" id="deleteModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">確認刪除</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>您確定要刪除會員 <strong id="deleteMemberName"></strong> 嗎？</p>
+                            <p class="text-danger">此操作無法復原！</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                            <form id="deleteForm" method="post" style="display: inline;">
+                                <button type="submit" class="btn btn-danger">確定刪除</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+        </th:block>
+    </main>
+
+    <!-- ===== 載入統一的 JavaScript ===== -->
+    <th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
+
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
+    <script>
+        // 全選/取消全選
+        document.getElementById('selectAll').addEventListener('change', function () {
+            const checkboxes = document.querySelectorAll('.member-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+
+        // 更新會員狀態
+        function updateMemberStatus(selectElement) {
+            const memberId = selectElement.dataset.memberId;
+            const status = selectElement.value;
+
+            fetch(`/backend/member/status/${memberId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `status=${status}`
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 可以添加成功提示
+                        console.log('狀態更新成功');
+                    } else {
+                        alert('狀態更新失敗: ' + data.message);
+                        // 恢復原狀態
+                        selectElement.selectedIndex = 0;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('狀態更新失敗');
+                    selectElement.selectedIndex = 0;
+                });
+        }
+
+        // 批量更新狀態
+        function batchUpdateStatus(status) {
+            const checkedBoxes = document.querySelectorAll('.member-checkbox:checked');
+            if (checkedBoxes.length === 0) {
+                alert('請選擇要操作的會員');
+                return;
+            }
+
+            const memberIds = Array.from(checkedBoxes).map(cb => cb.value);
+            const statusName = status === 1 ? '驗證' : '停用';
+
+            if (confirm(`確定要${statusName}選中的 ${memberIds.length} 個會員嗎？`)) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/backend/member/batch-status';
+
+                memberIds.forEach(id => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'memberIds';
+                    input.value = id;
+                    form.appendChild(input);
+                });
+
+                const statusInput = document.createElement('input');
+                statusInput.type = 'hidden';
+                statusInput.name = 'status';
+                statusInput.value = status;
+                form.appendChild(statusInput);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        // 刪除會員
+        function deleteMember(button) {
+            const memberId = button.dataset.memberId;
+            const memberName = button.dataset.memberName;
+
+            document.getElementById('deleteMemberName').textContent = memberName;
+            document.getElementById('deleteForm').action = `/backend/member/delete/${memberId}`;
+
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            deleteModal.show();
+        }
+
+        // 監聽複選框變化，更新全選狀態
+        document.addEventListener('change', function (e) {
+            if (e.target.classList.contains('member-checkbox')) {
+                const allCheckboxes = document.querySelectorAll('.member-checkbox');
+                const checkedCheckboxes = document.querySelectorAll('.member-checkbox:checked');
+                const selectAllCheckbox = document.getElementById('selectAll');
+
+                if (checkedCheckboxes.length === 0) {
+                    selectAllCheckbox.indeterminate = false;
+                    selectAllCheckbox.checked = false;
+                } else if (checkedCheckboxes.length === allCheckboxes.length) {
+                    selectAllCheckbox.indeterminate = false;
+                    selectAllCheckbox.checked = true;
+                } else {
+                    selectAllCheckbox.indeterminate = true;
+                }
+            }
+        });
+    </script>
+</body>

@@ -1,0 +1,46 @@
+.sortable-ghost {
+    opacity: 0.4;
+}
+
+.sortable-chosen {
+    transform: scale(1.05);
+}
+
+.sortable-drag {
+    transform: rotate(5deg);
+}
+
+.img-thumbnail {
+    border: 2px solid #dee2e6;
+    transition: all 0.2s ease;
+}
+
+.img-thumbnail:hover {
+    border-color: #007bff;
+    transform: scale(1.02);
+}
+
+.position-relative .btn-danger {
+    transform: translate(50%, -50%);
+}
+
+.table-responsive {
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.badge {
+    font-size: 0.75em;
+    font-weight: 500;
+}
+
+.modal-content {
+    border: none;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.alert {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
