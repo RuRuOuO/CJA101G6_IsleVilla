@@ -19,7 +19,7 @@
     <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
     <div class="container">
       <h2 class="card-title">優惠專案管理</h2>
-      <a class="btn btn-primary" th:href="@{/promotion/add}">新增專案</a>
+      <a class="btn btn-primary" th:href="@{/backend/promotion/add}">新增專案</a>
 
 
       <table class="table table-striped">
@@ -38,15 +38,15 @@
 			<tr>
 				<td th:text="${promotion.roomPromotionId}"></td>
 				<td th:text="${promotion.roomPromotionTitle}"></td>
-				<td th:text="${#dates.format(promotion.promotionStartDate, 'yyyy-MM-dd')}"></td>
-                <td th:text="${#dates.format(promotion.promotionEndDate, 'yyyy-MM-dd')}"></td>
+				<td th:text="${promotion.promotionStartDate != null ? promotion.promotionStartDate.toLocalDate() : ''}"></td>
+<td th:text="${promotion.promotionEndDate != null ? promotion.promotionEndDate.toLocalDate() : ''}"></td>
 				<td th:text="${promotion.promotionRemark}"></td>
                 <td>
-                    <form method="post" th:action="@{/promotion/getOneForUpdate}" style="display: inline-block; margin-bottom: 0px;">
+                    <form method="post" th:action="@{/backend/promotion/getOneForUpdate}" style="display: inline-block; margin-bottom: 0px;">
                         <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-pencil-fill me-1"></i>修改</button>
                         <input type="hidden" name="roomPromotionId" th:value="${promotion.roomPromotionId}">
                     </form>
-                    <form method="post" th:action="@{/promotion/delete}" style="display: inline-block; margin-bottom: 0px;" onsubmit="return confirm('您確定要刪除這筆優惠專案嗎？');">
+                    <form method="post" th:action="@{/backend/promotion/delete}" style="display: inline-block; margin-bottom: 0px;" onsubmit="return confirm('您確定要刪除這筆優惠專案嗎？');">
                         <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash-fill me-1"></i>刪除</button>
                         <input type="hidden" name="roomPromotionId" th:value="${promotion.roomPromotionId}">
                     </form>
