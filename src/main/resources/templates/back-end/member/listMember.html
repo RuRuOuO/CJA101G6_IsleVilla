@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>微嶼 | Isle Villa 後台 - 會員帳號管理</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+    <link href="/css/listMember.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- ===== 載入sidebar ===== -->
+    <!-- 插入手機版側邊欄 -->
+    <div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+    <!-- 插入桌面版側邊欄 -->
+    <div th:replace="~{fragments/backFragments :: sidebar}"></div>
+
+    <main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+        <th:block th:fragment="myContent">
+            <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+
+            <!-- 卡片標題與新增按鈕 -->
+            <div class="card-header bg-transparent border-0 pt-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0 fw-bold ">
+                        <i class="bi bi-people-fill me-2"></i>會員帳號管理
+                    </h4>
+                    <a class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addMemberModal">
+                        <i class="bi bi-plus-circle me-2"></i>新增會員
+                    </a>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <!-- 搜尋與篩選 -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" class="form-control" id="searchInput" placeholder="搜尋會員姓名、編號" />
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="genderFilter">
+                            <option value="">所有性別</option>
+                            <option value="0" th:selected="${selectedStatus != null and selectedStatus == 0}">男生
+                            </option>
+                            <option value="1" th:selected="${selectedStatus != null and selectedStatus == 1}">女生
+                            </option>
+                            <option value="2" th:selected="${selectedStatus != null and selectedStatus == 2}">其它
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="statusFilter">
+                            <option value="">所有狀態</option>
+                            <option value="0" th:selected="${selectedStatus != null and selectedStatus == 0}">未驗證
+                            </option>
+                            <option value="1" th:selected="${selectedStatus != null and selectedStatus == 1}">已驗證
+                            </option>
+                            <option value="2" th:selected="${selectedStatus != null and selectedStatus == 2}">停用
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 會員表格 -->
+                <div class="table-responsive">
+                    <table id="memberTable" class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>編號</th>
+                                <th>姓名</th>
+                                <th>電子信箱</th>
+                                <th>電話</th>
+                                <th>性別</th>
+                                <th>狀態</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="member : ${memberList}">
+                                <td th:text="${member.memberId}">會員編號</td>
+                                <td th:text="${member.memberName}">會員姓名</td>
+                                <td th:text="${member.memberEmail}">會員電子信箱</td>
+                                <td th:text="${member.memberPhone}">會員電話</td>
+                                <td>
+                                    <span th:switch="${member.memberGender}">
+                                        <span th:case="0" class="badge bg-primary">男生</span>
+                                        <span th:case="1" class="badge bg-info">女生</span>
+                                        <span th:case="2" class="badge bg-secondary">其它</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span th:switch="${member.memberStatus}">
+                                        <span th:case="0" class="badge rounded-pill bg-secondary">未驗證</span>
+                                        <span th:case="1" class="badge rounded-pill bg-success">已驗證</span>
+                                        <span th:case="2" class="badge rounded-pill bg-danger">停用</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2 flex-wrap">
+                                        <a data-bs-toggle="modal" data-bs-target="#editMemberModal"
+                                            class="btn btn-sm btn-primary" th:attr="
+                                     data-id=${member.memberId},
+                                     data-email=${member.memberEmail},
+                                     data-name=${member.memberName},
+                                     data-birthdate=${member.memberBirthdate},
+                                     data-gender=${member.memberGender},
+                                     data-phone=${member.memberPhone},
+                                     data-address=${member.memberAddress},
+                                     data-created-at=${member.memberCreatedAt},
+                                     data-last-login-time=${member.memberLastLoginTime},
+                                     data-status=${member.memberStatus}
+                                   ">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+            </div>
+        </th:block>
+        </div>
+    </main>
+    <!-- 新增會員 Modal -->
+    <div class="modal fade" id="addMemberModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-plus-circle me-2"></i>新增會員
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="card-header bg-transparent border-0 pt-4">
+                    <div class="d-flex justify-content-between align-items-center">
+
+
+                    </div>
+                </div>
+                <form th:object="${member}" method="post" id="addMemberForm" novalidate enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="memberName" class="form-label">會員姓名 <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="memberName" th:field="*{memberName}"
+                                    required>
+                                <div class="invalid-feedback">請輸入會員姓名</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="memberEmail" class="form-label">會員電子信箱 <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="memberEmail" th:field="*{memberEmail}"
+                                    required>
+                                <div class="invalid-feedback">請輸入會員電子信箱</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="memberAddress" class="form-label">會員地址 <span
+                                    class="text-danger">*</span></label>
+                            <textarea class="form-control" id="memberAddress" th:field="*{memberAddress}" rows="3"
+                                required></textarea>
+                            <div class="invalid-feedback">請輸入會員地址</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="memberGender" class="form-label">會員性別 <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="memberGender" th:field="*{memberGender}" required>
+                                    <option value="">請選擇性別</option>
+                                    <option th:value="0" th:selected="*{memberGender == 0}">男生</option>
+                                    <option th:value="1" th:selected="*{memberGender == 1}">女生</option>
+                                    <option th:value="2" th:selected="*{memberGender == 2}">其它</option>
+                                </select>
+                                <div class="invalid-feedback">請選擇會員性別</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="memberStatus" class="form-label">狀態 <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="memberStatus" th:field="*{memberStatus}" required>
+                                    <option value="">請選擇狀態</option>
+                                    <option th:value="0" th:selected="*{memberStatus == 0}">未驗證</option>
+                                    <option th:value="1" th:selected="*{memberStatus == 1}">已驗證</option>
+                                    <option th:value="2" th:selected="*{memberStatus == 2}">停用</option>
+                                </select>
+                                <div class="invalid-feedback">請選擇會員狀態</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">會員照片（可拖曳）</label>
+                            <input type="file" class="form-control" id="addMemberPhotoInput" accept="image/*" multiple
+                                style="max-width:300px;">
+                            <div class="mt-2 d-flex flex-wrap gap-2" id="addMemberPhotoPreview"></div>
+                            <small class="text-muted">點擊右上角可刪除</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle me-2"></i>儲存
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 修改會員 Modal -->
+    <div class="modal fade" id="editMemberModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-plus-circle me-2"></i>修改會員資料
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="card-header bg-transparent border-0 pt-4">
+                    <div class="d-flex justify-content-between align-items-center">
+
+
+                    </div>
+                </div>
+                <form th:object="${member}" method="post" id="editMemberForm" novalidate enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <input type="hidden" name="memberId" />
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editMemberName" class="form-label">會員姓名 <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="editMemberName" th:field="*{memberName}"
+                                    required>
+                                <div class="invalid-feedback">請輸入會員姓名</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editMemberEmail" class="form-label">會員電子信箱 <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="editMemberEmail" th:field="*{memberEmail}"
+                                    required>
+                                <div class="invalid-feedback">請輸入會員電子信箱</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editMemberAddress" class="form-label">會員地址 <span
+                                    class="text-danger">*</span></label>
+                            <textarea class="form-control" id="editMemberAddress" th:field="*{memberAddress}" rows="3"
+                                required></textarea>
+                            <div class="invalid-feedback">請輸入會員地址</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editMemberGender" class="form-label">會員性別 <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="editMemberGender" th:field="*{memberGender}" required>
+                                    <option value="">請選擇性別</option>
+                                    <option th:value="0" th:selected="*{memberGender == 0}">男生</option>
+                                    <option th:value="1" th:selected="*{memberGender == 1}">女生</option>
+                                    <option th:value="2" th:selected="*{memberGender == 2}">其它</option>
+                                </select>
+                                <div class="invalid-feedback">請選擇會員性別</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editMemberStatus" class="form-label">會員狀態 <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="editMemberStatus" th:field="*{memberStatus}" required>
+                                    <option value="">請選擇狀態</option>
+                                    <option th:value="0" th:selected="*{memberStatus == 0}">未驗證</option>
+                                    <option th:value="1" th:selected="*{memberStatus == 1}">已驗證</option>
+                                    <option th:value="2" th:selected="*{memberStatus == 2}">停用</option>
+                                </select>
+                                <div class="invalid-feedback">請選擇會員狀態</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">會員照片（可拖曳）</label>
+                            <div id="memberPhotoSortArea" class="d-flex flex-wrap gap-2"></div>
+                            <input type="file" class="form-control mt-2" id="editMemberPhotoInput" accept="image/*"
+                                multiple style="max-width:300px;">
+                            <small class="text-muted">點擊右上角可刪除</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle me-2"></i>儲存
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+	<script src="/js/listMember.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <!-- ===== 載入統一腳本 ===== -->
+    <th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
+
+</body>
+
+</html>
