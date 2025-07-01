@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,12 +15,25 @@ import java.util.Optional;
 public class RoomRVOrderService {
     @Autowired
     private RoomRVOrderRepository roomRVOrderRepository;
-    @Autowired
-    private MembersRepository membersRepository;
 
-    // 查詢全部
+    // 查詢全部 // 分頁
     public Page<RoomRVOrder> getAll(Pageable pageable) {
         return roomRVOrderRepository.findAll(pageable);
+    }
+
+    // 查詢全部
+    public List<RoomRVOrder> findAll() {
+        return roomRVOrderRepository.findAll();
+    }
+
+    // 查詢全部且按日期排序
+    public List<RoomRVOrder> getAllOrders() {
+        return roomRVOrderRepository.findAllByOrderByRoomOrderDateDesc();
+    }
+
+    // 查詢可操作(成立或入住中)的訂單
+    public List<RoomRVOrder> getOperableOrders() {
+        return roomRVOrderRepository.findByRoomOrderStatusIn(Arrays.asList(0, 1));
     }
 
     // 用id查詢單筆
@@ -42,7 +56,7 @@ public class RoomRVOrderService {
     public void cancelOrderFront(Integer orderId) {
         RoomRVOrder order = getById(orderId);
         if (order != null) {
-            order.setRoomOrderStatus("3");
+            order.setRoomOrderStatus(3);
             updateRoomRVOrder(order);
         }
     }
@@ -51,7 +65,7 @@ public class RoomRVOrderService {
     public void cancelOrderBack(Integer orderId) {
         RoomRVOrder order = getById(orderId);
         if (order != null) {
-            order.setRoomOrderStatus("4");
+            order.setRoomOrderStatus(4);
             updateRoomRVOrder(order);
         }
     }

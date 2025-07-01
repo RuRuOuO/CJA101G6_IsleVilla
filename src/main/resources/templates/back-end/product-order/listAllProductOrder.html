@@ -78,14 +78,16 @@
                                 <td th:text="${order.orderStatus == 0 ? '訂單成立' : (order.orderStatus == 1 ? '配送中' : '已完成')}"></td>
                                 <td th:text="${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
                                 <td>
-                                    <a type="button" class="btn btn-sm btn-primary" onclick="openEditModal(this)"
-                                        th:attr="data-id=${order.productOrderId},data-name=${order.contactName},data-phone=${order.contactPhone},data-address=${order.contactAddress},data-note=${order.note},data-status=${order.orderStatus}">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <a type="button" class="btn btn-sm btn-info ms-1" onclick="openDetailModal(this)"
-                                        th:attr="data-id=${order.productOrderId},data-member=${order.member.memberName},data-amount=${order.productOrderAmount},data-discount=${order.discountAmount},data-paid=${order.productPaidAmount},data-payment=${order.paymentMethod == 0 ? '信用卡' : '現金付款'},data-shipping=${order.shippingMethod == 0 ? '宅配' : '飯店自取'},data-name=${order.contactName},data-phone=${order.contactPhone},data-address=${order.contactAddress},data-note=${order.note},data-status=${order.orderStatus == 0 ? '訂單成立' : (order.orderStatus == 1 ? '配送中' : '已完成')},data-time=${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm:ss')}">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
+                                    <div class="d-flex justify-content-center align-items-center">
+                                        <a type="button" class="btn btn-sm btn-primary me-1" onclick="openEditModal(this)"
+                                            th:attr="data-id=${order.productOrderId},data-name=${order.contactName},data-phone=${order.contactPhone},data-address=${order.contactAddress},data-note=${order.note},data-status=${order.orderStatus}">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a type="button" class="btn btn-sm btn-info" onclick="openDetailModal(this)"
+                                            th:attr="data-id=${order.productOrderId},data-member=${order.member.memberName},data-amount=${order.productOrderAmount},data-discount=${order.discountAmount},data-paid=${order.productPaidAmount},data-payment=${order.paymentMethod == 0 ? '信用卡' : '現金付款'},data-shipping=${order.shippingMethod == 0 ? '宅配' : '飯店自取'},data-name=${order.contactName},data-phone=${order.contactPhone},data-address=${order.contactAddress},data-note=${order.note},data-status=${order.orderStatus == 0 ? '訂單成立' : (order.orderStatus == 1 ? '配送中' : '已完成')},data-time=${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm:ss')}">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>

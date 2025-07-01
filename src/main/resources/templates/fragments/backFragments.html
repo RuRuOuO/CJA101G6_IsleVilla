@@ -150,7 +150,7 @@
     </a>
     <hr class="my-4" style="border-color: #e3e6f0; opacity: 0.5;">
     <ul class="list-unstyled ps-0 sidebar-menu" id="sidebarMenu">
-        <!-- 分類1 -->
+        <!-- 員工管理 -->
         <li class="mb-1">
             <button
                     class="btn btn-toggle d-flex justify-content-between align-items-center w-100 rounded border-0 text-white"
@@ -179,7 +179,7 @@
             </div>
         </li>
 
-        <!-- 分類2 -->
+        <!-- 購物管理 -->
         <li class="mb-1" sec:authorize="hasAuthority('product')">
             <button
                     class="btn btn-toggle d-flex justify-content-between align-items-center w-100 rounded border-0 text-white"
@@ -209,7 +209,120 @@
                 </ul>
             </div>
         </li>
+
+        <!-- 住房管理 -->
+        <li class="mb-1">
+            <button
+                    class="btn btn-toggle d-flex justify-content-between align-items-center w-100 rounded border-0 text-white"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#dashboard-room"
+                    aria-expanded="false"
+            >
+                住房管理
+                <i class="bi bi-chevron-down fs-6"></i>
+            </button>
+            <div class="collapse" id="dashboard-room">
+                <ul
+                        class="btn-toggle-nav list-unstyled fw-normal pb-2 ps-4 lh-lg"
+                >
+                    <li>
+                        <a th:href="@{/backend/check-in-out/list}"
+                           class="link-body-emphasis text-white">住房管理</a>
+                    </li>
+                    <li>
+                        <a th:href="@{/backend/room-reservation/list}"
+                           class="link-body-emphasis text-white">訂房訂單管理</a>
+                    </li>
+                    <li>
+                        <a th:href="@{/backend/room/selectRoomPage}"
+                           class="link-body-emphasis text-white">房間管理</a>
+                    </li>
+                    <li>
+                        <a th:href="@{/backend/roomType/listRoomType}"
+                           class="link-body-emphasis text-white">房型管理</a>
+                    </li>
+                    <li>
+                        <a th:href="@{/backend/roomTypePhoto/selectRoomTypePhoto}"
+                           class="link-body-emphasis text-white">房型圖片管理</a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+        <!-- 首頁管理 -->
+        <li class="mb-1">
+            <button
+                    class="btn btn-toggle d-flex justify-content-between align-items-center w-100 rounded border-0 text-white"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#dashboard-home"
+                    aria-expanded="false"
+            >
+                首頁管理
+                <i class="bi bi-chevron-down fs-6"></i>
+            </button>
+            <div class="collapse" id="dashboard-home">
+                <ul
+                        class="btn-toggle-nav list-unstyled fw-normal pb-2 ps-4 lh-lg"
+                >
+                    <li>
+                        <a th:href="@{/backend/news/list}"
+                           class="link-body-emphasis text-white">最近消息</a>
+                    </li>
+                    <li>
+                        <a th:href="@{/backend/feedback/list}"
+                           class="link-body-emphasis text-white">顧客回饋</a>
+                    </li>
+                    <li>
+                        <a th:href="@{/backend/member/list}"
+                           class="link-body-emphasis text-white">會員管理</a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+        <!-- 接駁管理 -->
+        <li class="mb-1">
+            <button
+                    class="btn btn-toggle d-flex justify-content-between align-items-center w-100 rounded border-0 text-white"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#dashboard-shuttle"
+                    aria-expanded="false"
+            >
+                接駁管理
+                <i class="bi bi-chevron-down fs-6"></i>
+            </button>
+            <div class="collapse" id="dashboard-shuttle">
+                <ul
+                        class="btn-toggle-nav list-unstyled fw-normal pb-2 ps-4 lh-lg"
+                >
+                    <li>
+                        <a th:href="@{/backend/reservation/list}"
+                           class="link-body-emphasis text-white">接駁預約列表</a>
+                    </li>
+                    <li>
+                        <a th:href="@{/backend/backshuttlereservationseat/list}"
+                           class="link-body-emphasis text-white">接駁預約座位列表</a>
+                    </li>
+                    <li>
+                        <a th:href="@{/backend/seatavailability/list}"
+                           class="link-body-emphasis text-white">座位狀況列表</a>
+                    </li>
+                    <li>
+                        <a th:href="@{/backend/backseat/list}"
+                           class="link-body-emphasis text-white">座位列表</a>
+                    </li>
+                    <li>
+                        <a th:href="@{/backend/shuttle/list}"
+                           class="link-body-emphasis text-white">接駁船時段列表</a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+
     </ul>
+
+
     
     <!-- 用戶資訊和登出按鈕 -->
     <div class="sidebar-user">
