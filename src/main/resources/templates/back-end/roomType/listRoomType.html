@@ -24,7 +24,7 @@
 						<i class="bi bi-bag me-2"></i>房型管理
 					</h4>
 					<a class="btn btn-success" data-bs-toggle="modal"
-						data-bs-target="#addRoomTypeModel"> <i
+						data-bs-target="#addRoomTypeModal"> <i
 						class="bi bi-plus-circle "></i>新增房型
 					</a>
 				</div>
@@ -85,7 +85,7 @@
 								<td>
 									<div class="d-flex gap-2 flex-wrap">
 										<a data-bs-toggle="modal"
-											data-bs-target="#updateRoomTypeModel"
+											data-bs-target="#updateRoomTypeModal"
 											class="btn btn-sm btn-primary"
 											th:attr="
                                      data-id=${rt.roomTypeId},
@@ -111,7 +111,7 @@
 	
 	
 	<!-- 修改房型 -->
-	<div class="modal fade" id="updateRoomTypeModel" tabindex="-1">
+	<div class="modal fade" id="updateRoomTypeModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -185,7 +185,7 @@
 <!--                     <input type="file" class="form-control mt-2" id="editProductPhotoInput" accept="image/*" multiple style="max-width:300px;" onchange="addNewProductPhotos(this)"> -->
 <!--                     <small class="text-muted">可拖曳排序，右上角可刪除，點選可新增圖片</small> -->
 <!--                 </div> -->
-<!--             </div> -->
+            </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
                 <button type="submit" class="btn btn-success">
@@ -198,7 +198,7 @@
 </div>
 	
 	<!-- 新增房型 -->
-	<div class="modal fade" id="addRoomTypeModel" tabindex="-1">
+	<div class="modal fade" id="addRoomTypeModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -270,7 +270,7 @@
 <!--                     <input type="file" class="form-control mt-2" id="editProductPhotoInput" accept="image/*" multiple style="max-width:300px;" onchange="addNewProductPhotos(this)"> -->
 <!--                     <small class="text-muted">可拖曳排序，右上角可刪除，點選可新增圖片</small> -->
 <!--                 </div> -->
-<!--             </div> -->
+            </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
                 <button type="submit" class="btn btn-success">
@@ -281,9 +281,9 @@
         </div>
     </div>
 </div>
+	<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 <script src="/js/roomType.js"></script>
-	<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
 
 </body>
 </html>

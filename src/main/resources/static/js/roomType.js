@@ -18,24 +18,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 	
+	//自動清理殘留 backdrop
+	document.querySelectorAll('.modal-backdrop').forEach(e => e.remove());
+	
 	// 檢查頁面載入時是否有錯誤訊息，如果有就自動顯示對應的模態框
     // 如果有新增錯誤訊息，自動顯示新增模態框
 	const addErrorMessage = document.getElementById('addErrorMessage');
 	if (addErrorMessage) {
 		console.log('發現新增錯誤訊息，顯示新增模態框');
-   		const addModal = new bootstrap.Modal(document.getElementById('addRoomTypeModel'));
+   		const addModal = new bootstrap.Modal(document.getElementById('addRoomTypeModal'));
    		addModal.show();
    	}
    	// 如果有修改錯誤訊息，自動顯示修改模態框
 	const updateErrorMessage = document.getElementById('updateErrorMessage');
 	if (updateErrorMessage) {
 		console.log('發現修改錯誤訊息，顯示修改模態框');
-   		const updateModal = new bootstrap.Modal(document.getElementById('updateRoomTypeModel'));
+   		const updateModal = new bootstrap.Modal(document.getElementById('updateRoomTypeModal'));
    		updateModal.show();
    	}
 	
 	//處理修改表單，自動帶入該筆房型的原始資料
-	const updateModal = document.getElementById('updateRoomTypeModel');
+	const updateModal = document.getElementById('updateRoomTypeModal');
 	if (updateModal) {
 	   updateModal.addEventListener('show.bs.modal', function (event) {
 	       const button = event.relatedTarget; // 觸發 modal 的按鈕
@@ -87,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	};
 	   
 	// 處理新增表單
-	const addModal = document.getElementById('addRoomTypeModel');
+	const addModal = document.getElementById('addRoomTypeModal');
 	if (addModal) {
 		addModal.addEventListener('show.bs.modal', function (event) {
 			const modal = addModal;
