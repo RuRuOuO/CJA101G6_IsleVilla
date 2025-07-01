@@ -81,31 +81,6 @@
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/faq}">常見問題</a>
                     </li>
-                    <!--                    <li class="nav-item dropdown">-->
-                    <!--                        <a-->
-                    <!--                                aria-expanded="false"-->
-                    <!--                                class="nav-link dropdown-toggle"-->
-                    <!--                                data-bs-toggle="dropdown"-->
-                    <!--                                href="#"-->
-                    <!--                                role="button"-->
-                    <!--                        >-->
-                    <!--                            顧客服務-->
-                    <!--                        </a>-->
-                    <!--                        <ul class="dropdown-menu">-->
-                    <!--                            <li><a class="dropdown-item" th:href="@{/transportation}">交通資訊</a></li>-->
-                    <!--                            <li><a class="dropdown-item" href="#">天氣資訊</a></li>-->
-                    <!--                            <li><a class="dropdown-item" href="#">線上客服</a></li>-->
-                    <!--                            <li><a class="dropdown-item" th:href="@{/faq}">常見Q&A</a></li>-->
-                    <!--                        </ul>-->
-                    <!--                    </li>-->
-                    <!--                    <li th:if="${session.member!=null}" class="nav-item divider align-self-center px-1">|</li>-->
-                    <!--                    <li th:if="${session.member!=null}" class="nav-item">-->
-                    <!--                        <a-->
-                    <!--                                class="nav-link"-->
-                    <!--                                th:href="@{/member}"-->
-                    <!--                        >會員專區</a-->
-                    <!--                        >-->
-                    <!--                    </li>-->
                 </ul>
                 <div>
                     <!--                    <a th:href="@{/cart}" class="text-dark">-->
@@ -197,7 +172,7 @@
         </a>
         <a class="nav-link text-reset text-decoration-none" th:href="@{/member/feedback/list}"
            th:classappend="${activeTab == 'feedback'}?'active'">
-            問卷專區
+            住宿問卷
         </a>
         <a class="nav-link text-reset text-decoration-none" th:href="@{/member/info}"
            th:classappend="${activeTab == 'info'}?'active'">
@@ -207,7 +182,7 @@
 </div>
 <!-- ----- 側邊欄 結束 ----- -->
 <!-- ===== 分頁按鈕 Fragment 開始 ===== -->
-<nav aria-label="Page navigation" class="mt-5" th:fragment="paginationFragment(currentPage, totalPages, pageURL)">
+<nav aria-label="Page navigation" class="mt-5 pt-5" th:fragment="paginationFragment(currentPage, totalPages, pageURL)">
     <ul class="pagination justify-content-center">
         <!-- 上一頁 -->
         <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
@@ -251,7 +226,7 @@
             <!-- 購物車按鈕 -->
             <a th:href="@{/cart}"
                class="btn btn-outline-light bg-dark btn-lg shadow-lg d-flex align-items-center">
-                <i class="fa-solid fa-cart-shopping me-2"></i>
+                <i class="bi bi-cart me-2"></i>
                 <span>購物車</span>
             </a>
 

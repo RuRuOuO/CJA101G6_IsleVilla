@@ -9,7 +9,7 @@
     font-family: "Noto Sans TC", sans-serif;
 }
 
-.btn {
+.btn, .nav-link, .nav-item .nav-link {
     border-radius: 0 !important;
 }
 
@@ -24,6 +24,7 @@ body {
     flex-direction: column;
     min-height: 100vh;
     /* 背景圖片設定 */
+    background-color: #f4f4f4;
     background-image: url('/img/home/bg1_crop2.png');
     background-repeat: no-repeat;
     background-size: cover;
