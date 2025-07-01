@@ -58,6 +58,11 @@ public class DashboardService {
         // 取得今日成立的房間訂單
         List<RoomRVOrder> todayRoomOrdersList = findTodayRoomOrders(todayStart, todayEnd);
         
+        // 統計今日新增會員數
+        long todayNewMembers = dashboardRepository.countTodayNewMembers(todayStart, todayEnd);
+        // 統計今日搭乘接駁車人數
+        long todayShuttlePassengers = dashboardRepository.countTodayShuttlePassengers(today);
+        
         double roomOccupancyRate = calculateRoomOccupancyRate();
         DashboardDTO dto = new DashboardDTO(
             todayProductOrders,
@@ -66,7 +71,9 @@ public class DashboardService {
             confirmedProductOrders,
             todayRoomOrders,
             todayRoomRevenue,
-            todayRoomOrdersList
+            todayRoomOrdersList,
+            todayNewMembers,
+            todayShuttlePassengers
         );
         dto.setRoomOccupancyRate(roomOccupancyRate);
         return dto;
@@ -97,6 +104,11 @@ public class DashboardService {
         double roomRevenue = calculateTodayRoomRevenue(startDateTime, endDateTime);
         List<RoomRVOrder> roomOrdersList = findTodayRoomOrders(startDateTime, endDateTime);
         
+        // 區間內新增會員數
+        long newMembers = dashboardRepository.countTodayNewMembers(startDateTime, endDateTime);
+        // 區間內搭乘接駁車人數（以startDate為主）
+        long shuttlePassengers = dashboardRepository.countTodayShuttlePassengers(startDate);
+        
         return new DashboardDTO(
             productOrders,
             productRevenue,
@@ -104,7 +116,9 @@ public class DashboardService {
             confirmedOrders,
             roomOrders,
             roomRevenue,
-            roomOrdersList
+            roomOrdersList,
+            newMembers,
+            shuttlePassengers
         );
     }
     

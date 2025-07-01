@@ -25,7 +25,8 @@ public class DashboardController {
         
         // 將資料加入Model
         model.addAttribute("todayProductOrders", dashboardData.getTodayProductOrders());
-        // model.addAttribute("todayNewMembers", dashboardData.getTodayNewMembers());
+        model.addAttribute("todayNewMembers", dashboardData.getTodayNewMembers());
+        model.addAttribute("todayShuttlePassengers", dashboardData.getTodayShuttlePassengers());
         model.addAttribute("todayProductRevenue", dashboardData.getTodayProductRevenue());
         model.addAttribute("pendingProductOrders", dashboardData.getPendingProductOrders());
         model.addAttribute("confirmedProductOrders", dashboardData.getConfirmedProductOrders());
