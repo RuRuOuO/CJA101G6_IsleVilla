@@ -29,8 +29,6 @@ public class RoomType {
 	@Column(name="room_type_id") // Hibernate：對應欄位名稱
 	@GeneratedValue(strategy = GenerationType.IDENTITY) // Hibernate：MySQL 的 auto_increment 對應寫法
 	@OrderBy("room_type_id asc")
-	@NotNull(message = "房型編號: 請勿空白")
-	@Min(value=1, message="房型編號:格式錯誤，請輸入數字")
 	private Integer roomTypeId;
 	
 	@Column(name="room_type_code") 
@@ -39,7 +37,6 @@ public class RoomType {
 	private String roomTypeCode;
 	
 	@Column(name="room_type_name")
-	@Size(max=3)
 	@NotBlank(message = "房型名稱: 請勿空白")
 	@Pattern(regexp = "^[(\u4e00-\u9fa5)]{1,10}$", message = "房型名稱: 請輸入中文,且長度必需在1到10之間")
 	private String roomTypeName;

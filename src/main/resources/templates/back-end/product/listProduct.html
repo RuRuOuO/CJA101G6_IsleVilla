@@ -290,10 +290,10 @@
         const searchTerm = this.value.toLowerCase();
         const table = $('#productTable').DataTable();
         
-        // 自定義搜尋函數，只搜尋編號（第0欄）和名字（第2欄）
+        // 自定義搜尋函數，只搜尋編號（第0欄）和名字（第1欄）
         $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
             const productId = data[0].toLowerCase(); // 編號欄位
-            const productName = data[2].toLowerCase(); // 名字欄位
+            const productName = data[1].toLowerCase(); // 名字欄位
             
             return productId.includes(searchTerm) || productName.includes(searchTerm);
         });
