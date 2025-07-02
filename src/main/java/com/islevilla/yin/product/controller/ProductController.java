@@ -37,11 +37,11 @@ public class ProductController {
         // 查詢每個產品的第一張圖片並設置給產品資料
         for (Product product : products) {
             // 根據 productId 查詢該產品的第一張圖片
-            ProductPhoto firstProductPhoto = productPhotoService.getFirstProductPhotoByProductId(product.getProductId());
+            ProductPhoto mainProductPhoto = productPhotoService.getMainProductPhotoByProductId(product.getProductId());
             String productImageUrl = "https://dummyimage.com/300x200/";  // 預設圖片 URL
-            if (firstProductPhoto != null) {
+            if (mainProductPhoto != null) {
                 // 將圖片轉換為 Base64 或圖片 URL
-                productImageUrl = convertImageToBase64(firstProductPhoto.getProductImage());
+                productImageUrl = convertImageToBase64(mainProductPhoto.getProductImage());
             }
             // 封裝為 DTO
             ProductWithImageDTO productWithImageDTO = new ProductWithImageDTO(
@@ -83,10 +83,10 @@ public class ProductController {
 
         List<ProductWithImageDTO> productWithImageDTOs = new ArrayList<>();
         for (Product product : products) {
-            ProductPhoto firstProductPhoto = productPhotoService.getFirstProductPhotoByProductId(product.getProductId());
+            ProductPhoto mainProductPhoto = productPhotoService.getMainProductPhotoByProductId(product.getProductId());
             String productImageUrl = "https://dummyimage.com/300x200/";  // 預設圖片 URL
-            if (firstProductPhoto != null) {
-                productImageUrl = convertImageToBase64(firstProductPhoto.getProductImage());
+            if (mainProductPhoto != null) {
+                productImageUrl = convertImageToBase64(mainProductPhoto.getProductImage());
             }
             ProductWithImageDTO productWithImageDTO = new ProductWithImageDTO(
                     product.getProductId(),
@@ -105,11 +105,11 @@ public class ProductController {
         return "front-end/product/listProduct";
     }
 
-    // 取得商品第一張圖片（保留這個方法，刪除用 productPhotoId 查單一圖的方法）
+    // 取得商品主圖（排序第一張）
     @GetMapping("/product/photo/{productId}")
     @ResponseBody
     public ResponseEntity<byte[]> getProductPhoto(@PathVariable Integer productId) {
-        ProductPhoto photo = productPhotoService.getFirstProductPhotoByProductId(productId);
+        ProductPhoto photo = productPhotoService.getMainProductPhotoByProductId(productId);
         if (photo != null && photo.getProductImage() != null) {
             byte[] img = photo.getProductImage();
             String contentType = "image/jpeg";
