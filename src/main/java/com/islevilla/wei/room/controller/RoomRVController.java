@@ -38,11 +38,8 @@ public class RoomRVController {
     // 前台渲染會員訂單
     @GetMapping("/member/room/list")
     public String getRoomRVOrdersFromMember(Model model, HttpSession session) {
-//  public String getRoomRVOrdersFromMember(Model model) {
-        // // 從session抓出登入的會員物件
+        // 從session抓出登入的會員物件
         Members loginMember = (Members) session.getAttribute("member");
-        // 先寫死跳過登入步驟
-//         Members loginMember = membersService.getOneMember(8);
         if (loginMember == null) {
             return "redirect:/member/login";
         }
@@ -51,10 +48,12 @@ public class RoomRVController {
         if (!orderList.isEmpty()) {
             model.addAttribute("orderList", orderList);
         }
-        List<RoomRVDetail> detailList = roomRVDetailService.getDetailsByRoomRVOrderId(orderList.get(0).getRoomReservationId());
         if (!orderList.isEmpty()) {
+            int firstOrderId = orderList.get(0).getRoomReservationId();
+            List<RoomRVDetail> detailList = roomRVDetailService.getDetailsByRoomRVOrderId(firstOrderId);
             model.addAttribute("detailList", detailList);
         }
+
         return "front-end/member/member-room-list";
     }
 

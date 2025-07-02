@@ -17,7 +17,11 @@ public interface SeatRepository extends JpaRepository<Seat, Integer> {
 
 	// 查詢可用座位數量
 	@Query("SELECT COUNT(s) FROM Seat s WHERE s.seatStatus = 1")
-	long countAvailableSeats();
+	Integer countAvailableSeats();
+	
+	// 查詢不可用座位數量
+	@Query("SELECT COUNT(s) FROM Seat s WHERE s.seatStatus = 0")
+	Integer countUnavailableSeats();
 	
 	// 查詢所有座位並按座位號排序
     List<Seat> findAllByOrderBySeatNumber();

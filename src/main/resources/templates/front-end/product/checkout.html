@@ -677,6 +677,19 @@
         
         // 初始化優惠券選擇
         initCouponSelection();
+        
+        // 強化 coupon-item 點擊體驗
+        document.querySelectorAll('.coupon-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                // 避免點擊input或label時重複觸發
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'LABEL') return;
+                const radio = this.querySelector('input[type="radio"]');
+                if (radio && !radio.checked) {
+                    radio.checked = true;
+                    radio.dispatchEvent(new Event('change'));
+                }
+            });
+        });
     });
     
     // 表單驗證
