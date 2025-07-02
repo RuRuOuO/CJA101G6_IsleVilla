@@ -24,7 +24,7 @@
 						<i class="bi bi-bag me-2"></i>房型管理
 					</h4>
 					<a class="btn btn-success" data-bs-toggle="modal"
-						data-bs-target="#addRoomTypeModel"> <i
+						data-bs-target="#addRoomTypeModal"> <i
 						class="bi bi-plus-circle "></i>新增房型
 					</a>
 				</div>
@@ -85,7 +85,7 @@
 								<td>
 									<div class="d-flex gap-2 flex-wrap">
 										<a data-bs-toggle="modal"
-											data-bs-target="#updateRoomTypeModel"
+											data-bs-target="#updateRoomTypeModal"
 											class="btn btn-sm btn-primary"
 											th:attr="
                                      data-id=${rt.roomTypeId},
@@ -111,7 +111,7 @@
 	
 	
 	<!-- 修改房型 -->
-	<div class="modal fade" id="updateRoomTypeModel" tabindex="-1">
+	<div class="modal fade" id="updateRoomTypeModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -120,7 +120,8 @@
                 </h5>
                 <button type="button" class="btn-close btn-close-red" data-bs-dismiss="modal"></button>
             </div>
-			<!-- 修改表單的錯誤訊息提示區塊 -->
+            
+            <form th:object="${roomType}" th:action="@{/backend/roomType/updateRoomType}" method="post" id="updateRoomTypeForm" novalidate enctype="multipart/form-data">
             <div class="modal-body">
                 <!-- 錯誤訊息提示區塊 -->
                 <div th:if="${updateErrorMessage}" class="alert alert-danger" id="updateErrorMessage" role="alert">
@@ -132,9 +133,7 @@
                         <li th:each="msg : ${updateErrorMessage}" th:text="${msg}"></li>
                     </ul>
                 </div>
-            <form th:object="${roomType}" th:action="@{/backend/roomType/updateRoomType}" method="post" id="updateRoomTypeForm" novalidate enctype="multipart/form-data">
-            <div class="modal-body">
-                <input type="hidden" name="roomTypeId" />
+                <input type="hidden" th:field="*{roomTypeId}" />
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="updateRoomTypeName" class="form-label">房型名稱 <span class="text-danger">*</span></label>
@@ -186,7 +185,7 @@
 <!--                     <input type="file" class="form-control mt-2" id="editProductPhotoInput" accept="image/*" multiple style="max-width:300px;" onchange="addNewProductPhotos(this)"> -->
 <!--                     <small class="text-muted">可拖曳排序，右上角可刪除，點選可新增圖片</small> -->
 <!--                 </div> -->
-<!--             </div> -->
+            </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
                 <button type="submit" class="btn btn-success">
@@ -199,7 +198,7 @@
 </div>
 	
 	<!-- 新增房型 -->
-	<div class="modal fade" id="addRoomTypeModel" tabindex="-1">
+	<div class="modal fade" id="addRoomTypeModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -208,14 +207,18 @@
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="card-header bg-transparent border-0 pt-4">
-                <div class="d-flex justify-content-between align-items-center">
-
-
-                </div>
-            </div>
             <form th:object="${roomType}" th:action="@{/backend/roomType/addRoomType}" method="post" id="addRoomTypeForm" novalidate enctype="multipart/form-data">
             <div class="modal-body">
+                <!-- 錯誤訊息提示區塊 -->
+                <div th:if="${addErrorMessage}" class="alert alert-danger" id="addErrorMessage" role="alert">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <strong>輸入資料錯誤，請檢查以下項目：</strong>
+                    </div>
+                    <ul class="mb-0">
+                        <li th:each="msg : ${addErrorMessage}" th:text="${msg}"></li>
+                    </ul>
+                </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="addRoomTypeName" class="form-label">房型名稱 <span class="text-danger">*</span></label>
@@ -267,7 +270,7 @@
 <!--                     <input type="file" class="form-control mt-2" id="editProductPhotoInput" accept="image/*" multiple style="max-width:300px;" onchange="addNewProductPhotos(this)"> -->
 <!--                     <small class="text-muted">可拖曳排序，右上角可刪除，點選可新增圖片</small> -->
 <!--                 </div> -->
-<!--             </div> -->
+            </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
                 <button type="submit" class="btn btn-success">
@@ -278,9 +281,9 @@
         </div>
     </div>
 </div>
+	<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 <script src="/js/roomType.js"></script>
-	<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
 
 </body>
 </html>

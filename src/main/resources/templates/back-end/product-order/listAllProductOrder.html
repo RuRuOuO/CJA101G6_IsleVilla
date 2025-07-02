@@ -59,7 +59,7 @@
                         <thead>
                             <tr>
                                 <th>訂單編號</th>
-                                <th>會員名稱</th>
+                                <th>會員編號</th>
                                 <th>訂單金額</th>
                                 <th>折扣金額</th>
                                 <th>實付金額</th>
@@ -71,11 +71,20 @@
                         <tbody>
                             <tr th:each="order : ${productOrderListData}">
                                 <td th:text="${order.productOrderId}"></td>
-                                <td th:text="${order.member.memberName}"></td>
+                                <td th:text="${order.member.memberId}"></td>
                                 <td th:text="${order.productOrderAmount}"></td>
                                 <td th:text="${order.discountAmount}"></td>
                                 <td th:text="${order.productPaidAmount}"></td>
-                                <td th:text="${order.orderStatus == 0 ? '訂單成立' : (order.orderStatus == 1 ? '配送中' : '已完成')}"></td>
+                                <td>
+                                  <span th:classappend="
+                                    ${order.orderStatus} == 0 ? 'badge bg-primary' :
+                                    (${order.orderStatus} == 1 ? 'badge bg-warning text-dark' : 'badge bg-success')
+                                  "
+                                  th:text="
+                                    ${order.orderStatus} == 0 ? '訂單成立' :
+                                    (${order.orderStatus} == 1 ? '配送中' : '已完成')
+                                  "></span>
+                                </td>
                                 <td th:text="${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
                                 <td>
                                     <div class="d-flex justify-content-center align-items-center">

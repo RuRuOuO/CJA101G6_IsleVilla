@@ -14,7 +14,7 @@
         }
 
         .hero {
-            background: url("https://images.unsplash.com/photo-1494879540385-bc170b0878a7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D") center/cover no-repeat fixed; /* fixed */
+            background: url("/img/home/ocean1.png") center/cover no-repeat fixed; /* fixed */
         }
 
         .hero h1 {
@@ -35,7 +35,7 @@
 
         /* about區塊 */
         .about-section {
-            background: url("https://images.unsplash.com/photo-1509600110300-21b9d5fedeb7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D") center/cover no-repeat; /* fixed */
+            background: url("/img/home/about1.png") center/cover no-repeat; /* fixed */
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -106,16 +106,8 @@
 
                                 <img alt="預設圖片"
                                      class="card-img-top news-card-img"
-                                     src="https://images.unsplash.com/photo-1624474161796-7685c6919523?q=80&w=1974&auto=format&fit=crop"
+                                     src="/img/home/ocean3.png"
                                      th:unless="${news.newsImage != null}"/>
-
-<!--                                &lt;!&ndash; 新消息標籤 &ndash;&gt;-->
-<!--                                <div class="position-absolute top-0 end-0 m-3">-->
-<!--                                    <span class="badge news-date-badge text-white px-2 py-1 rounded-pill">-->
-<!--                                        <i class="fas fa-calendar-alt me-1"></i>-->
-<!--                                        <span th:text="${#temporals.format(news.newsTime, 'MM/dd')}">01/01</span>-->
-<!--                                    </span>-->
-<!--                                </div>-->
                             </div>
 
                             <!-- 內容區域 -->
@@ -193,11 +185,11 @@
             <!-- 區塊 左 -->
             <div class="row align-items-center mb-5">
                 <div class="col-md-6">
-                    <div class="square-img-wrapper">
+                    <div class="square-img-wrapper shadow-sm">
                         <img
                                 alt="客房介紹圖片"
                                 class="square-img shadow-sm"
-                                src="https://images.unsplash.com/photo-1681452816108-d75e2a08f75d?q=80&w=2076&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                src="/img/home/room1.png"
                         />
                     </div>
                 </div>
@@ -214,7 +206,7 @@
                     <!-- 看更多 -->
                     <a
                             class="btn btn-primary mt-4"
-                            href="/src/main/resources/templates/front-end/news/newsList.html"
+                            th:href="@{/}"
                     >
                         看更多 <i class="fa-solid fa-arrow-right"></i>
                     </a>
@@ -223,16 +215,16 @@
             <!-- 區塊 右 -->
             <div class="row align-items-center flex-md-row-reverse mb-5">
                 <div class="col-md-6">
-                    <div class="square-img-wrapper">
+                    <div class="square-img-wrapper shadow-sm">
                         <img
-                                alt="線上購物圖片"
+                                alt="接駁圖片"
                                 class="square-img shadow-sm"
-                                src="https://images.unsplash.com/photo-1585351923007-bf6a01cb19de?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                src="/img/home/transport4.png"
                         />
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <h2 class="mb-5 mt-3">購物商城</h2>
+                    <h2 class="mb-5 mt-3">專船接駁</h2>
                     <p>
                         將旅途中的美好收藏，延續回日常生活。<br/>
                         從香氛到小物，<br/>
@@ -253,27 +245,28 @@
             <!-- 區塊 左 -->
             <div class="row align-items-center mb-5">
                 <div class="col-md-6">
-                    <div class="square-img-wrapper">
+                    <div class="square-img-wrapper shadow-sm">
                         <img
-                                alt="顧客服務圖片"
+                                alt="購物商城圖片"
                                 class="square-img shadow-sm"
-                                src="https://images.unsplash.com/photo-1497256654106-4a29efafb831?q=80&w=2099&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                src="/img/home/product1.png"
                         />
                     </div>
                 </div>
                 <div class="col-md-6 px-5">
-                    <h3 class="mb-5 mt-3">顧客服務</h3>
+                    <h3 class="mb-5 mt-3">購物商城</h3>
                     <p>
-                        我們相信，美好的旅程來自每一個被照顧的細節。<br/>
-                        從預訂到入住，從提問到離開，<br/>
-                        微嶼的每一位夥伴都願意成為你旅途中的溫柔後盾。<br/>
+                        將旅途中的美好收藏，延續回日常生活。<br/>
+                        從香氛到小物，<br/>
+                        每一件商品都是微嶼的延伸與回聲。<br/>
                         <br/>
-                        如果你需要，我們一直都在，不只是服務，更是一份真誠的陪伴。
+                        即使回到城市，也能在熟悉的日常裡，感受到島嶼的氣息與記憶的溫度。<br/>
+                        你喜歡的風景，現在也能帶回家。
                     </p>
                     <!-- 看更多 -->
                     <a
                             class="btn btn-primary mt-4"
-                            href="/src/main/resources/templates/front-end/news/newsList.html"
+                            th:href="@{/product}"
                     >
                         看更多 <i class="fa-solid fa-arrow-right"></i>
                     </a>
@@ -282,11 +275,11 @@
             <!-- 區塊 右 -->
             <div class="row align-items-center flex-md-row-reverse mb-5">
                 <div class="col-md-6">
-                    <div class="square-img-wrapper">
+                    <div class="square-img-wrapper shadow-sm">
                         <img
                                 alt="會員專區圖片"
                                 class="square-img shadow-sm"
-                                src="https://images.unsplash.com/photo-1585351923007-bf6a01cb19de?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                src="/img/home/env4_crop1.png"
                         />
                     </div>
                 </div>

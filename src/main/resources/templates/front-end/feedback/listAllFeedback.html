@@ -6,20 +6,32 @@
     <title>微嶼 | Isle Villa | 佳評如潮</title>
     <!-- 載入 Bootstrap 樣式 -->
     <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+    <style>
+        body {
+            /* 背景圖片設定 */
+            background-image: url('/img/home/ocean2.png');
+        }
+    </style>
 </head>
 <body>
 <!-- Header 區塊 -->
 <div th:replace="~{fragments/fragments :: header}"></div>
-
-<div class="container my-5">
-    <!-- 頁面標題 -->
-    <div class="text-center mb-4">
-        <h1 class="mb-4">顧客評價</h1>
-        <p><i class="fa-solid fa-thumbs-up me-2"></i>來自入住旅客的真實分享</p>
-    </div>
+<main>
+    <!-- Hero Section -->
+    <section class="hero-section pt-5">
+        <div class="hero-content">
+            <div class="container text-center">
+                <h1 class="mb-4">顧客評價</h1>
+                <p class="mb-4">
+                    <i class="fa-solid fa-thumbs-up me-2"></i>
+                    來自入住旅客的真實分享
+                </p>
+            </div>
+        </div>
+    </section>
 
     <!-- 評價列表 -->
-    <section class="py-5">
+    <section class="py-4">
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <div id="reviewsList">
@@ -27,7 +39,7 @@
                 </div>
 
                 <!-- 載入狀態 -->
-                <div class="text-center py-5" id="loading">
+                <div class="text-center py-4" id="loading">
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">載入中...</span>
                     </div>
@@ -35,7 +47,7 @@
                 </div>
 
                 <!-- 無評價提示 -->
-                <div class="text-center py-5 d-none" id="noReviews">
+                <div class="text-center py-4 d-none" id="noReviews">
                     <div class="text-muted">
                         <i class="bi bi-chat-left-text display-1 mb-3 text-secondary"></i>
                         <h4>暫無評價</h4>
@@ -45,7 +57,7 @@
             </div>
         </div>
     </section>
-</div>
+</main>
 
 <!-- Footer 區塊 -->
 <div th:replace="~{fragments/fragments :: footer}"></div>
