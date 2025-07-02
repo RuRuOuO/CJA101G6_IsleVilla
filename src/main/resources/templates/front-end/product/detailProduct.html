@@ -125,6 +125,7 @@
                     <div class="quantity-control d-flex align-items-center">
                         <button type="button" class="btn btn-outline-secondary btn-sm" id="decrease">-</button>
                         <input type="number" id="quantity" value="1" min="1" th:max="${product.productQuantity}" class="form-control">
+                        <input type="hidden" id="stock" th:value="${product.productQuantity}" />
                         <button type="button" class="btn btn-outline-secondary btn-sm" id="increase">+</button>
                     </div>
                     <small class="text-muted" th:text="|庫存: ${product.productQuantity} 件|">庫存數量</small>
@@ -187,10 +188,12 @@
     });
 
     increaseBtn.addEventListener('click', () => {
-        const maxQuantity = parseInt(quantityInput.getAttribute('max'));
+        const maxQuantity = parseInt(document.getElementById('stock').value);
         if (quantityInput.value < maxQuantity) {
             quantityInput.value = parseInt(quantityInput.value) + 1;
             syncQuantity();
+        } else {
+            alert('已達庫存上限');
         }
     });
 
@@ -224,30 +227,41 @@
     // 加入購物車AJAX
     document.getElementById('addToCartForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        const formData = new FormData(this);
-        fetch(this.action, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (response.status === 401) {
-                // 未登入，跳轉到登入頁面
-                if (confirm('請先登入會員才能加入購物車，是否前往登入頁面？')) {
-                    window.location.href = '/member/login?redirect=' + encodeURIComponent(window.location.pathname);
+        const stock = parseInt(document.getElementById('stock').value);
+        const quantity = parseInt(document.getElementById('quantity').value);
+        const productId = document.querySelector('input[name="productId"]').value;
+        // 先查詢購物車內數量
+        fetch('/cart/quantity/' + productId)
+            .then(res => res.json())
+            .then(cartQty => {
+                if (quantity + cartQty > stock) {
+                    alert('庫存不足，無法再加入！');
+                    return;
                 }
-                return;
-            }
-            if (!response.ok) throw new Error('加入購物車失敗');
-            return response.text();
-        })
-        .then(msg => {
-            if (msg) {
-                alert(msg);
-            }
-        })
-        .catch(() => {
-            alert('加入購物車失敗，請稍後再試');
-        });
+                const formData = new FormData(document.getElementById('addToCartForm'));
+                fetch(document.getElementById('addToCartForm').action, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (response.status === 401) {
+                        if (confirm('請先登入會員才能加入購物車，是否前往登入頁面？')) {
+                            window.location.href = '/member/login?redirect=' + encodeURIComponent(window.location.pathname);
+                        }
+                        return;
+                    }
+                    if (!response.ok) throw new Error('加入購物車失敗');
+                    return response.text();
+                })
+                .then(msg => {
+                    if (msg) {
+                        alert(msg);
+                    }
+                })
+                .catch(() => {
+                    alert('加入購物車失敗，請稍後再試');
+                });
+            });
     });
 </script>
 </body>

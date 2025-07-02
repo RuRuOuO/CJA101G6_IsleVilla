@@ -49,7 +49,8 @@ public class ProductController {
                     product.getProductName(),
                     product.getProductDescription(),
                     product.getProductPrice(),
-                    productImageUrl
+                    productImageUrl,
+                    product.getProductQuantity()
             );
             // 加入到 DTO 列表中
             productWithImageDTOs.add(productWithImageDTO);
@@ -93,7 +94,8 @@ public class ProductController {
                     product.getProductName(),
                     product.getProductDescription(),
                     product.getProductPrice(),
-                    productImageUrl
+                    productImageUrl,
+                    product.getProductQuantity()
             );
             productWithImageDTOs.add(productWithImageDTO);
         }

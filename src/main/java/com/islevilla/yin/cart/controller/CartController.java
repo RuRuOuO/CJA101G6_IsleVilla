@@ -2,6 +2,7 @@ package com.islevilla.yin.cart.controller;
 import com.islevilla.yin.cart.model.CartDTO;
 import com.islevilla.yin.cart.model.CartService;
 import com.islevilla.lai.members.model.Members;
+import com.islevilla.yin.product.model.ProductService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,9 @@ public class CartController {
     @Autowired
     private CartService cartService;
 
+    @Autowired
+    private ProductService productService;
+
     @PostMapping("/addToCart")
     @ResponseBody
     public ResponseEntity<?> addToCart(@RequestParam Integer productId,
@@ -27,7 +31,11 @@ public class CartController {
         if (member == null) {
             return ResponseEntity.status(401).body("請先登入會員");
         }
-        
+        // 查詢商品庫存
+        Integer stock = productService.getProductById(productId).getProductQuantity();
+        if (quantity > stock) {
+            return ResponseEntity.badRequest().body("加入數量不能大於庫存量");
+        }
         String userId = String.valueOf(member.getMemberId()); // 使用實際會員ID
         cartService.addToCart(userId, productId, quantity);
         return ResponseEntity.ok().body("加入購物車成功");
@@ -59,7 +67,12 @@ public class CartController {
         if (member == null) {
             return "redirect:/member/login?redirect=/cart";
         }
-        
+        // 查詢商品庫存
+        Integer stock = productService.getProductById(productId).getProductQuantity();
+        if (quantity > stock) {
+            // 數量超過庫存，導回購物車並顯示錯誤
+            return "redirect:/cart?error=overstock";
+        }
         String userId = String.valueOf(member.getMemberId()); // 使用實際會員ID
         cartService.updateQuantity(userId, productId, quantity);
         return "redirect:/cart";
@@ -90,5 +103,17 @@ public class CartController {
         String userId = String.valueOf(member.getMemberId()); // 使用實際會員ID
         cartService.clearCart(userId);
         return "redirect:/cart";
+    }
+
+    // 取得購物車內某商品數量
+    @GetMapping("/cart/quantity/{productId}")
+    @ResponseBody
+    public int getCartProductQuantity(@PathVariable Integer productId, HttpSession session) {
+        Members member = (Members) session.getAttribute("member");
+        if (member == null) {
+            return 0;
+        }
+        String userId = String.valueOf(member.getMemberId());
+        return cartService.getProductQuantityInCart(userId, productId);
     }
 }
