@@ -23,10 +23,10 @@
         <!-- bootstrap icon -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
         <!-- 覆蓋樣式 -->
-        <link
-                href="https://cdn.jsdelivr.net/gh/RuRuOuO/CJA101G6_IsleVilla@WeiJing/src/main/resources/static/css/custom_style.css"
-                rel="stylesheet"
-        />
+        <!--        <link-->
+        <!--                href="https://cdn.jsdelivr.net/gh/RuRuOuO/CJA101G6_IsleVilla@WeiJing/src/main/resources/static/css/custom_style.css"-->
+        <!--                rel="stylesheet"-->
+        <!--        />-->
         <link href="/css/custom_style.css" rel="stylesheet">
     </th:block>
     <!-- ----- 統一載入樣式段落結束 ----- -->
@@ -63,44 +63,29 @@
                     </li>
                     <li class="nav-item divider align-self-center px-1">|</li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/feedback/list}">佳評如潮</a>
+                        <a class="nav-link" href="#">客房介紹</a>
                     </li>
                     <li class="nav-item divider align-self-center px-1">|</li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">客房介紹</a>
+                        <a class="nav-link" th:href="@{/transportation}">專船接駁</a>
                     </li>
                     <li class="nav-item divider align-self-center px-1">|</li>
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/product}">購物商城</a>
                     </li>
                     <li class="nav-item divider align-self-center px-1">|</li>
-                    <li class="nav-item dropdown">
-                        <a
-                                aria-expanded="false"
-                                class="nav-link dropdown-toggle"
-                                data-bs-toggle="dropdown"
-                                href="#"
-                                role="button"
-                        >
-                            顧客服務
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" th:href="@{/transportation}">交通資訊</a></li>
-                            <li><a class="dropdown-item" href="#">天氣資訊</a></li>
-                            <li><a class="dropdown-item" href="#">線上客服</a></li>
-                            <li><a class="dropdown-item" th:href="@{/faq}">常見Q&A</a></li>
-                        </ul>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/feedback/list}">佳評如潮</a>
                     </li>
-                    <li th:if="${session.member!=null}" class="nav-item divider align-self-center px-1">|</li>
-                    <li th:if="${session.member!=null}" class="nav-item">
-                        <a
-                                class="nav-link"
-                                th:href="@{/member}"
-                        >會員專區</a
-                        >
+                    <li class="nav-item divider align-self-center px-1">|</li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/faq}">常見問題</a>
                     </li>
                 </ul>
                 <div>
+                    <!--                    <a th:href="@{/cart}" class="text-dark">-->
+                    <!--                        <i class="fa-solid fa-cart-shopping"></i>-->
+                    <!--                    </a>-->
                     <div th:unless="${session.member!=null}">
                         <a class="btn btn-outline-dark" th:href="@{/member/login}">
                             <!--                            <i class="fa-solid fa-arrow-right-to-bracket"></i>-->
@@ -111,22 +96,15 @@
                             &nbsp;免費註冊&nbsp;
                         </a>
                     </div>
-                    <!--                    <div th:if="${session.member!=null}">-->
-                    <!--                        <a class="btn btn-dark" th:href="@{/member/logout}">-->
-                    <!--                            <i class="bi bi-box-arrow-in-right"></i> 登出-->
-                    <!--                        </a>-->
-                    <!--                    </div>-->
                     <div class="d-flex align-items-center gap-2" th:if="${session.member!=null}">
-                        <a th:href="@{/cart}" class="text-dark">
-                            <i class="fa-solid fa-cart-shopping"></i>
-                        </a>
                         &nbsp;
                         <div th:if="${session.member!=null}" class="dropdown">
-                            <button class="btn btn-dark dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                            <button class="btn btn-dark dropdown-toggle" type="button"
+                                    data-bs-toggle="dropdown"
                                     aria-expanded="false">
-                                <!--                            <i class="bi bi-person-circle"></i>-->
                                 <span>歡迎回來，</span><span
                                     th:text="${session.member.memberName}"></span><span>！</span>
+                                <!-- 會員專區-->
                             </button>
                             <ul class="dropdown-menu">
                                 <li class="px-3 py-2 d-flex align-items-center">
@@ -194,7 +172,7 @@
         </a>
         <a class="nav-link text-reset text-decoration-none" th:href="@{/member/feedback/list}"
            th:classappend="${activeTab == 'feedback'}?'active'">
-            問卷專區
+            住宿問卷
         </a>
         <a class="nav-link text-reset text-decoration-none" th:href="@{/member/info}"
            th:classappend="${activeTab == 'info'}?'active'">
@@ -204,7 +182,7 @@
 </div>
 <!-- ----- 側邊欄 結束 ----- -->
 <!-- ===== 分頁按鈕 Fragment 開始 ===== -->
-<nav aria-label="Page navigation" class="mt-5" th:fragment="paginationFragment(currentPage, totalPages, pageURL)">
+<nav aria-label="Page navigation" class="mt-5 pt-5" th:fragment="paginationFragment(currentPage, totalPages, pageURL)">
     <ul class="pagination justify-content-center">
         <!-- 上一頁 -->
         <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
@@ -235,7 +213,31 @@
 <!-- ===== 分頁按鈕 Fragment 結束 ===== -->
 <!-- ===== 統一Footer開始 ===== -->
 <footer class="footer bg-light py-5 justify-content-center shadow-sm" th:fragment="footer">
-    <a class="btn btn-dark booking-fixed-btn" th:href="@{/booking}"> 立即預訂 </a>
+    <!--    <a class="btn btn-dark booking-fixed-btn" th:href="@{/booking}"> 立即預訂 </a>-->
+    <div class="position-fixed bottom-0 end-0 p-5" style="z-index: 1050;">
+        <div class="d-flex flex-column gap-3">
+            <!-- 立即預訂按鈕 -->
+            <a th:href="@{/booking}"
+               class="btn btn-outline-light bg-dark btn-lg shadow-lg d-flex align-items-center custom-btn-specify font-weight-bold">
+                <i class="bi bi-calendar-check me-2"></i>
+                <span>立即預訂</span>
+            </a>
+
+            <!-- 購物車按鈕 -->
+            <a th:href="@{/cart}"
+               class="btn btn-outline-light bg-dark btn-lg shadow-lg d-flex align-items-center">
+                <i class="bi bi-cart me-2"></i>
+                <span>購物車</span>
+            </a>
+
+            <!-- 線上客服按鈕 -->
+            <a th:href="@{/member/chat/start}"
+               class="btn btn-outline-light bg-dark btn-lg shadow-lg d-flex align-items-center">
+                <i class="bi bi-chat-dots me-2"></i>
+                <span>線上客服</span>
+            </a>
+        </div>
+    </div>
     <div class="container">
         <div class="row">
             <div class="col-md-6 mb-3">

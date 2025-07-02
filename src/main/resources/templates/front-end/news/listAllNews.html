@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
 <head>
     <meta charset="UTF-8"/>
     <meta content="width=device-width, initial-scale=1" name="viewport"/>
@@ -27,17 +27,16 @@
         <div class="hero-content">
             <div class="container text-center">
                 <h1 class="mb-4">最新消息</h1>
-                <p class="mb-4"><i class="fas fa-newspaper me-2"></i>掌握 Isle Villa 的最新動態與精彩活動</p>
-<!--                <div class="d-flex justify-content-center align-items-center">-->
-<!--                    <i class="fas fa-newspaper me-2"></i>-->
-<!--                    <span>即時更新．精彩不斷</span>-->
-<!--                </div>-->
+                <p class="mb-4">
+                    <i class="fas fa-newspaper me-2"></i>
+                    掌握 Isle Villa 的最新動態與精彩活動
+                </p>
             </div>
         </div>
     </section>
 
     <!-- 最新消息列表 -->
-    <section class="py-5" id="news">
+    <section class="py-4" id="news">
         <div class="container">
             <!-- 消息卡片網格 -->
             <div class="row g-4 mb-5">
@@ -57,13 +56,13 @@
                                      src="https://images.unsplash.com/photo-1624474161796-7685c6919523?q=80&w=1974&auto=format&fit=crop"
                                      th:unless="${news.newsImage != null}"/>
 
-<!--                                &lt;!&ndash; 新消息標籤 &ndash;&gt;-->
-<!--                                <div class="position-absolute top-0 end-0 m-3">-->
-<!--                                    <span class="badge news-date-badge text-white px-2 py-1 rounded-pill">-->
-<!--                                        <i class="fas fa-calendar-alt me-1"></i>-->
-<!--                                        <span th:text="${#temporals.format(news.newsTime, 'MM/dd')}">01/01</span>-->
-<!--                                    </span>-->
-<!--                                </div>-->
+                                <!--                                &lt;!&ndash; 新消息標籤 &ndash;&gt;-->
+                                <!--                                <div class="position-absolute top-0 end-0 m-3">-->
+                                <!--                                    <span class="badge news-date-badge text-white px-2 py-1 rounded-pill">-->
+                                <!--                                        <i class="fas fa-calendar-alt me-1"></i>-->
+                                <!--                                        <span th:text="${#temporals.format(news.newsTime, 'MM/dd')}">01/01</span>-->
+                                <!--                                    </span>-->
+                                <!--                                </div>-->
                             </div>
 
                             <!-- 內容區域 -->
@@ -114,7 +113,7 @@
     </section>
 
     <!--    &lt;!&ndash; 行動呼籲區域 &ndash;&gt;-->
-    <!--    <section class="py-5 bg-primary bg-opacity-10">-->
+    <!--    <section class="py-4 bg-primary bg-opacity-10">-->
     <!--        <div class="container text-center">-->
     <!--            <div class="row justify-content-center">-->
     <!--                <div class="col-lg-8">-->
