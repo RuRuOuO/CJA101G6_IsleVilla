@@ -283,7 +283,8 @@
 
 
 
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+<!-- ===== 載入統一腳本 ===== -->
+<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
 <script>
     // 商品搜尋功能
     document.getElementById('searchInput').addEventListener('input', function() {
@@ -724,8 +725,7 @@
 
 </script>
 
-<!-- ===== 載入統一腳本 ===== -->
-<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
+
 
 </body>
 </html>

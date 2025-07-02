@@ -52,6 +52,15 @@
             text-align: center;
             border-radius: 0.4rem;
         }
+        .cart-qty-group .btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .cart-qty-group .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
         .cart-subtotal {
             font-weight: bold;
             color: #333;
@@ -135,9 +144,15 @@
                         <div class="cart-product-price">NT$ <span th:text="${item.productPrice}"></span></div>
                     </div>
                     <div class="cart-qty-group ms-auto">
-                        <button type="button" class="btn btn-outline-secondary btn-sm" th:data-product-id="${item.productId}" onclick="updateQuantity(event, -1)"><i class="bi bi-dash"></i></button>
-                        <input th:id="'quantity-' + ${item.productId}" type="text" name="quantity" th:value="${item.quantity}" class="form-control d-inline" readonly/>
-                        <button type="button" class="btn btn-outline-secondary btn-sm" th:data-product-id="${item.productId}" onclick="updateQuantity(event, 1)"><i class="bi bi-plus"></i></button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm decrease-btn" 
+                                th:data-product-id="${item.productId}" 
+                                th:classappend="${item.quantity == 1} ? 'disabled' : ''"
+                                th:disabled="${item.quantity == 1}"
+                                onclick="updateQuantity(event, -1)">
+                            <i class="bi bi-dash"></i>
+                        </button>
+                        <input th:id="'quantity-' + ${item.productId}" type="number" name="quantity" th:value="${item.quantity}" class="form-control d-inline" th:min="1" th:max="${item.productQuantity}" th:data-stock="${item.productQuantity}" th:data-price="${item.productPrice}"/>
+                        <button type="button" class="btn btn-outline-secondary btn-sm increase-btn" th:data-product-id="${item.productId}" onclick="updateQuantity(event, 1)"><i class="bi bi-plus"></i></button>
                         <form th:id="'updateForm-' + ${item.productId}" th:action="@{/updateQuantity}" method="post" class="d-inline">
                             <input type="hidden" name="productId" th:value="${item.productId}"/>
                             <input type="hidden" name="quantity" th:value="${item.quantity}"/>
@@ -169,16 +184,70 @@
 <div style="height: 55px"></div>
 <div th:replace="~{fragments/fragments :: footer}"></div>
 <script>
-    // 更新商品數量
+    // 更新商品數量（AJAX 版）
     function updateQuantity(event, change) {
-        var productId = event.target.closest('button').getAttribute("data-product-id");
+        var button = event.target.closest('button');
+        var productId = button.getAttribute("data-product-id");
         var quantityInput = document.getElementById("quantity-" + productId);
+        var stock = parseInt(quantityInput.getAttribute('data-stock'));
+        var price = parseInt(quantityInput.getAttribute('data-price'));
         var newQuantity = parseInt(quantityInput.value) + change;
         if (newQuantity < 1) newQuantity = 1;
+        if (newQuantity > stock) {
+            alert('已達庫存上限');
+            newQuantity = stock;
+        }
         quantityInput.value = newQuantity;
+        sendUpdate(productId, newQuantity, price);
+    }
+
+    // 直接輸入數字時
+    document.querySelectorAll('input[name="quantity"]').forEach(function(input) {
+        input.addEventListener('change', function() {
+            var stock = parseInt(input.getAttribute('data-stock'));
+            var price = parseInt(input.getAttribute('data-price'));
+            var value = parseInt(input.value);
+            if (value < 1) value = 1;
+            if (value > stock) {
+                value = stock;
+                alert('已達庫存上限');
+            }
+            input.value = value;
+            var productId = input.id.replace('quantity-', '');
+            sendUpdate(productId, value, price);
+        });
+    });
+
+    // AJAX送出數量變動，並即時更新小計與總金額
+    function sendUpdate(productId, quantity, price) {
         var form = document.getElementById("updateForm-" + productId);
-        form.quantity.value = newQuantity;
-        form.submit();
+        var formData = new FormData(form);
+        formData.set('quantity', quantity);
+        fetch(form.action, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('更新失敗');
+            // 更新小計
+            var subtotal = quantity * price;
+            document.querySelector('#quantity-' + productId).value = quantity;
+            document.querySelector('#quantity-' + productId).closest('.cart-card').querySelector('.cart-subtotal span').textContent = subtotal;
+            // 重新計算總金額
+            updateTotalAmount();
+        })
+        .catch(() => {
+            alert('更新失敗，請稍後再試');
+        });
+    }
+
+    // 重新計算總金額
+    function updateTotalAmount() {
+        var total = 0;
+        document.querySelectorAll('.cart-subtotal span').forEach(function(span) {
+            total += parseInt(span.textContent);
+        });
+        document.querySelector('.cart-total-amount span').textContent = total;
     }
 </script>
 </body>

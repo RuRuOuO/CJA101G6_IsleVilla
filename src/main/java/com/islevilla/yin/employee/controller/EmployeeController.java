@@ -104,7 +104,10 @@ public class EmployeeController {
             if (employeeGender != 0 && employeeGender != 1) {
                 return "error: 性別值必須是 0(女) 或 1(男)";
             }
-            
+            // 檢查email是否重複
+            if (employeeService.findByEmail(employeeEmail) != null) {
+                return "error: Email 已經被使用，請換一個！";
+            }
             Employee employee = new Employee();
             employee.setEmployeeName(employeeName);
             employee.setEmployeeEmail(employeeEmail);
@@ -155,6 +158,11 @@ public class EmployeeController {
             Employee employee = employeeService.getEmployeeById(employeeId);
             if (employee == null) {
                 return "員工不存在";
+            }
+            // 檢查email是否重複（排除自己）
+            Employee exist = employeeService.findByEmail(employeeEmail);
+            if (exist != null && !exist.getEmployeeId().equals(employeeId)) {
+                return "error: Email 已經被其他人使用，請換一個！";
             }
             employee.setEmployeeName(employeeName);
             employee.setEmployeeEmail(employeeEmail);

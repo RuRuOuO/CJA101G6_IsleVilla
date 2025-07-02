@@ -15,6 +15,12 @@
             -webkit-line-clamp: 2; /* 顯示幾行：這裡是2行 */
             max-height: 3.6em; /* 根據行高調整 */
         }
+
+        .card-title {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -24,14 +30,12 @@
 <main>
     <!-- Hero Section -->
     <section class="hero-section pt-5">
-        <div class="hero-content">
-            <div class="container text-center">
-                <h1 class="mb-4">最新消息</h1>
-                <p class="mb-4">
-                    <i class="fas fa-newspaper me-2"></i>
-                    掌握 Isle Villa 的最新動態與精彩活動
-                </p>
-            </div>
+        <div class="container text-center">
+            <h1 class="mb-4">最新消息</h1>
+            <p class="mb-4">
+                <i class="fas fa-newspaper me-2"></i>
+                掌握 Isle Villa 的最新動態與精彩活動
+            </p>
         </div>
     </section>
 
@@ -41,7 +45,7 @@
             <!-- 消息卡片網格 -->
             <div class="row g-4 mb-5">
                 <!-- 使用 Thymeleaf 遍歷新聞列表 -->
-                <div class="col-lg-4 col-md-6" th:each="news : ${newsList}">
+                <div class="col-lg-4 col-md-6 col-12" th:each="news : ${newsList}">
                     <a class="text-decoration-none" th:href="@{'/news/' + ${news.newsId}}">
                         <div class="card news-card shadow-sm h-100">
                             <!-- 圖片區域 -->
@@ -53,16 +57,8 @@
 
                                 <img alt="預設圖片"
                                      class="card-img-top news-card-img"
-                                     src="https://images.unsplash.com/photo-1624474161796-7685c6919523?q=80&w=1974&auto=format&fit=crop"
+                                     src="/img/news/news0.png"
                                      th:unless="${news.newsImage != null}"/>
-
-                                <!--                                &lt;!&ndash; 新消息標籤 &ndash;&gt;-->
-                                <!--                                <div class="position-absolute top-0 end-0 m-3">-->
-                                <!--                                    <span class="badge news-date-badge text-white px-2 py-1 rounded-pill">-->
-                                <!--                                        <i class="fas fa-calendar-alt me-1"></i>-->
-                                <!--                                        <span th:text="${#temporals.format(news.newsTime, 'MM/dd')}">01/01</span>-->
-                                <!--                                    </span>-->
-                                <!--                                </div>-->
                             </div>
 
                             <!-- 內容區域 -->
@@ -111,26 +107,6 @@
             </div>
         </div>
     </section>
-
-    <!--    &lt;!&ndash; 行動呼籲區域 &ndash;&gt;-->
-    <!--    <section class="py-4 bg-primary bg-opacity-10">-->
-    <!--        <div class="container text-center">-->
-    <!--            <div class="row justify-content-center">-->
-    <!--                <div class="col-lg-8">-->
-    <!--                    <h3 class="fw-bold text-dark mb-3">不想錯過任何消息？</h3>-->
-    <!--                    <p class="text-muted mb-4 fs-5">訂閱我們的電子報，第一時間收到最新優惠與活動資訊</p>-->
-    <!--                    <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">-->
-    <!--                        <a href="#" class="btn btn-primary btn-lg px-4">-->
-    <!--                            <i class="fas fa-envelope me-2"></i>立即訂閱-->
-    <!--                        </a>-->
-    <!--                        <a href="#" class="btn btn-outline-primary btn-lg px-4">-->
-    <!--                            <i class="fab fa-facebook me-2"></i>追蹤 Facebook-->
-    <!--                        </a>-->
-    <!--                    </div>-->
-    <!--                </div>-->
-    <!--            </div>-->
-    <!--        </div>-->
-    <!--    </section>-->
 </main>
 
 <!-- ========== 載入Footer ========== -->

@@ -54,7 +54,7 @@ public class CartService {
                         imageUrl = "/product/photo/" + productId;
                     }
                     cartItems.add(new CartDTO(productId, product.getProductName(),
-                            product.getProductPrice(), quantity, subtotal, imageUrl));
+                            product.getProductPrice(), quantity, subtotal, imageUrl, product.getProductQuantity()));
                 }
             }
         }
@@ -84,5 +84,16 @@ public class CartService {
             String cartKey = getCartKey(userId);
             jedis.del(cartKey);
         }
+    }
+
+    public int getProductQuantityInCart(String userId, Integer productId) {
+        String cartKey = getCartKey(userId);
+        try (Jedis jedis = new Jedis("localhost", 6379)) {
+            String value = jedis.hget(cartKey, productId.toString());
+            if (value != null) {
+                return Integer.parseInt(value);
+            }
+        }
+        return 0;
     }
 }
