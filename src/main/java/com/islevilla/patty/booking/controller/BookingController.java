@@ -11,10 +11,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.islevilla.patty.booking.model.BookingService;
+import com.islevilla.chen.roomTypePhoto.model.RoomTypePhotoService;
+import com.islevilla.chen.roomTypePhoto.model.RoomTypePhoto;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class BookingController {
@@ -22,13 +27,21 @@ public class BookingController {
     @Autowired
     private BookingService bookingService;
 
+    @Autowired
+    private RoomTypePhotoService roomTypePhotoService;
+
     @GetMapping("/booking")
     public String showBookingPage() {
         return "front-end/booking/online-booking";
     }
 
     @GetMapping("/booking/form")
-    public String showBookingForm() {
+    public String showBookingForm(jakarta.servlet.http.HttpSession session) {
+        Object member = session.getAttribute("member");
+        if (member == null) {
+            return "redirect:/member/login?redirect=/booking/form";
+        }
+
         return "front-end/booking/booking-form";
     }
 
@@ -83,26 +96,43 @@ public class BookingController {
             @RequestParam("guestName") String guestName,
             @RequestParam("guestPhone") String guestPhone,
             @RequestParam("guestEmail") String guestEmail,
-            @RequestParam("guestIdNumber") String guestIdNumber,
             @RequestParam(value = "guestAddress", required = false) String guestAddress,
             @RequestParam(value = "specialRequests", required = false) String specialRequests,
             @RequestParam("paymentMethod") String paymentMethod,
+            @RequestParam("bookingData") String bookingDataJson,
+            HttpSession session,
             Model model) {
-        
-        // 這裡可以處理訂房資料的儲存邏輯
-        System.out.println("收到訂房資料:");
-        System.out.println("訂房人: " + guestName);
-        System.out.println("電話: " + guestPhone);
-        System.out.println("Email: " + guestEmail);
-        System.out.println("身分證: " + guestIdNumber);
-        System.out.println("地址: " + guestAddress);
-        System.out.println("特殊需求: " + specialRequests);
-        System.out.println("付款方式: " + paymentMethod);
-        
-        // 可以加入成功訊息
-        model.addAttribute("message", "訂房成功！我們會盡快與您聯繫確認。");
-        
-        return "front-end/booking/booking-success";
+        try {
+            // 解析 bookingData
+            ObjectMapper mapper = new ObjectMapper();
+            var bookingData = mapper.readValue(bookingDataJson, java.util.Map.class);
+            // 取得會員
+            var member = session.getAttribute("member");
+            if (member == null) {
+                model.addAttribute("message", "請先登入會員");
+                return "front-end/booking/booking-success";
+            }
+            // 建立訂單
+            bookingService.createOrder(guestName, guestPhone, guestEmail, guestAddress, specialRequests, paymentMethod, bookingData, (com.islevilla.lai.members.model.Members)member);
+            model.addAttribute("message", "訂房成功！我們會盡快與您聯繫確認。");
+            return "front-end/booking/booking-success";
+        } catch (Exception e) {
+            model.addAttribute("message", "訂房失敗：" + e.getMessage());
+            return "front-end/booking/booking-success";
+        }
+    }
+
+    @GetMapping("/booking/roomTypePhoto/image/{roomTypePhotoId}")
+    public ResponseEntity<byte[]> getRoomTypePhotoImageForBooking(@PathVariable Integer roomTypePhotoId) {
+        RoomTypePhoto roomTypePhoto = roomTypePhotoService.findById(roomTypePhotoId);
+        if (roomTypePhoto != null && roomTypePhoto.getRoomTypePhoto() != null) {
+            byte[] imageBytes = roomTypePhoto.getRoomTypePhoto();
+            return ResponseEntity.ok()
+                    .header("Content-Type", "image/png")
+                    .body(imageBytes);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 } 

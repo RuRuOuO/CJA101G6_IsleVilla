@@ -76,8 +76,17 @@
                     <div class="row">
                         <!-- 房型圖片 -->
                         <div class="col-md-3">
-                            <img th:if="${roomTypeObj.photoId != null}" th:src="@{'/roomTypePhoto/' + ${roomTypeObj.photoId}}" alt="房型圖片" style="max-width:100%; height:auto;" class="img-fluid rounded">
-                            <div th:if="${roomTypeObj.photoId == null}" class="bg-light rounded d-flex align-items-center justify-content-center" style="height:150px;">
+                            <div th:if="${roomTypeObj.photoIds != null and #lists.size(roomTypeObj.photoIds) > 1}">
+                                <div class="position-relative">
+                                    <img th:src="@{'/booking/roomTypePhoto/image/' + ${roomTypeObj.photoIds[0]}}" th:attr="data-photo-ids=${roomTypeObj.photoIds}" class="d-block w-100 roomtype-photo-manual" alt="房型圖片" th:attrappend="data-roomtype-id=${roomTypeObj.roomType.roomTypeId}" style="max-width:100%; height:auto;">
+                                    <button type="button" class="btn btn-secondary btn-sm position-absolute top-50 start-0 translate-middle-y prev-photo-btn" th:attr="data-roomtype-id=${roomTypeObj.roomType.roomTypeId}"><i class="bi bi-chevron-left"></i></button>
+                                    <button type="button" class="btn btn-secondary btn-sm position-absolute top-50 end-0 translate-middle-y next-photo-btn" th:attr="data-roomtype-id=${roomTypeObj.roomType.roomTypeId}"><i class="bi bi-chevron-right"></i></button>
+                                </div>
+                            </div>
+                            <div th:if="${roomTypeObj.photoIds != null and #lists.size(roomTypeObj.photoIds) == 1}">
+                                <img th:src="@{'/booking/roomTypePhoto/image/' + ${roomTypeObj.photoIds[0]}}" alt="房型圖片" style="max-width:100%; height:auto;" class="img-fluid rounded">
+                            </div>
+                            <div th:if="${roomTypeObj.photoIds == null or #lists.isEmpty(roomTypeObj.photoIds)}" class="bg-light rounded d-flex align-items-center justify-content-center" style="height:150px;">
                                 <span class="text-muted">無圖片</span>
                             </div>
                         </div>
@@ -91,12 +100,12 @@
                                     <div>
                                         <div class="fw-bold">原價</div>
                                         <div class="text-primary">
-                                            <span th:text="${roomTypeObj.roomType.roomTypePrice}">原價</span> 元
+                                            <span class="room-type-price" th:attr="data-price=${roomTypeObj.roomType.roomTypePrice}" th:text="${roomTypeObj.roomType.roomTypePrice} + ' 元/晚'">原價</span>
                                         </div>
                                     </div>
                                     <a href="#" class="btn btn-dark btn-select-room ms-2"
                                        th:if="${roomTypeObj.promotions == null or #lists.isEmpty(roomTypeObj.promotions)}"
-                                       th:attr="data-room-name=${roomTypeObj.roomType.roomTypeName},data-room-price=${roomTypeObj.roomType.roomTypePrice}">
+                                       th:attr="data-room-name=${roomTypeObj.roomType.roomTypeName},data-room-price=${roomTypeObj.roomType.roomTypePrice},data-room-id=${roomTypeObj.roomType.roomTypeId},data-room-type-id=${roomTypeObj.roomType.roomTypeId}">
                                         選擇
                                     </a>
                                 </div>
@@ -107,14 +116,14 @@
                                     <div>
                                         <div class="fw-bold" th:text="${promotion.promotion.promotion.roomPromotionTitle}">優惠專案名稱</div>
                                         <div class="text-success">
-                                            折扣價：<span th:text="${promotion.discountedPrice}">折扣價</span> 元
+                                            <span class="room-type-discounted" th:attr="data-discounted=${promotion.discountedPrice}" th:text="${promotion.discountedPrice} + ' 元/晚'">折扣價</span>
                                         </div>
                                         <div class="text-danger">
-                                            <small>省下 <span th:text="${promotion.diff}">差額</span> 元</small>
+                                            <small><span class="room-type-saved" th:attr="data-diff=${promotion.diff}" th:text="'省下 ' + ${promotion.diff} + ' 元'">省下金額</span></small>
                                         </div>
                                     </div>
                                     <a href="#" class="btn btn-dark btn-select-room ms-2"
-                                       th:attr="data-room-name=${roomTypeObj.roomType.roomTypeName + ' - ' + (promotion.promotion.promotion.roomPromotionTitle != null ? promotion.promotion.promotion.roomPromotionTitle : '優惠專案')},data-room-price=${promotion.discountedPrice != null ? promotion.discountedPrice : roomTypeObj.roomType.roomTypePrice}">
+                                       th:attr="data-room-name=${roomTypeObj.roomType.roomTypeName + ' - ' + (promotion.promotion.promotion.roomPromotionTitle != null ? promotion.promotion.promotion.roomPromotionTitle : '優惠專案')},data-room-price=${promotion.discountedPrice != null ? promotion.discountedPrice : roomTypeObj.roomType.roomTypePrice},data-room-id=${roomTypeObj.roomType.roomTypeId},data-room-type-id=${roomTypeObj.roomType.roomTypeId}">
                                         選擇
                                     </a>
                                 </div>
@@ -253,6 +262,7 @@
 
         // 頁面載入時自動更新右側資訊
         if (typeof updateCartInfo === 'function') updateCartInfo();
+        updateRoomTypePrices();
     });
 </script>
 
@@ -304,6 +314,9 @@ function updateCartInfo() {
   // 總價
   let total = 0;
   cartRoomsArr.forEach(room => total += parseInt(room.price||0));
+  if (typeof nights === 'number' && nights > 0) {
+    total = total * nights;
+  }
   document.getElementById('cart-total').textContent = total;
 }
 
@@ -318,12 +331,23 @@ function renderCart() {
         selectedRoomsContainer.innerHTML = '<div class="text-muted text-center">尚未選擇房型</div>';
         bookingButtonContainer.style.display = 'none';
     } else {
+        // 取得住宿夜數
+        const checkin = document.getElementById('checkin').value;
+        const checkout = document.getElementById('checkout').value;
+        let nights = 1;
+        if (checkin && checkout) {
+            const d1 = new Date(checkin);
+            const d2 = new Date(checkout);
+            nights = Math.max(1, Math.round((d2-d1)/(1000*60*60*24)));
+        }
         selectedRoomsContainer.innerHTML = cartRoomsArr.map(function(room, index) {
+            const price = parseInt(room.price || 0);
+            const subtotal = price * nights;
             return '<div class="border rounded p-2 mb-2">' +
                    '<div class="d-flex justify-content-between align-items-start">' +
                    '<div class="flex-grow-1">' +
                    '<div class="fw-bold small">' + room.name + '</div>' +
-                   '<div class="text-primary">' + room.price + ' 元</div>' +
+                   '<div class="text-primary">' + price + ' 元/晚 × ' + nights + ' 晚 = ' + subtotal + ' 元</div>' +
                    '</div>' +
                    '<button type="button" class="btn btn-sm btn-outline-danger" onclick="removeRoom(' + index + ')">' +
                    '<i class="bi bi-x"></i>' +
@@ -342,39 +366,38 @@ function removeRoom(index) {
 
 // 送出預訂按鈕事件處理
 document.addEventListener('DOMContentLoaded', function() {
-    // 延遲綁定事件，確保按鈕已經渲染
     setTimeout(function() {
-        const submitButton = document.getElementById('btn-submit-booking');
+        var submitButton = document.getElementById('btn-submit-booking');
         if (submitButton) {
             submitButton.addEventListener('click', function() {
-                // 檢查是否有選擇房型
-                if (cartRoomsArr.length === 0) {
-                    alert('請先選擇房型');
-                    return;
-                }
-                
-                // 檢查是否有選擇日期
+                // 組 bookingData
                 const checkin = document.getElementById('checkin').value;
                 const checkout = document.getElementById('checkout').value;
-                if (!checkin || !checkout) {
-                    alert('請先選擇入住與退房日期');
-                    return;
+                const adults = document.getElementById('main-adults').value;
+                const children = document.getElementById('main-children').value;
+                // 計算住宿夜數
+                let nights = 1;
+                if (checkin && checkout) {
+                    const d1 = new Date(checkin);
+                    const d2 = new Date(checkout);
+                    nights = Math.max(1, Math.round((d2-d1)/(1000*60*60*24)));
                 }
-                
-                // 準備訂房資料
+                // 計算總價
+                let totalPrice = 0;
+                cartRoomsArr.forEach(room => totalPrice += parseInt(room.price||0));
+                totalPrice = totalPrice * nights;
+                // bookingData
                 const bookingData = {
-                    checkin: checkin,
-                    checkout: checkout,
-                    adults: document.getElementById('main-adults').value,
-                    children: document.getElementById('main-children').value,
-                    selectedRooms: cartRoomsArr,
-                    totalPrice: document.getElementById('cart-total').textContent
+                    checkin,
+                    checkout,
+                    adults,
+                    children,
+                    nights,
+                    totalPrice,
+                    selectedRooms: cartRoomsArr
                 };
-                
-                // 將訂房資料存入 sessionStorage，供下一個頁面使用
                 sessionStorage.setItem('bookingData', JSON.stringify(bookingData));
-                
-                // 跳轉到訂房資料填寫頁面
+                // 跳轉
                 window.location.href = '/booking/form';
             });
         }
@@ -386,7 +409,9 @@ document.querySelectorAll('.btn-select-room').forEach(btn => {
         e.preventDefault();
         const roomName = this.getAttribute('data-room-name');
         const price = this.getAttribute('data-room-price');
-        cartRoomsArr.push({ name: roomName, price });
+        const roomId = this.getAttribute('data-room-id');
+        const roomTypeId = this.getAttribute('data-room-type-id');
+        cartRoomsArr.push({ name: roomName, price, roomId, roomTypeId });
         renderCart();
     });
 });
@@ -395,9 +420,64 @@ document.querySelectorAll('.btn-select-room').forEach(btn => {
 ['checkin','checkout','main-adults','main-children'].forEach(id => {
     const el = document.getElementById(id);
     if (el) {
-        el.addEventListener('change', updateCartInfo);
+        el.addEventListener('change', function() {
+            updateCartInfo();
+            updateRoomTypePrices();
+        });
     }
 });
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.prev-photo-btn, .next-photo-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var roomTypeId = btn.getAttribute('data-roomtype-id');
+      var img = document.querySelector('img.roomtype-photo-manual[data-roomtype-id="' + roomTypeId + '"]');
+      var photoIds = img.getAttribute('data-photo-ids').replace(/\[|\]|\s/g, '').split(',');
+      var currentSrc = img.getAttribute('src');
+      var currentIdx = photoIds.findIndex(function(id) {
+        return currentSrc.includes('/' + id);
+      });
+      if (btn.classList.contains('prev-photo-btn')) {
+        currentIdx = (currentIdx - 1 + photoIds.length) % photoIds.length;
+      } else {
+        currentIdx = (currentIdx + 1) % photoIds.length;
+      }
+      img.setAttribute('src', '/booking/roomTypePhoto/image/' + photoIds[currentIdx]);
+    });
+  });
+});
+</script>
+
+<script>
+// 房型價格動態顯示小計
+function updateRoomTypePrices() {
+  // 取得住宿夜數
+  const checkin = document.getElementById('checkin').value;
+  const checkout = document.getElementById('checkout').value;
+  let nights = 1;
+  if (checkin && checkout) {
+    const d1 = new Date(checkin);
+    const d2 = new Date(checkout);
+    nights = Math.max(1, Math.round((d2-d1)/(1000*60*60*24)));
+  }
+  // 原價
+  document.querySelectorAll('.room-type-price').forEach(function(span) {
+    const price = parseInt(span.getAttribute('data-price'));
+    span.textContent = price + ' 元/晚 × ' + nights + ' 晚 = ' + (price * nights) + ' 元';
+  });
+  // 優惠價
+  document.querySelectorAll('.room-type-discounted').forEach(function(span) {
+    const price = parseInt(span.getAttribute('data-discounted'));
+    span.textContent = price + ' 元/晚 × ' + nights + ' 晚 = ' + (price * nights) + ' 元';
+  });
+  // 省下金額
+  document.querySelectorAll('.room-type-saved').forEach(function(span) {
+    const diff = parseInt(span.getAttribute('data-diff'));
+    span.textContent = '省下 ' + (diff * nights) + ' 元';
+  });
+}
 </script>
 </body>
 </html>

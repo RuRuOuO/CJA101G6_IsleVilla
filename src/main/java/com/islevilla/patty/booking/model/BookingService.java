@@ -348,10 +348,11 @@ public class BookingService {
                 })
                 .collect(Collectors.toList());
             
-            // 取得房型第一張照片ID
-            Integer photoId = findFirstPhotoIdByRoomTypeId(roomType.getRoomTypeId());
+            // 取得所有照片ID
+            List<Integer> photoIds = roomTypePhotoRepository.findWithPhotos(roomType.getRoomTypeId())
+                .stream().map(RoomTypePhoto::getRoomTypePhotoId).collect(Collectors.toList());
             
-            result.add(new RoomTypeWithPromotionsAndPhoto(roomType, promotionWithDiffs, photoId));
+            result.add(new RoomTypeWithPromotionsAndPhoto(roomType, promotionWithDiffs, photoIds));
         }
         return result;
     }
@@ -359,11 +360,56 @@ public class BookingService {
     // JPQL 查詢 room_type_photo 第一張圖 id
     public Integer findFirstPhotoIdByRoomTypeId(int roomTypeId) {
         List<Integer> ids = entityManager.createQuery(
-            "SELECT p.roomTypePhotoId FROM RoomTypePhoto p WHERE p.roomTypeId = :roomTypeId ORDER BY p.roomTypePhotoId ASC", Integer.class)
+            "SELECT p.roomTypePhotoId FROM RoomTypePhoto p WHERE p.roomType.roomTypeId = :roomTypeId ORDER BY p.roomTypePhotoId ASC", Integer.class)
             .setParameter("roomTypeId", roomTypeId)
             .setMaxResults(1)
             .getResultList();
         return ids.isEmpty() ? null : ids.get(0);
+    }
+
+    public void createOrder(String guestName, String guestPhone, String guestEmail, String guestAddress, String specialRequests, String paymentMethod, java.util.Map bookingData, com.islevilla.lai.members.model.Members member) {
+        // 解析 bookingData 取得必要資訊
+        java.time.LocalDate checkin = java.time.LocalDate.parse((String)bookingData.get("checkin"));
+        java.time.LocalDate checkout = java.time.LocalDate.parse((String)bookingData.get("checkout"));
+        int adults = Integer.parseInt(bookingData.getOrDefault("adults", "1").toString());
+        int children = Integer.parseInt(bookingData.getOrDefault("children", "0").toString());
+        int totalPrice = Integer.parseInt(bookingData.getOrDefault("totalPrice", "0").toString());
+        java.util.List<java.util.Map> selectedRooms = (java.util.List<java.util.Map>)bookingData.get("selectedRooms");
+
+        // 建立 RoomRVOrder
+        com.islevilla.wei.room.model.RoomRVOrder order = new com.islevilla.wei.room.model.RoomRVOrder();
+        order.setMembers(member);
+        order.setRoomOrderDate(java.time.LocalDate.now());
+        order.setRoomOrderStatus(0); // 0:成立
+        order.setCheckInDate(checkin);
+        order.setCheckOutDate(checkout);
+        order.setRemark(specialRequests);
+        order.setRoomTotalAmount(totalPrice);
+        order.setRvDiscountAmount(0); // 先預設 0
+        order.setRvPaidAmount(totalPrice);
+        // 明細
+        java.util.List<com.islevilla.wei.room.model.RoomRVDetail> details = new java.util.ArrayList<>();
+        for (java.util.Map room : selectedRooms) {
+            com.islevilla.wei.room.model.RoomRVDetail detail = new com.islevilla.wei.room.model.RoomRVDetail();
+            // 取得 roomId 與 roomTypeId
+            Integer roomId = room.get("roomId") != null ? Integer.parseInt(room.get("roomId").toString()) : null;
+            Integer roomTypeId = room.get("roomTypeId") != null ? Integer.parseInt(room.get("roomTypeId").toString()) : null;
+            if (roomId != null) {
+                detail.setRoom(roomRepository.findById(roomId).orElse(null));
+            }
+            if (roomTypeId != null) {
+                detail.setRoomType(roomTypeRepository.findById(roomTypeId).orElse(null));
+            }
+            detail.setGuestCount(adults); // 先用總人數
+            detail.setRoomPrice(Integer.parseInt(room.getOrDefault("price", "0").toString()));
+            detail.setRvDiscountAmount(0);
+            detail.setRvPaidAmount(Integer.parseInt(room.getOrDefault("price", "0").toString()));
+            detail.setRoomRVOrder(order);
+            details.add(detail);
+        }
+        order.setRoomRVDetails(details);
+        // 儲存
+        bookingRepository.save(order);
     }
 
     public static class RoomTypeWithPromotions {
@@ -380,15 +426,15 @@ public class BookingService {
     public static class RoomTypeWithPromotionsAndPhoto {
         private RoomType roomType;
         private List<PromotionWithDiff> promotions;
-        private Integer photoId;
-        public RoomTypeWithPromotionsAndPhoto(RoomType roomType, List<PromotionWithDiff> promotions, Integer photoId) {
+        private List<Integer> photoIds;
+        public RoomTypeWithPromotionsAndPhoto(RoomType roomType, List<PromotionWithDiff> promotions, List<Integer> photoIds) {
             this.roomType = roomType;
             this.promotions = promotions;
-            this.photoId = photoId;
+            this.photoIds = photoIds;
         }
         public RoomType getRoomType() { return roomType; }
         public List<PromotionWithDiff> getPromotions() { return promotions; }
-        public Integer getPhotoId() { return photoId; }
+        public List<Integer> getPhotoIds() { return photoIds; }
     }
 
     public static class PromotionWithDiff {
