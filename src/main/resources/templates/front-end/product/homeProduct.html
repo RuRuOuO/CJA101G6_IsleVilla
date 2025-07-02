@@ -187,11 +187,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: formData
             })
             .then(response => {
+                if (response.status === 401) {
+                    // 未登入，跳轉到登入頁面
+                    if (confirm('請先登入會員才能加入購物車，是否前往登入頁面？')) {
+                        window.location.href = '/member/login?redirect=' + encodeURIComponent(window.location.pathname);
+                    }
+                    return;
+                }
                 if (!response.ok) throw new Error('加入購物車失敗');
                 return response.text();
             })
             .then(msg => {
-                alert(msg || '加入購物車成功');
+                if (msg) {
+                    alert(msg);
+                }
             })
             .catch(() => {
                 alert('加入購物車失敗，請稍後再試');

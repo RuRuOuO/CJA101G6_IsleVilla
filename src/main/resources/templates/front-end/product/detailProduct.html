@@ -132,7 +132,7 @@
             </div>
 
             <div class="d-grid gap-2 d-md-flex mb-3">
-                <form th:action="@{/addToCart}" method="post" class="d-inline">
+                <form th:action="@{/addToCart}" method="post" class="d-inline" id="addToCartForm">
                     <input type="hidden" name="productId" th:value="${product.productId}" />
                     <input type="hidden" name="quantity" id="formQuantity" value="1" />
                     <button type="submit" class="btn btn-primary btn-lg" id="add-to-cart">
@@ -220,6 +220,35 @@
 
     // 初始化同步數量
     syncQuantity();
+
+    // 加入購物車AJAX
+    document.getElementById('addToCartForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        fetch(this.action, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.status === 401) {
+                // 未登入，跳轉到登入頁面
+                if (confirm('請先登入會員才能加入購物車，是否前往登入頁面？')) {
+                    window.location.href = '/member/login?redirect=' + encodeURIComponent(window.location.pathname);
+                }
+                return;
+            }
+            if (!response.ok) throw new Error('加入購物車失敗');
+            return response.text();
+        })
+        .then(msg => {
+            if (msg) {
+                alert(msg);
+            }
+        })
+        .catch(() => {
+            alert('加入購物車失敗，請稍後再試');
+        });
+    });
 </script>
 </body>
 </html>

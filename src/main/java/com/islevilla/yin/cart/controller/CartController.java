@@ -1,12 +1,14 @@
 package com.islevilla.yin.cart.controller;
 import com.islevilla.yin.cart.model.CartDTO;
 import com.islevilla.yin.cart.model.CartService;
+import com.islevilla.lai.members.model.Members;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 
 @Controller
@@ -18,15 +20,28 @@ public class CartController {
     @PostMapping("/addToCart")
     @ResponseBody
     public ResponseEntity<?> addToCart(@RequestParam Integer productId,
-                                       @RequestParam Integer quantity) {
-        String userId = "testUser"; // 測試階段先固定假帳號
+                                       @RequestParam Integer quantity,
+                                       HttpSession session) {
+        // 檢查會員是否已登入
+        Members member = (Members) session.getAttribute("member");
+        if (member == null) {
+            return ResponseEntity.status(401).body("請先登入會員");
+        }
+        
+        String userId = String.valueOf(member.getMemberId()); // 使用實際會員ID
         cartService.addToCart(userId, productId, quantity);
         return ResponseEntity.ok().body("加入購物車成功");
     }
 
     @GetMapping("/cart")
-    public String viewCart(Model model) {
-        String userId = "testUser"; // 固定使用這個測試帳號
+    public String viewCart(Model model, HttpSession session) {
+        // 檢查會員是否已登入
+        Members member = (Members) session.getAttribute("member");
+        if (member == null) {
+            return "redirect:/member/login?redirect=/cart";
+        }
+        
+        String userId = String.valueOf(member.getMemberId()); // 使用實際會員ID
         List<CartDTO> cartItems = cartService.getCartItems(userId);
         int totalAmount = cartItems.stream().mapToInt(CartDTO::getSubtotal).sum();
 
@@ -37,22 +52,42 @@ public class CartController {
 
     @PostMapping("/updateQuantity")
     public String updateQuantity(@RequestParam Integer productId,
-                                 @RequestParam Integer quantity) {
-        String userId = "testUser"; // 假設暫時使用測試用戶
+                                 @RequestParam Integer quantity,
+                                 HttpSession session) {
+        // 檢查會員是否已登入
+        Members member = (Members) session.getAttribute("member");
+        if (member == null) {
+            return "redirect:/member/login?redirect=/cart";
+        }
+        
+        String userId = String.valueOf(member.getMemberId()); // 使用實際會員ID
         cartService.updateQuantity(userId, productId, quantity);
         return "redirect:/cart";
     }
 
     @PostMapping("/removeFromCart")
-    public String removeFromCart(@RequestParam Integer productId) {
-        String userId = "testUser"; // 假設暫時使用測試用戶
+    public String removeFromCart(@RequestParam Integer productId,
+                                 HttpSession session) {
+        // 檢查會員是否已登入
+        Members member = (Members) session.getAttribute("member");
+        if (member == null) {
+            return "redirect:/member/login?redirect=/cart";
+        }
+        
+        String userId = String.valueOf(member.getMemberId()); // 使用實際會員ID
         cartService.removeFromCart(userId, productId);
         return "redirect:/cart";
     }
 
     @PostMapping("/clearCart")
-    public String clearCart() {
-        String userId = "testUser";
+    public String clearCart(HttpSession session) {
+        // 檢查會員是否已登入
+        Members member = (Members) session.getAttribute("member");
+        if (member == null) {
+            return "redirect:/member/login?redirect=/cart";
+        }
+        
+        String userId = String.valueOf(member.getMemberId()); // 使用實際會員ID
         cartService.clearCart(userId);
         return "redirect:/cart";
     }
