@@ -58,7 +58,7 @@ public class CheckoutController {
             }
         }
         
-        String userId = "testUser"; // 固定使用這個測試帳號
+        String userId = String.valueOf(loggedInMember.getMemberId()); // 使用實際會員ID
         List<CartDTO> cartItems = cartService.getCartItems(userId);
         
         // 檢查購物車是否為空
@@ -100,7 +100,7 @@ public class CheckoutController {
             return "redirect:/member/login";
         }
         
-        String userId = "testUser"; // 固定使用這個測試帳號
+        String userId = String.valueOf(loggedInMember.getMemberId()); // 使用實際會員ID
         List<CartDTO> cartItems = cartService.getCartItems(userId);
         
         // 檢查購物車是否為空
