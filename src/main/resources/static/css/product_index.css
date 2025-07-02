@@ -7,25 +7,25 @@
     width: 100%;
     padding: 15px 0;
     border-radius: 5px; /* 圓角 */
-    border: 2px solid darkgray; /* 邊框 */
+    border: 2px solid black; /* 邊框 */
     text-align: center;
 }
 
-.category-item i {
-    font-size: 30px;
-    margin-bottom: 10px;
-    color: #007bff; /* 圖示顏色 */
-}
 
 .category-item p {
     font-size: 14px;
     margin-bottom: 0;
-    color: gray; /* 文字顏色 */
+    color: black; /* 文字顏色 */
 }
 
 .category-item button:hover {
     background-color: lightgrey; /* 滑鼠懸停背景顏色 */
     border-color: dimgrey; /* 滑鼠懸停邊框顏色 */
+}
+
+.category-item button:active {
+    background-color: grey; /* 按下時背景顏色 */
+    border-color: darkgrey; /* 按下時邊框顏色 */
 }
 
 .category-row {
