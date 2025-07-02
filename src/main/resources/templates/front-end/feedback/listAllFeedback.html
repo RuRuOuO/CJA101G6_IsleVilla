@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta content="width=device-width, initial-scale=1" name="viewport"/>
-    <title>微嶼 | Isle Villa | 佳評如潮</title>
+    <title>微嶼 | Isle Villa | 顧客好評</title>
     <!-- 載入 Bootstrap 樣式 -->
     <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
     <style>
@@ -21,7 +21,7 @@
     <section class="hero-section pt-5">
         <div class="hero-content">
             <div class="container text-center">
-                <h1 class="mb-4">顧客評價</h1>
+                <h1 class="mb-4">顧客好評</h1>
                 <p class="mb-4">
                     <i class="fa-solid fa-thumbs-up me-2"></i>
                     來自入住旅客的真實分享
@@ -95,7 +95,7 @@
                         <div class="d-flex align-items-center">
                             <i class="${category.icon} me-2 text-primary"></i>
                             <span class="me-2 text-muted">${category.name}</span>
-                            <div class="ms-auto">
+                            <div>
                                 ${generateStars(rating)}
                             </div>
                         </div>
@@ -120,7 +120,7 @@
 
         return `
             <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body p-4">
+                <div class="card-body p-5">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div class="d-flex align-items-center">
                             <span class="badge text-dark fs-6 me-3">
