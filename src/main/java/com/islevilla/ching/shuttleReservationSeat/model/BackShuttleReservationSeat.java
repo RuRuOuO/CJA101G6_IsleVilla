@@ -3,7 +3,7 @@ package com.islevilla.ching.shuttleReservationSeat.model;
 import java.io.Serializable;
 import java.util.Objects;
 
-import com.islevilla.ching.seat.model.BackSeat;
+import com.islevilla.ching.shuttleSeat.model.BackSeat;
 import com.islevilla.ching.shuttleReservation.model.BackShuttleReservation;
 import com.islevilla.lai.shuttle.model.Seat;
 import com.islevilla.lai.shuttle.model.ShuttleReservation;

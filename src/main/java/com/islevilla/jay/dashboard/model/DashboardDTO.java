@@ -17,12 +17,17 @@ public class DashboardDTO {
     
     private double roomOccupancyRate;
     
+    // 新增欄位
+    private long todayNewMembers;
+    private long todayShuttlePassengers;
+    
     // 建構子
     public DashboardDTO() {}
     
     public DashboardDTO(long todayProductOrders, double todayProductRevenue, 
                        long pendingProductOrders, List<ProductOrder> confirmedProductOrders,
-                       long todayRoomOrders, double todayRoomRevenue, List<RoomRVOrder> todayRoomOrdersList) {
+                       long todayRoomOrders, double todayRoomRevenue, List<RoomRVOrder> todayRoomOrdersList,
+                       long todayNewMembers, long todayShuttlePassengers) {
         this.todayProductOrders = todayProductOrders;
         this.todayProductRevenue = todayProductRevenue;
         this.pendingProductOrders = pendingProductOrders;
@@ -30,6 +35,8 @@ public class DashboardDTO {
         this.todayRoomOrders = todayRoomOrders;
         this.todayRoomRevenue = todayRoomRevenue;
         this.todayRoomOrdersList = todayRoomOrdersList;
+        this.todayNewMembers = todayNewMembers;
+        this.todayShuttlePassengers = todayShuttlePassengers;
     }
     
     // Getter 和 Setter
@@ -95,5 +102,18 @@ public class DashboardDTO {
     }
     public void setRoomOccupancyRate(double roomOccupancyRate) {
         this.roomOccupancyRate = roomOccupancyRate;
+    }
+
+    public long getTodayNewMembers() {
+        return todayNewMembers;
+    }
+    public void setTodayNewMembers(long todayNewMembers) {
+        this.todayNewMembers = todayNewMembers;
+    }
+    public long getTodayShuttlePassengers() {
+        return todayShuttlePassengers;
+    }
+    public void setTodayShuttlePassengers(long todayShuttlePassengers) {
+        this.todayShuttlePassengers = todayShuttlePassengers;
     }
 } 

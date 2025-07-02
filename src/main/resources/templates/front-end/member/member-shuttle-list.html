@@ -12,75 +12,104 @@
 <div th:replace="~{fragments/fragments :: header}"></div>
 
 <main>
-    <div class="container py-5">
-        <h1 class="text-center mb-4">會員專區</h1>
-        <div class="row">
-            <!-- 載入側邊欄 -->
-            <div th:replace="~{fragments/fragments :: memberSidebar(activeTab='shuttle')}"></div>
+    <!-- Hero Section -->
+    <section class="hero-section pt-5">
+        <div class="container text-center">
+            <h1 class="mb-4">會員專區</h1>
+            <p class="mb-4">
+                <i class="fa-solid fa-ship me-2"></i>
+                訂房即可預約接駁服務
+            </p>
+        </div>
+    </section>
 
-            <!-- 右側內容區 -->
-            <div class="col-md-9">
-                <!-- 有預約時 -->
-                <div th:if="${shuttleReservationList != null and !shuttleReservationList.isEmpty()}">
-                    <div class="row">
-                        <div class="col-12 col-lg-6 mb-4" th:each="shuttleReservation : ${shuttleReservationList}">
-                            <div class="card h-100 shadow-sm">
-                                <div class="card-header bg-light">
-                                    <h6 class="card-title mb-0">
-<!--                                        <i class="fas fa-bus me-2"></i>-->
-                                        <i class="fas fa-ship me-2"></i>
-                                        預約編號：<span th:text="${shuttleReservation.shuttleReservationId}"
-                                                       class="text-primary"></span>
-                                    </h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <small class="text-muted">訂房編號</small>
-                                        <div th:text="${shuttleReservation.roomRVOrder.roomReservationId}"></div>
+    <!-- Content Section -->
+    <section class="py-4">
+        <div class="container">
+            <div class="row">
+                <!-- ===== 載入側邊欄 ===== -->
+                <div th:replace="~{fragments/fragments :: memberSidebar(activeTab='shuttle')}"></div>
+
+                <!-- 右側內容區 -->
+                <div class="col-md-9">
+                    <!-- //////////////////// 會員頁面內容放這裡 //////////////////// -->
+                    <!-- 有預約時 -->
+                    <div th:if="${shuttleReservationList != null and !shuttleReservationList.isEmpty()}">
+                        <div class="row">
+                            <div class="col-12 col-lg-6 mb-4" th:each="shuttleReservation : ${shuttleReservationList}">
+                                <div class="card h-100 shadow-sm">
+                                    <div class="card-header bg-light">
+                                        <h6 class="card-title mb-0">
+                                            <!--                                        <i class="fas fa-bus me-2"></i>-->
+                                            <i class="fas fa-ship me-2"></i>
+                                            預約編號：<span th:text="${shuttleReservation.shuttleReservationId}"
+                                                           class="text-primary"></span>
+                                        </h6>
                                     </div>
-                                    <div class="mb-3">
-                                        <small class="text-muted">接駁日期</small>
-                                        <div th:text="${#temporals.format(shuttleReservation.shuttleDate, 'yyyy-MM-dd')}"></div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <small class="text-muted">班次編號</small>
-                                        <div th:text="${shuttleReservation.shuttleSchedule.shuttleScheduleId}"></div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <small class="text-muted">方向</small>
-                                        <div th:switch="${shuttleReservation.shuttleDirection}">
-                                            <span th:case="'0'" class="badge bg-info">去程</span>
-                                            <span th:case="'1'" class="badge bg-secondary">回程</span>
-                                            <span th:case="*">未知</span>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <small class="text-muted">訂房編號</small>
+                                            <div th:text="${shuttleReservation.roomRVOrder.roomReservationId}"></div>
                                         </div>
-                                    </div>
-                                    <div class="mb-0">
-                                        <small class="text-muted">預約狀態</small>
-                                        <div th:switch="${shuttleReservation.shuttleReservationStatus}">
-                                            <span th:case="'0'" class="badge bg-secondary">已取消</span>
-                                            <span th:case="'1'" class="badge bg-success">正常</span>
-                                            <span th:case="*"
-                                                  class="badge bg-dark">未知</span>
+                                        <div class="mb-3">
+                                            <small class="text-muted">接駁日期</small>
+                                            <div th:text="${#temporals.format(shuttleReservation.shuttleDate, 'yyyy-MM-dd')}"></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <small class="text-muted">班次編號</small>
+                                            <div th:text="${shuttleReservation.shuttleSchedule.shuttleScheduleId}"></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <small class="text-muted">方向</small>
+                                            <div th:switch="${shuttleReservation.shuttleDirection}">
+                                                <span th:case="'0'" class="badge bg-info">去程</span>
+                                                <span th:case="'1'" class="badge bg-secondary">回程</span>
+                                                <span th:case="*">未知</span>
+                                            </div>
+                                        </div>
+                                        <div class="mb-0">
+                                            <small class="text-muted">預約狀態</small>
+                                            <div th:switch="${shuttleReservation.shuttleReservationStatus}">
+                                                <span th:case="'0'" class="badge bg-secondary">已取消</span>
+                                                <span th:case="'1'" class="badge bg-success">正常</span>
+                                                <span th:case="*"
+                                                      class="badge bg-dark">未知</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- 無預約提示 -->
-                <div th:unless="${shuttleReservationList != null and !shuttleReservationList.isEmpty()}"
-                     class="text-center py-5">
-                    <div class="mb-4">
-                        <i class="fas fa-inbox fa-3x text-muted"></i>
+                    <!-- 無預約提示 -->
+                    <!--                    <div th:unless="${shuttleReservationList != null and !shuttleReservationList.isEmpty()}"-->
+                    <!--                         class="text-center py-5">-->
+                    <!--                        <div class="mb-4">-->
+                    <!--                            <i class="fas fa-inbox fa-3x text-muted"></i>-->
+                    <!--                        </div>-->
+                    <!--                        <h5 class="text-muted">尚無接駁預約</h5>-->
+                    <!--                        <p class="text-muted">您目前還沒有接駁預約紀錄</p>-->
+                    <!--                    </div>-->
+                    <div th:unless="${shuttleReservationList != null and !shuttleReservationList.isEmpty()}"
+                         id="noOrdersMessage" class="card p-5 shadow-sm text-center">
+                        <div class="no-orders-message">
+                            <div class="mb-4">
+                                <i class="fas fa-inbox fa-3x text-muted"></i>
+                            </div>
+                            <h3 class="text-muted">尚無接駁預約</h3>
+                            <p class="text-muted mb-3">
+                                您目前還沒有接駁預約紀錄
+                            </p>
+                            <div class="mt-4">
+                                <a href="/shuttle/reservation" class="btn btn-outline-dark me-2">預約接駁</a>
+                            </div>
+                        </div>
                     </div>
-                    <h5 class="text-muted">尚無接駁預約</h5>
-                    <p class="text-muted">您目前還沒有接駁預約紀錄</p>
-                </div>
+                </div><!-- //////////////////// 會員頁面內容放這裡 //////////////////// -->
             </div>
         </div>
-    </div>
+    </section>
 </main>
 
 <!-- 載入Footer -->

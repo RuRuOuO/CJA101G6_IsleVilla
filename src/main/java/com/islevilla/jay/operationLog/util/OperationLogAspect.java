@@ -101,7 +101,17 @@ public class OperationLogAspect {
 
     // 根據操作類型記錄日誌
     private void logByType(JoinPoint joinPoint, String actionType) {
-        HttpSession session = getSession();
+        // 讓只有back-end路徑的才會被記錄到
+        HttpServletRequest request = null;
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        if (requestAttributes instanceof ServletRequestAttributes) {
+            request = ((ServletRequestAttributes) requestAttributes).getRequest();
+        }
+        if (request == null || !request.getRequestURI().contains("/backend")) {
+            return;
+        }
+        HttpSession session = request.getSession(false);
+        
         String className = joinPoint.getTarget().getClass().getSimpleName();
         String methodName = joinPoint.getSignature().getName();
         System.out.println("[AOP DEBUG] actionType=" + actionType + ", class=" + className + ", method=" + methodName + ", session=" + (session != null) + ", employee=" + (session != null && session.getAttribute("employee") != null));
