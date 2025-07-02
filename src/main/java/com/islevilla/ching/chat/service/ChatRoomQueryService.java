@@ -71,7 +71,7 @@ public class ChatRoomQueryService {
         }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    /** ✔ 查詢單一聊天室 */
+    // 查詢單一聊天室 
     public ChatRoomDTO getChatRoom(Integer roomId, Integer userId) {
         String json = redisStr.opsForValue().get(ChatRedisKey.chatRoom(roomId));
         if (json == null) return null;

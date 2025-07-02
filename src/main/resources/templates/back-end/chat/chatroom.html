@@ -11,14 +11,14 @@ body {
 }
 
 h2 {
-	margin-bottom: 1rem;
 	text-align: center;
+	margin-bottom: 20px;
 }
 
 .container {
-	position: relative;
 	max-width: 600px;
 	margin: auto;
+	position: relative;
 }
 
 .back-btn {
@@ -47,12 +47,15 @@ h2 {
 	margin-bottom: 10px;
 	border-radius: 8px;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
 }
 
+/* ✔ 對話訊息 */
 .msg {
-	margin-bottom: 10px;
 	display: flex;
-	max-width: 80%;
+	width: 100%;
 }
 
 .msg.left {
@@ -61,31 +64,30 @@ h2 {
 
 .msg.right {
 	justify-content: flex-end;
-	margin-left: auto;
 }
 
 .bubble {
+	max-width: 70%;
 	padding: 10px 14px;
-	border-radius: 12px;
-	background-color: #e6f0fa;
-	position: relative;
+	border-radius: 16px;
 	word-break: break-word;
-	max-width: 100%;
-	display: inline-block;
+	box-shadow: 0 1px 4px rgba(0,0,0,0.1);
 }
 
 .left .bubble {
 	background-color: #e6f0fa;
+	border-top-left-radius: 4px;
 }
 
 .right .bubble {
 	background-color: #d4edda;
+	border-top-right-radius: 4px;
 }
 
 .bubble .name {
 	font-weight: bold;
 	display: block;
-	margin-bottom: 3px;
+	margin-bottom: 4px;
 	color: #3498db;
 }
 
@@ -99,13 +101,12 @@ h2 {
 	display: block;
 	margin-top: 4px;
 	text-align: right;
-	position: static; 
 }
 
+/* ✔ 輸入框 */
 .input-area {
 	display: flex;
 	gap: 10px;
-	box-sizing: border-box;
 }
 
 input[type="text"] {
@@ -128,59 +129,82 @@ button {
 button:hover {
 	background-color: #2980b9;
 }
+
+#status-banner {
+	text-align: center;
+	color: red;
+	font-weight: bold;
+	margin-bottom: 8px;
+}
 </style>
 </head>
 <body>
 
-	<h2>與會員 [[${room.memberName}]] 連線中 | 編號
-	<span th:text="${roomId}">0</span></h2>
+<h2>與會員 [[${room.memberName}]] 連線中 | 編號 <span th:text="${roomId}">0</span></h2>
 
-	<div class="container">
-		<!-- ✔ 返回首頁放右上角 -->
-		<button class="back-btn" onclick="gochatlist()">返回 聊天室列表</button>
-		<!-- ✔ 對話框 -->
-		<div id="chat"></div>
+<div class="container">
+	<button class="back-btn" onclick="gochatlist()">返回聊天室列表</button>
 
-		<!-- ✔ 輸入框和發送按鈕 對齊對話框 -->
-		<div class="input-area">
-			<input id="msg" type="text" placeholder="輸入訊息..."
-				onkeydown="handleKey(event)" />
-			<button onclick="sendMessage()">送出</button>
-		</div>
+	<div id="status-banner"></div>
+
+	<div id="chat"></div>
+
+	<div class="input-area">
+		<input id="msg" type="text" placeholder="輸入訊息..." onkeydown="handleKey(event)" />
+		<button onclick="sendMessage()">送出</button>
 	</div>
+</div>
 
-	<script th:inline="javascript">
+<script th:inline="javascript">
 const roomId = [[${roomId}]];
 const senderId = [[${senderId}]];
 const senderName = '[[${senderName}]]';
-const senderType = [[${senderType}]];  // ✔ 客服 → 1
+const senderType = [[${senderType}]];
 const chatStatus = [[${room.chatStatus}]];  // ✔ 狀態
 
 console.log("🟥 客服聊天室 | roomId=", roomId, "senderId=", senderId, "senderName=", senderName);
 
-// WebSocket連線
+const input = document.getElementById("msg");
+const banner = document.getElementById("status-banner");
+
+// 建立 WebSocket
 const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/chat?roomId=${roomId}`);
 
-ws.onopen = () => console.log("✅ WebSocket 已連線聊天室", roomId);
-ws.onclose = () => console.log("❌ WebSocket 已關閉");
-ws.onerror = err => console.error("❌ WebSocket 錯誤", err);
+ws.onopen = () => {
+    console.log("✅ WebSocket 已連線聊天室", roomId);
+    if (chatStatus === 0) {
+        disableInput("⚠️ 此聊天室已結束，無法傳送訊息");
+    }
+};
+
+ws.onclose = () => {
+    console.log("❌ WebSocket 已關閉");
+    disableInput("❌ 聯線已中斷");
+};
+
+ws.onerror = (err) => {
+    console.error("❌ WebSocket 錯誤", err);
+    disableInput("❌ 發生錯誤，請重試");
+};
 
 ws.onmessage = event => {
     const msg = JSON.parse(event.data);
-    const isMe = msg.senderId === senderId;
-    renderMessage(isMe, msg.senderName, msg.messageContent, msg.messageTime);
+    const isMe = (msg.senderId === senderId) && (msg.senderType === senderType);
+    const displayName = msg.senderType === 1 ? 'IsleVilla 客服' : msg.senderName;
+    renderMessage(isMe, displayName, msg.messageContent, msg.messageTime);
 };
 
 // 拉取歷史訊息
 window.onload = () => {
-    fetch(`/api/chat/room/${roomId}/history`)
-        .then(res => res.json())
-        .then(history => {
-            history.forEach(msg => {
-                const isMe = msg.senderId === senderId;
-                renderMessage(isMe, msg.senderName, msg.messageContent, msg.messageTime);
-            });
+	fetch(`/api/chat/room/${roomId}/history`)
+    .then(res => res.json())
+    .then(history => {
+        history.forEach(msg => {
+            const isMe = (msg.senderId === senderId) && (msg.senderType === senderType);
+            const displayName = msg.senderType === 1 ? 'IsleVilla 客服' : msg.senderName;
+            renderMessage(isMe, displayName, msg.messageContent, msg.messageTime);
         });
+    });
 };
 
 // 發送訊息
@@ -190,7 +214,6 @@ function sendMessage() {
         return;
     }
 
-    const input = document.getElementById("msg");
     const content = input.value.trim();
     if (!content) return;
 
@@ -214,12 +237,9 @@ function renderMessage(isMe, sender, content, timeMillis) {
 
     const timeStr = timeMillis ? formatTime(timeMillis) : formatTime(Date.now());
 
-    // 客服名字統一
-    const displayName = isMe ? 'IsleVilla 客服' : sender;
-
     div.innerHTML = `
         <div class="bubble">
-            <span class="name">${displayName}</span>
+            <span class="name">${sender}</span>
             <span class="content">${content}</span>
             <span class="time">${timeStr}</span>
         </div>
@@ -248,6 +268,13 @@ function handleKey(event) {
         event.preventDefault();
         sendMessage();
     }
+}
+
+// 停用輸入框
+function disableInput(message) {
+    input.disabled = true;
+    document.querySelector("button").disabled = true;
+    banner.textContent = message;
 }
 </script>
 

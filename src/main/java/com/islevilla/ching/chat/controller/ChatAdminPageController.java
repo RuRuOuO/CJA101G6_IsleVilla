@@ -1,16 +1,15 @@
 package com.islevilla.ching.chat.controller;
 
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.islevilla.ching.chat.modelDTO.ChatMessageDTO;
 import com.islevilla.ching.chat.modelDTO.ChatRoomDTO;
@@ -34,18 +33,21 @@ public class ChatAdminPageController {
 			return "redirect:/backend/auth";
 		}
 
-		String employeeName = employee.getEmployeeName();
-
 		List<ChatRoomDTO> rooms = chatRedisService.getAllChatRoomsWithEmployeeUnread().stream()
-				.filter(r -> r.getMemberName() != null && !"未知會員".equals(r.getMemberName())).toList();
+		        .filter(r -> r.getMemberName() != null && !"未知會員".equals(r.getMemberName()))
+		        .sorted(Comparator.comparing(
+		                r -> Optional.ofNullable(r.getLastMessageTime()).orElse(0L),
+		                Comparator.reverseOrder()
+		        ))
+		        .toList();
 
 		model.addAttribute("rooms", rooms);
-		model.addAttribute("employeeName", employeeName);
+		model.addAttribute("employeeName", employee.getEmployeeName());
 
 		return "back-end/chat/chatroomlist";
 	}
 
-	// 聊天室詳細視窗
+	// 聊天室對話視窗
 	@GetMapping("/room/{id}")
 	public String chatRoomDetail(@PathVariable("id") Integer roomId, HttpSession session, Model model) {
 
@@ -63,6 +65,12 @@ public class ChatAdminPageController {
 			model.addAttribute("error", "找不到該聊天室");
 			return "back-end/chat/error";
 		}
+		
+		// 如果狀態是等待處理 → 自動轉回進行中
+		if (room.getChatStatus() == 3) {
+		    room.setChatStatus(1);
+		}
+		
 		// 誰最後進入聊天室，聊天室客服就是誰
 		room.setEmployeeId(employeeId);
 		room.setEmployeeName(employeeName);
@@ -75,52 +83,13 @@ public class ChatAdminPageController {
 		List<ChatMessageDTO> messages = chatRedisService.getMessageHistory(roomId);
 
 		model.addAttribute("chatStatus", room.getChatStatus());
-		model.addAttribute("room", room); 
-        model.addAttribute("roomId", roomId);
-        model.addAttribute("messages", messages);
-        model.addAttribute("senderId", employeeId);
-        model.addAttribute("senderName", employeeName);
-        model.addAttribute("senderType", 1); // 1 = 客服端
+		model.addAttribute("room", room);
+		model.addAttribute("roomId", roomId);
+		model.addAttribute("messages", messages);
+		model.addAttribute("senderId", employeeId);
+		model.addAttribute("senderName", employeeName);
+		model.addAttribute("senderType", 1); // 1 = 客服端
 
 		return "back-end/chat/chatroom";
-	}
-
-	// 結束聊天室
-	@PostMapping("/room/{id}/close")
-	@ResponseBody
-	public Map<String, Object> closeChatRoom(@PathVariable("id") Integer roomId, HttpSession session) {
-
-		Employee employee = (Employee) session.getAttribute("employee");
-		if (employee == null) {
-			return Map.of("success", false, "message", "未登入");
-		}
-
-		ChatRoomDTO room = chatRedisService.getChatRoom(roomId);
-		if (room == null) {
-			return Map.of("success", false, "message", "聊天室不存在");
-		}
-
-		chatRedisService.closeChatRoom(roomId);
-		return Map.of("success", true, "message", "聊天室已結束");
-	}
-
-	/** ✔ 重新開啟聊天室 */
-	@PostMapping("/room/{id}/open")
-	@ResponseBody
-	public Map<String, Object> openChatRoom(@PathVariable("id") Integer roomId, HttpSession session) {
-		Employee employee = (Employee) session.getAttribute("employee");
-		if (employee == null) {
-			return Map.of("success", false, "message", "未登入");
-		}
-
-		ChatRoomDTO room = chatRedisService.getChatRoom(roomId);
-		if (room == null) {
-			return Map.of("success", false, "message", "聊天室不存在");
-		}
-
-		room.setChatStatus(1); // ✔ 狀態改為進行中
-		chatRedisService.saveChatRoom(room);
-
-		return Map.of("success", true, "message", "聊天室已重新開啟");
 	}
 }
