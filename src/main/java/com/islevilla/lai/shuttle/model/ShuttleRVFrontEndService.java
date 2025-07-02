@@ -104,13 +104,14 @@ public class ShuttleRVFrontEndService {
         // 先查詢該班次該日期的座位總數設定
         Optional<ShuttleSeatAvailability> availability = 
             shuttleSeatAvailabilityRepository.findByShuttleScheduleIdAndShuttleDate(scheduleId, shuttleDate);
-        
-        Integer totalSeats = availability.map(ShuttleSeatAvailability::getSeatQuantity).orElse(100);
+        Integer unavailableSeats = seatRepository.countUnavailableSeats();
+        Integer totalSeats = availability.map(ShuttleSeatAvailability::getSeatQuantity).orElse(100 - unavailableSeats);
         
         // 查詢已預約的座位數
-        Long reservedSeats = shuttleRVRepository.countReservationsByDateAndScheduleId(shuttleDate, scheduleId);
+//        Integer reservedSeats = shuttleRVRepository.countReservationsByDateAndScheduleId(shuttleDate, scheduleId);
+        Integer reservedSeats = shuttleRVRepository.getTotalShuttleNumberByShuttleDateAndShuttleScheduleId(shuttleDate, scheduleId);
         
-        return totalSeats - reservedSeats.intValue();
+        return totalSeats - reservedSeats;
     }
     
     /**
@@ -196,11 +197,11 @@ public class ShuttleRVFrontEndService {
      * 取得預約摘要
      */
     public TempShuttleRVSummaryDTO getReservationSummary(Integer reservationRequestId) {
-    	TempShuttleRVRequest entity = tempShuttleRVRequestRepository.findById(reservationRequestId)
+    	TempShuttleRVRequest tempShuttleRVRequest = tempShuttleRVRequestRepository.findById(reservationRequestId)
             .orElseThrow(() -> new RuntimeException("預約請求不存在"));
         
         // 取得班次資訊
-        ShuttleSchedule schedule = shuttleScheduleRepository.findById(entity.getSelectedScheduleId())
+        ShuttleSchedule schedule = shuttleScheduleRepository.findById(tempShuttleRVRequest.getSelectedScheduleId())
             .orElseThrow(() -> new RuntimeException("班次不存在"));
         
         ShuttleScheduleWithAvailabilityDTO scheduleDTO = new ShuttleScheduleWithAvailabilityDTO(
@@ -208,24 +209,24 @@ public class ShuttleRVFrontEndService {
             schedule.getShuttleDirection(),
             schedule.getShuttleDepartureTime(),
             schedule.getShuttleArrivalTime(),
-            calculateAvailableSeats(schedule.getShuttleScheduleId(), entity.getShuttleDate())
+            calculateAvailableSeats(schedule.getShuttleScheduleId(), tempShuttleRVRequest.getShuttleDate())
         );
         
         // 取得選擇的座位資訊
         List<SeatDTO> selectedSeats = new ArrayList<>();
-        if (entity.getSelectedSeatIdsList() != null && !entity.getSelectedSeatIdsList().isEmpty()) {
-            List<Seat> seats = seatRepository.findAllById(entity.getSelectedSeatIdsList());
+        if (tempShuttleRVRequest.getSelectedSeatIdsList() != null && !tempShuttleRVRequest.getSelectedSeatIdsList().isEmpty()) {
+            List<Seat> seats = seatRepository.findAllById(tempShuttleRVRequest.getSelectedSeatIdsList());
             selectedSeats = seats.stream()
                 .map(seat -> new SeatDTO(seat.getSeatId(), seat.getSeatNumber(), seat.getSeatStatus(), false))
                 .collect(Collectors.toList());
         }
         
         TempShuttleRVSummaryDTO summary = new TempShuttleRVSummaryDTO();
-        summary.setMemberId(entity.getMemberId());
-        summary.setRoomReservationId(entity.getRoomReservationId());
-        summary.setShuttleDate(entity.getShuttleDate());
-        summary.setShuttleDirection(entity.getShuttleDirection());
-        summary.setShuttleNumber(entity.getShuttleNumber());
+        summary.setMemberId(tempShuttleRVRequest.getMemberId());
+        summary.setRoomReservationId(tempShuttleRVRequest.getRoomReservationId());
+        summary.setShuttleDate(tempShuttleRVRequest.getShuttleDate());
+        summary.setShuttleDirection(tempShuttleRVRequest.getShuttleDirection());
+        summary.setShuttleNumber(tempShuttleRVRequest.getShuttleNumber());
         summary.setSchedule(scheduleDTO);
         summary.setSelectedSeats(selectedSeats);
         

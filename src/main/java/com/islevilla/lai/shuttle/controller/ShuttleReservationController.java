@@ -117,7 +117,7 @@ public class ShuttleReservationController {
         
         try {
             // 查詢會員的訂房記錄
-            List<RoomRVOrder> memberRoomReservations = roomRVOrderService.getRoomRVOrderByMember(member);
+            List<RoomRVOrder> memberRoomReservations = roomRVOrderService.getFutureRoomRVOrderByMember(member);
             System.out.println("找到 " + memberRoomReservations.size() + " 筆訂房記錄");
             model.addAttribute("memberRoomReservations", memberRoomReservations);
         } catch (Exception e) {
@@ -153,7 +153,7 @@ public class ShuttleReservationController {
         reservationRequest.setMemberId(member.getMemberId());
         System.out.println("會員ID: " + member.getMemberId());
         
-        // 打印接收到的數據進行調試
+        // 確認接收到的預約資料
         System.out.println("接收到的預約資料:");
         System.out.println("- 會員ID: " + reservationRequest.getMemberId());
         System.out.println("- 訂房編號: " + reservationRequest.getRoomReservationId());

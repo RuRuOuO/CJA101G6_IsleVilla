@@ -122,12 +122,22 @@
                                                     <span class="badge bg-success">已完成付款</span>
                                                 </td>
                                                 <td>
-                                                	<!-- 選擇訂房按鈕 -->
+													<!-- 選擇訂房按鈕 -->
 													<button type="button" class="btn btn-primary btn-sm select-room-btn"
 													        th:attr="data-room-reservation-id=${room.roomReservationId},
 													                 data-check-in-date=${#temporals.format(room.checkInDate, 'yyyy-MM-dd')}, 
-													                 data-check-out-date=${#temporals.format(room.checkOutDate, 'yyyy-MM-dd')}">
-													    選擇此訂房
+													                 data-check-out-date=${#temporals.format(room.checkOutDate, 'yyyy-MM-dd')},
+													                 data-shuttle-date=${#temporals.format(room.checkInDate, 'yyyy-MM-dd')},
+													                 data-shuttle-direction=0">
+													    預約去程
+													</button>
+													<button type="button" class="btn btn-primary btn-sm select-room-btn"
+													        th:attr="data-room-reservation-id=${room.roomReservationId},
+													                 data-check-in-date=${#temporals.format(room.checkInDate, 'yyyy-MM-dd')}, 
+													                 data-check-out-date=${#temporals.format(room.checkOutDate, 'yyyy-MM-dd')}, 
+													                 data-shuttle-date=${#temporals.format(room.checkOutDate, 'yyyy-MM-dd')},
+													                 data-shuttle-direction=1">
+													    預約回程
 													</button>
                                                 </td>
                                             </tr>
@@ -152,6 +162,9 @@
                         <!-- 隱藏欄位：接駁日期 (由 JavaScript 設定) -->
                         <input type="hidden" th:field="*{shuttleDate}" id="selectedShuttleDate">
                         
+                        <!-- 隱藏欄位：接駁日期 (由 JavaScript 設定) -->
+                        <input type="hidden" th:field="*{shuttleDirection}" id="selectedShuttleDirection">
+                        
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
@@ -166,25 +179,6 @@
                                     </select>
                                     <div th:if="${#fields.hasErrors('shuttleNumber')}" class="invalid-feedback"
                                         th:errors="*{shuttleNumber}"></div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">接駁方向 <span class="text-danger">*</span></label>
-                                    <div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" th:field="*{shuttleDirection}"
-                                                value="0" required id="direction-outward">
-                                            <label class="form-check-label" for="direction-outward">去程</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" th:field="*{shuttleDirection}"
-                                                value="1" required id="direction-return">
-                                            <label class="form-check-label" for="direction-return">回程</label>
-                                        </div>
-                                    </div>
-                                    <div th:if="${#fields.hasErrors('shuttleDirection')}" class="text-danger"
-                                        th:errors="*{shuttleDirection}"></div>
                                 </div>
                             </div>
                         </div>
