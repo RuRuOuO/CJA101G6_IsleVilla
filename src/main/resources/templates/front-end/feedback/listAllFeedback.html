@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta content="width=device-width, initial-scale=1" name="viewport"/>
-    <title>微嶼 | Isle Villa | 佳評如潮</title>
+    <title>微嶼 | Isle Villa | 顧客好評</title>
     <!-- 載入 Bootstrap 樣式 -->
     <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
     <style>
@@ -21,7 +21,7 @@
     <section class="hero-section pt-5">
         <div class="hero-content">
             <div class="container text-center">
-                <h1 class="mb-4">顧客評價</h1>
+                <h1 class="mb-4">顧客好評</h1>
                 <p class="mb-4">
                     <i class="fa-solid fa-thumbs-up me-2"></i>
                     來自入住旅客的真實分享
@@ -64,13 +64,13 @@
 
 <script>
     const ratingCategories = {
-        fbShuttleRating: {name: '接駁服務', icon: 'bi-bus-front'},
-        fbReceptionRating: {name: '櫃台服務', icon: 'bi-person-check'},
-        fbRoomRating: {name: '房間品質', icon: 'bi-house-door'},
-        fbFacilityRating: {name: '設施', icon: 'bi-building'},
-        fbEnvRating: {name: '環境', icon: 'bi-tree'},
+        fbShuttleRating: {name: '接駁服務', icon: 'fa-solid fa-ship'},
+        fbReceptionRating: {name: '櫃台服務', icon: 'bi bi-person-fill'},
+        fbRoomRating: {name: '房間品質', icon: 'bi bi-house-door-fill'},
+        fbFacilityRating: {name: '設施', icon: 'fa-solid fa-water-ladder'},
+        fbEnvRating: {name: '環境', icon: 'fa-solid fa-mountain-sun'},
         fbValueRating: {name: '性價比', icon: 'bi-currency-dollar'},
-        fbWebsiteRating: {name: '網站使用', icon: 'bi-globe'}
+        fbWebsiteRating: {name: '網站使用', icon: 'bi bi-globe2'}
     };
 
     function generateStars(rating) {
@@ -79,7 +79,7 @@
             if (i <= rating) {
                 stars += '<i class="bi bi-star-fill text-warning"></i>';
             } else {
-                stars += '<i class="bi bi-star text-muted"></i>';
+                stars += '<i class="bi bi-star text-warning"></i>';
             }
         }
         return stars;
@@ -93,9 +93,9 @@
                 ratingsHtml += `
                     <div class="col-6 col-md-4 mb-2">
                         <div class="d-flex align-items-center">
-                            <i class="${category.icon} me-2 text-primary"></i>
+                            <i class="${category.icon} me-2 text-muted"></i>
                             <span class="me-2 text-muted">${category.name}</span>
-                            <div class="ms-auto">
+                            <div>
                                 ${generateStars(rating)}
                             </div>
                         </div>
@@ -120,11 +120,11 @@
 
         return `
             <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body p-4">
+                <div class="card-body p-5">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div class="d-flex align-items-center">
                             <span class="badge text-dark fs-6 me-3">
-                                ${generateStars(review.fbOverallRating)} ${review.fbOverallRating}
+                            整體評價 ${generateStars(review.fbOverallRating)} ${review.fbOverallRating}
                             </span>
                             ${review.fbRecommend === 1 ? '<span class="badge bg-success">推薦</span>' : ''}
                             ${review.fbRevisit === 1 ? '<span class="badge bg-info ms-1">會再訪</span>' : ''}
@@ -136,14 +136,14 @@
 
                     ${hasCompliment ? `
                         <div class="mb-3">
-                            <h6 class="text-success mb-2"><i class="bi bi-heart-fill me-1"></i>好評分享</h6>
+                            <h6 class="mb-2"><i class="bi bi-heart-fill me-1"></i>好評分享</h6>
                             <p class="mb-0 lh-base text-dark">${review.fbCompliment}</p>
                         </div>` : ''}
 
                     ${hasSuggestion ? `
                         <div class="mb-3">
-                            <h6 class="text-info mb-2"><i class="bi bi-lightbulb me-1"></i>改進建議</h6>
-                            <div class="bg-light border-start border-info border-4 rounded ps-3 py-2">
+                            <h6 class="mb-2"><i class="bi bi-lightbulb me-1"></i>改進建議</h6>
+                            <div class="bg-light rounded ps-3 py-2">
                                 <p class="mb-0 text-dark">${review.fbSuggestion}</p>
                             </div>
                         </div>` : ''}
