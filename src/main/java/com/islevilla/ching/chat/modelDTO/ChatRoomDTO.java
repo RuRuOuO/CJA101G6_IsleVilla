@@ -5,16 +5,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@Data
 public class ChatRoomDTO {
     private Integer chatRoomId;
     private Integer memberId;
     private String memberName;
     private Integer employeeId;
     private String employeeName;
-    private Integer chatStatus; // 1 = 進行中，0 = 已結束
+    private Integer chatStatus; // 1 = 進行中 2 = 已結案
     private Integer unreadCount; // ✔ 未讀訊息數
+    private Long lastMessageTime;
+	
 }
