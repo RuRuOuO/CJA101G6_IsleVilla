@@ -3,7 +3,6 @@ package com.islevilla.lai.shuttle.model;
 import java.time.LocalDate;
 import java.util.List;
 
-import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -22,12 +21,11 @@ public class TempShuttleRVRequestDTO {
 	private Integer roomReservationId;
 
 	@NotNull(message = "請選擇接駁日期")
-//    @Future(message = "接駁日期必須是未來日期")
 	private LocalDate shuttleDate;
 
 	@NotNull(message = "請選擇接駁人數")
 	@Min(value = 1, message = "接駁人數不能少於1人")
-	@Max(value = 10, message = "接駁人數不能超過10人")
+//	@Max(value = 10, message = "接駁人數不能超過10人")
 	private Integer shuttleNumber;
 
 	@NotNull(message = "請選擇接駁方向")
