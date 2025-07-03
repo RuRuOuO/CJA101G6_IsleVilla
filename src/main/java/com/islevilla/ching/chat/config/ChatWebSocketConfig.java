@@ -17,7 +17,12 @@ public class ChatWebSocketConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        // 一般聊天室（前台或後台的對話視窗）
         registry.addHandler(chatWebSocketHandler, "/ws/chat")
                 .setAllowedOrigins("*"); // 生產建議改為指定網域
+
+        // 聊天室列表（後台聊天室管理用）
+        registry.addHandler(chatWebSocketHandler, "/ws/chatroomList")
+                .setAllowedOrigins("*");
     }
 }

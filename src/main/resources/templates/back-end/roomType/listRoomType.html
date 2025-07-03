@@ -71,7 +71,7 @@
 								<th>數量</th>
 								<th>價格</th>
 								<th>狀態</th>
-								<th>修改</th>
+								<th>操作</th>
 							</tr>
 						</thead>
 						<tbody id="roomTypeTBody">
@@ -96,9 +96,11 @@
                                      data-content=${rt.roomTypeContent},
                                      data-price=${rt.roomTypePrice},
                                      data-status=${rt.roomTypeSaleStatus}
-                                   ">
+                                   "
+											onclick="loadRoomTypeForUpdate(this)">
 											<i class="bi bi-pencil"></i>
 										</a>
+
 									</div>
 								</td>
 							</tr>
@@ -179,12 +181,20 @@
                     </div>
                 </div>
 
-<!--                 <div class="mb-3"> -->
-<!--                     <label class="form-label">商品圖片（可拖曳）</label> -->
-<!--                     <div id="productPhotoSortArea" class="d-flex flex-wrap gap-2"></div> -->
-<!--                     <input type="file" class="form-control mt-2" id="editProductPhotoInput" accept="image/*" multiple style="max-width:300px;" onchange="addNewProductPhotos(this)"> -->
-<!--                     <small class="text-muted">可拖曳排序，右上角可刪除，點選可新增圖片</small> -->
-<!--                 </div> -->
+                <!-- 房型圖片管理區塊 -->
+                <div class="mb-3">
+                    <label class="form-label">房型圖片（可拖曳排序）</label>
+                    <div id="roomTypePhotoSortArea" class="d-flex flex-wrap gap-2 mb-2" style="min-height: 120px; border: 2px dashed #dee2e6; border-radius: 8px; padding: 10px;">
+                        <div class="d-flex align-items-center justify-content-center text-muted" style="width: 100%; height: 100px;" id="noPhotosPlaceholder">
+                            <div class="text-center">
+                                <i class="bi bi-images fs-1"></i>
+                                <div>暫無圖片</div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="file" class="form-control mt-2" id="updateRoomTypePhotoInput" accept="image/*" multiple style="max-width:300px;" onchange="addNewRoomTypePhotos(this)">
+                    <small class="text-muted">支援格式：JPG、PNG、GIF，單檔不超過5MB。可拖曳排序，右上角可刪除</small>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
@@ -264,12 +274,20 @@
                     </div>
                 </div>
 
-<!--                 <div class="mb-3"> -->
-<!--                     <label class="form-label">商品圖片（可拖曳）</label> -->
-<!--                     <div id="productPhotoSortArea" class="d-flex flex-wrap gap-2"></div> -->
-<!--                     <input type="file" class="form-control mt-2" id="editProductPhotoInput" accept="image/*" multiple style="max-width:300px;" onchange="addNewProductPhotos(this)"> -->
-<!--                     <small class="text-muted">可拖曳排序，右上角可刪除，點選可新增圖片</small> -->
-<!--                 </div> -->
+                <!-- 新增房型圖片區塊 -->
+                <div class="mb-3">
+                    <label class="form-label">房型圖片（可拖曳排序）</label>
+                    <div id="addRoomTypePhotoPreview" class="d-flex flex-wrap gap-2 mb-2" style="min-height: 120px; border: 2px dashed #dee2e6; border-radius: 8px; padding: 10px;">
+                        <div class="d-flex align-items-center justify-content-center text-muted" style="width: 100%; height: 100px;" id="addNoPhotosPlaceholder">
+                            <div class="text-center">
+                                <i class="bi bi-images fs-1"></i>
+                                <div>暫無圖片</div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="file" class="form-control mt-2" id="addRoomTypePhotoInput" accept="image/*" multiple style="max-width:300px;" onchange="addNewRoomTypePhotos_add(this)">
+                    <small class="text-muted">支援格式：JPG、PNG、GIF，單檔不超過5MB。可拖曳排序，右上角可刪除</small>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
@@ -281,9 +299,14 @@
         </div>
     </div>
 </div>
+
+
+
 	<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 <script src="/js/roomType.js"></script>
+
+
 
 </body>
 </html>

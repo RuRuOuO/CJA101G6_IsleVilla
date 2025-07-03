@@ -12,6 +12,10 @@ public interface RoomRVDetailRepository extends JpaRepository<RoomRVDetail, Inte
     // 傳進整個RoomRVOrder entity
     List<RoomRVDetail> findByRoomRVOrder(RoomRVOrder roomRVOrder);
     
+    // 接駁預約：查詢每筆訂房訂單的總入住人數
+    @Query("SELECT COALESCE(SUM(r.guestCount), 0) FROM RoomRVDetail r WHERE r.roomRVOrder = :roomRVOrder")
+    Integer countGuestByRoomRVOrder(@Param("roomRVOrder") RoomRVOrder roomRVOrder);
+
     // ==================== 給 RoomTypeAvailability 庫存計算相關查詢 ====================
 
     //查詢特定房型在特定日期的預訂詳情
