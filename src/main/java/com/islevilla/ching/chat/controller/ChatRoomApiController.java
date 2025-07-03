@@ -1,9 +1,13 @@
 package com.islevilla.ching.chat.controller;
 
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,15 +47,11 @@ public class ChatRoomApiController {
 	// 查詢所有聊天室
 	@GetMapping("/rooms")
 	public List<ChatRoomDTO> getAllRooms() {
-	    return chatRedisService.getAllChatRoomsWithEmployeeUnread().stream()
-	            .filter(r -> r.getMemberName() != null && !"未知會員".equals(r.getMemberName()))
-	            .sorted(Comparator.comparing(
-	                    ChatRoomDTO::getLastMessageTime,
-	                    Comparator.nullsFirst(Comparator.reverseOrder())
-	            ))
-	            .toList();
+		return chatRedisService.getAllChatRoomsWithEmployeeUnread().stream()
+				.filter(r -> r.getMemberName() != null && !"未知會員".equals(r.getMemberName())).sorted(Comparator
+						.comparing(ChatRoomDTO::getLastMessageTime, Comparator.nullsFirst(Comparator.reverseOrder())))
+				.toList();
 	}
-
 
 	// 查詢聊天室狀態
 	@GetMapping("/room/{roomId}/status")
@@ -76,15 +76,15 @@ public class ChatRoomApiController {
 		if (room.getChatStatus() == 2) {
 			return fail("聊天室已是結案狀態");
 		}
-		
+
 		// 狀態改為結案
 		room.setChatStatus(2);
 		chatRedisService.saveChatRoom(room);
-		
-	    // 記錄結案時間
-	    chatRedisService.markRoomEndTime(roomId);
-	    
-	    // 廣播結案狀態給聊天室內的成員
+
+		// 記錄結案時間
+		chatRedisService.markRoomEndTime(roomId);
+
+		// 廣播結案狀態給聊天室內的成員
 		chatWebSocketHandler.broadcastRoomStatus(roomId, "roomComplete");
 
 		log.info(" 聊天室 {} 已結案", roomId);
@@ -118,10 +118,10 @@ public class ChatRoomApiController {
 
 	// 查詢聊天室歷史訊息
 	@GetMapping("/room/{roomId}/history")
-	public List<ChatMessageDTO> getMessageHistory(@PathVariable Integer roomId, 
-								@RequestParam(name = "afterEnd", required = false, defaultValue = "false") boolean afterEnd) {
+	public List<ChatMessageDTO> getMessageHistory(@PathVariable Integer roomId,
+			@RequestParam(name = "afterEnd", required = false, defaultValue = "false") boolean afterEnd) {
 
-	    return chatRedisService.getMessageHistory(roomId, afterEnd);
+		return chatRedisService.getMessageHistory(roomId, afterEnd);
 	}
 
 	// 查詢客服未讀
@@ -160,29 +160,43 @@ public class ChatRoomApiController {
 	private Map<String, Object> fail(String msg) {
 		return Map.of("success", false, "message", msg);
 	}
-	
+
 	/* =================== 存入SQL =================== */
 	@PostMapping("/room/{roomId}/import")
-	public Map<String, Object> importRoomToSql(@PathVariable Integer roomId,HttpSession session){
+	public Map<String, Object> importRoomToSql(@PathVariable Integer roomId, HttpSession session) {
 		Employee employee = (Employee) session.getAttribute("employee");
-		if(employee == null) {
+		if (employee == null) {
 			return fail("未登入");
 		}
-		
+
 		ChatRoomDTO redisRoom = chatRedisService.getChatRoom(roomId);
-		if(redisRoom == null) {
+		if (redisRoom == null) {
 			return fail("查無此聊天室");
 		}
-		
+
 		List<ChatMessageDTO> redisMessages = chatRedisService.getMessageHistory(roomId, false);
-		
+
 		try {
 			chatRoomDbService.saveRoomAndMessageToSql(redisRoom, redisMessages);
-		}catch(Exception e) {
-			log.error("匯入失敗 {}",roomId, e);
-			return fail("匯入失敗"+ e.getMessage());
+		} catch (Exception e) {
+			log.error("匯入失敗 {}", roomId, e);
+			return fail("匯入失敗" + e.getMessage());
 		}
-			log.info("匯入成功 {}", roomId);
-			return success("匯入成功" + roomId);
-		}
+		log.info("匯入成功 {}", roomId);
+		return success("匯入成功" + roomId);
 	}
+
+	@GetMapping("/room/{roomId}/lastMessageTime")
+	public Map<String, String> getLastMessageTime(@PathVariable Integer roomId) {
+		ChatRoomDTO room = chatRedisService.getChatRoom(roomId);
+		if (room == null || room.getLastMessageTime() == null) {
+			return Map.of("lastMessageTime", "-");
+		}
+		// 將 epoch 毫秒轉換成 LocalDateTime
+	    Instant instant = Instant.ofEpochMilli(room.getLastMessageTime());
+	    LocalDateTime dateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+
+	    String formatted = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+	    return Map.of("lastMessageTime", formatted);
+}
+}

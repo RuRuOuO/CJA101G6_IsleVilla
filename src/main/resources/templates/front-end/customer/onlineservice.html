@@ -71,7 +71,7 @@ h2 {
 	padding: 10px 14px;
 	border-radius: 12px;
 	word-break: break-word;
-	box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
 .left .bubble {
@@ -133,95 +133,122 @@ button:hover {
 </head>
 
 <body>
-
-<h2>線上客服 | 聊天室編號 <span th:text="${roomId}">0</span></h2>
-
-<div class="container">
-	<button class="back-btn" onclick="goHome()">返回 IsleVilla 首頁</button>
-
-	<div id="chat"></div>
-
-	<div id="inputArea" class="input-area">
-		<input id="msg" type="text" placeholder="輸入訊息..." 
-			onkeydown="handleKey(event)" autocomplete="off"/>
-		<button onclick="sendMessage()">送出</button>
+	<div id="chatStatusDisplay"
+		style="text-align: center; margin-bottom: 10px;">
+		<span id="statusIndicator"
+			style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: gray; margin-right: 8px;"></span>
+		<span id="statusText">聊天室狀態讀取中...</span>
 	</div>
-</div>
+	<h2>
+		線上客服 | 聊天室編號 <span th:text="${roomId}">0</span>
+	</h2>
 
-<script th:inline="javascript">
+	<div class="container">
+		<button class="back-btn" onclick="goHome()">返回 IsleVilla 首頁</button>
+
+		<div id="chat"></div>
+
+		<div id="inputArea" class="input-area">
+			<input id="msg" type="text" placeholder="輸入訊息..."
+				onkeydown="handleKey(event)" autocomplete="off" />
+			<button onclick="sendMessage()">送出</button>
+		</div>
+	</div>
+
+	<script th:inline="javascript">
 const roomId = [[${roomId}]];
 const senderId = [[${senderId}]];
 const senderName = '[[${senderName}]]';
 const senderType = [[${senderType}]];
 
-console.log("🟦 會員聊天室 | roomId=", roomId, "senderId=", senderId, "senderName=", senderName);
+console.log("會員聊天室 | roomId=", roomId, "senderId=", senderId, "senderName=", senderName);
 
 const input = document.getElementById("msg");
 const chat = document.getElementById("chat");
 
+let chatStatus = 0; // 全域狀態變數：1 進行中，2 已結案，3 等待處理
+
 // WebSocket 建立
 const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/chat?roomId=${roomId}`);
 
-ws.onopen = () => console.log("✅ WebSocket 已連線聊天室", roomId);
-ws.onclose = () => console.log("❌ WebSocket 已關閉");
-ws.onerror = (err) => console.error("❌ WebSocket 錯誤", err);
+ws.onopen = () => console.log("WebSocket 已連線聊天室", roomId);
+ws.onclose = () => console.log("WebSocket 已關閉");
+ws.onerror = (err) => console.error("WebSocket 錯誤", err);
 
 ws.onmessage = event => {
     const msg = JSON.parse(event.data);
 
     if (msg.type === 'system') {
         if (msg.action === 'roomComplete') {
-            renderSystemMessage('-----  已結案  -----<br><br>--- 有任何問題，請再呼叫我們！---');
+            renderSystemMessage('----- 已結案 -----<br><br> 有任何相關問題請再與我們聯絡 ! <br><br>IsleVilla 微嶼 ');
+            updateStatusIndicator(2);
+            chatStatus = 2;
         } else if (msg.action === 'roomReopen') {
-            renderSystemMessage('✅ 客服已重新開啟聊天室，正在為您服務');
+            renderSystemMessage('~~~ 很高興為您服務 ~~~<br><br>IsleVilla 微嶼');
+            updateStatusIndicator(1);
+            chatStatus = 1;
         }
         return;
     }
 
     const isMe = (msg.senderId === senderId) && (msg.senderType === senderType);
     const displayName = msg.senderType === 1 ? 'IsleVilla 客服' : msg.senderName;
+
+    // 等待處理中 + 客服回覆 = 狀態切回進行中
+    if (chatStatus === 3 && msg.senderType === 1) {
+        renderSystemMessage(' 很高興為您服務 <br><br> IsleVilla 微嶼');
+        updateStatusIndicator(1);
+        chatStatus = 1;
+    }
+
     renderMessage(isMe, displayName, msg.messageContent, msg.messageTime);
 };
 
-// 拉取歷史訊息
+// 拉取歷史訊息 & 狀態燈設定
 window.onload = () => {
     fetch(`/api/chat/room/${roomId}/status`)
         .then(res => res.json())
         .then(statusRes => {
             const status = statusRes.chatStatus;
+            chatStatus = status; 			// 同步全域狀態
+            updateStatusIndicator(status);  // 狀態燈更新
 
             let afterEnd = false;
 
             if (status === 3) {
-                renderSystemMessage('您在結案後傳送訊息，目前聊天室已轉為「等待處理」。');
+                renderSystemMessage('在結案後傳送訊息，目前聊天室已轉為" 等待處理 "');
                 afterEnd = true;
             }
 
             if (status === 2) {
-                renderSystemMessage('-----  已結案  -----<br><br>--- 有任何問題請再呼叫我們！---');
+                renderSystemMessage('-----已結案 -----<br><br> 有任何相關問題請再與我們聯絡 ! <br><br> IsleVilla 微嶼 ');
+            	 // 不轉成等待處理，讓使用者發送時再變更
                 afterEnd = false;
             }
 
-            if (status === 1) {
-                afterEnd = false; // 進行中 → 顯示完整歷史
-            }
-
             fetch(`/api/chat/room/${roomId}/history?afterEnd=${afterEnd}`)
-                .then(res => res.json())
-                .then(history => {
-                    history.forEach(msg => {
-                        const isMe = (msg.senderId === senderId) && (msg.senderType === senderType);
-                        const displayName = msg.senderType === 1 ? 'IsleVilla 客服' : msg.senderName;
-                        renderMessage(isMe, displayName, msg.messageContent, msg.messageTime);
-                    });
+            .then(res => res.json())
+            .then(history => {
+                history.forEach(msg => {
+                    const isMe = (msg.senderId === senderId) && (msg.senderType === senderType);
+                    const displayName = msg.senderType === 1 ? 'IsleVilla 客服' : msg.senderName;
+                    renderMessage(isMe, displayName, msg.messageContent, msg.messageTime);
                 });
-        });
-};
+              });
+   		    });
+	      };
 
 // 發送訊息
 function sendMessage() {
     const content = input.value.trim();
     if (!content) return;
+    
+    // 使用者在已結案狀態下再次輸入訊息
+    if (chatStatus === 2) {
+        renderSystemMessage(' 請稍等，即將為您服務 ! <br><br>IsleVilla 微嶼 ');
+        updateStatusIndicator(3);
+        chatStatus = 3;
+    }
 
     const data = {
         chatRoomId: roomId,
@@ -233,7 +260,7 @@ function sendMessage() {
 
     ws.send(JSON.stringify(data));
     input.value = "";
-    console.log("🟩 發送訊息", data);
+    console.log("發送訊息", data);
 }
 
 // 渲染訊息
@@ -281,6 +308,24 @@ function formatTime(timestamp) {
     const hh = date.getHours().toString().padStart(2, '0');
     const mm = date.getMinutes().toString().padStart(2, '0');
     return `${hh}:${mm}`;
+}
+function updateStatusIndicator(status) {
+	const indicator = document.getElementById("statusIndicator");
+	const text = document.getElementById("statusText");
+
+	if (status === 1) {
+		indicator.style.backgroundColor = "#2ecc71"; // 綠色
+		text.textContent = "進行中";
+	} else if (status === 2) {
+		indicator.style.backgroundColor = "#e74c3c"; // 紅色
+		text.textContent = "已結案";
+	} else if (status === 3) {
+		indicator.style.backgroundColor = "#f39c12"; // 橘色
+		text.textContent = "等待處理";
+	} else {
+		indicator.style.backgroundColor = "gray";
+		text.textContent = "未知狀態";
+	}
 }
 
 // 返回首頁

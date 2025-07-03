@@ -151,8 +151,8 @@ tr:hover {
 				<th>聊天室編號</th>
 				<th>會員名稱</th>
 				<th>客服名稱</th>
-				<th>狀態</th>
-				<th>最後訊息時間</th>
+				<th>狀態欄</th>
+				<th>最新訊息接收時間</th>
 				<th>未讀</th>
 				<th>操作</th>
 			</tr>
@@ -213,6 +213,7 @@ ws.onmessage = event => {
         console.log(`新訊息來自聊天室 ${roomId}`);
         updateUnreadCount(roomId);
         checkAndUpdateStatus(roomId);
+        updateLastMessageTime(roomId);
     }
 };
 
@@ -283,6 +284,31 @@ function importRoom(roomId) {
                 alert('❌ 匯入失敗，請查看console');
             });
     }
+}
+
+function updateLastMessageTime(roomId) {
+	fetch(`/api/chat/room/${roomId}/lastMessageTime`)
+    .then(res => res.json())
+    .then(data => {
+        const timeStr = data.lastMessageTime;
+        const row = document.querySelector(`tr[data-room-id='${roomId}']`);
+        const timeCell = row.querySelector('td:nth-child(5)');
+
+        if (row && timeCell) {
+            timeCell.textContent = timeStr || '-';
+
+            // 移動條件：timeStr 有意義（不為 "-"）且 row 存在
+            if (timeStr && timeStr !== '-') {
+                const tbody = row.parentNode;
+
+                // 把這行移到所有資料列中第一筆
+                const firstValidRow = Array.from(tbody.children).find(tr => tr.dataset.roomId);
+                if (firstValidRow && firstValidRow !== row) {
+                    tbody.insertBefore(row, firstValidRow);
+                }
+            }
+        }
+    });
 }
 
 function updateStatus(roomId, status) {
