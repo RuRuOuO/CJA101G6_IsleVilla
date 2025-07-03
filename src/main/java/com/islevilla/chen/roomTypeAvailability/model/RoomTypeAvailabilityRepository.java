@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -49,4 +51,61 @@ public interface RoomTypeAvailabilityRepository extends JpaRepository<RoomTypeAv
     // 查詢可用數量大於指定值的記錄
     @Query("SELECT rta FROM RoomTypeAvailability rta WHERE rta.roomTypeAvailabilityCount > :minCount")
     List<RoomTypeAvailability> findByAvailabilityCountGreaterThan(@Param("minCount") Integer minCount);
+    
+ // ==================== 分頁查詢方法 ====================
+    
+    // 分頁查詢所有記錄
+    Page<RoomTypeAvailability> findAll(Pageable pageable);
+    
+    // 根據房型ID分頁查詢
+    Page<RoomTypeAvailability> findByRoomTypeAvailabilityId_RoomTypeId(Integer roomTypeId, Pageable pageable);
+    
+    // 根據日期分頁查詢
+    Page<RoomTypeAvailability> findByRoomTypeAvailabilityId_RoomTypeAvailabilityDate(LocalDate availabilityDate, Pageable pageable);
+    
+    // 根據房型ID和日期範圍分頁查詢
+    @Query("SELECT rta FROM RoomTypeAvailability rta WHERE rta.roomTypeAvailabilityId.roomTypeId = :roomTypeId " +
+           "AND rta.roomTypeAvailabilityId.roomTypeAvailabilityDate BETWEEN :startDate AND :endDate")
+    Page<RoomTypeAvailability> findByRoomTypeIdAndDateRange(
+        @Param("roomTypeId") Integer roomTypeId,
+        @Param("startDate") LocalDate startDate,
+        @Param("endDate") LocalDate endDate,
+        Pageable pageable
+    );
+    
+    // 根據日期範圍分頁查詢
+    @Query("SELECT rta FROM RoomTypeAvailability rta WHERE rta.roomTypeAvailabilityId.roomTypeAvailabilityDate BETWEEN :startDate AND :endDate")
+    Page<RoomTypeAvailability> findByDateRange(
+        @Param("startDate") LocalDate startDate,
+        @Param("endDate") LocalDate endDate,
+        Pageable pageable
+    );
+    
+    // 複合查詢：支援房型ID、特定日期、日期範圍的組合查詢
+    @Query("SELECT rta FROM RoomTypeAvailability rta WHERE " +
+           "(:roomTypeId IS NULL OR rta.roomTypeAvailabilityId.roomTypeId = :roomTypeId) " +
+           "AND (:specificDate IS NULL OR rta.roomTypeAvailabilityId.roomTypeAvailabilityDate = :specificDate) " +
+           "AND (:startDate IS NULL OR rta.roomTypeAvailabilityId.roomTypeAvailabilityDate >= :startDate) " +
+           "AND (:endDate IS NULL OR rta.roomTypeAvailabilityId.roomTypeAvailabilityDate <= :endDate)")
+    Page<RoomTypeAvailability> findByComplexQuery(
+        @Param("roomTypeId") Integer roomTypeId,
+        @Param("specificDate") LocalDate specificDate,
+        @Param("startDate") LocalDate startDate,
+        @Param("endDate") LocalDate endDate,
+        Pageable pageable
+    );
+    
+    // 複合查詢：支援房型ID、特定日期、日期範圍的組合查詢 (不分頁版本)
+    @Query("SELECT rta FROM RoomTypeAvailability rta WHERE " +
+           "(:roomTypeId IS NULL OR rta.roomTypeAvailabilityId.roomTypeId = :roomTypeId) " +
+           "AND (:specificDate IS NULL OR rta.roomTypeAvailabilityId.roomTypeAvailabilityDate = :specificDate) " +
+           "AND (:startDate IS NULL OR rta.roomTypeAvailabilityId.roomTypeAvailabilityDate >= :startDate) " +
+           "AND (:endDate IS NULL OR rta.roomTypeAvailabilityId.roomTypeAvailabilityDate <= :endDate) " +
+           "ORDER BY rta.roomTypeAvailabilityId.roomTypeAvailabilityDate DESC")
+    List<RoomTypeAvailability> findByComplexQueryAll(
+        @Param("roomTypeId") Integer roomTypeId,
+        @Param("specificDate") LocalDate specificDate,
+        @Param("startDate") LocalDate startDate,
+        @Param("endDate") LocalDate endDate
+    );
 }

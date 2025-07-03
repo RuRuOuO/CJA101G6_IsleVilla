@@ -255,3 +255,153 @@ li {
     width: 500px;
     font-weight: normal;
 }
+
+/* ==================== 月份視圖表格樣式 ==================== */
+
+/* 表格容器 */
+.table-responsive {
+    max-height: 600px;
+    overflow-x: auto;
+    overflow-y: auto;
+}
+
+/* 固定左側房型欄位 */
+.sticky-col {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background-color: #f8f9fa !important;
+    border-right: 2px solid #dee2e6 !important;
+    min-width: 120px;
+    max-width: 150px;
+}
+
+/* 表格標頭樣式 */
+#availabilityTable thead th {
+    position: sticky;
+    top: 0;
+    z-index: 11;
+    background-color: #e9ecef !important;
+    border-bottom: 2px solid #dee2e6 !important;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 12px 8px;
+}
+
+/* 左上角固定單元格 */
+#availabilityTable thead th.sticky-col {
+    z-index: 12;
+    background-color: #e9ecef !important;
+}
+
+/* 表格單元格樣式 */
+#availabilityTable td {
+    padding: 8px;
+    vertical-align: middle;
+    min-width: 80px;
+    font-size: 0.85rem;
+}
+
+/* 庫存單元格樣式 */
+.availability-cell {
+    padding: 6px 10px !important;
+    font-size: 0.9rem !important;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.availability-cell:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    border: 1px solid #fff;
+}
+
+/* 日期欄位樣式 */
+.text-nowrap {
+    white-space: nowrap;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* 表格邊框增強 */
+#availabilityTable {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+#availabilityTable th,
+#availabilityTable td {
+    border: 1px solid #dee2e6;
+}
+
+/* 表格行斑馬紋效果 */
+#availabilityTable tbody tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+#availabilityTable tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.08);
+}
+
+/* 右鍵菜單樣式 */
+#contextMenu {
+    min-width: 200px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border: none;
+    border-radius: 8px;
+}
+
+#contextMenu .dropdown-header {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    padding: 8px 16px;
+}
+
+#contextMenu .dropdown-item {
+    padding: 8px 16px;
+    transition: all 0.2s ease;
+}
+
+#contextMenu .dropdown-item:hover {
+    background-color: #e9ecef;
+    transform: translateX(2px);
+}
+
+/* 月份選擇器樣式 */
+input[type="month"] {
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+input[type="month"]:focus {
+    border-color: #86b7fe;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+    .sticky-col {
+        min-width: 100px;
+        font-size: 0.8rem;
+    }
+    
+    #availabilityTable td {
+        min-width: 60px;
+        padding: 6px 4px;
+    }
+    
+    .availability-cell {
+        padding: 4px 6px !important;
+        font-size: 0.8rem !important;
+    }
+    
+    .text-nowrap {
+        font-size: 0.7rem;
+    }
+}
