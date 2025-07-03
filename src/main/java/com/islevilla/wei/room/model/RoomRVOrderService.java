@@ -53,6 +53,12 @@ public class RoomRVOrderService {
     public List<RoomRVOrder> getRoomRVOrderByMember(Members member) {
         return roomRVOrderRepository.findByMembers(member);
     }
+    
+    // 用會員id查詢該會員今天以後的訂單
+    public List<RoomRVOrder> getFutureRoomRVOrderByMember(Members member) {
+    	LocalDate today = LocalDate.now();
+        return roomRVOrderRepository.findByMembersAndCheckInDateGreaterThan(member, today);
+    }
 
     // 更新訂單
     public void updateRoomRVOrder(RoomRVOrder roomRVOrder) {
