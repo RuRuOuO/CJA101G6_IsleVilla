@@ -105,7 +105,7 @@ public class MembersController {
 				if (redirect != null && !redirect.isEmpty()) {
 					return "redirect:" + redirect;
 				} else {
-					return "redirect:/";
+					return "redirect:/member";
 				}
 
 			} else {

@@ -1,9 +1,16 @@
 /* ==================== 全域設定 ==================== */
 
 /* 字型與圓角設定 */
+/** {*/
+/*    border-radius: 0 !important;*/
+/*    font-family: "Noto Sans TC", sans-serif;*/
+/*}*/
 * {
-    border-radius: 0 !important;
     font-family: "Noto Sans TC", sans-serif;
+}
+
+.btn, .nav-link, .nav-item .nav-link {
+    border-radius: 0 !important;
 }
 
 /* 基礎版面配置 */
@@ -17,7 +24,8 @@ body {
     flex-direction: column;
     min-height: 100vh;
     /* 背景圖片設定 */
-    background-image: url('https://images.unsplash.com/photo-1517384084767-6bc118943770?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+    background-color: #f4f4f4;
+    background-image: url('/img/home/bg1_crop2.png');
     background-repeat: no-repeat;
     background-size: cover;
     background-attachment: fixed;
@@ -83,6 +91,12 @@ li {
     border: 1px solid black;
 }
 
+/* 強調按鈕 */
+.custom-btn-specify {
+    border: 1px solid white;
+    box-shadow: 0 0px 15px rgba(255, 255, 200, 1) !important;
+}
+
 /* ==================== 按鈕樣式 ==================== */
 
 /* 按鈕基本樣式 */
@@ -102,19 +116,19 @@ li {
 }
 
 /* 固定預訂按鈕 */
-.booking-fixed-btn {
-    position: fixed;
-    bottom: 48px;
-    right: 60px;
-    padding: 12px 30px;
-    z-index: 1050;
-    box-shadow: 0 0px 15px rgba(255, 255, 200, 1);
-    border: 1px solid white;
-}
+/*.booking-fixed-btn {*/
+/*    position: fixed;*/
+/*    bottom: 48px;*/
+/*    right: 60px;*/
+/*    padding: 12px 30px;*/
+/*    z-index: 1050;*/
+/*    box-shadow: 0 0px 15px rgba(255, 255, 200, 1);*/
+/*    border: 1px solid white;*/
+/*}*/
 
-.booking-fixed-btn:hover{
-    box-shadow: 0px 0px 20px rgba(255, 255, 200, 1);
-}
+/*.booking-fixed-btn:hover {*/
+/*    box-shadow: 0px 0px 20px rgba(255, 255, 200, 1);*/
+/*}*/
 
 /* ==================== 導覽列樣式 ==================== */
 

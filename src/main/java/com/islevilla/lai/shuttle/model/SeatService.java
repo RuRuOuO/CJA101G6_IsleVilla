@@ -32,8 +32,14 @@ public class SeatService {
 		return seatRepository.findBySeatStatus(status);
 	}
 
-	public long getAvailableSeatsCount() {
+	// 查詢可用座位數量
+	public Integer getAvailableSeatsCount() {
 		return seatRepository.countAvailableSeats();
+	}
+
+	// 查詢不可用座位數量
+	public Integer getUnavailableSeatsCount() {
+		return seatRepository.countUnavailableSeats();
 	}
 
 	public Seat saveSeat(Seat seat) {
