@@ -23,7 +23,8 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Component
-public class RoomType {
+public class RoomType implements java.io.Serializable {
+	private static final long serialVersionUID = 1L;
 	
 	@Id // Hibernate：主鍵
 	@Column(name="room_type_id") // Hibernate：對應欄位名稱
