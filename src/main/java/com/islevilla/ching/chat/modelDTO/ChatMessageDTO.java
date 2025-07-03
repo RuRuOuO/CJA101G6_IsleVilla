@@ -1,15 +1,16 @@
 package com.islevilla.ching.chat.modelDTO;
 
-import java.sql.Timestamp;
-
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class ChatMessageDTO {
+	private Integer messageId;        // ✔ 主鍵，訊息ID
     private Integer chatRoomId;
     private Integer senderType;       // 0 = 會員，1 = 客服
     private Integer senderId;
