@@ -112,6 +112,13 @@
             font-size: 17px;
             color: #666;
         }
+
+
+        footer {
+            margin-top: 120px; /* 或你要的任意數值 */
+        }
+        
+        
     </style>
 </head>
 <body>
@@ -171,7 +178,9 @@
     </main>
 
     <!-- ========== 載入Footer ========== -->
-    <div th:replace="~{fragments/fragments :: footer}"></div>
+    <!-- <div th:replace="~{fragments/fragments :: footer}"></div> -->
+    <footer th:replace="~{fragments/fragments :: footer}"></footer>
+
 
     <script>
         function goBack() {

@@ -31,7 +31,10 @@ public class HomePageController {
     @GetMapping("/member")
     public String member(Model model, HttpSession session) {
         Members loginMember = (Members) session.getAttribute("member");
-        model.addAttribute("loginMember", loginMember);
+//        model.addAttribute("loginMember", loginMember);
+        if (loginMember == null) {
+            return "redirect:/member/login";
+        }
         return "front-end/member/member";
     }
 
