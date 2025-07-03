@@ -117,7 +117,7 @@
 
                                     <!-- 預設圖片 -->
                                     <img th:unless="${session.member.memberPhoto != null}"
-                                         src="https://images.unsplash.com/photo-1603736087997-5daec6092347?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                         src="/img/home/member1.png"
                                          alt="預設頭像"
                                          class="rounded-circle me-2"
                                          style="width: 40px; height: 40px; object-fit: cover;"/>
@@ -158,6 +158,10 @@
 <!-- ===== 側邊欄 開始 ===== -->
 <div class="col-md-3 mb-4" th:fragment="memberSidebar">
     <div class="nav flex-column nav-pills" id="memberTabs" role="tablist" aria-orientation="vertical">
+        <a class="nav-link text-reset text-decoration-none" th:href="@{/member}"
+           th:classappend="${activeTab == 'welcome'} ? ' active'">
+            Welcome!
+        </a>
         <a class="nav-link text-reset text-decoration-none" th:href="@{/member/room/list}"
            th:classappend="${activeTab == 'room'} ? ' active'">
             住宿訂單

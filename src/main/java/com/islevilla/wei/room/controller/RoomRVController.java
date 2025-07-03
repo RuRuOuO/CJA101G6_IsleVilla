@@ -1,35 +1,22 @@
 package com.islevilla.wei.room.controller;
 
 import com.islevilla.lai.members.model.Members;
-import com.islevilla.lai.members.model.MembersRepository;
-import com.islevilla.lai.members.model.MembersService;
-import com.islevilla.wei.PageUtil;
-import com.islevilla.wei.news.model.News;
 import com.islevilla.wei.room.model.RoomRVDetail;
 import com.islevilla.wei.room.model.RoomRVDetailService;
 import com.islevilla.wei.room.model.RoomRVOrder;
 import com.islevilla.wei.room.model.RoomRVOrderService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
-import java.io.IOException;
 import java.util.List;
 
 @Controller
 public class RoomRVController {
-    @Autowired
-    MembersRepository membersRepository;
-    @Autowired
-    MembersService membersService;
     @Autowired
     private RoomRVOrderService roomRVOrderService;
     @Autowired
