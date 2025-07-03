@@ -18,6 +18,7 @@ import com.islevilla.wei.room.model.RoomRVOrder;
 import com.islevilla.patty.roompromotionprice.model.RoomPromotionPriceRepository;
 import com.islevilla.patty.roompromotionprice.model.RoomPromotionPrice;
 import com.islevilla.chen.roomTypePhoto.model.RoomTypePhotoRepository;
+import com.islevilla.patty.roompromotionprice.model.RoomPromotionPrice;
 import com.islevilla.chen.roomTypePhoto.model.RoomTypePhoto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -29,13 +30,17 @@ public class BookingService {
     private BookingRepository bookingRepository;
 
     @Autowired
+    private BookingDetailRepository bookingDetailRepository;
+
+
+    @Autowired
     private RoomRepository roomRepository;
 
     @Autowired
     private RoomTypeRepository roomTypeRepository;
 
-    @Autowired
-    private RoomPromotionPriceRepository roomPromotionPriceRepository;
+   @Autowired
+   private RoomPromotionPriceRepository roomPromotionPriceRepository;
 
     @Autowired
     private RoomTypePhotoRepository roomTypePhotoRepository;
@@ -66,7 +71,7 @@ public class BookingService {
         }
 
         // 2. 根據重疊的訂單，找出所有被佔用的房間 ID
-        List<RoomRVDetail> occupiedDetails = bookingRepository.findDetailsByOrders(overlappingOrders);
+        List<RoomRVDetail> occupiedDetails = bookingDetailRepository.findDetailsByOrders(overlappingOrders);
         List<Integer> occupiedRoomIds = occupiedDetails.stream()
                 .map(detail -> detail.getRoom().getRoomId())
                 .collect(Collectors.toList());
@@ -134,7 +139,7 @@ public class BookingService {
         }
 
         // 2. 根據重疊的訂單，找出所有被佔用的房間 ID
-        List<RoomRVDetail> occupiedDetails = bookingRepository.findDetailsByOrders(overlappingOrders);
+        List<RoomRVDetail> occupiedDetails = bookingDetailRepository.findDetailsByOrders(overlappingOrders);
         List<Integer> occupiedRoomIds = occupiedDetails.stream()
                 .map(detail -> detail.getRoom().getRoomId())
                 .collect(Collectors.toList());
@@ -201,7 +206,7 @@ public class BookingService {
         }
 
         // 2. 根據重疊的訂單，找出所有被佔用的房間 ID
-        List<RoomRVDetail> occupiedDetails = bookingRepository.findDetailsByOrders(overlappingOrders);
+        List<RoomRVDetail> occupiedDetails = bookingDetailRepository.findDetailsByOrders(overlappingOrders);
         List<Integer> occupiedRoomIds = occupiedDetails.stream()
                 .map(detail -> detail.getRoom().getRoomId())
                 .collect(Collectors.toList());
@@ -287,7 +292,7 @@ public class BookingService {
         }
 
         // 2. 根據重疊的訂單，找出所有被佔用的房間 ID
-        List<RoomRVDetail> occupiedDetails = bookingRepository.findDetailsByOrders(overlappingOrders);
+        List<RoomRVDetail> occupiedDetails = bookingDetailRepository.findDetailsByOrders(overlappingOrders);
         List<Integer> occupiedRoomIds = occupiedDetails.stream()
                 .map(detail -> detail.getRoom().getRoomId())
                 .collect(Collectors.toList());
@@ -342,7 +347,8 @@ public class BookingService {
                 .map(promo -> {
                     int originalPrice = roomType.getRoomTypePrice();
                     // 使用折扣率計算折扣後價格
-                    int discountedPrice = (int) (originalPrice * promo.getRoomDiscountRate());
+//                    int discountedPrice = (int) (originalPrice * promo.getRoomDiscountRate());
+                    int discountedPrice = 0;
                     int diff = originalPrice - discountedPrice;
                     return new PromotionWithDiff(promo, diff, discountedPrice);
                 })
@@ -379,7 +385,7 @@ public class BookingService {
         // 建立 RoomRVOrder
         com.islevilla.wei.room.model.RoomRVOrder order = new com.islevilla.wei.room.model.RoomRVOrder();
         order.setMembers(member);
-        order.setRoomOrderDate(java.time.LocalDate.now());
+        order.setRoomOrderDate(java.time.LocalDateTime.now());
         order.setRoomOrderStatus(0); // 0:成立
         order.setCheckInDate(checkin);
         order.setCheckOutDate(checkout);
