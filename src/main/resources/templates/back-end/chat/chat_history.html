@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>聊天室歷史訊息｜MatchMarket 後台</title>
+    <style>
+        body {
+            font-family: "Noto Sans TC", sans-serif;
+            background-color: #f4f6f8;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 95%;
+            margin: auto;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #34495e;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .back-btn {
+            display: block;
+            margin: 20px auto 0 auto;
+            padding: 8px 20px;
+            background-color: #f39c12;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 4px;
+            width: fit-content;
+        }
+
+        .back-btn:hover {
+            background-color: #e67e22;
+        }
+
+        .identity {
+            font-weight: bold;
+        }
+
+        .identity.member {
+            color: #2c3e50;
+        }
+
+        .identity.employee {
+            color: #27ae60;
+        }
+
+        .content {
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+
+<h2>聊天室 #[[${room.chatRoomId}]] 歷史訊息</h2>
+
+<p style="text-align:center;">
+    會員：<strong th:text="${room.memberName}">會員名稱</strong>　
+    |　客服：<strong th:text="${room.employeeName}">客服名稱</strong>
+</p>
+
+<table>
+    <thead>
+    <tr>
+        <th>時間</th>
+        <th>發送者</th>
+        <th>身分</th>
+        <th>訊息內容</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="msg : ${messages}">
+        <td th:text="${#dates.format(msg.messageTime, 'yyyy-MM-dd HH:mm:ss')}">2025-07-03 10:30</td>
+        <td th:text="${msg.senderName}">誰說的</td>
+        <td>
+            <span th:text="${msg.senderType == 0 ? '會員' : '客服'}"
+                  th:classappend="${msg.senderType == 0 ? 'identity member' : 'identity employee'}">身份</span>
+        </td>
+        <td th:text="${msg.messageContent}" class="content">訊息內容</td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(messages)}">
+        <td colspan="4" style="text-align:center;">❗ 查無訊息紀錄</td>
+    </tr>
+    </tbody>
+</table>
+
+<a th:href="@{/backend/chat/room/list}" class="back-btn">← 返回聊天室列表</a>
+
+</body>
+</html>

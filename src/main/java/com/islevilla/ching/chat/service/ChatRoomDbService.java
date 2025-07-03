@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.islevilla.ching.chat.config.repository.ChatMessageRepository;
 import com.islevilla.ching.chat.config.repository.ChatRoomRepository;
@@ -33,6 +34,7 @@ public class ChatRoomDbService {
 	}
 
 	// 聊天室與訊息匯入SQL
+	@Transactional
 	public void saveRoomAndMessageToSql(ChatRoomDTO roomDto, List<ChatMessageDTO> messageDtos) {
 
 		// ChatRoomDTO實體轉換 先存聊天室
@@ -59,12 +61,6 @@ public class ChatRoomDbService {
 			
 			// 時間從 毫秒(Long) 轉 Timestamp
 			m.setMessageTime(new Timestamp(dto.getMessageTime()));
-			// 保險寫法
-//			if (dto.getMessageTime() == null) {
-//			    m.setMessageTime(new Timestamp(System.currentTimeMillis()));
-//			} else {
-//			    m.setMessageTime(new Timestamp(dto.getMessageTime()));
-//			}
 			return m; 
 		}).toList();
 

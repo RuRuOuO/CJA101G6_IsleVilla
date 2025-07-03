@@ -134,6 +134,15 @@ tr:hover {
 .btn-import:hover {
 	background-color: #8e44ad;
 }
+
+/* 歷史訊息 */
+.btn-history {
+	background-color: #7f8c8d;
+}
+
+.btn-history:hover {
+	background-color: #666;
+}
 </style>
 </head>
 
@@ -182,6 +191,8 @@ tr:hover {
 				</td>
 
 				<td class="actions">
+				<a th:href="@{'/backend/chat/history/' + ${room.chatRoomId}}" class="btn-action btn-history">歷史</a>
+				
 					<a th:href="@{'/backend/chat/room/' + ${room.chatRoomId}}" class="btn-action btn-enter">進入</a>
 
 					<button th:if="${room.chatStatus == 1}" 
@@ -202,9 +213,9 @@ tr:hover {
 <script>
 const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/chatroomList`);
 
-ws.onopen = () => console.log("✅ WebSocket 已連線聊天室列表");
-ws.onclose = () => console.log("❌ WebSocket 已關閉");
-ws.onerror = (err) => console.error("❌ WebSocket 錯誤", err);
+ws.onopen = () => console.log(" WebSocket 已連線聊天室列表");
+ws.onclose = () => console.log(" WebSocket 已關閉");
+ws.onerror = (err) => console.error(" WebSocket 錯誤", err);
 
 ws.onmessage = event => {
     const msg = JSON.parse(event.data);
@@ -214,8 +225,32 @@ ws.onmessage = event => {
         updateUnreadCount(roomId);
         checkAndUpdateStatus(roomId);
         updateLastMessageTime(roomId);
+    } else if (msg.type === 'newRoom') {
+        const room = msg.room;
+        console.log(`新聊天室已創立: ${room.chatRoomId}`);
+        appendNewRoomToTable(room); // 自製函數加入新行
     }
 };
+
+function appendNewRoomToTable(room) {
+    const tbody = document.querySelector("#chatroom-table tbody");
+    const tr = document.createElement("tr");
+    tr.dataset.roomId = room.chatRoomId;
+    tr.innerHTML = `
+        <td>\${room.chatRoomId}</td>
+        <td>\${room.memberName || '未知會員'}</td>
+        <td>\${room.employeeName || '-'}</td>
+        <td class="unread-cell">1 🔴</td>
+        <td>-</td>
+        <td class="status"><span class="status-pending">等待處理</span></td>
+        <td class="actions">
+            <a href="/backend/chat/room/\${room.chatRoomId}" class="btn-action btn-enter">進入</a>
+            <button class="btn-action btn-import" onclick="importRoom(\${room.chatRoomId})">匯入SQL</button>
+        </td>
+    `;
+    tbody.prepend(tr);
+    updateLastMessageTime(room.chatRoomId); // 立即更新最新訊息時間
+}
 
 function checkAndUpdateStatus(roomId) {
     fetch(`/api/chat/room/${roomId}/status`)
@@ -247,7 +282,7 @@ function completeRoom(roomId) {
                     alert(data.message);
                     updateStatus(roomId, 2);
                 } else {
-                    alert("❌ " + data.message);
+                    alert(data.message);
                 }
             });
     }
@@ -262,46 +297,43 @@ function reopenRoom(roomId) {
                     alert(data.message);
                     updateStatus(roomId, 1);
                 } else {
-                    alert("❌ " + data.message);
+                    alert(data.message);
                 }
             });
     }
 }
 
 function importRoom(roomId) {
-    if (confirm(`⚠ 是否將聊天室 ${roomId} 匯入SQL？`)) {
+    if (confirm(`是否將聊天室 ${roomId} 匯入SQL？`)) {
         fetch(`/api/chat/room/${roomId}/import`, { method: 'POST' })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    alert(`✅ ${data.message}`);
+                    alert(`${data.message}`);
                 } else {
-                    alert(`❌ ${data.message}`);
+                    alert(`${data.message}`);
                 }
             })
             .catch(err => {
                 console.error(err);
-                alert('❌ 匯入失敗，請查看console');
+                alert(' 匯入失敗，請查看console');
             });
     }
 }
 
 function updateLastMessageTime(roomId) {
-	fetch(`/api/chat/room/${roomId}/lastMessageTime`)
+    fetch(`/api/chat/room/${roomId}/lastMessageTime`)
     .then(res => res.json())
     .then(data => {
         const timeStr = data.lastMessageTime;
         const row = document.querySelector(`tr[data-room-id='${roomId}']`);
-        const timeCell = row.querySelector('td:nth-child(5)');
+        const timeCell = row?.querySelector('td:nth-child(5)');
 
         if (row && timeCell) {
             timeCell.textContent = timeStr || '-';
 
-            // 移動條件：timeStr 有意義（不為 "-"）且 row 存在
             if (timeStr && timeStr !== '-') {
                 const tbody = row.parentNode;
-
-                // 把這行移到所有資料列中第一筆
                 const firstValidRow = Array.from(tbody.children).find(tr => tr.dataset.roomId);
                 if (firstValidRow && firstValidRow !== row) {
                     tbody.insertBefore(row, firstValidRow);
@@ -318,36 +350,30 @@ function updateStatus(roomId, status) {
     const statusCell = row.querySelector('.status');
     const actionsCell = row.querySelector('.actions');
 
-    // 狀態標籤
     if (status === 1) {
         statusCell.innerHTML = '<span class="status-open">進行中</span>';
+        actionsCell.innerHTML = `
+          <a href="/backend/chat/room/${roomId}" class="btn-action btn-enter">進入</a>
+          <button class="btn-action btn-complete" onclick="completeRoom(${roomId})">結案</button>
+          <button class="btn-action btn-import" onclick="importRoom(${roomId})">匯入SQL</button>
+        `;
     } else if (status === 2) {
         statusCell.innerHTML = '<span class="status-complete">已結案</span>';
+        actionsCell.innerHTML = `
+          <a href="/backend/chat/room/${roomId}" class="btn-action btn-enter">進入</a>
+          <button class="btn-action btn-reopen" onclick="reopenRoom(${roomId})">重新開啟</button>
+          <button class="btn-action btn-import" onclick="importRoom(${roomId})">匯入SQL</button>
+        `;
     } else if (status === 3) {
         statusCell.innerHTML = '<span class="status-pending">等待處理</span>';
-    }
-
-    // 按鈕邏輯
-    if (status === 1) {
         actionsCell.innerHTML = `
-            <a href="/backend/chat/room/${roomId}" class="btn-action btn-enter">進入</a>
-            <button class="btn-action btn-complete" onclick="completeRoom(${roomId})">結案</button>
-            <button class="btn-action btn-import" onclick="importRoom(${roomId})">匯入SQL</button>
-        `;
-    } else if (status === 2) {
-        actionsCell.innerHTML = `
-            <a href="/backend/chat/room/${roomId}" class="btn-action btn-enter">進入</a>
-            <button class="btn-action btn-reopen" onclick="reopenRoom(${roomId})">重新開啟</button>
-            <button class="btn-action btn-import" onclick="importRoom(${roomId})">匯入SQL</button>
-        `;
-    } else if (status === 3) {
-        actionsCell.innerHTML = `
-            <a href="/backend/chat/room/${roomId}" class="btn-action btn-enter">進入</a>
-            <button class="btn-action btn-import" onclick="importRoom(${roomId})">匯入SQL</button>
+          <a href="/backend/chat/room/${roomId}" class="btn-action btn-enter">進入</a>
+          <button class="btn-action btn-import" onclick="importRoom(${roomId})">匯入SQL</button>
         `;
     }
 }
 </script>
+
 
 </body>
 </html>

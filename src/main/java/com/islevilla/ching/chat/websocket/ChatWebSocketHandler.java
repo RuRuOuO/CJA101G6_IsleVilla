@@ -1,8 +1,8 @@
 package com.islevilla.ching.chat.websocket;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -18,7 +18,9 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.islevilla.ching.chat.modelDTO.ChatMessageDTO;
 import com.islevilla.ching.chat.modelDTO.ChatRoomDTO;
+import com.islevilla.ching.chat.modelDTO.ChatRoomResult;
 import com.islevilla.ching.chat.service.ChatRedisService;
+import com.islevilla.ching.chat.service.ChatRoomUpdateService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,174 +28,145 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class ChatWebSocketHandler extends TextWebSocketHandler {
 
-	// 每個聊天室的所有session
-	private static final Map<Integer, List<WebSocketSession>> chatRoomSessions = new ConcurrentHashMap<>();
-
-	// 聊天室列表頁面的Session
-	private static final List<WebSocketSession> chatRoomListSessions = Collections.synchronizedList(new ArrayList<>());
-
 	@Autowired
 	private ChatRedisService chatRedisService;
 
+	@Autowired
+	private ChatRoomUpdateService chatRoomUpdateService;
+
 	private final ObjectMapper mapper = new ObjectMapper();
+
+	// 每個聊天室的所有 WebSocketSession
+	private static final Map<Integer, List<WebSocketSession>> chatRoomSessions = new ConcurrentHashMap<>();
+
+	// 後台聊天室列表頁的 WebSocketSession（chatroomlist.html）
+	private static final List<WebSocketSession> chatRoomListSessions = Collections.synchronizedList(new ArrayList<>());
 
 	// 建立連線
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) {
 		String uri = Objects.requireNonNull(session.getUri()).toString();
+
 		if (uri.contains("/ws/chatroomList")) {
 			chatRoomListSessions.add(session);
 			log.info(" WebSocket 連線成功 | ChatRoomList | Session {}", session.getId());
 		} else {
 			Integer roomId = getParam(session, "roomId");
 			chatRoomSessions.computeIfAbsent(roomId, k -> new ArrayList<>()).add(session);
-			log.info(" WebSocket 連線成功 | Session {} 進入聊天室 {}", session.getId(), roomId);
+			log.info("✅ 已加入聊天室 {} 的 session：{}", roomId, session.getId());
 		}
 	}
 
 	// 接收訊息
 	@Override
 	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-		
-		//解json訊息
+
+		// 解json訊息
 		ChatMessageDTO chatMessage = mapper.readValue(message.getPayload(), ChatMessageDTO.class);
 
-		if (chatMessage.getMessageContent() == null || chatMessage.getMessageContent().trim().isEmpty()) {
-			session.sendMessage(new TextMessage(" 訊息內容不得為空"));
+		// 從連線 URI 中取得 roomId
+		Integer roomId = getParam(session, "roomId");
+		if (roomId == null) {
+			log.warn(" 找不到 roomId，無法處理訊息");
 			return;
 		}
-
+		// 設定補充欄位
+		chatMessage.setChatRoomId(roomId);
 		chatMessage.setMessageTime(System.currentTimeMillis());
 		chatMessage.setIsRead(0);
 
-		Integer roomId = chatMessage.getChatRoomId();
-		ChatRoomDTO room = chatRedisService.getChatRoom(roomId);
-
-		if (room == null) {
-			session.sendMessage(new TextMessage(" 聊天室不存在 "));
-			return;
-		}
-		
-		if (room.getChatStatus() == 2 && chatMessage.getSenderType() == 0) {
-	        room.setChatStatus(3);
-	        chatRedisService.saveChatRoom(room);
-	        log.info(" 聊天室 {} 狀態從已結案 -> 等待處理 ", roomId);
-	    }
-
-
-		// 訊息儲存
+		// 儲存訊息
 		chatRedisService.saveMessage(roomId, chatMessage);
-		
-		// 更新最後發送訊息時間
-		chatRedisService.updateLastMessageTime(roomId, chatMessage.getMessageTime());
 
-		// 廣播到聊天室內
+		// 廣播給聊天室內所有人
 		List<WebSocketSession> sessions = chatRoomSessions.getOrDefault(roomId, Collections.emptyList());
 		for (WebSocketSession s : sessions) {
 			if (s.isOpen()) {
 				s.sendMessage(new TextMessage(mapper.writeValueAsString(chatMessage)));
 			}
 		}
-
-		log.info(" 廣播訊息：聊天室 {} | {}：{}", roomId, chatMessage.getSenderName(), chatMessage.getMessageContent());
-
-		// 廣播到聊天室列表頁 → 更新未讀數
-		broadcastToRoomList(roomId);
+		// 廣播聊天室列表頁面（未讀數更新）
+		broadcastToRoomList("newMessage", roomId, null);
 	}
 
 	// 廣播聊天室狀態（完成/重新開啟）
 	public void broadcastRoomStatus(Integer roomId, String action) {
-		Map<String, Object> payload = Map.of("type", "system", "action", action, // roomComplete 或 roomReopen
-				"roomId", roomId);
-		String json;
+		Map<String, Object> payload = Map.of("type", "system", "action", action, "roomId", roomId); // roomComplete 或
+																									// roomReopen
+
 		try {
-			json = mapper.writeValueAsString(payload);
-		} catch (Exception e) {
-			log.error(" JSON 轉換失敗 {}", e.getMessage());
-			return;
-		}
-
-		List<WebSocketSession> sessions = chatRoomSessions.getOrDefault(roomId, Collections.emptyList());
-		for (WebSocketSession s : sessions) {
-			if (s.isOpen()) {
-				try {
+			String json = mapper.writeValueAsString(payload);
+			for (WebSocketSession s : chatRoomSessions.getOrDefault(roomId, Collections.emptyList())) {
+				if (s.isOpen())
 					s.sendMessage(new TextMessage(json));
-				} catch (Exception e) {
-					log.error("廣播聊天室狀態失敗 {}", e.getMessage());
-				}
 			}
+			log.info("廣播聊天室 {} 狀態更新：{}", roomId, action);
+		} catch (Exception e) {
+			log.error("廣播聊天室狀態失敗：{}", e.getMessage());
 		}
-
-		log.info(" 廣播聊天室 {} 狀態更新：{}", roomId, action);
 	}
 
-	// 廣播到聊天室列表 → 更新未讀
-	private void broadcastToRoomList(Integer roomId) {
-		Map<String, Object> payload = Map.of("type", "newMessage", "roomId", roomId);
-		String json;
+	// 廣播到聊天室列表(更新未讀)
+	// 廣播至聊天室列表頁（更新列表顯示）
+	private void broadcastToRoomList(String type, Integer roomId, ChatRoomDTO roomData) {
 		try {
-			json = mapper.writeValueAsString(payload);
-		} catch (Exception e) {
-			log.error(" JSON 轉換失敗 {}", e.getMessage());
-			return;
-		}
+			Map<String, Object> data = new HashMap<>();
+			data.put("type", type);
 
-		for (WebSocketSession session : chatRoomListSessions) {
-			if (session.isOpen()) {
-				try {
-					session.sendMessage(new TextMessage(json));
-				} catch (Exception e) {
-					log.error(" 廣播至聊天室列表失敗 {}", e.getMessage());
+			if (roomId != null) {
+				data.put("roomId", roomId);
+			}
+
+			if (roomData != null) {
+				data.put("room", roomData);
+			}
+
+			String payload = mapper.writeValueAsString(data);
+			for (WebSocketSession s : chatRoomListSessions) {
+				if (s.isOpen()) {
+					s.sendMessage(new TextMessage(payload));
 				}
 			}
+		} catch (Exception e) {
+			log.error("❌ 廣播聊天室列表失敗", e);
 		}
+	}
+
+	// 從 WebSocket URI 中解析 query string，例如 ?roomId=5
+	private Integer getParam(WebSocketSession session, String param) {
+		try {
+			String query = session.getUri().getQuery(); // roomId=5
+			for (String pair : query.split("&")) {
+				String[] parts = pair.split("=");
+				if (parts.length == 2 && parts[0].equals(param)) {
+					return Integer.parseInt(parts[1]);
+				}
+			}
+		} catch (Exception e) {
+			log.error("❌ getParam 發生錯誤", e);
+		}
+		return null;
+	}
+
+	// 外部觸發：新增聊天室時廣播
+	public void notifyNewRoom(ChatRoomDTO newRoom) {
+		broadcastToRoomList("newRoom", null, newRoom);
 	}
 
 	// 離線
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-		String uri = Objects.requireNonNull(session.getUri()).toString();
-		if (uri.contains("/ws/chatroomList")) {
-			chatRoomListSessions.remove(session);
-			log.info(" Session {} 離開聊天室列表頁", session.getId());
-		} else {
-			try {
-				Integer roomId = getParam(session, "roomId");
-				List<WebSocketSession> sessions = chatRoomSessions.getOrDefault(roomId, new ArrayList<>());
-				sessions.remove(session);
-				if (sessions.isEmpty()) {
-					chatRoomSessions.remove(roomId);
-				}
-				log.info(" Session {} 離開聊天室 {}", session.getId(), roomId);
-			} catch (Exception e) {
-				log.error(" 關閉WebSocket時發生錯誤: {}", e.getMessage());
-			}
-		}
+		chatRoomListSessions.remove(session);
+
+		chatRoomSessions.values().forEach(list -> list.remove(session));
+
+		log.info(" WebSocket 已關閉 | Session {}", session.getId());
 	}
 
 	// 錯誤處理
 	@Override
 	public void handleTransportError(WebSocketSession session, Throwable exception) {
 		log.error(" WebSocket 錯誤：{}", exception.getMessage());
-	}
-
-	// 取得參數
-	private Integer getParam(WebSocketSession session, String key) {
-		try {
-			String uri = Objects.requireNonNull(session.getUri()).toString();
-			String[] parts = uri.split("\\?");
-			if (parts.length > 1) {
-				String[] params = parts[1].split("&");
-				for (String param : params) {
-					if (param.startsWith(key + "=")) {
-						return Integer.parseInt(param.split("=")[1]);
-					}
-				}
-			}
-		} catch (Exception e) {
-			log.error(" 解析參數失敗：{}", e.getMessage());
-		}
-		throw new IllegalArgumentException(" 缺少必要參數：" + key);
 	}
 
 }

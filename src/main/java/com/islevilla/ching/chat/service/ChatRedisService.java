@@ -1,45 +1,53 @@
 package com.islevilla.ching.chat.service;
 
-import com.google.gson.Gson;
-import com.islevilla.ching.chat.modelDTO.ChatMessageDTO;
-import com.islevilla.ching.chat.modelDTO.ChatRoomDTO;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import com.google.gson.Gson;
+import com.islevilla.ching.chat.modelDTO.ChatMessageDTO;
+import com.islevilla.ching.chat.modelDTO.ChatRoomDTO;
+import com.islevilla.ching.chat.modelDTO.ChatRoomResult;
 
 @Service
 public class ChatRedisService {
 
 	@Autowired
-	@Qualifier("redisStringTemplatedDb1") // 用來存未讀數或簡單ID
+	@Qualifier("redisTemplate")
 	private RedisTemplate<String, String> redisStr;
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
+	@Autowired
+	private ChatRoomUpdateService chatRoomUpdateService;
+
 	private final Gson gson = new Gson();
 
 	// 建立聊天室（不存在就建立）
-	public ChatRoomDTO getOrCreateChatRoom(Integer memberId, String memberName, Integer employeeId,
+	public ChatRoomResult getOrCreateChatRoom(Integer memberId, String memberName, Integer employeeId,
 			String employeeName) {
 		Integer existingRoomId = getChatRoomIdByMember(memberId);
 		if (existingRoomId != null) {
-			return getChatRoom(existingRoomId);
+			return new ChatRoomResult(getChatRoom(existingRoomId), false);
 		}
 
-		int roomId = incrementChatRoomId();
+		int roomId = chatRoomUpdateService.incrementChatRoomId();
 		ChatRoomDTO room = ChatRoomDTO.builder().chatRoomId(roomId).memberId(memberId).memberName(memberName)
 				.employeeId(employeeId).employeeName(employeeName).chatStatus(1).unreadCount(0).build();
 
-		saveChatRoom(room);
-		redisStr.opsForSet().add(ChatRedisKey.CHAT_ROOMS_SET, String.valueOf(roomId));
-		bindMemberToRoom(memberId, roomId);
-		return room;
+		chatRoomUpdateService.saveChatRoom(room);
+		chatRoomUpdateService.bindMemberToRoom(memberId, roomId);
+		return new ChatRoomResult(room, true);
 	}
 
 	// 查詢單一聊天室（即時補名稱）
@@ -55,16 +63,14 @@ public class ChatRedisService {
 		room.setEmployeeName(getEmployeeName(room.getEmployeeId()));
 
 		// 撈最後訊息時間
-		Long lastMsgTime = getLastMessageTime(roomId);
-		room.setLastMessageTime(lastMsgTime != null ? lastMsgTime : 0L);
-
+		room.setLastMessageTime(chatRoomUpdateService.getLastMessageTime(roomId));
 		return room;
 	}
 
 	// 查詢所有聊天室
 	public List<ChatRoomDTO> getAllChatRooms() {
 		Set<String> ids = redisStr.opsForSet().members(ChatRedisKey.CHAT_ROOMS_SET);
-		if (ids == null)
+		if (ids == null || ids.isEmpty())
 			return Collections.emptyList();
 
 		return ids.stream().map(id -> getChatRoom(Integer.parseInt(id))).filter(Objects::nonNull)
@@ -80,78 +86,19 @@ public class ChatRedisService {
 		}).collect(Collectors.toList());
 	}
 
-	// 更新聊天室資訊
-	public void saveChatRoom(ChatRoomDTO room) {
-		redisStr.opsForValue().set(ChatRedisKey.chatRoom(room.getChatRoomId()), gson.toJson(room));
-	}
-
-	// 聊天室結案（狀態=2）
-	public void completeRoom(Integer roomId) {
-		ChatRoomDTO room = getChatRoom(roomId);
-		if (room != null) {
-			room.setChatStatus(2);
-			saveChatRoom(room);
-		}
-	}
-
-	// 聊天室重新開啟（狀態=1）
-	public void reopenRoom(Integer roomId) {
-		ChatRoomDTO room = getChatRoom(roomId);
-		if (room != null) {
-			room.setChatStatus(1);
-			saveChatRoom(room);
-		}
-	}
-
-	// 結束聊天室
-	public void closeChatRoom(Integer roomId) {
-		ChatRoomDTO room = getChatRoom(roomId);
-		if (room != null) {
-			room.setChatStatus(0); // 0 = 結束
-			saveChatRoom(room);
-		}
-	}
-
-	// 查詢聊天室狀態
-	public Integer getChatRoomStatus(Integer roomId) {
-		ChatRoomDTO room = getChatRoom(roomId);
-		return room != null ? room.getChatStatus() : 0;
-	}
-
-	// 刪除聊天室（含訊息與未讀）
-	public void deleteChatRoom(Integer roomId) {
-		ChatRoomDTO room = getChatRoom(roomId);
-
-		redisStr.delete(ChatRedisKey.chatRoom(roomId));
-		redisStr.delete(ChatRedisKey.chatMessages(roomId));
-		redisStr.delete(ChatRedisKey.chatUnreadEmployee(roomId));
-		redisStr.delete(ChatRedisKey.chatUnreadMember(roomId));
-
-		if (room != null) {
-			redisStr.delete(ChatRedisKey.chatMemberRoom(room.getMemberId()));
-		}
-
-		redisStr.opsForSet().remove(ChatRedisKey.CHAT_ROOMS_SET, String.valueOf(roomId));
-	}
-
-	// 自增聊天室ID
-	public Integer incrementChatRoomId() {
-		return Optional.ofNullable(redisStr.opsForValue().increment(ChatRedisKey.chatRoomSeq())).orElse(1L).intValue();
-	}
-
 	/* ================= 訊息管理 ================= */
 
 	// 儲存訊息
 	public void saveMessage(Integer roomId, ChatMessageDTO message) {
 		redisStr.opsForList().rightPush(ChatRedisKey.chatMessages(roomId), gson.toJson(message));
+		chatRoomUpdateService.updateLastMessageTime(roomId, message.getMessageTime());
 
-		if (message.getSenderType() == 0) {
+		if (message.getSenderType() == 0)
 			// 會員發送 → 增加客服的未讀
 			redisStr.opsForValue().increment(ChatRedisKey.chatUnreadEmployee(roomId));
-		} else {
+		else
 			// 客服發送 → 增加會員的未讀
 			redisStr.opsForValue().increment(ChatRedisKey.chatUnreadMember(roomId));
-		}
 	}
 
 	// 查詢歷史訊息
@@ -160,27 +107,18 @@ public class ChatRedisService {
 		if (list == null)
 			return new ArrayList<>();
 
-		 if (!afterEnd) {
-		        return list.stream()
-		                .map(s -> gson.fromJson(s, ChatMessageDTO.class))
-		                .collect(Collectors.toList());
-		    }
-		 Long endTime = getRoomEndTime(roomId);
-		    if (endTime == null) {
-		        // 沒有結案時間，回傳全部
-		        return list.stream()
-		                .map(s -> gson.fromJson(s, ChatMessageDTO.class))
-		                .collect(Collectors.toList());
-		    }
-		    return list.stream()
-		            .map(s -> gson.fromJson(s, ChatMessageDTO.class))
-		            .filter(msg -> msg.getMessageTime() != null && msg.getMessageTime() > endTime)
-		            .collect(Collectors.toList());
+		if (!afterEnd) {
+			return list.stream().map(s -> gson.fromJson(s, ChatMessageDTO.class)).collect(Collectors.toList());
 		}
-	
+		Long endTime = chatRoomUpdateService.getRoomEndTime(roomId);
+		return list.stream().map(s -> gson.fromJson(s, ChatMessageDTO.class))
+				.filter(msg -> msg.getMessageTime() != null && msg.getMessageTime() > endTime)
+				.collect(Collectors.toList());
+	}
+
 	// 預設查詢全部訊息
 	public List<ChatMessageDTO> getMessageHistory(Integer roomId) {
-	    return getMessageHistory(roomId, false); 
+		return getMessageHistory(roomId, false);
 	}
 
 	/* ================= 未讀管理 ================= */
@@ -197,17 +135,20 @@ public class ChatRedisService {
 		return count == null ? 0 : Integer.parseInt(count);
 	}
 
-	// 清除會員未讀（進入聊天室時）
-	public void clearUnreadForMember(Integer roomId) {
-		redisStr.delete(ChatRedisKey.chatUnreadMember(roomId));
+	public Integer getChatRoomIdByMember(Integer memberId) {
+		String id = redisStr.opsForValue().get(ChatRedisKey.chatMemberRoom(memberId));
+		return id == null ? null : Integer.parseInt(id);
 	}
 
-	// 清除客服未讀
-	public void clearUnreadForEmployee(Integer roomId) {
-		redisStr.delete(ChatRedisKey.chatUnreadEmployee(roomId));
+	public Integer getMemberId(Integer roomId) {
+		ChatRoomDTO room = getChatRoom(roomId);
+		return room == null ? null : room.getMemberId();
 	}
 
-	/* ================= 工具 ================= */
+	public Integer getEmployeeId(Integer roomId) {
+		ChatRoomDTO room = getChatRoom(roomId);
+		return room == null ? null : room.getEmployeeId();
+	}
 
 	// 從資料庫查會員名稱
 	private String getMemberName(Integer memberId) {
@@ -227,59 +168,5 @@ public class ChatRedisService {
 		} catch (Exception e) {
 			return "未知客服";
 		}
-	}
-
-	// 查聊天室對應的會員ID
-	public Integer getMemberId(Integer roomId) {
-		ChatRoomDTO room = getChatRoom(roomId);
-		return room == null ? null : room.getMemberId();
-	}
-
-	// 查聊天室對應的客服ID
-	public Integer getEmployeeId(Integer roomId) {
-		ChatRoomDTO room = getChatRoom(roomId);
-		return room == null ? null : room.getEmployeeId();
-	}
-
-	// 查詢會員對應的聊天室ID
-	public Integer getChatRoomIdByMember(Integer memberId) {
-		String id = redisStr.opsForValue().get(ChatRedisKey.chatMemberRoom(memberId));
-		return id == null ? null : Integer.parseInt(id);
-	}
-
-	// 綁定會員對應的聊天室ID
-	public void bindMemberToRoom(Integer memberId, Integer roomId) {
-		redisStr.opsForValue().set(ChatRedisKey.chatMemberRoom(memberId), String.valueOf(roomId));
-	}
-
-	// 解除會員與聊天室綁定（例如客服點結束聊天室）
-	public void unbindMemberFromRoom(Integer memberId) {
-		redisStr.delete(ChatRedisKey.chatMemberRoom(memberId));
-	}
-
-	// 更新最後訊息時間
-	public void updateLastMessageTime(Integer roomId, Long timestamp) {
-		String key = "chatroom:lastMessageTime:" + roomId;
-		redisStr.opsForValue().set(key, String.valueOf(timestamp));
-	}
-
-	// 查詢最後訊息時間
-	public Long getLastMessageTime(Integer roomId) {
-		String key = "chatroom:lastMessageTime:" + roomId;
-		String value = redisStr.opsForValue().get(key);
-		return value != null ? Long.parseLong(value) : null;
-	}
-
-	// 記錄結案時間
-	public void markRoomEndTime(Integer roomId) {
-		String key = "chat:endTime:" + roomId;
-		redisStr.opsForValue().set(key, String.valueOf(System.currentTimeMillis()));
-	}
-
-	// 查詢結案時間
-	public Long getRoomEndTime(Integer roomId) {
-		String key = "chat:endTime:" + roomId;
-		String value = redisStr.opsForValue().get(key);
-		return (value != null) ? Long.parseLong(value) : null;
 	}
 }

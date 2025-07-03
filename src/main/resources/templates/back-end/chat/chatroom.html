@@ -156,14 +156,16 @@ button:hover {
 </div>
 
 <script th:inline="javascript">
-const roomId = [[${roomId}]];
-const senderId = [[${senderId}]];
-const senderName = '[[${senderName}]]';
-const senderType = [[${senderType}]];
-const chatStatus = [[${room.chatStatus}]];  // ✔ 狀態
+/*<![CDATA[*/
+const roomId = Number(/*[[${roomId}]]*/);
+const senderId = /*[[${senderId}]]*/;
+const senderName = /*[[${senderName}]]*/ "";
+const senderType = /*[[${senderType}]]*/;
+const chatStatus = /*[[${room.chatStatus}]]*/;
+/*]]>*/
+</script>
 
-console.log("🟥 客服聊天室 | roomId=", roomId, "senderId=", senderId, "senderName=", senderName);
-
+<script>
 const input = document.getElementById("msg");
 const banner = document.getElementById("status-banner");
 
@@ -171,20 +173,20 @@ const banner = document.getElementById("status-banner");
 const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/chat?roomId=${roomId}`);
 
 ws.onopen = () => {
-    console.log("✅ WebSocket 已連線聊天室", roomId);
-    if (chatStatus === 0) {
-        disableInput("⚠️ 此聊天室已結束，無法傳送訊息");
+    console.log(" WebSocket 已連線聊天室", roomId);
+    if (chatStatus === 2) {
+        disableInput(" 此聊天室已結束，無法傳送訊息");
     }
 };
 
 ws.onclose = () => {
-    console.log("❌ WebSocket 已關閉");
-    disableInput("❌ 聯線已中斷");
+    console.log(" WebSocket 已關閉");
+    disableInput(" 聯線已中斷");
 };
 
 ws.onerror = (err) => {
-    console.error("❌ WebSocket 錯誤", err);
-    disableInput("❌ 發生錯誤，請重試");
+    console.error(" WebSocket 錯誤", err);
+    disableInput(" 發生錯誤，請重試");
 };
 
 ws.onmessage = event => {
@@ -209,8 +211,8 @@ window.onload = () => {
 
 // 發送訊息
 function sendMessage() {
-    if (chatStatus === 0) {
-        alert("⚠️ 此聊天室已結束，無法發送訊息");
+    if (chatStatus === 2) {
+        alert(" 此聊天室已結束，無法發送訊息");
         return;
     }
 
@@ -227,26 +229,35 @@ function sendMessage() {
 
     ws.send(JSON.stringify(data));
     input.value = "";
-    console.log("🟨 發送訊息", data);
+    console.log("發送訊息", data);
 }
 
-// 渲染訊息
+// 演繹訊息
 function renderMessage(isMe, sender, content, timeMillis) {
-    const div = document.createElement("div");
-    div.className = "msg " + (isMe ? "right" : "left");
+  const div = document.createElement("div");
+  div.className = "msg " + (isMe ? "right" : "left");
 
-    const timeStr = timeMillis ? formatTime(timeMillis) : formatTime(Date.now());
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
 
-    div.innerHTML = `
-        <div class="bubble">
-            <span class="name">${sender}</span>
-            <span class="content">${content}</span>
-            <span class="time">${timeStr}</span>
-        </div>
-    `;
-    const chat = document.getElementById("chat");
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
+  const nameSpan = document.createElement("span");
+  nameSpan.className = "name";
+  nameSpan.textContent = sender;
+
+  const contentSpan = document.createElement("span");
+  contentSpan.className = "content";
+  contentSpan.textContent = content;
+
+  const timeSpan = document.createElement("span");
+  timeSpan.className = "time";
+  timeSpan.textContent = formatTime(timeMillis ?? Date.now());
+
+  bubble.append(nameSpan, contentSpan, timeSpan);
+  div.appendChild(bubble);
+
+  const chat = document.getElementById("chat");
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
 }
 
 // 格式化時間

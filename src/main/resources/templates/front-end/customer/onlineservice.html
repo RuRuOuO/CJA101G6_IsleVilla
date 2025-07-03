@@ -155,12 +155,16 @@ button:hover {
 		</div>
 	</div>
 
-	<script th:inline="javascript">
+<script th:inline="javascript">
+/*<![CDATA[*/
 const roomId = [[${roomId}]];
 const senderId = [[${senderId}]];
-const senderName = '[[${senderName}]]';
 const senderType = [[${senderType}]];
+const senderName = '[[${senderName}]]';  // 加上單引號包住字串
+/*]]>*/
+</script>
 
+	<script>
 console.log("會員聊天室 | roomId=", roomId, "senderId=", senderId, "senderName=", senderName);
 
 const input = document.getElementById("msg");
@@ -177,7 +181,8 @@ ws.onerror = (err) => console.error("WebSocket 錯誤", err);
 
 ws.onmessage = event => {
     const msg = JSON.parse(event.data);
-
+    console.log("📩 收到訊息", msg); // ← 這要有
+    
     if (msg.type === 'system') {
         if (msg.action === 'roomComplete') {
             renderSystemMessage('----- 已結案 -----<br><br> 有任何相關問題請再與我們聯絡 ! <br><br>IsleVilla 微嶼 ');
@@ -192,6 +197,7 @@ ws.onmessage = event => {
     }
 
     const isMe = (msg.senderId === senderId) && (msg.senderType === senderType);
+    
     const displayName = msg.senderType === 1 ? 'IsleVilla 客服' : msg.senderName;
 
     // 等待處理中 + 客服回覆 = 狀態切回進行中
@@ -248,6 +254,9 @@ function sendMessage() {
         renderSystemMessage(' 請稍等，即將為您服務 ! <br><br>IsleVilla 微嶼 ');
         updateStatusIndicator(3);
         chatStatus = 3;
+        
+     // 通知後端更新聊天室狀態為等待處理
+        fetch(`/api/chat/room/${roomId}/mark-pending`, { method: 'POST' });
     }
 
     const data = {
