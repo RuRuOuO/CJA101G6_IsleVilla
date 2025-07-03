@@ -37,6 +37,13 @@
                 <h4 class="card-title mb-0 fw-bold">
                     <i class="bi bi-house-door me-2"></i>住房管理
                 </h4>
+                <!--                <button-->
+                <!--                        class="btn btn-success"-->
+                <!--                        data-bs-toggle="modal"-->
+                <!--                        data-bs-target="#addEmployeeModal"-->
+                <!--                >-->
+                <!--                    <i class="bi bi-plus-circle me-2"></i>新增員工-->
+                <!--                </button>-->
             </div>
         </div>
 
@@ -79,8 +86,10 @@
                                           onsubmit="return confirmCheckin();">
                                         <div class="mb-3">
                                             <label for="checkinOrderId" class="form-label">訂房編號</label>
-                                            <input type="number" class="form-control" id="checkinOrderId" name="checkinOrderId"
-                                                   placeholder="請輸入訂房編號" required oninput="updateCheckinAction(this.value)">
+                                            <input type="number" class="form-control" id="checkinOrderId"
+                                                   name="checkinOrderId"
+                                                   placeholder="請輸入訂房編號" required
+                                                   oninput="updateCheckinAction(this.value)">
                                         </div>
                                         <button type="submit" class="btn btn-success w-100">
                                             <i class="bi bi-check-circle"></i> 確認入住
@@ -102,8 +111,10 @@
                                           onsubmit="return confirmCheckout();">
                                         <div class="mb-3">
                                             <label for="checkoutOrderId" class="form-label">訂房編號</label>
-                                            <input type="number" class="form-control" id="checkoutOrderId" name="checkoutOrderId"
-                                                   placeholder="請輸入訂房編號" required oninput="updateCheckoutAction(this.value)">
+                                            <input type="number" class="form-control" id="checkoutOrderId"
+                                                   name="checkoutOrderId"
+                                                   placeholder="請輸入訂房編號" required
+                                                   oninput="updateCheckoutAction(this.value)">
                                         </div>
                                         <button type="submit" class="btn btn-warning w-100">
                                             <i class="bi bi-x-circle"></i> 確認退房
@@ -134,7 +145,9 @@
                             <tr th:each="order : ${orderListToday}" th:if="${orderListToday != null}">
                                 <td th:text="${order.roomReservationId}">1001</td>
                                 <td th:text="${order.members.memberId}">M001</td>
-                                <td th:text="${#temporals.format(order.roomOrderDate, 'yyyy-MM-dd HH:mm')}">2024-01-15 14:30</td>
+                                <td th:text="${#temporals.format(order.roomOrderDate, 'yyyy-MM-dd HH:mm')}">2024-01-15
+                                    14:30
+                                </td>
                                 <td>
                                     <span th:switch="${order.roomOrderStatus}">
                                         <span th:case="0" class="badge bg-primary">成立</span>
@@ -146,7 +159,8 @@
                                 </td>
                                 <td th:text="${#temporals.format(order.checkInDate, 'yyyy-MM-dd')}">2024-01-20</td>
                                 <td th:text="${#temporals.format(order.checkOutDate, 'yyyy-MM-dd')}">2024-01-22</td>
-                                <td th:text="${order.promotion != null ? order.promotion.roomPromotionTitle : '-'}">-</td>
+                                <td th:text="${order.promotion != null ? order.promotion.roomPromotionTitle : '-'}">-
+                                </td>
                                 <td th:text="'$' + ${order.rvPaidAmount}">$3000</td>
                                 <td>
                                     <div>
@@ -196,7 +210,8 @@
                     <!-- 搜尋和篩選 -->
                     <div class="row mb-3 mt-4">
                         <div class="col-md-4">
-                            <input type="text" id="orderSearchInput" class="form-control" placeholder="搜尋 訂房編號 或 會員編號">
+                            <input type="text" id="orderSearchInput" class="form-control"
+                                   placeholder="搜尋 訂房編號 或 會員編號">
                         </div>
                         <div class="col-md-3">
                             <select id="orderStatusFilter" class="form-select">
@@ -230,7 +245,9 @@
                             <tr th:each="order : ${orderList}" th:if="${orderList != null}">
                                 <td th:text="${order.roomReservationId}">1001</td>
                                 <td th:text="${order.members.memberId}">M001</td>
-                                <td th:text="${#temporals.format(order.roomOrderDate, 'yyyy-MM-dd HH:mm')}">2024-01-15 14:30</td>
+                                <td th:text="${#temporals.format(order.roomOrderDate, 'yyyy-MM-dd HH:mm')}">2024-01-15
+                                    14:30
+                                </td>
                                 <td>
                                     <span th:switch="${order.roomOrderStatus}">
                                         <span th:case="0" class="badge bg-success">訂單成立</span>
@@ -243,7 +260,8 @@
                                 </td>
                                 <td th:text="${#temporals.format(order.checkInDate, 'yyyy-MM-dd')}">2024-01-20</td>
                                 <td th:text="${#temporals.format(order.checkOutDate, 'yyyy-MM-dd')}">2024-01-22</td>
-                                <td th:text="${order.promotion != null ? order.promotion.roomPromotionTitle : '-'}">-</td>
+                                <td th:text="${order.promotion != null ? order.promotion.roomPromotionTitle : '-'}">-
+                                </td>
                                 <td th:text="'$' + ${order.rvPaidAmount}">$3000</td>
                                 <td>
                                     <div>
@@ -388,15 +406,15 @@
             scrollX: true,
             autoWidth: false,
             columnDefs: [
-                { width: "80px", targets: 0 },  // 訂房編號
-                { width: "70px", targets: 1 },  // 會員編號
-                { width: "120px", targets: 2 }, // 訂單日期
-                { width: "70px", targets: 3 },  // 狀態
-                { width: "90px", targets: 4 },  // 入住日期
-                { width: "90px", targets: 5 },  // 退房日期
-                { width: "80px", targets: 6 },  // 優惠專案
-                { width: "70px", targets: 7 },  // 總金額
-                { width: "100px", targets: 8, orderable: false }  // 操作
+                {width: "80px", targets: 0},  // 訂房編號
+                {width: "70px", targets: 1},  // 會員編號
+                {width: "120px", targets: 2}, // 訂單日期
+                {width: "70px", targets: 3},  // 狀態
+                {width: "90px", targets: 4},  // 入住日期
+                {width: "90px", targets: 5},  // 退房日期
+                {width: "80px", targets: 6},  // 優惠專案
+                {width: "70px", targets: 7},  // 總金額
+                {width: "100px", targets: 8, orderable: false}  // 操作
             ],
             language: {
                 paginate: {
@@ -424,15 +442,15 @@
             scrollX: true,
             autoWidth: false,
             columnDefs: [
-                { width: "80px", targets: 0 },  // 訂房編號
-                { width: "70px", targets: 1 },  // 會員編號
-                { width: "120px", targets: 2 }, // 訂單日期
-                { width: "70px", targets: 3 },  // 狀態
-                { width: "90px", targets: 4 },  // 入住日期
-                { width: "90px", targets: 5 },  // 退房日期
-                { width: "80px", targets: 6 },  // 優惠專案
-                { width: "70px", targets: 7 },  // 總金額
-                { width: "100px", targets: 8, orderable: false }  // 操作
+                {width: "80px", targets: 0},  // 訂房編號
+                {width: "70px", targets: 1},  // 會員編號
+                {width: "120px", targets: 2}, // 訂單日期
+                {width: "70px", targets: 3},  // 狀態
+                {width: "90px", targets: 4},  // 入住日期
+                {width: "90px", targets: 5},  // 退房日期
+                {width: "80px", targets: 6},  // 優惠專案
+                {width: "70px", targets: 7},  // 總金額
+                {width: "100px", targets: 8, orderable: false}  // 操作
             ],
             language: {
                 paginate: {
