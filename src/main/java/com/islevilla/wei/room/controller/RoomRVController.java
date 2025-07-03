@@ -88,7 +88,7 @@ public class RoomRVController {
     // 後台顯示全部訂單 // 使用前端分頁
     @GetMapping("/backend/room-reservation/list")
     public String roomRVOrderList(Model model) {
-        List<RoomRVOrder> orderList = roomRVOrderService.findAll();
+        List<RoomRVOrder> orderList = roomRVOrderService.getAllOrders();
         model.addAttribute("orderList", orderList);
         return "back-end/roomRVOrder/listAllRoomRVOrder";
     }
