@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -245,37 +246,70 @@ public String deleteRoomTypePhoto(@PathVariable Integer roomTypePhotoId,
 @GetMapping("/image/{roomTypePhotoId}")
 public ResponseEntity<byte[]> getRoomTypePhotoImage(@PathVariable Integer roomTypePhotoId) {
 	try {
-	     RoomTypePhoto roomTypePhoto = roomTypePhotoService.findById(roomTypePhotoId);
-	     if (roomTypePhoto != null && roomTypePhoto.getRoomTypePhoto() != null) {
-	         // 將 Byte[] 轉換為 byte[]
-	         Byte[] photoBytes = roomTypePhoto.getRoomTypePhoto();
-	         byte[] imageBytes = new byte[photoBytes.length];
-	         for (int i = 0; i < photoBytes.length; i++) {
-	             imageBytes[i] = photoBytes[i];
-	         }
-	         
-	         return ResponseEntity.ok()
-	                 .header("Content-Type", "image/png") // 預設為jpeg，實際應根據檔案類型判斷
-	                 .body(imageBytes);
-	     }else{
-	    	// 找不到，回傳預設圖片
-	    	 InputStream defaultImageStream = getClass().getResourceAsStream("/static/img/roomTypePhoto/noPicture.png");
-		    if (defaultImageStream != null) {
-		        byte[] defaultImageBytes = defaultImageStream.readAllBytes();
-		        return ResponseEntity.ok()
-		                .header("Content-Type", "image/*")
-		                .body(defaultImageBytes);
-		    } else {
-		        // 如果連預設圖片都找不到，返回錯誤訊息
-		        return ResponseEntity.ok()
-		                .header("Content-Type", "text/plain; charset=UTF-8")
-		                .body("找不到預設圖片，請聯絡管理員".getBytes(StandardCharsets.UTF_8));
-		    }
-	     }
-     }catch (Exception e) {
-		 return ResponseEntity.ok()
-	             .header("Content-Type", "text/plain; charset=UTF-8")
-	             .body("找不到預設圖片，請聯絡管理員".getBytes(StandardCharsets.UTF_8));
-     }
-} 
+		RoomTypePhoto roomTypePhoto = roomTypePhotoService.findById(roomTypePhotoId);
+		if (roomTypePhoto != null && roomTypePhoto.getRoomTypePhoto() != null) {
+			// 將 Byte[] 轉換為 byte[]
+			Byte[] photoBytes = roomTypePhoto.getRoomTypePhoto();
+			byte[] imageBytes = new byte[photoBytes.length];
+			for (int i = 0; i < photoBytes.length; i++) {
+				imageBytes[i] = photoBytes[i];
+			}
+			
+			return ResponseEntity.ok()
+					.header("Content-Type", "image/png")
+					.body(imageBytes);
+		} else {
+			// 找不到，回傳預設圖片
+			InputStream defaultImageStream = getClass().getResourceAsStream("/static/img/roomTypePhoto/noPicture.png");
+			if (defaultImageStream != null) {
+				byte[] defaultImageBytes = defaultImageStream.readAllBytes();
+				return ResponseEntity.ok()
+						.header("Content-Type", "image/*")
+						.body(defaultImageBytes);
+			} else {
+				// 如果連預設圖片都找不到，返回錯誤訊息
+				return ResponseEntity.ok()
+						.header("Content-Type", "text/plain; charset=UTF-8")
+						.body("找不到預設圖片，請聯絡管理員".getBytes(StandardCharsets.UTF_8));
+			}
+		}
+	} catch (Exception e) {
+		return ResponseEntity.ok()
+				.header("Content-Type", "text/plain; charset=UTF-8")
+				.body("找不到預設圖片，請聯絡管理員".getBytes(StandardCharsets.UTF_8));
+	}
+}
+
+// 根據房型ID查詢所有圖片（API端點）
+// 建立RESTful API端點，路徑為 /backend/roomTypePhoto/photos/{roomTypeId}
+// @ResponseBody 讓Spring直接將回傳值轉換為JSON格式
+// ResponseEntity：Spring的HTTP回應封裝類，可控制狀態碼和標頭
+// List<Map<String, Object>>：回傳圖片資料的陣列，每個圖片是一個Map物件
+@GetMapping("/photos/{roomTypeId}")
+@ResponseBody
+public ResponseEntity<List<Map<String, Object>>> getRoomTypePhotosByRoomTypeId(@PathVariable Integer roomTypeId) {
+	try {
+		List<RoomTypePhoto> photos = roomTypePhotoService.roomTypeFindPhotos(roomTypeId);
+		List<Map<String, Object>> photoData = new ArrayList<>();
+		
+		// 將JPA實體物件轉換為前端可用的JSON格式
+		// 只提取必要的欄位，避免傳送過多資料
+		// 使用Map結構讓前端JavaScript容易處理
+		for (RoomTypePhoto photo : photos) {
+			Map<String, Object> photoMap = new HashMap<>();
+			photoMap.put("roomTypePhotoId", photo.getRoomTypePhotoId());
+			photoMap.put("roomTypeId", photo.getRoomType().getRoomTypeId());
+			photoMap.put("displayOrder", photo.getDisplayOrder());
+			photoData.add(photoMap);
+		}
+		
+		// 回傳HTTP 200狀態碼和JSON資料
+		return ResponseEntity.ok(photoData);
+	} catch (Exception e) {
+		// 發生任何錯誤時，回傳空陣列而不是錯誤訊息
+		// 讓前端能正常處理「無圖片」的情況
+		// 避免因為後端錯誤導致前端JavaScript崩潰
+		return ResponseEntity.ok(new ArrayList<>());
+	}
+}
 }

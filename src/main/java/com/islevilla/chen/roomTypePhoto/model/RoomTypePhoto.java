@@ -27,8 +27,6 @@ public class RoomTypePhoto implements java.io.Serializable {
 	@Id
 	@Column(name = "room_type_photo_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@NotNull(message = "房型圖片編號: 請勿空白")
-	@Min(value=1, message="房型編號:格式錯誤，請輸入數字")
 	private Integer roomTypePhotoId;
 	
 	@ManyToOne
