@@ -4,87 +4,103 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>微嶼 | Isle Villa 後台首頁</title>
-    <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
 </head>
 <body>
-<!-- ===== 載入sidebar ===== -->
-<!-- 插入手機版側邊欄 -->
+<!-- 側邊欄 -->
 <div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
-<!-- 插入桌面版側邊欄 -->
 <div th:replace="~{fragments/backFragments :: sidebar}"></div>
 
 <main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
     <th:block th:fragment="myContent">
-        <!-- //////////////////// 頁面內容放在這個card裡面(外框已經有加card和container，直接放入table和標題即可)//////////////////// -->
-        <h1 class="mb-4">修改消息</h1>
-
-        <a class="btn btn-secondary mb-4" th:href="@{/backend/news/list}">← 回到消息列表</a>
-
-        <form class="row g-3" enctype="multipart/form-data" method="post" th:action="@{/backend/news/update}"
-              th:object="${news}">
-
-            <div class="col-12">
-                <label for="newsId" class="form-label">編號</label>
-                <input type="text" id="newsId" th:field="*{newsId}" class="form-control" readonly>
+        <!-- 卡片標題與返回按鈕 -->
+        <div class="card-header bg-transparent border-0 pt-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0 fw-bold">
+                    <i class="bi bi-pencil-square me-2"></i>修改最新消息
+                </h4>
+                <a class="btn btn-secondary" th:href="@{/backend/news/list}">
+                    ← 回到消息列表
+                </a>
             </div>
+        </div>
 
-            <div class="col-12">
-                <label for="newsTitle" class="form-label">標題</label>
-                <input type="text" id="newsTitle" th:field="*{newsTitle}" class="form-control">
-            </div>
+        <!-- 表單區塊 -->
+        <div class="card-body">
+            <form class="row g-3" enctype="multipart/form-data" method="post"
+                  th:action="@{/backend/news/update}" th:object="${news}">
 
-            <div class="col-12">
-                <label for="newsContent" class="form-label">內文</label>
-                <textarea id="newsContent" th:field="*{newsContent}" maxlength="1000" rows="4" class="form-control"></textarea>
-            </div>
+                <!-- 編號 -->
+                <div class="col-md-6">
+                    <label for="newsId" class="form-label">編號</label>
+                    <input type="text" id="newsId" th:field="*{newsId}" class="form-control" readonly>
+                </div>
 
-            <div class="col-12">
-                <label for="newsTime" class="form-label">時間</label>
-                <input type="text" id="newsTime" th:field="*{newsTime}" class="form-control">
-            </div>
+                <!-- 上架狀態 -->
+                <div class="col-md-6">
+                    <label for="newsStatus" class="form-label">狀態</label>
+                    <select id="newsStatus" th:field="*{newsStatus}" class="form-select">
+                        <option value="1">上架</option>
+                        <option value="0">下架</option>
+                    </select>
+                </div>
 
-            <!-- 顯示原本的圖片 -->
-            <div class="col-12">
-                <label class="form-label">原圖</label><br>
-                <img th:if="${news.newsImage != null}" th:src="@{'/news/image/' + ${news.newsId}}"
-                     alt="原圖片" class="img-thumbnail" style="max-width: 300px;">
-                <p th:if="${news.newsImage == null}" class="text-muted">目前沒有圖片</p>
-            </div>
+                <!-- 標題 -->
+                <div class="col-12">
+                    <label for="newsTitle" class="form-label">標題</label>
+                    <input type="text" id="newsTitle" th:field="*{newsTitle}" class="form-control">
+                </div>
 
-            <!-- 上傳新圖片 -->
-            <div class="col-12">
-                <label for="newsImageFile" class="form-label">上傳新圖片（可略過）</label>
-                <input type="file" id="newsImageFile" name="newsImageFile" class="form-control">
-            </div>
+                <!-- 內文 -->
+                <div class="col-12">
+                    <label for="newsContent" class="form-label">內文</label>
+                    <textarea id="newsContent" th:field="*{newsContent}" maxlength="1000" rows="4" class="form-control"></textarea>
+                </div>
 
-            <div class="col-12">
-                <label for="newsStatus" class="form-label">狀態</label>
-                <select id="newsStatus" th:field="*{newsStatus}" class="form-select">
-                    <option value="1">上架</option>
-                    <option value="0">下架</option>
-                </select>
-            </div>
-            <!-- 對應優惠專案-->
-            <div class="col-12">
-                <label for="promotion">對應專案</label>
-                <select id="promotion" name="promotion.roomPromotionId" class="form-control">
-                    <option value="">無</option>
-                    <th:block th:each="promotion:${promotionList}">
-                        <option th:value="${promotion.roomPromotionId}"
-                                th:text="${promotion.roomPromotionTitle}"
-                                th:selected="${news.promotion?.roomPromotionId == promotion.roomPromotionId}">
-                        </option>
-                    </th:block>
-                </select>
-            </div>
+                <!-- 發布時間 -->
+                <div class="col-md-6">
+                    <label for="newsTime" class="form-label">時間</label>
+                    <input type="text" id="newsTime" th:field="*{newsTime}" class="form-control">
+                </div>
 
-            <div class="col-12">
-                <button type="submit" class="btn btn-primary">送出</button>
-            </div>
-        </form>
-        <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+                <!-- 優惠專案 -->
+                <div class="col-md-6">
+                    <label for="promotion" class="form-label">對應優惠專案</label>
+                    <select id="promotion" name="promotion.roomPromotionId" class="form-select">
+                        <option value="">無</option>
+                        <th:block th:each="promotion : ${promotionList}">
+                            <option th:value="${promotion.roomPromotionId}"
+                                    th:text="${promotion.roomPromotionTitle}"
+                                    th:selected="${news.promotion?.roomPromotionId == promotion.roomPromotionId}">
+                            </option>
+                        </th:block>
+                    </select>
+                </div>
+
+                <!-- 原圖顯示 -->
+                <div class="col-12">
+                    <label class="form-label">原圖</label><br>
+                    <img th:if="${news.newsImage != null}" th:src="@{'/news/image/' + ${news.newsId}}"
+                         alt="原圖片" class="img-thumbnail" style="max-width: 300px;">
+                    <p th:if="${news.newsImage == null}" class="text-muted">目前沒有圖片</p>
+                </div>
+
+                <!-- 上傳新圖片 -->
+                <div class="col-12">
+                    <label for="newsImageFile" class="form-label">上傳新圖片（可略過）</label>
+                    <input type="file" id="newsImageFile" name="newsImageFile" class="form-control">
+                </div>
+
+                <!-- 按鈕 -->
+                <div class="col-12 d-flex gap-3">
+                    <button type="submit" class="btn btn-primary">送出</button>
+                    <a class="btn btn-outline-secondary" th:href="@{/backend/news/list}">取消</a>
+                </div>
+            </form>
+        </div>
     </th:block>
 </main>
+
+<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
 </body>
 </html>

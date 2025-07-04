@@ -190,19 +190,20 @@
                             <tr th:each="detail, iterStat : ${detailList}"
                                 th:class="${iterStat.odd} ? 'table-light' : ''">
                                 <td class="fw-semibold">
-                                        <span class="badge bg-outline-secondary"
+                                        <span class="badge bg-dark"
                                               th:text="${detail.roomReservationDetailId}">
                                             D001
                                         </span>
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white me-2"
+                                        <div th:if="${detail.room?.roomId != null}"
+                                             class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white me-2"
                                              style="width: 30px; height: 30px; font-size: 0.8rem;">
                                             <span th:text="${detail.room.roomId}">101</span>
                                         </div>
                                         <span class="fw-semibold"
-                                              th:text="'房間 ' + ${detail.room.roomId}">房間 101</span>
+                                              th:text="${detail.room?.roomId != null} ? '房間 ' + ${detail.room.roomId} : '-'">房間 -</span>
                                     </div>
                                 </td>
                                 <td>

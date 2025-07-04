@@ -27,10 +27,6 @@ public class ShuttleReservationService {
 		return shuttleReservationRepository.findById(id);
 	}
 
-//	public List<ShuttleReservation> getReservationsByMemberId(Members member) {
-//		return shuttleReservationRepository.findByMembers(member);
-//	}
-
 	// 根據會員獲取預約記錄
 	public List<ShuttleReservation> getReservationsByMember(Members member) {
 		return shuttleReservationRepository.findByMembers(member);
@@ -45,10 +41,6 @@ public class ShuttleReservationService {
 	public List<ShuttleReservation> getReservationsByDate(LocalDate date) {
 		return shuttleReservationRepository.findByShuttleDate(date);
 	}
-
-//	public List<ShuttleReservation> getReservationsByScheduleAndDate(Integer scheduleId, LocalDate date) {
-//		return shuttleReservationRepository.findByShuttleScheduleIdAndShuttleDate(scheduleId, date);
-//	}
 
 	// 根據班次和日期獲取預約記錄
 	public List<ShuttleReservation> getReservationsByScheduleAndDate(ShuttleSchedule shuttleSchedule, LocalDate date) {
@@ -153,14 +145,24 @@ public class ShuttleReservationService {
 		return shuttleReservationRepository.existsById(id);
 	}
 
+	// 根據訂房編號檢查是否已經預約去程接駁
+	public boolean existsByRoomRVOrderAndShuttleReservationStatusDeparture(RoomRVOrder roomRVOrder) {
+		return shuttleReservationRepository
+				.existsByRoomRVOrderAndShuttleDirectionAndShuttleReservationStatus(roomRVOrder, 0, 1);
+	}
+
+	// 根據訂房編號檢查是否已經預約回程接駁
+	public boolean existsByRoomRVOrderAndShuttleReservationStatusArrival(RoomRVOrder roomRVOrder) {
+		return shuttleReservationRepository
+				.existsByRoomRVOrderAndShuttleDirectionAndShuttleReservationStatus(roomRVOrder, 1, 1);
+	}
+
 	// 檢查會員是否已經預約特定班次
-	public boolean hasMemberReserved(Members member, LocalDate shuttleDate, 
-			ShuttleSchedule shuttleSchedule, Integer direction) {
-		List<ShuttleReservation> reservations = getMemberReservationsBySchedule(
-				member, shuttleDate, shuttleSchedule, direction);
+	public boolean hasMemberReserved(Members member, LocalDate shuttleDate, ShuttleSchedule shuttleSchedule,
+			Integer direction) {
+		List<ShuttleReservation> reservations = getMemberReservationsBySchedule(member, shuttleDate, shuttleSchedule,
+				direction);
 		return !reservations.isEmpty();
 	}
-	
-	
-	
+
 }
