@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>員工管理</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+</head>
+<body>
+<!-- ===== 載入sidebar ===== -->
+<!-- 插入手機版側邊欄 -->
+<th:block th:replace="~{fragments/backFragments :: mobileSidebar}"></th:block>
+<!-- 插入桌面版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+
+<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+    <th:block th:fragment="myContent">
+        <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+        <!-- 卡片標題與新增按鈕 -->
+        <div class="card-header bg-transparent border-0 pt-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0 fw-bold">
+                    <i class="bi bi-people me-2"></i>員工管理
+                </h4>
+                <button
+                        class="btn btn-success"
+                        data-bs-toggle="modal"
+                        data-bs-target="#addEmployeeModal"
+                >
+                    <i class="bi bi-plus-circle me-2"></i>新增員工
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- 搜尋與篩選 -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="searchInput" placeholder="搜尋員工姓名、編號"/>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="departmentFilter">
+                        <option value="">全部部門</option>
+                        <option th:each="dept : ${departments}"
+                                th:value="${dept.departmentId}"
+                                th:text="${dept.departmentName}"
+                                th:selected="${dept.departmentId != null and dept.departmentId == selectedDepartmentId}">
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="statusFilter">
+                        <option value="">全部狀態</option>
+                        <option value="1" th:selected="${selectedStatus != null and selectedStatus == 1}">在職</option>
+                        <option value="0" th:selected="${selectedStatus != null and selectedStatus == 0}">離職</option>
+                        <option value="2" th:selected="${selectedStatus != null and selectedStatus == 2}">停職</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 員工表格 -->
+            <div class="table-responsive">
+                <table class="table table-hover" id="employeeTable">
+                    <thead>
+                    <tr>
+                        <th>編號</th>
+                        <th>姓名</th>
+                        <th>部門</th>
+                        <th>信箱</th>
+                        <th>手機</th>
+                        <th>狀態</th>
+                        <th>權限</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="employee : ${employees}">
+                        <td th:text="${employee.employeeId}">員工編號</td>
+                        <td th:text="${employee.employeeName}">姓名</td>
+                        <td th:text="${employee.department != null ? employee.department.departmentName : ''}">部門</td>
+                        <td th:text="${employee.employeeEmail}">信箱</td>
+                        <td th:text="${employee.employeeMobile}">手機</td>
+                        <td>
+                            <span th:if="${employee.employeeStatus == 1}" class="badge bg-success">在職</span>
+                            <span th:if="${employee.employeeStatus == 0}" class="badge bg-danger">離職</span>
+                            <span th:if="${employee.employeeStatus == 2}" class="badge bg-warning">停職</span>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-wrap gap-1">
+                                <span th:if="${employee.permissions != null}"
+                                      th:each="permission : ${employee.permissions}"
+                                      class="badge bg-info text-white small"
+                                      th:text="${permission.permissionName}">
+                                    權限
+                                </span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <button class="btn btn-sm btn-primary"
+                                        th:attr="onclick='editEmployee(' + ${employee.employeeId} + ')'">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-info"
+                                        th:attr="onclick='viewEmployee(' + ${employee.employeeId} + ')'">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+        </div>
+    </th:block>
+</main>
+
+<!-- ===== 載入統一的 JavaScript ===== -->
+<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
+
+<script>
+    // 搜尋功能
+    document.getElementById('searchInput').addEventListener('input', function () {
+        const searchTerm = this.value.toLowerCase();
+        const table = $('#employeeTable').DataTable();
+        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+            return data[0].toLowerCase().includes(searchTerm) || data[1].toLowerCase().includes(searchTerm);
+        });
+        table.draw();
+        $.fn.dataTable.ext.search.pop();
+    });
+
+    // 篩選功能
+    ['departmentFilter', 'statusFilter'].forEach(id => {
+        document.getElementById(id).addEventListener('change', () => {
+            const url = new URL(window.location);
+            const dept = document.getElementById('departmentFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            if (dept) url.searchParams.set('departmentId', dept); else url.searchParams.delete('departmentId');
+            if (status) url.searchParams.set('status', status); else url.searchParams.delete('status');
+            window.location.href = url.toString();
+        });
+    });
+
+    // 初始化 DataTable
+    $(document).ready(function () {
+        $('#employeeTable').DataTable({
+            dom: "t<'d-flex justify-content-center my-3'p>",
+            pagingType: 'simple_numbers',
+            lengthChange: false,
+            info: false,
+            language: {
+                paginate: {
+                    previous: '上一頁',
+                    next: '下一頁'
+                }
+            },
+            drawCallback: function () {
+                const $pg = $('#employeeTable_wrapper .pagination');
+                $pg.find('li.disabled a, li.active a').each(function () {
+                    const txt = $(this).text();
+                    $(this).replaceWith($('<span/>').addClass('page-link').text(txt));
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>

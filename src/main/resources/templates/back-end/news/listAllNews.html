@@ -4,73 +4,105 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>微嶼 | Isle Villa 後台首頁</title>
-    <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
 </head>
 <body>
-<!-- ===== 載入sidebar ===== -->
-<!-- 插入手機版側邊欄 -->
-<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
-<!-- 插入桌面版側邊欄 -->
+<!-- 側邊欄 -->
+<th:block th:replace="~{fragments/backFragments :: mobileSidebar}"></th:block>
 <div th:replace="~{fragments/backFragments :: sidebar}"></div>
 
 <main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
     <th:block th:fragment="myContent">
-        <!-- //////////////////// 頁面內容放在這個card裡面(外框已經有加card和container，直接放入table和標題即可)//////////////////// -->
-        <h2 class="section-title text-center mb-5">最新消息一覽</h2>
-        <!--新增最新消息-->
-        <a class="btn btn-dark" th:href="@{/backend/news/add}">新增最新消息</a>
-        <table class="table table-striped-columns shadow-sm align-middle">
-            <thead>
-            <tr>
-                <th>編號</th>
-                <th>標題</th>
-                <th>內文</th>
-                <th>優惠專案</th>
-                <th>上傳時間</th>
-                <th>圖片</th>
-                <th>狀態</th>
-                <th>操作</th>
-            </tr>
-            </thead>
-            <tbody>
-            <th:block th:each="news : ${newsList}">
-                <tr>
-                    <td th:text="${news.newsId}"></td>
-                    <td>
-                        <span class="d-inline-block text-truncate" style="width: 150px;"
-                        th:text="${news.newsTitle}"></span>
-                    </td>
-                    <td>
-                        <span class="d-inline-block text-truncate" style="width: 200px;"
-                        th:text="${news.newsContent}"></span>
-                    </td>
-                    <td>
-                        <span class="d-inline-block text-truncate" style="width: 120px;"
-                        th:text="${news.promotion != null ? news.promotion.roomPromotionTitle : '無'}"></span>
-                    </td>
-                    <td th:text="${news.newsTime}"></td>
-                    <td>
-                        <img alt="消息圖片"
-                             style="max-height:40px; width: 40px; object-fit: cover;"
-                             th:if="${news.newsImage != null}" th:src="@{'/news/image/' + ${news.newsId}}"/>
-                        <span th:unless="${news.newsImage != null}">無</span>
-                    </td>
-                    <td th:text="${news.newsStatus == 1 ? '上架' : '下架'}"></td>
-                    <td>
-                        <a class="btn btn-dark btn-sm" th:href="@{'/backend/news/edit/' + ${news.newsId}}">修改</a>
-                    </td>
-                </tr>
-            </th:block>
-            </tbody>
-        </table>
-        <!-- ========== 載入分頁 ========== -->
-        <th:block
-                th:replace="~{fragments/fragments :: paginationFragment(currentPage=${currentPage}, totalPages=${totalPages}, pageURL=${pageURL})}"/>
+        <!-- 卡片標題與新增按鈕 -->
+        <div class="card-header bg-transparent border-0 pt-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0 fw-bold">
+                    <i class="bi bi-megaphone me-2"></i>最新消息一覽
+                </h4>
+                <a class="btn btn-success" th:href="@{/backend/news/add}">
+                    <i class="bi bi-plus-circle me-2"></i>新增最新消息
+                </a>
+            </div>
+        </div>
 
-
-        <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover" id="newsTable">
+                    <thead>
+                    <tr>
+                        <th>編號</th>
+                        <th>標題</th>
+                        <th>內文</th>
+                        <th>優惠專案</th>
+                        <th>上傳時間</th>
+                        <th>圖片</th>
+                        <th>狀態</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="news : ${newsList}">
+                        <td th:text="${news.newsId}"></td>
+                        <td><span class="d-inline-block text-truncate" style="max-width: 150px;"
+                                  th:text="${news.newsTitle}"></span></td>
+                        <td><span class="d-inline-block text-truncate" style="max-width: 200px;"
+                                  th:text="${news.newsContent}"></span></td>
+                        <td><span class="d-inline-block text-truncate" style="max-width: 120px;"
+                                  th:text="${news.promotion != null ? news.promotion.roomPromotionTitle : '無'}"></span>
+                        </td>
+                        <td th:text="${news.newsTime}"></td>
+                        <td>
+                            <img alt="消息圖片" style="max-height:40px; width: 40px; object-fit: cover;"
+                                 th:if="${news.newsImage != null}" th:src="@{'/news/image/' + ${news.newsId}}"/>
+                            <span th:unless="${news.newsImage != null}">無</span>
+                        </td>
+                        <td>
+                                <span th:text="${news.newsStatus == 1 ? '上架' : '下架'}"
+                                      th:classappend="${news.newsStatus == 1 ? 'badge bg-success' : 'badge bg-secondary'}">
+                                </span>
+                        </td>
+                        <td>
+                            <a class="btn btn-sm btn-primary" th:href="@{'/backend/news/edit/' + ${news.newsId}}">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- 分頁 -->
+            <th:block
+                    th:replace="~{fragments/fragments :: paginationFragment(currentPage=${currentPage}, totalPages=${totalPages}, pageURL=${pageURL})}"/>
+        </div>
     </th:block>
 </main>
+
+<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
+
+<script>
+    // 初始化 DataTable
+    $(document).ready(function () {
+        $('#newsTable').DataTable({
+            dom: "t<'d-flex justify-content-center my-3'p>",
+            // pagingType: 'simple_numbers',
+            paging: false, // 關閉分頁
+            lengthChange: false,
+            info: false,
+            language: {
+                paginate: {
+                    previous: '上一頁',
+                    next: '下一頁'
+                }
+            },
+            drawCallback: function () {
+                const $pg = $('#newsTable_wrapper .pagination');
+                $pg.find('li.disabled a, li.active a').each(function () {
+                    const txt = $(this).text();
+                    $(this).replaceWith($('<span/>').addClass('page-link').text(txt));
+                });
+            }
+        });
+    });
+</script>
 </body>
 </html>

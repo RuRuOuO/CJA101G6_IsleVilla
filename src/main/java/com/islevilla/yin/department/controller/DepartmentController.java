@@ -21,6 +21,7 @@ public class DepartmentController {
     public String listDepartment(Model model) {
         List<Department> departments = departmentService.getAllDepartments();
         model.addAttribute("departments", departments);
+        model.addAttribute("sidebarActive", "department-list");
         return "back-end/department/listDepartment";
     }
 
