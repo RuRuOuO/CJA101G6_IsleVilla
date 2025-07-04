@@ -76,16 +76,12 @@ public class BookingController {
             roomAdults = List.of(2);
         }
 
-        // 查詢可用房型（含原價與所有促銷方案）
-        List<com.islevilla.patty.booking.model.BookingService.RoomTypeWithPromotionsAndOriginal> availableRoomTypes = bookingService.findAvailableRoomTypesWithPromotionsAndOriginal(checkin, roomCount, roomAdults);
-        System.out.println("查詢結果房型數量: " + (availableRoomTypes != null ? availableRoomTypes.size() : "null"));
-
-        // 計算入住晚數
-        long nightCount = java.time.temporal.ChronoUnit.DAYS.between(checkin, checkout);
-        model.addAttribute("nightCount", nightCount);
+        // 查詢可用房型（即使查無資料也會回傳空集合）
+        var availableRoomTypesWithPromotionsAndPhoto = bookingService.findAvailableRoomTypesWithPromotionsAndPhoto(checkin, checkout, roomCount, roomAdults);
+        System.out.println("查詢結果房型數量: " + (availableRoomTypesWithPromotionsAndPhoto != null ? availableRoomTypesWithPromotionsAndPhoto.size() : "null"));
 
         // 將查詢結果加入 model
-        model.addAttribute("availableRooms", availableRoomTypes != null ? availableRoomTypes : List.of());
+        model.addAttribute("availableRooms", availableRoomTypesWithPromotionsAndPhoto != null ? availableRoomTypesWithPromotionsAndPhoto : List.of());
         model.addAttribute("checkin", checkin);
         model.addAttribute("checkout", checkout);
         model.addAttribute("roomCount", roomCount);

@@ -376,16 +376,6 @@
                 return;
             }
             
-            // 送出前強制格式化 checkin/checkout
-            if (bookingData.checkin && bookingData.checkin.includes('T')) {
-                bookingData.checkin = bookingData.checkin.split('T')[0];
-            }
-            if (bookingData.checkout && bookingData.checkout.includes('T')) {
-                bookingData.checkout = bookingData.checkout.split('T')[0];
-            }
-            // 排查用 log
-            console.log('送出前 bookingData:', bookingData);
-            sessionStorage.setItem('bookingData', JSON.stringify(bookingData));
             // 將 sessionStorage.bookingData 填入隱藏欄位
             document.getElementById('bookingData').value = sessionStorage.getItem('bookingData') || '{}';
             // 送出表單

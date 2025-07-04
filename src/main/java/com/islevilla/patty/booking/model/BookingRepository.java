@@ -19,5 +19,9 @@ public interface BookingRepository extends JpaRepository<RoomRVOrder, Integer> {
     @Query("SELECT o FROM RoomRVOrder o WHERE o.checkInDate < :endDate AND o.checkOutDate > :startDate")
     List<RoomRVOrder> findOverlappingOrders(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
-
+    /**
+     * 根據訂單列表，找出所有的訂單明細
+     */
+    @Query("SELECT d FROM RoomRVDetail d WHERE d.roomRVOrder IN :orders")
+    List<RoomRVDetail> findDetailsByOrders(@Param("orders") List<RoomRVOrder> orders);
 } 

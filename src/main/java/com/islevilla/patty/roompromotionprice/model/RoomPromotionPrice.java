@@ -1,39 +1,41 @@
 package com.islevilla.patty.roompromotionprice.model;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import lombok.Data;
 import java.io.Serializable;
-import java.sql.Date;
+import java.time.LocalDate;
+
+import jakarta.persistence.*;
+import com.islevilla.chen.roomType.model.RoomType;
+import lombok.Data;
 
 @Data
 @Entity
 @Table(name = "room_promotion_price")
 public class RoomPromotionPrice implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "room_promotion_id")
     private Integer roomPromotionId;
 
-    @NotEmpty(message = "優惠專案名稱: 請勿空白")
-    @Pattern(regexp = "^[(\u4e00-\u9fa5)(a-zA-Z0-9)]{2,10}$", message = "優惠專案名稱: 只能是中、英文字母、數字 , 且長度必需在2到10之間")
-    @Column(name = "room_promotion_title")
-    private String roomPromotionTitle;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_type_id")
+    private RoomType roomType;
 
-    @NotNull(message = "開始日期請勿空白")
     @Column(name = "promotion_start_date")
-    private Date promotionStartDate;
-    
-    @NotNull(message = "結束日期請勿空白")
-    @Column(name = "promotion_end_date")
-    private Date promotionEndDate;
+    private LocalDate promotionStartDate;
 
-    @Pattern(regexp = "^[(\u4e00-\u9fa5)(a-zA-Z0-9)]{2,20}$", message = "備註只能是中、英文或數字，長度2~20")
+    @Column(name = "promotion_end_date")
+    private LocalDate promotionEndDate;
+
+    @Column(name = "room_discount_rate")
+    private Double roomDiscountRate;
+
     @Column(name = "promotion_remark")
     private String promotionRemark;
-    
-    public String getPromotion() { return "";}
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_promotion_id", referencedColumnName = "room_promotion_id", insertable = false, updatable = false)
+    private com.islevilla.patty.promotion.model.Promotion promotion;
+
+    public RoomPromotionPrice() {}
 }
