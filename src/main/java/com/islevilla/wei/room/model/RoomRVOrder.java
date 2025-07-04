@@ -42,14 +42,14 @@ public class RoomRVOrder {
     private LocalDate checkInDate;
 
     @Column(name = "actual_check_in_date")
-    private LocalDate actualCheckInDate;
+    private LocalDateTime actualCheckInDate;
 
     @Column(name = "check_out_date")
     @NotNull(message = "請選擇住宿結束日期")
     private LocalDate checkOutDate;
 
     @Column(name = "actual_check_out_date")
-    private LocalDate actualCheckOutDate;
+    private LocalDateTime actualCheckOutDate;
 
     @ManyToOne
     @JoinColumn(name = "room_promotion_id")

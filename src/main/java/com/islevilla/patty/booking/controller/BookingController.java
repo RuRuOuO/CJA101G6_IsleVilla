@@ -123,10 +123,10 @@ public class BookingController {
     }
 
     @GetMapping("/booking/roomTypePhoto/image/{roomTypePhotoId}")
-    public ResponseEntity<byte[]> getRoomTypePhotoImageForBooking(@PathVariable Integer roomTypePhotoId) {
+    public ResponseEntity<Byte[]> getRoomTypePhotoImageForBooking(@PathVariable Integer roomTypePhotoId) {
         RoomTypePhoto roomTypePhoto = roomTypePhotoService.findById(roomTypePhotoId);
         if (roomTypePhoto != null && roomTypePhoto.getRoomTypePhoto() != null) {
-            byte[] imageBytes = roomTypePhoto.getRoomTypePhoto();
+            Byte[] imageBytes = roomTypePhoto.getRoomTypePhoto();
             return ResponseEntity.ok()
                     .header("Content-Type", "image/png")
                     .body(imageBytes);
