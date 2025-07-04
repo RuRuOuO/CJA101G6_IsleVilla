@@ -162,15 +162,19 @@
                                    class="btn btn-secondary btn-sm text-center"
                                    style="flex: 1 1 0; min-width: 0; white-space: nowrap;">查看詳情</a>
                                 <!-- 加入購物車按鈕 -->
-                                <form th:action="@{/addToCart}" method="post" class="add-to-cart-form" style="flex: 1 1 0; min-width: 0;">
+                                <form id="addToCartForm" th:action="@{/addToCart}" method="post" style="display: none;">
                                     <input type="hidden" name="productId" th:value="${prod.productId}" />
                                     <input type="hidden" name="quantity" value="1" />
                                     <input type="hidden" name="stock" th:value="${prod.productQuantity}" />
-                                    <button type="submit" class="btn btn-primary btn-sm text-center w-100"
-                                            style="white-space: nowrap;">
-                                        加入購物車
-                                    </button>
                                 </form>
+
+                                <!-- Button outside the form -->
+                                <button type="submit"
+                                        class="btn btn-primary btn-sm text-center"
+                                        style="flex: 1 1 0; min-width: 0; white-space: nowrap;"
+                                        form="addToCartForm">
+                                    加入購物車
+                                </button>
                             </div>
                         </div>
 
