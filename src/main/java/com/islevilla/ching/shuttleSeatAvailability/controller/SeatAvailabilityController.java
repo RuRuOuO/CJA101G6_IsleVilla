@@ -12,10 +12,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.islevilla.ching.shuttleSchedule.model.ShuttleSchedule;
 import com.islevilla.ching.shuttleSchedule.model.ShuttleService;
 import com.islevilla.ching.shuttleSeatAvailability.model.SeatAvailability;
-import com.islevilla.ching.shuttleSeatAvailability.model.SeatAvailability.ShuttleSeatAvailabilityId;
 import com.islevilla.ching.shuttleSeatAvailability.model.SeatAvailabilityService;
 
 @Controller
@@ -33,9 +34,21 @@ public class SeatAvailabilityController {
 	// 顯示所有座位量
 	@GetMapping("/list")
 	public String listSeatAvailability(Model model) {
-		List<SeatAvailability> list = seatAvailabilityService.getAllSeatAvailability();
-		model.addAttribute("seatavailability", list);
-		return "back-end/seatavailability/seatavailability_list";
+	    // 所有座位記錄
+	    List<SeatAvailability> list = seatAvailabilityService.getAllSeatAvailability();
+	    model.addAttribute("seatavailability", list);
+
+	    // 日期選單資料
+	    List<String> availableDates = seatAvailabilityService.getAllAvailableDates()
+	            .stream()
+	            .map(LocalDate::toString)
+	            .toList();
+	    model.addAttribute("availableDates", availableDates);
+
+	    // 時段選單資料（接駁船時段表）
+	    model.addAttribute("availableSchedules", shuttleService.getAllShuttle());
+
+	    return "back-end/seatavailability/seatavailability_list";
 	}
 
 	// 顯示新增表單
@@ -50,7 +63,7 @@ public class SeatAvailabilityController {
 	@PostMapping("/add")
 	public String addSetAvailability(@ModelAttribute("seatavailability") SeatAvailability seatAvailability) {
 		seatAvailabilityService.addSeatAvailability(seatAvailability);
-		return "redirect:/seatavailability/list";
+		return "redirect:/backend/seatavailability/list";
 	}
 
 	// 處理複合主鍵刪除（必須同時接收兩個路徑變數）
@@ -61,7 +74,7 @@ public class SeatAvailabilityController {
 		LocalDate date = LocalDate.parse(dateStr);
 		seatAvailabilityService.deleteSeatAvailability(scheduleId,date);
 
-		return "redirect:/seatavailability/list";
+		return "redirect:/backend/seatavailability/list";
 	}
 
 	// 顯示編輯表單
@@ -77,7 +90,7 @@ public class SeatAvailabilityController {
 //			model.addAttribute("scheduleList", shuttleService.getAllShuttle()); // 雖然這裡用不到但也可保留
 			return "back-end/seatavailability/seatavailability_edit";
 		} else {
-			return "redirect:/seatavailability/list";
+			return "redirect:/backend/seatavailability/list";
 		}
 	}
 
@@ -94,7 +107,7 @@ public class SeatAvailabilityController {
 	        seatAvailabilityService.updateSeatAvailability(existing);
 	    }
 
-	    return "redirect:/seatavailability/list";
+	    return "redirect:/backend/seatavailability/list";
 	}
 	
 	//顯示查詢頁面
@@ -116,6 +129,37 @@ public class SeatAvailabilityController {
 		}
 		model.addAttribute("seat",null);
 		return "back-end/seatavailability/seatavailability_getseat";
+	}
+	
+	// 根據日期與時段查交集或單一條件
+	@GetMapping("/api/filter")
+	@ResponseBody
+	public List<SeatAvailability> filterByDateAndSchedule(
+	        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+	        @RequestParam(required = false) Integer scheduleId) {
+
+	    List<SeatAvailability> list = seatAvailabilityService.getAllSeatAvailability();
+
+	    if (date != null) {
+	        list = list.stream()
+	                   .filter(sa -> sa.getShuttleDate().equals(date))
+	                   .toList();
+	    }
+
+	    if (scheduleId != null) {
+	        list = list.stream()
+	                   .filter(sa -> sa.getShuttleScheduleId().equals(scheduleId))
+	                   .toList();
+	    }
+
+	    return list;
+	}
+	
+	// 根據日期載入該日的所有時段
+	@GetMapping("/api/schedules/byDate")
+	@ResponseBody
+	public List<ShuttleSchedule> getSchedulesByDate(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+	    return seatAvailabilityService.getSchedulesByDate(date);
 	}
 	
 	//處裡查詢頁面

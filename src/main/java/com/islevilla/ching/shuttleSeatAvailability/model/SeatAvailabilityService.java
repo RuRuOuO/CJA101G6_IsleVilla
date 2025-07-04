@@ -3,11 +3,11 @@ package com.islevilla.ching.shuttleSeatAvailability.model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.islevilla.ching.shuttleSchedule.model.ShuttleSchedule;
 import com.islevilla.ching.shuttleSchedule.model.ShuttleService;
 
 @Service
@@ -60,4 +60,11 @@ public class SeatAvailabilityService {
 				.toList();
 	}
 
+	public List<ShuttleSchedule> getSchedulesByDate(LocalDate date) {
+	    return seatAvailabilityRepository.findAll().stream()
+	            .filter(sa -> sa.getShuttleDate().equals(date))
+	            .map(SeatAvailability::getShuttleSchedule)
+	            .distinct()
+	            .toList();
+	}
 }

@@ -70,7 +70,7 @@ public class ShuttleScheduleController {
 		}
 		// 通過驗證後儲存
 		shuttleService.addShuttle(shuttleSchedule);
-		return "redirect:/shuttle/list";
+		return "redirect:/backend/shuttle/list";
 	}
 
 	// 顯示編輯表單
@@ -78,7 +78,7 @@ public class ShuttleScheduleController {
 	public String showEditForm(@PathVariable("shuttleScheduleId") Integer shuttleScheduleId, Model model) {
 		ShuttleSchedule shuttle = shuttleService.getShuttleById(shuttleScheduleId);
 		if (shuttle == null) {
-			return "redirect:/shuttle/list";
+			return "redirect:/backend/shuttle/list";
 		}
 		model.addAttribute("shuttleSchedule", shuttle);
 		model.addAttribute("formMode", "edit");
@@ -117,14 +117,14 @@ public class ShuttleScheduleController {
 		}
 		// 通過驗證後更新
 		shuttleService.updateShuttle(shuttleSchedule);
-		return "redirect:/shuttle/list";
+		return "redirect:/backend/shuttle/list";
 	}
 
 	// 刪除班次
 	@GetMapping("/delete/{shuttleScheduleId}")
 	public String deleteShuttle(@PathVariable("shuttleScheduleId") Integer shuttleScheduleId) {
 		shuttleService.deleteShuttle(shuttleScheduleId);
-		return "redirect:/shuttle/list";
+		return "redirect:/backend/shuttle/list";
 	}
 
 	// 顯示查詢頁面
@@ -138,7 +138,7 @@ public class ShuttleScheduleController {
 	// 查詢功能
 	@GetMapping("/getshuttle")
 	public String getShuttleById(@RequestParam(value = "departureId", required = false) Integer departureId,
-								 @RequestParam(value = "returnId", required = false) Integer returnId, Model model) {
+			@RequestParam(value = "returnId", required = false) Integer returnId, Model model) {
 
 		ShuttleSchedule departureShuttle = null;
 		ShuttleSchedule returnShuttle = null;
@@ -158,13 +158,13 @@ public class ShuttleScheduleController {
 		}
 
 		model.addAttribute("departureShuttles", shuttleService.getDepartureShuttles());
-	    model.addAttribute("returnShuttles", shuttleService.getReturnShuttles());
+		model.addAttribute("returnShuttles", shuttleService.getReturnShuttles());
 
-	    model.addAttribute("departureShuttle", departureShuttle);
-	    model.addAttribute("returnShuttle", returnShuttle);
-	    model.addAttribute("selectedDepartureId", departureId);
-	    model.addAttribute("selectedReturnId", returnId);
+		model.addAttribute("departureShuttle", departureShuttle);
+		model.addAttribute("returnShuttle", returnShuttle);
+		model.addAttribute("selectedDepartureId", departureId);
+		model.addAttribute("selectedReturnId", returnId);
 
-	    return "back-end/shuttle/shuttle_get";
+		return "back-end/shuttle/shuttle_get";
 	}
 }

@@ -1,69 +1,149 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<title>接駁預約列表</title>
-<th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+  <meta charset="UTF-8">
+  <title>接駁預約列表 | Isle Villa 後台</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- 共用樣式 -->
+  <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+
+  <!-- DataTables -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+  
+  <!-- font-awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+  
+    .table thead th {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(6px);
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      text-align: center;
+      vertical-align: middle;
+      padding: 12px;
+    }
+
+    table.dataTable td {
+      vertical-align: middle;
+      text-align: center;
+      padding: 10px;
+    }
+
+    div.dataTables_wrapper div.dataTables_paginate {
+      display: flex;
+      justify-content: flex-end;
+      padding-right: 1rem;
+    }
+
+    .input-group .form-control:focus {
+      box-shadow: none;
+      border-color: #86b7fe;
+    }
+  </style>
 </head>
+
 <body>
-	<!-- 載入側邊欄（桌機） -->
-	<div th:replace="~{fragments/backFragments :: sidebar}"></div>
-	<!-- 載入側邊欄（手機） -->
-	<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+  <!-- 側邊欄 -->
+  <th:block th:replace="~{fragments/backFragments :: mobileSidebar}"></th:block>
+  <div th:replace="~{fragments/backFragments :: sidebar}"></div>
 
-	<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
-    <th:block th:fragment="myContent">
+  <main th:replace="~{fragments/backFragments :: mainContent(~{::content})}">
+    <th:block th:fragment="content">
 
-        <h2 class="mb-4">⛴️ 接駁預約列表</h2>
+      <!-- 標題列 -->
+      <div class="pt-2 mb-3">
+        <h4 class="fw-bold mb-3">
+          <i class="bi bi-ship me-2"></i>接駁預約列表
+        </h4>
 
-        <!-- 🔍 查詢按鈕 -->
-        <div class="mb-3">
-            <a class="btn btn-primary ms-2"
-               th:href="@{/backend/reservation/getbackres}">
-               <i class="fa-solid fa-magnifying-glass me-1"></i>
-                查詢接駁預約</a>
-                
-              
-                
-        </div>
+        <!-- 搜尋欄 -->
+        <div class="input-group mb-3" style="max-width: 200px;">
+  <span class="input-group-text border-end-0 bg-white px-2">
+    <i class="fa-solid fa-magnifying-glass text-secondary"></i>
+  </span>
+  <input type="text" id="searchInput"
+         class="form-control border-start-0 px-2"
+         placeholder="關鍵字搜尋"
+         style="background-color: white;">
+</div>
+      </div>
 
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped align-middle text-center">
-                <thead class="table-dark">
-                <tr>
-                    <th>#</th>
-                    <th>會員</th>
-                    <th>訂房編號</th>
-                    <th>接駁日期</th>
-                    <th>班次</th>
-                    <th>方向</th>
-                    <th>人數</th>
-                    <th>狀態</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="res, iterStat : ${shuttleReservationList}"
-                    th:with="scheduleText=|${res.shuttleSchedule.shuttleDepartureTime} → ${res.shuttleSchedule.shuttleArrivalTime}|">
-                    <td th:text="${iterStat.count}">1</td>
-                    <td th:text="${res.members?.memberName}">會員名稱</td>
-                    <td th:text="${res.roomRVOrder?.roomReservationId}">訂房ID</td>
-                    <td th:text="${res.shuttleDate}">日期</td>
-                    <td th:text="${scheduleText}">班次</td>
-                    <td>
-                        <span th:text="${res.shuttleDirection == 0 ? '去程' : '回程'}">方向</span>
-                    </td>
-                    <td th:text="${res.shuttleNumber}">人數</td>
-                    <td>
-                        <span th:classappend="${res.shuttleReservationStatus == 1 ? 'text-success' : 'text-danger'}"
-                              th:text="${res.shuttleReservationStatus == 1 ? '正常' : '取消'}">狀態</span>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
+      <!-- 表格 -->
+      <div class="table-responsive">
+        <table id="reservationTable" class="table table-hover align-middle text-center">
+          <thead>
+            <tr>
+              <th class="text-center">#</th>
+              <th class="text-center">會員</th>
+              <th class="text-center">訂房編號</th>
+              <th class="text-center">接駁日期</th>
+              <th class="text-center">班次時間</th>
+              <th class="text-center">方向</th>
+              <th class="text-center">人數</th>
+              <th class="text-center">狀態</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="res, iterStat : ${shuttleReservationList}"
+                th:with="scheduleText=|${res.shuttleSchedule.shuttleDepartureTime} → ${res.shuttleSchedule.shuttleArrivalTime}|">
+              <td th:text="${iterStat.count}">1</td>
+              <td th:text="${res.members?.memberName}">會員名稱</td>
+              <td th:text="${res.roomRVOrder?.roomReservationId}">訂房ID</td>
+              <td th:text="${res.shuttleDate}">日期</td>
+              <td th:text="${scheduleText}">班次</td>
+              <td><span th:text="${res.shuttleDirection == 0 ? '去程' : '回程'}">方向</span></td>
+              <td th:text="${res.shuttleNumber}">人數</td>
+              <td>
+                <span th:classappend="${res.shuttleReservationStatus == 1 ? 'text-success' : 'text-danger'}"
+                      th:text="${res.shuttleReservationStatus == 1 ? '正常' : '取消'}">狀態</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
     </th:block>
-</main>
+  </main>
 
+  <!-- 共用腳本 -->
+  <th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
+
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+  <script>
+    $(document).ready(function () {
+      const table = $('#reservationTable').DataTable({
+        dom: 'lrtip',
+        language: {
+          paginate: {
+            previous: '上一頁',
+            next: '下一頁'
+          },
+          lengthMenu: '每頁顯示 _MENU_ 筆資料',
+          zeroRecords: '找不到符合的資料',
+          info: '顯示第 _START_ 到 _END_ 筆，共 _TOTAL_ 筆',
+          infoEmpty: '目前沒有資料',
+          infoFiltered: '(從 _MAX_ 筆資料中篩選)',
+          search: ''
+        },
+        pagingType: 'simple_numbers',
+        ordering: true,
+        paging: true,
+        lengthChange: false,
+        autoWidth: false,
+        info: false
+      });
+
+      $('#searchInput').on('keyup', function () {
+        table.column(2).search(this.value).draw(); // 第3欄：訂房編號
+      });
+    });
+  </script>
 </body>
 </html>
