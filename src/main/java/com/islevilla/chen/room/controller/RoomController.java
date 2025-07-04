@@ -47,8 +47,9 @@ public class RoomController {
 	    roomStatusMap = new HashMap<>();
 	    roomStatusMap.put((byte)0, "空房");
 	    roomStatusMap.put((byte)1, "入住中");
-	    roomStatusMap.put((byte)2, "待清潔");
+	    roomStatusMap.put((byte)2, "待維修");
 	    roomStatusMap.put((byte)3, "待清潔");
+	    roomStatusMap.put((byte)4, "停用");
 	}
 
 	
