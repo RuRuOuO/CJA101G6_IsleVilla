@@ -8,7 +8,6 @@ import com.islevilla.patty.promotion.model.Promotion;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.ToString;
@@ -31,7 +30,7 @@ public class RoomRVOrder {
 
     @Column(name = "room_order_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @NotNull(message = "請輸入訂單日期")
-    private LocalDate roomOrderDate;
+    private LocalDateTime roomOrderDate;
 
     @Column(name = "room_order_status")
     @NotNull(message = "請選擇訂單狀態")
@@ -42,14 +41,14 @@ public class RoomRVOrder {
     private LocalDate checkInDate;
 
     @Column(name = "actual_check_in_date")
-    private LocalDate actualCheckInDate;
+    private LocalDateTime actualCheckInDate;
 
     @Column(name = "check_out_date")
     @NotNull(message = "請選擇住宿結束日期")
     private LocalDate checkOutDate;
 
     @Column(name = "actual_check_out_date")
-    private LocalDate actualCheckOutDate;
+    private LocalDateTime actualCheckOutDate;
 
     @ManyToOne
     @JoinColumn(name = "room_promotion_id")
