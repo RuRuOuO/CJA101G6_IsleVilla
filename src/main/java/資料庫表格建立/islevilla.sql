@@ -12,6 +12,8 @@ TABLE刪除順序：被關聯最多的TABLE最晚刪除
 */
 
 -- 其他
+DROP TABLE IF EXISTS chat_message;               -- 聊天訊息
+DROP TABLE IF EXISTS chat_room;                  -- 聊天室
 DROP TABLE IF EXISTS feedback;                   -- 問卷紀錄
 DROP TABLE IF EXISTS news;                       -- 最新消息
 DROP TABLE IF EXISTS carousel_photo;             -- 輪播圖片
@@ -1305,7 +1307,37 @@ VALUES (),
 -- DROP TABLE IF EXISTS carousel_photo;
 
 
+-- 聊天室 (Redis串SQL) chat_room （王人慶）
+CREATE TABLE chat_room (
+    chat_room_id   INT          AUTO_INCREMENT  PRIMARY KEY  COMMENT '聊天室ID',
+    member_id      INT          NOT NULL                     COMMENT '會員ID',
+    member_name    VARCHAR(50)  NOT NULL                     COMMENT '會員名稱',
+    employee_id    INT                                       COMMENT '員工ID',
+    employee_name  VARCHAR(50)                               COMMENT '員工名稱',
+    chat_status    TINYINT      NOT NULL        DEFAULT 1    COMMENT '聊天室狀態 1=進行中 0=已結束',
 
+    FOREIGN KEY (member_id) REFERENCES members(member_id),
+    FOREIGN KEY (employee_id) REFERENCES employee(employee_id)
+);
+
+-- DROP TABLE IF EXISTS chat_room;
+
+
+-- 聊天訊息 (Redis串SQL) chat_message （王人慶）
+CREATE TABLE chat_message (
+    message_id        INT            AUTO_INCREMENT  PRIMARY KEY          COMMENT '訊息ID',
+    chat_room_id      INT            NOT NULL                             COMMENT '聊天室ID (FK)',
+    sender_type       TINYINT        NOT NULL                             COMMENT '發送者類型 0=會員 1=客服',
+    sender_id         INT            NOT NULL                             COMMENT '發送者ID',
+    sender_name       VARCHAR(50)    NOT NULL                             COMMENT '發送者名稱',
+    message_content   VARCHAR(1000)  NOT NULL                             COMMENT '訊息內容',
+    is_read           TINYINT        NOT NULL  DEFAULT 0                  COMMENT '是否已讀 0=未讀 1=已讀',
+    message_time      DATETIME       NOT NULL  DEFAULT CURRENT_TIMESTAMP  COMMENT '訊息時間',
+
+    FOREIGN KEY (chat_room_id) REFERENCES chat_room(chat_room_id)
+);
+
+-- DROP TABLE IF EXISTS chat_message;
 
 
 

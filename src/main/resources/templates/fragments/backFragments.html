@@ -4,6 +4,8 @@
 
     <!-- ===== 統一載入樣式段落開始 ===== -->
     <th:block th:fragment="styles">
+        <link rel="icon" href="/favicon.ico?v=2" type="image/x-icon">
+
 
         <!-- ========= CSS ========= -->
 
@@ -69,6 +71,81 @@
                 border: 2px solid rgba(255, 255, 255, 0.3);
             }
 
+            /* 手機版導航欄樣式 */
+            .mobile-navbar {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1100;
+                background-color: #223363;
+                padding: 0.5rem 1rem;
+            }
+
+            .mobile-navbar .navbar-brand {
+                color: white;
+                font-family: Kaisei HarunoUmi;
+            }
+
+            .mobile-navbar .navbar-toggler {
+                border-color: rgba(255, 255, 255, 0.5);
+            }
+
+            .mobile-navbar .navbar-toggler-icon {
+                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+            }
+
+            .mobile-navbar .navbar-collapse {
+                background-color: #223363;
+                margin-top: 0.5rem;
+                border-radius: 0.375rem;
+            }
+
+            .mobile-navbar .nav-link {
+                color: white;
+                padding: 0.75rem 1rem;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .mobile-navbar .nav-link:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+
+            .mobile-navbar .btn-toggle {
+                color: white;
+                background: none;
+                border: none;
+                width: 100%;
+                text-align: left;
+                padding: 0.75rem 1rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .mobile-navbar .btn-toggle:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+
+            .mobile-navbar .btn-toggle-nav {
+                background-color: rgba(255, 255, 255, 0.05);
+                margin: 0;
+                padding: 0;
+            }
+
+            .mobile-navbar .btn-toggle-nav a {
+                color: white;
+                padding: 0.5rem 2rem;
+                display: block;
+                text-decoration: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .mobile-navbar .btn-toggle-nav a:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+
             @media (max-width: 991.98px) {
                 .sidebar {
                     display: none !important;
@@ -76,24 +153,14 @@
 
                 .content {
                     margin-left: 0 !important;
+                    padding-top: 70px;
                 }
 
-                .sidebar-toggle {
-                    display: block !important;
-                }
-
-                .offcanvas {
+                .mobile-navbar {
                     display: block !important;
                 }
             }
 
-            .sidebar-toggle {
-                display: none;
-                position: fixed;
-                top: 1rem;
-                left: 1rem;
-                z-index: 1100;
-            }
             /* 移除 sidebar 內所有 a、button 的底線 */
             .sidebar a,
             .sidebar .btn-toggle,
@@ -124,16 +191,152 @@
     </th:block>
 </head>
 <body>
-<!-- 漢堡選單按鈕（手機版顯示） -->
-<button
-        class="btn btn-primary sidebar-toggle"
-        type="button"
-        data-bs-toggle="offcanvas"
-        data-bs-target="#mobileSidebar"
-        aria-controls="mobileSidebar"
->
-    <i class="bi bi-list"></i>
-</button>
+
+<!-- 手機版導航欄 -->
+<nav th:fragment="mobileSidebar" class="mobile-navbar navbar navbar-expand-lg">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/backend/dashboard}">
+            IsleVilla微嶼 後台管理
+        </a>
+        <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#mobileNavbarCollapse"
+                aria-controls="mobileNavbarCollapse"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mobileNavbarCollapse">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <!-- 員工管理 -->
+                <li class="nav-item">
+                    <button
+                            class="btn btn-toggle"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#mobile-employee"
+                            aria-expanded="false"
+                    >
+                        員工管理
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                    <div class="collapse" id="mobile-employee">
+                        <ul class="btn-toggle-nav list-unstyled">
+                            <li><a th:href="@{/backend/employee/list}">員工列表</a></li>
+                            <li><a th:href="@{/backend/department/list}">部門管理</a></li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- 住房管理 -->
+                <li class="nav-item">
+                    <button
+                            class="btn btn-toggle"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#mobile-room"
+                            aria-expanded="false"
+                    >
+                        住房管理
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                    <div class="collapse" id="mobile-room">
+                        <ul class="btn-toggle-nav list-unstyled">
+                            <li><a th:href="@{/backend/check-in-out/list}">住房管理</a></li>
+                            <li><a th:href="@{/backend/room-reservation/list}">訂房訂單管理</a></li>
+                            <li><a th:href="@{/backend/room/selectRoomPage}">房間管理</a></li>
+                            <li><a th:href="@{/backend/roomType/listRoomType}">房型管理</a></li>
+                            <li><a th:href="@{/backend/roomTypeAvailability/list}">房型庫存管理</a></li>
+
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- 購物管理 -->
+                <li class="nav-item" sec:authorize="hasAuthority('product')">
+                    <button
+                            class="btn btn-toggle"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#mobile-product"
+                            aria-expanded="false"
+                    >
+                        購物管理
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                    <div class="collapse" id="mobile-product">
+                        <ul class="btn-toggle-nav list-unstyled">
+                            <li><a th:href="@{/backend/product/list}">商品管理</a></li>
+                            <li><a th:href="@{/backend/product/category/list}">商品分類管理</a></li>
+                            <li><a th:href="@{/backend/product-order/listAllProductOrder}">訂單管理</a></li>
+                            <li><a th:href="@{/backend/coupon/list}">優惠券管理</a></li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- 接駁管理 -->
+                <li class="nav-item">
+                    <button
+                            class="btn btn-toggle"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#mobile-shuttle"
+                            aria-expanded="false"
+                    >
+                        接駁管理
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                    <div class="collapse" id="mobile-shuttle">
+                        <ul class="btn-toggle-nav list-unstyled">
+                            <li><a th:href="@{/backend/reservation/list}">接駁預約列表</a></li>
+                            <li><a th:href="@{/backend/backshuttlereservationseat/list}">接駁預約座位列表</a></li>
+                            <li><a th:href="@{/backend/seatavailability/list}">座位狀況列表</a></li>
+                            <li><a th:href="@{/backend/backseat/list}">座位列表</a></li>
+                            <li><a th:href="@{/backend/shuttle/list}">接駁船時段列表</a></li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- 其他管理 -->
+                <li class="nav-item">
+                    <button
+                            class="btn btn-toggle"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#mobile-home"
+                            aria-expanded="false"
+                    >
+                        其他管理
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                    <div class="collapse" id="mobile-home">
+                        <ul class="btn-toggle-nav list-unstyled">
+                            <li><a th:href="@{/backend/news/list}">最近消息</a></li>
+                            <li><a th:href="@{/backend/feedback/list}">顧客回饋</a></li>
+                            <li><a th:href="@{/backend/member/list}">會員管理</a></li>
+                            <li><a th:href="@{/backend/chat/room/list}">客服管理</a></li>
+                            <li><a th:href="@{/backend/operation-log/list}">log檢視</a></li>
+                        </ul>
+                    </div>
+                </li>
+
+
+                <!-- 用戶資訊和登出 -->
+                <li class="nav-item">
+                    <div class="border-top pt-3 mt-3">
+                        <div class="text-white mb-3">
+                            <div class="fw-bold" th:text="${#authentication.principal.employeeName}">員工姓名</div>
+                            <div class="small" th:text="${#authentication.principal.employeeEmail}">員工信箱</div>
+                        </div>
+                        <form th:action="@{/backend/logout}" method="post" style="margin: 0;">
+                            <button type="submit" class="btn btn-outline-light btn-sm w-100">
+                                <i class="bi bi-box-arrow-right me-2"></i>登出
+                            </button>
+                        </form>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
 
 <!-- Sidebar（桌機版） -->
 <div th:fragment="sidebar" class="sidebar p-3 position-fixed top-0 start-0 vh-100">
@@ -166,40 +369,6 @@
                     </li>
                     <li>
                         <a th:href="@{/backend/department/list}" class="link-body-emphasis text-white">部門管理</a>
-                    </li>
-                    <li>
-                        <a th:href="@{/backend/operation-log/list}" class="link-body-emphasis text-white">log檢視</a>
-                    </li>
-                </ul>
-            </div>
-        </li>
-
-        <!-- 購物管理 -->
-        <li class="mb-1" sec:authorize="hasAuthority('product')">
-            <button
-                    class="btn btn-toggle d-flex justify-content-between align-items-center w-100 rounded border-0 text-white"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#dashboard-product"
-                    aria-expanded="false"
-            >
-                購物管理
-                <i class="bi bi-chevron-down fs-6"></i>
-            </button>
-            <div class="collapse" id="dashboard-product">
-                <ul
-                        class="btn-toggle-nav list-unstyled fw-normal pb-1 ps-4 lh-lg"
-                >
-                    <li>
-                        <a th:href="@{/backend/product/list}" class="link-body-emphasis text-white">商品管理</a>
-                    </li>
-                    <li>
-                        <a th:href="@{/backend/product/category/list}" class="link-body-emphasis text-white">商品分類管理</a>
-                    </li>
-                    <li>
-                        <a th:href="@{/backend/product-order/listAllProductOrder}" class="link-body-emphasis text-white">訂單管理</a>
-                    </li>
-                    <li>
-                        <a th:href="@{/backend/coupon/list}" class="link-body-emphasis text-white">優惠券管理</a>
                     </li>
                 </ul>
             </div>
@@ -237,39 +406,39 @@
                            class="link-body-emphasis text-white">房型管理</a>
                     </li>
                     <li>
-                        <a th:href="@{/backend/roomTypePhoto/selectRoomTypePhoto}"
-                           class="link-body-emphasis text-white">房型圖片管理</a>
+                        <a th:href="@{/backend/roomTypeAvailability/list}"
+                           class="link-body-emphasis text-white">房型庫存管理</a>
                     </li>
                 </ul>
             </div>
         </li>
 
-        <!-- 首頁管理 -->
-        <li class="mb-1">
+        <!-- 購物管理 -->
+        <li class="mb-1" sec:authorize="hasAuthority('product')">
             <button
                     class="btn btn-toggle d-flex justify-content-between align-items-center w-100 rounded border-0 text-white"
                     data-bs-toggle="collapse"
-                    data-bs-target="#dashboard-home"
+                    data-bs-target="#dashboard-product"
                     aria-expanded="false"
             >
-                首頁管理
+                購物管理
                 <i class="bi bi-chevron-down fs-6"></i>
             </button>
-            <div class="collapse" id="dashboard-home">
+            <div class="collapse" id="dashboard-product">
                 <ul
-                        class="btn-toggle-nav list-unstyled fw-normal pb-2 ps-4 lh-lg"
+                        class="btn-toggle-nav list-unstyled fw-normal pb-1 ps-4 lh-lg"
                 >
                     <li>
-                        <a th:href="@{/backend/news/list}"
-                           class="link-body-emphasis text-white">最近消息</a>
+                        <a th:href="@{/backend/product/list}" class="link-body-emphasis text-white">商品管理</a>
                     </li>
                     <li>
-                        <a th:href="@{/backend/feedback/list}"
-                           class="link-body-emphasis text-white">顧客回饋</a>
+                        <a th:href="@{/backend/product/category/list}" class="link-body-emphasis text-white">商品分類管理</a>
                     </li>
                     <li>
-                        <a th:href="@{/backend/member/list}"
-                           class="link-body-emphasis text-white">會員管理</a>
+                        <a th:href="@{/backend/product-order/listAllProductOrder}" class="link-body-emphasis text-white">訂單管理</a>
+                    </li>
+                    <li>
+                        <a th:href="@{/backend/coupon/list}" class="link-body-emphasis text-white">優惠券管理</a>
                     </li>
                 </ul>
             </div>
@@ -314,6 +483,46 @@
             </div>
         </li>
 
+        <!-- 其他管理 -->
+        <li class="mb-1">
+            <button
+                    class="btn btn-toggle d-flex justify-content-between align-items-center w-100 rounded border-0 text-white"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#dashboard-home"
+                    aria-expanded="false"
+            >
+                其他管理
+                <i class="bi bi-chevron-down fs-6"></i>
+            </button>
+            <div class="collapse" id="dashboard-home">
+                <ul
+                        class="btn-toggle-nav list-unstyled fw-normal pb-2 ps-4 lh-lg"
+                >
+                    <li>
+                        <a th:href="@{/backend/news/list}"
+                           class="link-body-emphasis text-white">最近消息</a>
+                    </li>
+                    <li>
+                        <a th:href="@{/backend/feedback/list}"
+                           class="link-body-emphasis text-white">顧客回饋</a>
+                    </li>
+                    <li>
+                        <a th:href="@{/backend/member/list}"
+                           class="link-body-emphasis text-white">會員管理</a>
+                    </li>
+                    <li>
+                        <a th:href="@{/backend/chat/room/list}"
+                           class="link-body-emphasis text-white">客服管理</a>
+                    </li>
+                    <li>
+                        <a th:href="@{/backend/operation-log/list}" class="link-body-emphasis text-white">log檢視</a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+
+
 
     </ul>
 
@@ -332,74 +541,6 @@
                 <i class="bi bi-box-arrow-right me-2"></i>登出
             </button>
         </form>
-    </div>
-</div>
-
-<!-- Sidebar（手機版 Offcanvas） -->
-<div th:fragment="mobileSidebar" class="offcanvas offcanvas-start" tabindex="-1" id="mobileSidebar"
-     aria-labelledby="mobileSidebarLabel">
-    <div class="offcanvas-header">
-        <h5 class="offcanvas-title text-primary" id="mobileSidebarLabel">
-            IsleVilla微嶼 後台管理
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body">
-        <ul class="list-unstyled ps-0" id="mobileSidebarMenu">
-            <!-- 分類1 -->
-            <li class="mb-1">
-                <button
-                        class="btn btn-toggle d-flex justify-content-between align-items-center w-100 rounded border-0 text-primary"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#mobile-dashboard-employee"
-                        aria-expanded="false"
-                >
-                    員工管理
-                    <i class="bi bi-chevron-down fs-6"></i>
-                </button>
-                <div class="collapse" id="mobile-dashboard-employee">
-                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-4 lh-lg">
-                        <li><a th:href="@{/backend/employee/list}" class="link-body-emphasis text-primary">員工列表</a></li>
-                        <li><a th:href="@{/backend/employee/permission}" class="link-body-emphasis text-primary">權限設定</a></li>
-                        <li><a th:href="@{/}" class="link-body-emphasis text-primary">部門管理</a></li>
-                    </ul>
-                </div>
-            </li>
-            <!-- 分類2 -->
-            <li class="mb-1" sec:authorize="hasAuthority('product')">
-                <button
-                        class="btn btn-toggle d-flex justify-content-between align-items-center w-100 rounded border-0 text-primary"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#mobile-dashboard-product"
-                        aria-expanded="false"
-                >
-                    購物管理
-                    <i class="bi bi-chevron-down fs-6"></i>
-                </button>
-                <div class="collapse" id="mobile-dashboard-product">
-                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-4 lh-lg">
-                        <li><a th:href="@{/backend/product/list}" class="link-body-emphasis text-primary">商品管理</a></li>
-                        <li><a th:href="@{/}" class="link-body-emphasis text-primary">商品分類管理</a></li>
-                        <li><a th:href="@{/}" class="link-body-emphasis text-primary">訂單管理</a></li>
-                    </ul>
-                </div>
-            </li>
-        </ul>
-        
-        <!-- 手機版用戶資訊和登出按鈕 -->
-        <div class="border-top pt-3 mt-3">
-            <div class="d-flex align-items-center mb-3">
-                <div class="flex-grow-1">
-                    <div class="text-primary fw-bold" th:text="${#authentication.principal.employeeName}">員工姓名</div>
-                    <div class="text-muted small" th:text="${#authentication.principal.employeeEmail}">員工信箱</div>
-                </div>
-            </div>
-            <form th:action="@{/backend/logout}" method="post" style="margin: 0;">
-                <button type="submit" class="btn btn-outline-primary btn-sm w-100">
-                    <i class="bi bi-box-arrow-right me-2"></i>登出
-                </button>
-            </form>
-        </div>
     </div>
 </div>
 
