@@ -3,6 +3,9 @@ package com.islevilla.patty.booking.controller;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -19,6 +22,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.islevilla.patty.booking.model.BookingService;
 import com.islevilla.chen.roomTypePhoto.model.RoomTypePhotoService;
 import com.islevilla.chen.roomTypePhoto.model.RoomTypePhoto;
+import com.islevilla.chen.roomType.model.RoomTypeService;
+import com.islevilla.chen.roomType.model.RoomType;
+import com.islevilla.chen.roomTypeAvailability.model.RoomTypeAvailabilityService;
+import com.islevilla.chen.roomTypeAvailability.model.RoomTypeAvailability;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -29,6 +36,12 @@ public class BookingController {
 
     @Autowired
     private RoomTypePhotoService roomTypePhotoService;
+    
+    @Autowired
+    private RoomTypeService roomTypeService;
+    
+    @Autowired
+    private RoomTypeAvailabilityService roomTypeAvailabilityService;
 
     @GetMapping("/booking")
     public String showBookingPage() {
@@ -76,12 +89,41 @@ public class BookingController {
             roomAdults = List.of(2);
         }
 
-        // 查詢可用房型（即使查無資料也會回傳空集合）
-        var availableRoomTypesWithPromotionsAndPhoto = bookingService.findAvailableRoomTypesWithPromotionsAndPhoto(checkin, checkout, roomCount, roomAdults);
-        System.out.println("查詢結果房型數量: " + (availableRoomTypesWithPromotionsAndPhoto != null ? availableRoomTypesWithPromotionsAndPhoto.size() : "null"));
-
-        // 將查詢結果加入 model
-        model.addAttribute("availableRooms", availableRoomTypesWithPromotionsAndPhoto != null ? availableRoomTypesWithPromotionsAndPhoto : List.of());
+        // 使用 chen 的房型資料和空房查詢
+        try {
+            // 1. 查詢所有上架中的房型
+            List<RoomType> allRoomTypes = roomTypeService.findByRoomTypeSaleStatus((byte) 1);
+            System.out.println("查詢到房型數量: " + allRoomTypes.size());
+            
+            // 2. 檢查每個房型在指定日期範圍內是否有足夠的空房
+            List<RoomType> availableRoomTypes = new ArrayList<>();
+            
+            for (RoomType roomType : allRoomTypes) {
+                Integer roomTypeId = roomType.getRoomTypeId();
+                Integer requiredCount = roomCount; // 需要的房間數
+                
+                // 檢查在入住期間是否有足夠的空房
+                boolean hasAvailableRooms = roomTypeAvailabilityService.hasAvailableRoomsInRange(
+                    roomTypeId, checkin, checkout, requiredCount);
+                
+                if (hasAvailableRooms) {
+                    availableRoomTypes.add(roomType);
+                    System.out.println("房型 " + roomType.getRoomTypeName() + " 在 " + checkin + " 至 " + checkout + " 期間有足夠空房");
+                } else {
+                    System.out.println("房型 " + roomType.getRoomTypeName() + " 在 " + checkin + " 至 " + checkout + " 期間空房不足");
+                }
+            }
+            
+            System.out.println("符合空房條件的房型數量: " + availableRoomTypes.size());
+            
+            // 將查詢結果加入 model
+            model.addAttribute("roomTypes", availableRoomTypes);
+            
+        } catch (Exception e) {
+            System.err.println("查詢房型或空房失敗: " + e.getMessage());
+            model.addAttribute("roomTypes", List.of());
+        }
+        
         model.addAttribute("checkin", checkin);
         model.addAttribute("checkout", checkout);
         model.addAttribute("roomCount", roomCount);
@@ -89,6 +131,114 @@ public class BookingController {
         model.addAttribute("children", children);
 
         return "front-end/booking/online-booking";
+    }
+
+    /**
+     * 查詢 chen 的房型資料
+     */
+    @GetMapping("/booking/chen/roomTypes")
+    public String getRoomTypes(Model model) {
+        try {
+            // 查詢所有上架中的房型 (saleStatus = 1)
+            List<RoomType> roomTypes = roomTypeService.findByRoomTypeSaleStatus((byte) 1);
+            model.addAttribute("roomTypes", roomTypes);
+            System.out.println("查詢到房型數量: " + roomTypes.size());
+        } catch (Exception e) {
+            System.err.println("查詢房型失敗: " + e.getMessage());
+            model.addAttribute("roomTypes", List.of());
+        }
+        return "front-end/booking/online-booking";
+    }
+
+    /**
+     * 根據房型ID查詢 chen 的單一房型資料
+     */
+    @GetMapping("/booking/chen/roomType/{roomTypeId}")
+    public ResponseEntity<RoomType> getRoomTypeById(@PathVariable Integer roomTypeId) {
+        try {
+            RoomType roomType = roomTypeService.findById(roomTypeId);
+            if (roomType != null) {
+                return ResponseEntity.ok(roomType);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            System.err.println("查詢房型失敗: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
+     * 複合查詢 chen 的房型資料
+     */
+    @GetMapping("/booking/chen/roomTypes/search")
+    public ResponseEntity<List<RoomType>> searchRoomTypes(
+            @RequestParam(value = "roomTypeId", required = false) Integer roomTypeId,
+            @RequestParam(value = "roomTypeSaleStatus", required = false) Byte roomTypeSaleStatus) {
+        try {
+            List<RoomType> roomTypes = roomTypeService.compoundQuery(roomTypeId, roomTypeSaleStatus);
+            return ResponseEntity.ok(roomTypes);
+        } catch (Exception e) {
+            System.err.println("複合查詢房型失敗: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
+     * 查詢 chen 的空房資料
+     */
+    @GetMapping("/booking/chen/availability")
+    public ResponseEntity<List<RoomTypeAvailability>> getAvailability(
+            @RequestParam(value = "roomTypeId", required = false) Integer roomTypeId,
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate) {
+        try {
+            List<RoomTypeAvailability> availability;
+            if (roomTypeId != null && startDate != null && endDate != null) {
+                // 查詢特定房型在日期範圍內的空房
+                availability = roomTypeAvailabilityService.findByRoomTypeIdAndDateRange(roomTypeId, startDate, endDate);
+            } else if (startDate != null && endDate != null) {
+                // 查詢日期範圍內所有房型的空房
+                availability = roomTypeAvailabilityService.findByDateRange(startDate, endDate);
+            } else if (roomTypeId != null) {
+                // 查詢特定房型的所有空房記錄
+                availability = roomTypeAvailabilityService.findByRoomTypeId(roomTypeId);
+            } else {
+                // 查詢所有空房記錄
+                availability = roomTypeAvailabilityService.findAll();
+            }
+            return ResponseEntity.ok(availability);
+        } catch (Exception e) {
+            System.err.println("查詢空房失敗: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
+     * 檢查特定房型在指定日期範圍內是否有足夠空房
+     */
+    @GetMapping("/booking/chen/availability/check")
+    public ResponseEntity<Map<String, Object>> checkAvailability(
+            @RequestParam("roomTypeId") Integer roomTypeId,
+            @RequestParam("startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate,
+            @RequestParam("endDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate,
+            @RequestParam("requiredCount") Integer requiredCount) {
+        try {
+            boolean hasAvailableRooms = roomTypeAvailabilityService.hasAvailableRoomsInRange(
+                roomTypeId, startDate, endDate, requiredCount);
+            
+            Map<String, Object> result = new HashMap<>();
+            result.put("hasAvailableRooms", hasAvailableRooms);
+            result.put("roomTypeId", roomTypeId);
+            result.put("startDate", startDate);
+            result.put("endDate", endDate);
+            result.put("requiredCount", requiredCount);
+            
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            System.err.println("檢查空房失敗: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @PostMapping("/booking/submit")
