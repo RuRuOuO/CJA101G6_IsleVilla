@@ -2,17 +2,20 @@ package com.islevilla.chen.roomType.controller;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.islevilla.chen.roomType.model.RoomType;
 import com.islevilla.chen.roomType.model.RoomTypeService;
@@ -88,6 +91,43 @@ public class FrontRoomTypeController {
 			return ResponseEntity.ok()
 					.header("Content-Type", "text/plain; charset=UTF-8")
 					.body("載入圖片時發生錯誤".getBytes(StandardCharsets.UTF_8));
+		}
+	}
+	
+	// 獲取房型所有圖片列表
+	@GetMapping("/{roomTypeId}/images")
+	@ResponseBody
+	public ResponseEntity<List<Map<String, Object>>> getRoomTypeImages(@PathVariable Integer roomTypeId) {
+		try {
+			List<RoomTypePhoto> photos = roomTypePhotoService.roomTypeFindPhotos(roomTypeId);
+			
+			if (photos == null || photos.isEmpty()) {
+				return ResponseEntity.ok(new ArrayList<>());
+			}
+			
+			List<Map<String, Object>> imageList = new ArrayList<>();
+			for (RoomTypePhoto photo : photos) {
+				// 只加入有圖片資料的項目
+				if (photo.getRoomTypePhoto() != null) {
+					Map<String, Object> imageInfo = new HashMap<>();
+					imageInfo.put("photoId", photo.getRoomTypePhotoId());
+					imageInfo.put("displayOrder", photo.getDisplayOrder());
+					imageInfo.put("hasImage", true);
+					imageList.add(imageInfo);
+				}
+			}
+			
+			// 按照顯示順序排序
+			imageList.sort((a, b) -> {
+				Integer orderA = (Integer) a.get("displayOrder");
+				Integer orderB = (Integer) b.get("displayOrder");
+				return Integer.compare(orderA != null ? orderA : 0, orderB != null ? orderB : 0);
+			});
+			
+			return ResponseEntity.ok(imageList);
+		} catch (Exception e) {
+			System.err.println("取得房型圖片列表失敗: " + e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
 } 
