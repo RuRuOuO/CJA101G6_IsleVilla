@@ -379,7 +379,7 @@ public class BookingService {
         // 建立 RoomRVOrder
         com.islevilla.wei.room.model.RoomRVOrder order = new com.islevilla.wei.room.model.RoomRVOrder();
         order.setMembers(member);
-        order.setRoomOrderDate(java.time.LocalDate.now());
+        order.setRoomOrderDate(java.time.LocalDateTime.now());
         order.setRoomOrderStatus(0); // 0:成立
         order.setCheckInDate(checkin);
         order.setCheckOutDate(checkout);
