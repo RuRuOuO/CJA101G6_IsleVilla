@@ -131,12 +131,16 @@ public class BookingController {
                     promotions = new ArrayList<>();
                 }
                 
-                // 查詢第一張圖片ID
+                // 查詢第一張圖片ID與所有圖片ID
                 Integer firstPhotoId = null;
+                List<Integer> photoIds = new ArrayList<>();
                 try {
                     List<RoomTypePhoto> photos = roomTypePhotoService.roomTypeFindPhotos(roomTypeId);
                     if (photos != null && !photos.isEmpty()) {
                         firstPhotoId = photos.get(0).getRoomTypePhotoId();
+                        for (RoomTypePhoto photo : photos) {
+                            photoIds.add(photo.getRoomTypePhotoId());
+                        }
                     }
                 } catch (Exception e) {
                     System.err.println("查詢房型 " + roomType.getRoomTypeName() + " 圖片時發生錯誤: " + e.getMessage());
@@ -154,7 +158,9 @@ public class BookingController {
                 
                 System.out.println("房型 " + roomType.getRoomTypeName() + " 有 " + promotions.size() + " 個有效優惠專案，空房狀態: " + (hasAvailableRooms ? "有空房" : "無空房"));
                 
-                roomTypesWithPromotions.add(new RoomTypeWithPromotions(roomType, promotions, hasAvailableRooms, firstPhotoId));
+                RoomTypeWithPromotions rtp = new RoomTypeWithPromotions(roomType, promotions, hasAvailableRooms, firstPhotoId);
+                rtp.setPhotoIds(photoIds); // 設定所有圖片ID
+                roomTypesWithPromotions.add(rtp);
             }
             
             System.out.println("最終處理的房型數量: " + roomTypesWithPromotions.size());
@@ -187,6 +193,7 @@ public class BookingController {
         private List<RoomPromotionPrice> promotions;
         private boolean hasAvailableRooms;
         private Integer firstPhotoId;
+        private List<Integer> photoIds;
         
         public RoomTypeWithPromotions(RoomType roomType, List<RoomPromotionPrice> promotions, boolean hasAvailableRooms, Integer firstPhotoId) {
             this.roomType = roomType;
@@ -201,6 +208,8 @@ public class BookingController {
         public List<RoomPromotionPrice> getPromotions() { return promotions; }
         public boolean hasAvailableRooms() { return hasAvailableRooms; }
         public Integer getFirstPhotoId() { return firstPhotoId; }
+        public List<Integer> getPhotoIds() { return photoIds; }
+        public void setPhotoIds(List<Integer> photoIds) { this.photoIds = photoIds; }
         
         // 計算折扣後價格的輔助方法
         public int getDiscountedPrice(RoomPromotionPrice promotion) {
