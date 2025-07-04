@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class RoomRVController {
@@ -30,28 +32,37 @@ public class RoomRVController {
         if (loginMember == null) {
             return "redirect:/member/login";
         }
-        // 查詢訂單
+
+        // 查詢該會員的所有訂單
         List<RoomRVOrder> orderList = roomRVOrderService.getRoomRVOrderByMember(loginMember);
-        if (!orderList.isEmpty()) {
-            model.addAttribute("orderList", orderList);
+        model.addAttribute("orderList", orderList);
+
+        // 建立 detailMap 並塞入每筆訂單的明細
+        Map<Integer, List<RoomRVDetail>> detailMap = new HashMap<>();
+        for (RoomRVOrder order : orderList) {
+            List<RoomRVDetail> details = roomRVDetailService.getDetailsByRoomRVOrderId(order.getRoomReservationId());
+            detailMap.put(order.getRoomReservationId(), details);
         }
-        if (!orderList.isEmpty()) {
-            int firstOrderId = orderList.get(0).getRoomReservationId();
-            List<RoomRVDetail> detailList = roomRVDetailService.getDetailsByRoomRVOrderId(firstOrderId);
-            model.addAttribute("detailList", detailList);
-        }
+        model.addAttribute("detailMap", detailMap);
 
         return "front-end/member/member-room-list";
     }
 
-    // 前台渲染訂單明細
-    @GetMapping("/member/room/{id}")
-    public String getRoomRVOrdersFromMember(@PathVariable Integer id, Model model) {
-        // 查詢訂單
-        List<RoomRVOrder> orderList = List.of(roomRVOrderService.getById(id));
-        model.addAttribute("orderList", orderList);
-        return "front-end/member/member-room-detail";
-    }
+//    // 前台渲染訂單明細
+//    @GetMapping("/member/room/{id}")
+//    public String getRoomRVOrdersFromMember(@PathVariable Integer id, Model model) {
+//        // 查詢訂單
+//        List<RoomRVOrder> orderList = List.of(roomRVOrderService.getById(id));
+//        // model.addAttribute("orderList", orderList);
+//        Map<Integer, List<RoomRVDetail>> detailMap = new HashMap<>();
+//        for (RoomRVOrder order : orderList) {
+//            List<RoomRVDetail> details = roomRVDetailService.getDetailsByRoomRVOrderId(order.getRoomReservationId());
+//            detailMap.put(order.getRoomReservationId(), details);
+//        }
+//        model.addAttribute("orderList", orderList);
+//        model.addAttribute("detailMap", detailMap);
+//        return "front-end/member/member-room-detail";
+//    }
 
     // 前台取消訂單
     @PostMapping("/member/room/{id}/cancel")

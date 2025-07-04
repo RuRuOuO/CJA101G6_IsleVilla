@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="zh-Hant">
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns="http://www.w3.org/1999/html"
+        lang="zh-Hant"
+>
 <head>
     <meta charset="UTF-8"/>
     <meta content="width=device-width, initial-scale=1" name="viewport"/>
@@ -9,7 +13,7 @@
     <style>
         body {
             /* 背景圖片設定 */
-            background-image: url('/img/home/ocean2.png');
+            background-image: url("/img/home/ocean2.png");
         }
     </style>
 </head>
@@ -49,7 +53,9 @@
                 <!-- 無評價提示 -->
                 <div class="text-center py-4 d-none" id="noReviews">
                     <div class="text-muted">
-                        <i class="bi bi-chat-left-text display-1 mb-3 text-secondary"></i>
+                        <i
+                                class="bi bi-chat-left-text display-1 mb-3 text-secondary"
+                        ></i>
                         <h4>暫無評價</h4>
                         <p>目前還沒有公開的顧客評價，請稍後再來查看</p>
                     </div>
@@ -57,6 +63,7 @@
             </div>
         </div>
     </section>
+    <div class="text-center py-3" id="pagination"></div>
 </main>
 
 <!-- Footer 區塊 -->
@@ -64,17 +71,17 @@
 
 <script>
     const ratingCategories = {
-        fbShuttleRating: {name: '接駁服務', icon: 'fa-solid fa-ship'},
-        fbReceptionRating: {name: '櫃台服務', icon: 'bi bi-person-fill'},
-        fbRoomRating: {name: '房間品質', icon: 'bi bi-house-door-fill'},
-        fbFacilityRating: {name: '設施', icon: 'fa-solid fa-water-ladder'},
-        fbEnvRating: {name: '環境', icon: 'fa-solid fa-mountain-sun'},
-        fbValueRating: {name: '性價比', icon: 'bi-currency-dollar'},
-        fbWebsiteRating: {name: '網站使用', icon: 'bi bi-globe2'}
+        fbShuttleRating: {name: "接駁服務", icon: "fa-solid fa-ship"},
+        fbReceptionRating: {name: "櫃台服務", icon: "bi bi-person-fill"},
+        fbRoomRating: {name: "房間品質", icon: "bi bi-house-door-fill"},
+        fbFacilityRating: {name: "設施", icon: "fa-solid fa-water-ladder"},
+        fbEnvRating: {name: "環境", icon: "fa-solid fa-mountain-sun"},
+        fbValueRating: {name: "性價比", icon: "bi-currency-dollar"},
+        fbWebsiteRating: {name: "網站使用", icon: "bi bi-globe2"},
     };
 
     function generateStars(rating) {
-        let stars = '';
+        let stars = "";
         for (let i = 1; i <= 5; i++) {
             if (i <= rating) {
                 stars += '<i class="bi bi-star-fill text-warning"></i>';
@@ -86,7 +93,7 @@
     }
 
     function generateCategoryRatings(review) {
-        let ratingsHtml = '';
+        let ratingsHtml = "";
         for (const [key, category] of Object.entries(ratingCategories)) {
             const rating = review[key];
             if (rating) {
@@ -94,7 +101,9 @@
                     <div class="col-6 col-md-4 mb-2">
                         <div class="d-flex align-items-center">
                             <i class="${category.icon} me-2 text-muted"></i>
-                            <span class="me-2 text-muted">${category.name}</span>
+                            <span class="me-2 text-muted">${
+                    category.name
+                }</span>
                             <div>
                                 ${generateStars(rating)}
                             </div>
@@ -108,54 +117,96 @@
     }
 
     function createReviewCard(review) {
-        const reviewDate = new Date(review.fbCreatedAt).toLocaleDateString('zh-TW', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
+        const hasImage =
+            review.fbImageBase64 && review.fbImageBase64.trim() !== "";
+        const hasSuggestion =
+            review.fbSuggestion && review.fbSuggestion.trim() !== "";
+        const hasCompliment =
+            review.fbCompliment && review.fbCompliment.trim() !== "";
 
-        const hasImage = review.fbImageBase64 && review.fbImageBase64.trim() !== '';
-        const hasSuggestion = review.fbSuggestion && review.fbSuggestion.trim() !== '';
-        const hasCompliment = review.fbCompliment && review.fbCompliment.trim() !== '';
+        const customerName = review.customerName || "匿名旅客";
+        const customerAvatar =
+            review.customerAvatar && review.customerAvatar.trim() !== ""
+                ? review.customerAvatar
+                : "/img/home/member1.png";
+
+        const reviewDate = new Date(review.fbCreatedAt).toLocaleDateString(
+            "zh-TW",
+            {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+            }
+        );
 
         return `
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-body p-5">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div class="d-flex align-items-center">
+                            <img src="${customerAvatar}"
+                         alt="${customerName}"
+                         class="rounded-circle me-3"
+                         width="50"
+                         height="50"
+                         style="object-fit: cover;">
+                    <div>
+                        <h6 class="mb-0 fw-bold">${customerName}</h6>
+                    </div>
                             <span class="badge text-dark fs-6 me-3">
-                            整體評價 ${generateStars(review.fbOverallRating)} ${review.fbOverallRating}
+${generateStars(review.fbOverallRating)}
                             </span>
-                            ${review.fbRecommend === 1 ? '<span class="badge bg-success">推薦</span>' : ''}
-                            ${review.fbRevisit === 1 ? '<span class="badge bg-info ms-1">會再訪</span>' : ''}
+                            ${
+            review.fbRecommend === 1
+                ? '<span class="badge bg-success">推薦</span>'
+                : ""
+        }
+                            ${
+            review.fbRevisit === 1
+                ? '<span class="badge bg-info ms-1">會再訪</span>'
+                : ""
+        }
                         </div>
                         <small class="text-muted">
                             <i class="bi bi-calendar3 me-1"></i>${reviewDate}
                         </small>
                     </div>
 
-                    ${hasCompliment ? `
+                    ${
+            hasCompliment
+                ? `
                         <div class="mb-3">
                             <h6 class="mb-2"><i class="bi bi-heart-fill me-1"></i>好評分享</h6>
-                            <p class="mb-0 lh-base text-dark">${review.fbCompliment}</p>
-                        </div>` : ''}
+                            <pre class="mb-0 lh-base text-dark">${review.fbCompliment}</pre>
+                        </div>`
+                : ""
+        }
 
-                    ${hasSuggestion ? `
+                    ${
+            hasSuggestion
+                ? `
+<br>
                         <div class="mb-3">
                             <h6 class="mb-2"><i class="bi bi-lightbulb me-1"></i>改進建議</h6>
                             <div class="bg-light rounded ps-3 py-2">
-                                <p class="mb-0 text-dark">${review.fbSuggestion}</p>
+                                <pre class="mb-0 text-dark">${review.fbSuggestion}</pre>
                             </div>
-                        </div>` : ''}
+                        </div>`
+                : ""
+        }
 
-                    ${hasImage ? `
+                    ${
+            hasImage
+                ? `
                         <div class="mb-3">
                             <h6 class="text-primary mb-2"><i class="bi bi-camera me-1"></i>顧客分享</h6>
                             <img src="${review.fbImageBase64}"
                                  alt="顧客分享圖片"
                                  class="img-fluid rounded w-100"
                                  style="object-fit: cover; max-height: 300px;">
-                        </div>` : ''}
+                        </div>`
+                : ""
+        }
 
                     <div class="bg-light rounded p-3 mt-4">
                         <h6 class="text-muted mb-3"><i class="bi bi-bar-chart me-1"></i>各項評分</h6>
@@ -166,7 +217,9 @@
 
                     <div class="mt-3 pt-3 border-top">
                         <small class="text-muted">
-                            <i class="bi bi-receipt me-1"></i>訂單編號：${review.roomReservationId}
+                            <i class="bi bi-receipt me-1"></i>訂單編號：${
+            review.roomReservationId
+        }
                         </small>
                     </div>
                 </div>
@@ -174,44 +227,90 @@
         `;
     }
 
+    document.addEventListener("DOMContentLoaded", () => {
+        loadReviews();
+    });
+
+
+    const REVIEWS_PER_PAGE = 5;
+    let currentPage = 1;
+    let allReviews = [];
+
     function loadReviews() {
-        fetch('/api/feedbacks/public')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
+        const loading = document.getElementById("loading");
+        const noReviews = document.getElementById("noReviews");
+        const reviewsList = document.getElementById("reviewsList");
+
+        fetch("/api/feedbacks/public")
+            .then((response) => {
+                if (!response.ok) throw new Error("Network response was not ok");
                 return response.json();
             })
-            .then(data => {
-                const reviewsList = document.getElementById('reviewsList');
-                const loading = document.getElementById('loading');
-                const noReviews = document.getElementById('noReviews');
-
+            .then((data) => {
                 loading.classList.add("d-none");
 
                 if (data && data.length > 0) {
-                    data.sort((a, b) => new Date(b.fbCreatedAt) - new Date(a.fbCreatedAt));
-                    reviewsList.innerHTML = data.map(createReviewCard).join('');
+                    allReviews = data.sort((a, b) => new Date(b.fbCreatedAt) - new Date(a.fbCreatedAt));
+                    renderPage(currentPage);
                 } else {
                     noReviews.classList.remove("d-none");
                 }
             })
-            .catch(error => {
-                console.error('載入評價失敗:', error);
-                const loading = document.getElementById('loading');
-                const noReviews = document.getElementById('noReviews');
-
+            .catch((error) => {
+                console.error("載入評價失敗:", error);
                 loading.classList.add("d-none");
                 noReviews.classList.remove("d-none");
 
-                document.querySelector('#noReviews h4').textContent = '載入失敗';
-                document.querySelector('#noReviews p').textContent = '無法載入評價資料，請稍後再試';
+                document.querySelector("#noReviews h4").textContent = "載入失敗";
+                document.querySelector("#noReviews p").textContent = "無法載入評價資料，請稍後再試";
             });
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        loadReviews();
-    });
+    function renderPage(page) {
+        const start = (page - 1) * REVIEWS_PER_PAGE;
+        const end = start + REVIEWS_PER_PAGE;
+        const reviewsList = document.getElementById("reviewsList");
+
+        reviewsList.innerHTML = allReviews.slice(start, end).map(createReviewCard).join("");
+
+        renderPagination(allReviews.length);
+    }
+
+    function renderPagination(totalReviews) {
+        const totalPages = Math.ceil(totalReviews / REVIEWS_PER_PAGE);
+        const container = document.getElementById("pagination");
+
+        let html = `
+        <nav>
+            <ul class="pagination justify-content-center">
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <button class="page-link" onclick="goToPage(${currentPage - 1})">上一頁</button>
+                </li>
+    `;
+
+        for (let i = 1; i <= totalPages; i++) {
+            html += `
+            <li class="page-item ${i === currentPage ? 'active' : ''}">
+                <button class="page-link" onclick="goToPage(${i})">${i}</button>
+            </li>
+        `;
+        }
+
+        html += `
+                <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                    <button class="page-link" onclick="goToPage(${currentPage + 1})">下一頁</button>
+                </li>
+            </ul>
+        </nav>
+    `;
+
+        container.innerHTML = html;
+    }
+
+    function goToPage(page) {
+        currentPage = page;
+        renderPage(page);
+    }
 </script>
 </body>
 </html>

@@ -8,6 +8,12 @@
 * {
     font-family: "Noto Sans TC", sans-serif;
 }
+pre {
+    font-family: "Noto Sans TC", sans-serif;
+    font-size: 1rem;  /* 可視需求調整大小 */
+    white-space: pre-wrap; /* 保留換行但讓內容可換行避免過寬 */
+    word-break: break-word;
+}
 
 .btn, .nav-link, .nav-item .nav-link {
     border-radius: 0 !important;

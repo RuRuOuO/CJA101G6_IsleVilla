@@ -154,9 +154,9 @@
             let actionBtnHtml = '';
             if (fb.fbPublic === 1) {
                 if (fb.fbStatus === 1) {
-                    actionBtnHtml = `<button class="btn btn-sm btn-warning toggleStatusBtn" data-id="${fb.fbId}" data-status="0">下架</button>`;
+                    actionBtnHtml = `<button class="btn btn-sm btn-secondary toggleStatusBtn" data-id="${fb.fbId}" data-status="0">下架</button>`;
                 } else {
-                    actionBtnHtml = `<button class="btn btn-sm btn-success toggleStatusBtn" data-id="${fb.fbId}" data-status="1">上架</button>`;
+                    actionBtnHtml = `<button class="btn btn-sm btn-warning toggleStatusBtn" data-id="${fb.fbId}" data-status="1">上架</button>`;
                 }
             }
 
@@ -165,16 +165,16 @@
                 <td>${fb.roomReservationId}</td>
                 <td><span class="badge bg-warning">${fb.fbOverallRating} ★</span></td>
                 <td>
-                    <span class="badge ${fb.fbRecommend === 1 ? 'bg-success' : 'bg-secondary'}">${fb.fbRecommend === 1 ? '推薦' : '不推薦'}</span>
+                    <span class="badge ${fb.fbRecommend === 1 ? 'bg-info' : 'bg-secondary'}">${fb.fbRecommend === 1 ? '推薦' : '不推薦'}</span>
                 </td>
                 <td>
                     <span class="badge ${fb.fbRevisit === 1 ? 'bg-info' : 'bg-secondary'}">${fb.fbRevisit === 1 ? '會再訪' : '不會'}</span>
                 </td>
                 <td>
-                    <span class="badge ${fb.fbPublic === 1 ? 'bg-primary' : 'bg-secondary'}">${fb.fbPublic === 1 ? '公開' : '不公開'}</span>
+                    <span class="badge ${fb.fbPublic === 1 ? 'bg-info' : 'bg-secondary'}">${fb.fbPublic === 1 ? '公開' : '不公開'}</span>
                 </td>
                 <td class="fbStatusCell">
-                    <span class="badge ${fb.fbStatus === 1 ? 'bg-success' : 'bg-danger'}">${fb.fbStatus === 1 ? '上架' : '下架'}</span>
+                    <span class="badge ${fb.fbStatus === 1 ? 'bg-info' : 'bg-secondary'}">${fb.fbStatus === 1 ? '上架' : '下架'}</span>
                 </td>
                 <td>
                     <div class="d-flex gap-2 flex-wrap">
@@ -241,7 +241,7 @@
                             if (newStatus === 1) {
                                 toggleBtn.textContent = '下架';
                                 toggleBtn.classList.remove('btn-success');
-                                toggleBtn.classList.add('btn-warning');
+                                toggleBtn.classList.add('btn-secondary');
                                 toggleBtn.setAttribute('data-status', '0');
                             } else {
                                 toggleBtn.textContent = '上架';
@@ -295,7 +295,7 @@
 
     // 篩選功能
     ['statusFilter', 'publicFilter', 'recommendFilter'].forEach(id => {
-        document.getElementById(id).addEventListener('change', function() {
+        document.getElementById(id).addEventListener('change', function () {
             applyFilters();
         });
     });
