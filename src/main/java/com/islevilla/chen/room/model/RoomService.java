@@ -46,4 +46,14 @@ public class RoomService {
 	public List<Room> compoundQuery(Integer roomId, Integer roomTypeId, Byte roomStatus){
 	    return roomRepository.searchRooms(roomId,roomTypeId, roomStatus);
 	}
+	//計算房型數量List(key=roomTypeId, value=roomCount)
+	@Transactional(readOnly = true)
+    public List<RoomTypeCount> getRoomCountsByType() {
+        return roomRepository.countRoomsByRoomTypeId();
+    }
+	//長期不可用房間狀態的房型數量(key=roomTypeId, value=roomCount)
+	@Transactional(readOnly = true)
+    public List<RoomTypeCount> getRoomCountsByTypeWithStatus() {
+        return roomRepository.countRoomsByRoomTypeIdWithStatus();
+    }
 }
