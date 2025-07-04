@@ -1,11 +1,10 @@
 package com.islevilla.chen.room.model;
 
-import java.util.ArrayList;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,11 +31,7 @@ public class RoomService {
 	
 	@Transactional
 	public void deleteRoom(Integer roomId) {
-		 try {
 	        roomRepository.deleteById(roomId);
-	    } catch (DataIntegrityViolationException e) {
-	        throw new IllegalStateException("此房間尚有訂單資料，無法刪除");
-	    }
 	}
 	@Transactional(readOnly = true)
 	public Room findById(Integer roomId) {

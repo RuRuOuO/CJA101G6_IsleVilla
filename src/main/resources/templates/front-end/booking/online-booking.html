@@ -42,9 +42,9 @@
                         <div class="mb-3">
                             <label for="main-date-range" class="form-label">入住/退房日期</label>
                             <input type="text" class="form-control" id="main-date-range" placeholder="請選擇入住與退房日期"
-                              th:value="${checkin != null and checkout != null} ? ${checkin + ' 至 ' + checkout} : ''" required>
-                            <input type="hidden" name="checkin" id="checkin" th:value="${checkin}">
-                            <input type="hidden" name="checkout" id="checkout" th:value="${checkout}">
+                              value="" required>
+                            <input type="hidden" name="checkin" id="checkin" value="">
+                            <input type="hidden" name="checkout" id="checkout" value="">
                         </div>
                         <!-- 人數選擇 -->
                         <div class="mb-3 d-flex gap-2">
@@ -76,17 +76,7 @@
                     <div class="row">
                         <!-- 房型圖片 -->
                         <div class="col-md-3">
-                            <div th:if="${roomTypeObj.photoIds != null and #lists.size(roomTypeObj.photoIds) > 1}">
-                                <div class="position-relative">
-                                    <img th:src="@{'/booking/roomTypePhoto/image/' + ${roomTypeObj.photoIds[0]}}" th:attr="data-photo-ids=${roomTypeObj.photoIds}" class="d-block w-100 roomtype-photo-manual" alt="房型圖片" th:attrappend="data-roomtype-id=${roomTypeObj.roomType.roomTypeId}" style="max-width:100%; height:auto;">
-                                    <button type="button" class="btn btn-secondary btn-sm position-absolute top-50 start-0 translate-middle-y prev-photo-btn" th:attr="data-roomtype-id=${roomTypeObj.roomType.roomTypeId}"><i class="bi bi-chevron-left"></i></button>
-                                    <button type="button" class="btn btn-secondary btn-sm position-absolute top-50 end-0 translate-middle-y next-photo-btn" th:attr="data-roomtype-id=${roomTypeObj.roomType.roomTypeId}"><i class="bi bi-chevron-right"></i></button>
-                                </div>
-                            </div>
-                            <div th:if="${roomTypeObj.photoIds != null and #lists.size(roomTypeObj.photoIds) == 1}">
-                                <img th:src="@{'/booking/roomTypePhoto/image/' + ${roomTypeObj.photoIds[0]}}" alt="房型圖片" style="max-width:100%; height:auto;" class="img-fluid rounded">
-                            </div>
-                            <div th:if="${roomTypeObj.photoIds == null or #lists.isEmpty(roomTypeObj.photoIds)}" class="bg-light rounded d-flex align-items-center justify-content-center" style="height:150px;">
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height:150px;">
                                 <span class="text-muted">無圖片</span>
                             </div>
                         </div>
@@ -94,38 +84,26 @@
                         <div class="col-md-9">
                             <h5 th:text="${roomTypeObj.roomType.roomTypeName}">房型名稱</h5>
                             <p th:text="${roomTypeObj.roomType.roomTypeContent}">房型說明</p>
-                            <!-- 原價區塊（永遠顯示，但按鈕只在無優惠專案時顯示） -->
-                            <div class="mt-2">
-                                <div class="p-2 bg-light rounded mb-1 d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <div class="fw-bold">原價</div>
-                                        <div class="text-primary">
-                                            <span class="room-type-price" th:attr="data-price=${roomTypeObj.roomType.roomTypePrice}" th:text="${roomTypeObj.roomType.roomTypePrice} + ' 元/晚'">原價</span>
+                            <!-- 促銷方案區塊 -->
+                            <div class="row">
+                                <div class="col-12 col-md-6 col-lg-4 mb-2" th:each="promo : ${roomTypeObj.promotions}">
+                                    <div class="p-2 bg-light rounded d-flex justify-content-between align-items-center h-100">
+                                        <div>
+                                            <div class="fw-bold" th:text="${promo.title}">促銷名稱</div>
+                                            <div th:if="${nightCount != null}">
+                                                <span th:if="${promo.isOriginal}" class="text-primary"
+                                                      th:text="${promo.price} + ' 元/晚 × ' + ${nightCount} + ' 晚 = ' + (promo.price * nightCount) + ' 元'"></span>
+                                                <span th:if="${!promo.isOriginal}" class="text-success"
+                                                      th:text="${promo.price} + ' 元/晚 × ' + ${nightCount} + ' 晚 = ' + (promo.price * nightCount) + ' 元'"></span>
+                                            </div>
                                         </div>
+                                        <button type="button" class="btn btn-dark btn-select-room ms-2"
+                                            th:attr="data-room-name=${roomTypeObj.roomType.roomTypeName},data-room-price=${promo.price},data-room-id=${roomTypeObj.roomType.roomTypeId},data-room-type-id=${roomTypeObj.roomType.roomTypeId},data-promotion-id=${promo.promotionId},data-promotion-title=${promo.title}"
+                                            >選擇</button>
                                     </div>
-                                    <a href="#" class="btn btn-dark btn-select-room ms-2"
-                                       th:if="${roomTypeObj.promotions == null or #lists.isEmpty(roomTypeObj.promotions)}"
-                                       th:attr="data-room-name=${roomTypeObj.roomType.roomTypeName},data-room-price=${roomTypeObj.roomType.roomTypePrice},data-room-id=${roomTypeObj.roomType.roomTypeId},data-room-type-id=${roomTypeObj.roomType.roomTypeId}">
-                                        選擇
-                                    </a>
                                 </div>
-                            </div>
-                            <!-- 優惠專案詳細資訊 -->
-                            <div th:if="${roomTypeObj.promotions != null and #lists.size(roomTypeObj.promotions) > 0}" class="mt-2">
-                                <div th:each="promotion : ${roomTypeObj.promotions}" class="p-2 bg-light rounded mb-1 d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <div class="fw-bold" th:text="${promotion.promotion.promotion.roomPromotionTitle}">優惠專案名稱</div>
-                                        <div class="text-success">
-                                            <span class="room-type-discounted" th:attr="data-discounted=${promotion.discountedPrice}" th:text="${promotion.discountedPrice} + ' 元/晚'">折扣價</span>
-                                        </div>
-                                        <div class="text-danger">
-                                            <small><span class="room-type-saved" th:attr="data-diff=${promotion.diff}" th:text="'省下 ' + ${promotion.diff} + ' 元'">省下金額</span></small>
-                                        </div>
-                                    </div>
-                                    <a href="#" class="btn btn-dark btn-select-room ms-2"
-                                       th:attr="data-room-name=${roomTypeObj.roomType.roomTypeName + ' - ' + (promotion.promotion.promotion.roomPromotionTitle != null ? promotion.promotion.promotion.roomPromotionTitle : '優惠專案')},data-room-price=${promotion.discountedPrice != null ? promotion.discountedPrice : roomTypeObj.roomType.roomTypePrice},data-room-id=${roomTypeObj.roomType.roomTypeId},data-room-type-id=${roomTypeObj.roomType.roomTypeId}">
-                                        選擇
-                                    </a>
+                                <div class="col-12" th:if="${#lists.size(roomTypeObj.promotions) == 1}">
+                                    <div class="p-2 bg-light rounded text-muted">無促銷</div>
                                 </div>
                             </div>
                         </div>
@@ -411,7 +389,9 @@ document.querySelectorAll('.btn-select-room').forEach(btn => {
         const price = this.getAttribute('data-room-price');
         const roomId = this.getAttribute('data-room-id');
         const roomTypeId = this.getAttribute('data-room-type-id');
-        cartRoomsArr.push({ name: roomName, price, roomId, roomTypeId });
+        const promotionId = this.getAttribute('data-promotion-id');
+        const promotionTitle = this.getAttribute('data-promotion-title');
+        cartRoomsArr.push({ name: roomName, price, roomId, roomTypeId, promotionId, promotionTitle });
         renderCart();
     });
 });

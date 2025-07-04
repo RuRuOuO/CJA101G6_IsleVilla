@@ -249,8 +249,8 @@ public String showUpdateRoom(@PathVariable Integer roomId, Model model) {
 		 try {
 		        roomService.deleteRoom(roomId);
 		        redirectAttr.addFlashAttribute("successMessage", "房間刪除成功！");
-		    } catch (IllegalStateException e) {
-		        redirectAttr.addFlashAttribute("errorMessage", e.getMessage());
+		    } catch (Exception e) { //外鍵約束錯誤會發生在控制器，service不用寫
+		        redirectAttr.addFlashAttribute("errorMessage", "此房間尚有訂單資料，無法刪除");
 		    }
 		// 如果有上一頁就回去，否則回預設頁面
 		if (referer != null) {
