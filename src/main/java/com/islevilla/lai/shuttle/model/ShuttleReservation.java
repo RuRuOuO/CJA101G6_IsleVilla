@@ -19,7 +19,7 @@ public class ShuttleReservation {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "shuttle_reservation_id")
 	private Integer shuttleReservationId;
-	
+
 	// 多對一
 	@ManyToOne
 	@JoinColumn(name = "member_id", nullable = false)
@@ -35,12 +35,12 @@ public class ShuttleReservation {
 	@Column(name = "shuttle_date", nullable = false)
 	@NotNull(message = "請選擇接駁日期")
 	private LocalDate shuttleDate;
-	
+
 	// 多對一
 	@ManyToOne
-    @JoinColumn(name = "shuttle_schedule_id", nullable = false)
+	@JoinColumn(name = "shuttle_schedule_id", nullable = false)
 	@NotNull(message = "請選擇接駁班次")
-    private ShuttleSchedule shuttleSchedule;
+	private ShuttleSchedule shuttleSchedule;
 
 	@Column(name = "shuttle_direction", nullable = false)
 	@NotNull(message = "請選擇去回程")
@@ -54,7 +54,7 @@ public class ShuttleReservation {
 	@Column(name = "shuttle_reservation_status", nullable = false)
 	@NotNull(message = "請選擇預約狀態")
 	private Integer shuttleReservationStatus; // 0:取消 1:正常
-	
+
 	// 一對多
 	@OneToMany(mappedBy = "shuttleReservation", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<ShuttleReservationSeat> shuttleReservationSeats;
