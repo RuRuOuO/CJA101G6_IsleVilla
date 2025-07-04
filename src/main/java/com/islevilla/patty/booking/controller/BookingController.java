@@ -100,10 +100,17 @@ public class BookingController {
             List<RoomType> allRoomTypes = roomTypeService.findByRoomTypeSaleStatus((byte) 1);
             System.out.println("查詢到房型數量: " + allRoomTypes.size());
             
+            // 依大人人數過濾房型（room_type_capacity >= adults）
+            int adults = roomAdults.stream().mapToInt(Integer::intValue).max().orElse(1);
+            List<RoomType> filteredRoomTypes = allRoomTypes.stream()
+                .filter(rt -> rt.getRoomTypeCapacity() != null && rt.getRoomTypeCapacity() >= adults)
+                .toList();
+            System.out.println("依大人人數過濾後房型數量: " + filteredRoomTypes.size());
+            
             // 2. 為每個房型查詢當天有效的優惠專案，並檢查空房狀態
             List<RoomTypeWithPromotions> roomTypesWithPromotions = new ArrayList<>();
             
-            for (RoomType roomType : allRoomTypes) {
+            for (RoomType roomType : filteredRoomTypes) {
                 System.out.println("處理房型: " + roomType.getRoomTypeId() + " - " + roomType.getRoomTypeName());
                 
                 Integer roomTypeId = roomType.getRoomTypeId();
@@ -124,6 +131,17 @@ public class BookingController {
                     promotions = new ArrayList<>();
                 }
                 
+                // 查詢第一張圖片ID
+                Integer firstPhotoId = null;
+                try {
+                    List<RoomTypePhoto> photos = roomTypePhotoService.roomTypeFindPhotos(roomTypeId);
+                    if (photos != null && !photos.isEmpty()) {
+                        firstPhotoId = photos.get(0).getRoomTypePhotoId();
+                    }
+                } catch (Exception e) {
+                    System.err.println("查詢房型 " + roomType.getRoomTypeName() + " 圖片時發生錯誤: " + e.getMessage());
+                }
+                
                 // 檢查在入住期間是否有足夠的空房
                 boolean hasAvailableRooms = false;
                 try {
@@ -136,7 +154,7 @@ public class BookingController {
                 
                 System.out.println("房型 " + roomType.getRoomTypeName() + " 有 " + promotions.size() + " 個有效優惠專案，空房狀態: " + (hasAvailableRooms ? "有空房" : "無空房"));
                 
-                roomTypesWithPromotions.add(new RoomTypeWithPromotions(roomType, promotions, hasAvailableRooms));
+                roomTypesWithPromotions.add(new RoomTypeWithPromotions(roomType, promotions, hasAvailableRooms, firstPhotoId));
             }
             
             System.out.println("最終處理的房型數量: " + roomTypesWithPromotions.size());
@@ -150,6 +168,10 @@ public class BookingController {
             model.addAttribute("roomTypes", List.of());
         }
         
+        // 計算入住天數
+        int nights = (int) java.time.temporal.ChronoUnit.DAYS.between(checkin, checkout);
+        model.addAttribute("nights", nights);
+
         model.addAttribute("checkin", checkin);
         model.addAttribute("checkout", checkout);
         model.addAttribute("roomCount", roomCount);
@@ -164,16 +186,21 @@ public class BookingController {
         private RoomType roomType;
         private List<RoomPromotionPrice> promotions;
         private boolean hasAvailableRooms;
+        private Integer firstPhotoId;
         
-        public RoomTypeWithPromotions(RoomType roomType, List<RoomPromotionPrice> promotions, boolean hasAvailableRooms) {
+        public RoomTypeWithPromotions(RoomType roomType, List<RoomPromotionPrice> promotions, boolean hasAvailableRooms, Integer firstPhotoId) {
             this.roomType = roomType;
             this.promotions = promotions;
             this.hasAvailableRooms = hasAvailableRooms;
+            this.firstPhotoId = firstPhotoId;
         }
-        
+        public RoomTypeWithPromotions(RoomType roomType, List<RoomPromotionPrice> promotions, boolean hasAvailableRooms) {
+            this(roomType, promotions, hasAvailableRooms, null);
+        }
         public RoomType getRoomType() { return roomType; }
         public List<RoomPromotionPrice> getPromotions() { return promotions; }
         public boolean hasAvailableRooms() { return hasAvailableRooms; }
+        public Integer getFirstPhotoId() { return firstPhotoId; }
         
         // 計算折扣後價格的輔助方法
         public int getDiscountedPrice(RoomPromotionPrice promotion) {
@@ -339,13 +366,17 @@ public class BookingController {
     }
 
     @GetMapping("/booking/roomTypePhoto/image/{roomTypePhotoId}")
-    public ResponseEntity<Byte[]> getRoomTypePhotoImageForBooking(@PathVariable Integer roomTypePhotoId) {
+    public ResponseEntity<byte[]> getRoomTypePhotoImageForBooking(@PathVariable Integer roomTypePhotoId) {
         RoomTypePhoto roomTypePhoto = roomTypePhotoService.findById(roomTypePhotoId);
         if (roomTypePhoto != null && roomTypePhoto.getRoomTypePhoto() != null) {
             Byte[] imageBytes = roomTypePhoto.getRoomTypePhoto();
+            byte[] primitiveBytes = new byte[imageBytes.length];
+            for (int i = 0; i < imageBytes.length; i++) {
+                primitiveBytes[i] = imageBytes[i];
+            }
             return ResponseEntity.ok()
                     .header("Content-Type", "image/png")
-                    .body(imageBytes);
+                    .body(primitiveBytes);
         } else {
             return ResponseEntity.notFound().build();
         }

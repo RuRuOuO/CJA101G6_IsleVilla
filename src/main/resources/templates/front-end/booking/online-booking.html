@@ -77,7 +77,10 @@
                         <!-- 房型圖片 -->
                         <div class="col-md-3">
                             <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height:150px;">
-                                <span class="text-muted">無圖片</span>
+                                <img th:if="${roomTypeWithPromotions.firstPhotoId != null}"
+                                     th:src="@{/booking/roomTypePhoto/image/{photoId}(photoId=${roomTypeWithPromotions.firstPhotoId})}"
+                                     alt="房型圖片" style="max-width:100%; max-height:140px; object-fit:cover; border-radius:8px;">
+                                <span class="text-muted" th:if="${roomTypeWithPromotions.firstPhotoId == null}">無圖片</span>
                             </div>
                         </div>
                         <!-- 房型資訊 -->
@@ -90,10 +93,11 @@
                                 <div class="p-2 bg-light rounded mb-1 d-flex justify-content-between align-items-center">
                                     <div>
                                         <div class="fw-bold">原價</div>
-                                        <div class="text-primary">
-                                            <span class="room-type-price" 
-                                                  th:attr="data-price=${roomTypeWithPromotions.roomType.roomTypePrice}" 
-                                                  th:text="${roomTypeWithPromotions.roomType.roomTypePrice} + ' 元/晚'">原價</span>
+                                        <div class="text-primary fw-bold">
+                                            <span th:text="${roomTypeWithPromotions.roomType.roomTypePrice * nights} + ' 元'"></span>
+                                            <small class="text-muted ms-2" th:if="${nights > 1}">
+                                                (每晚 <span th:text="${roomTypeWithPromotions.roomType.roomTypePrice}"></span> 元)
+                                            </small>
                                         </div>
                                     </div>
                                     <a href="#" class="btn btn-dark btn-select-room ms-2"
@@ -116,9 +120,12 @@
                                             <span th:text="${promotion.promotion.roomPromotionTitle}">優惠專案名稱</span>
                                         </div>
                                         <div class="text-success">
-                                            <span th:text="${roomTypeWithPromotions.getDiscountedPrice(promotion)} + ' 元/晚'">折扣價</span>
+                                            <span th:text="${roomTypeWithPromotions.getDiscountedPrice(promotion) * nights} + ' 元'"></span>
+                                            <small class="text-muted ms-2" th:if="${nights > 1}">
+                                                (每晚 <span th:text="${roomTypeWithPromotions.getDiscountedPrice(promotion)}"></span> 元)
+                                            </small>
                                             <small class="text-muted ms-2">
-                                                (省 <span th:text="${roomTypeWithPromotions.getDiscountAmount(promotion)}">0</span> 元)
+                                                (省 <span th:text="${roomTypeWithPromotions.getDiscountAmount(promotion) * nights}"></span> 元)
                                             </small>
                                         </div>
                                         <small class="text-muted" th:if="${promotion.promotionRemark}">
