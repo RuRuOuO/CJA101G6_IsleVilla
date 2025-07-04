@@ -38,7 +38,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .card .card-text {
+        .card {
             font-size: 0.95rem;
             margin-bottom: 0.5rem;
             overflow: hidden;
@@ -70,29 +70,37 @@
             min-height: unset;
             min-width: 80px;
             white-space: nowrap;
-            display: inline-block;
+            display: block;
             text-decoration: none;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 100%; /* 確保按鈕寬度100% */
         }
-        
+        /* 確保form按鈕也使用相同的寬度 */
+        .card .card-footer form .btn {
+            width: 100% !important; /* 確保form的按鈕寬度是100% */
+        }
+
         /* 按鈕寬度一致性 */
         .card .card-footer .d-flex {
             width: 100%;
         }
-        
+
         .card .card-footer .btn,
         .card .card-footer form {
             flex: 1 1 0 !important;
             min-width: 0 !important;
             max-width: none !important;
         }
-        
+
         .card .card-footer .btn {
             white-space: nowrap;
         }
-        
+
         .card .card-footer form .btn {
             width: 100% !important;
+        }
+        .btn-secondary{
+            border: 1px solid white;
         }
     </style>
 </head>

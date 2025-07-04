@@ -361,11 +361,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 const checkOutDate = this.getAttribute('data-check-out-date');
                 const shuttleDate = this.getAttribute('data-shuttle-date');
                 const shuttleDirection = this.getAttribute('data-shuttle-direction');
+//				const guestCount = this.getAttribute('data-guest-count');
+				const shuttleNumber = this.getAttribute('data-shuttle-number');
 
                 // 設定隱藏欄位值
                 const selectedRoomField = document.getElementById('selectedRoomReservationId');
                 const selectedShuttleDateField = document.getElementById('selectedShuttleDate');
 				const selectedShuttleDirectionField = document.getElementById('selectedShuttleDirection');
+				const selectedShuttleNumberField = document.getElementById('selectedShuttleNumber');
                 if (selectedRoomField) {
                     selectedRoomField.value = roomReservationId;
                 }
@@ -375,19 +378,31 @@ document.addEventListener('DOMContentLoaded', function () {
 				if (selectedShuttleDirectionField) {
                     selectedShuttleDirectionField.value = shuttleDirection;
                 }
+				if (selectedShuttleNumberField) {
+	                selectedShuttleNumberField.value = shuttleNumber;
+	            }
 
+				// 自動設定接駁人數
+//                const shuttleNumberSelect = document.querySelector('select[name="shuttleNumber"]');
+//                if (shuttleNumberSelect && guestCount) {
+//                    shuttleNumberSelect.value = guestCount;
+//                    console.log('自動設定接駁人數:', guestCount);
+//                }
+								
                 // 顯示選擇的訂房資訊
                 const displayElements = {
                     roomId: document.getElementById('displayRoomId'),
                     checkIn: document.getElementById('displayCheckIn'),
                     checkOut: document.getElementById('displayCheckOut'),
-                    shuttleDate: document.getElementById('displayShuttleDate')
+                    shuttleDate: document.getElementById('displayShuttleDate'),
+                    shuttleNumber: document.getElementById('displayShuttleNumber')
                 };
 
                 if (displayElements.roomId) displayElements.roomId.textContent = roomReservationId;
                 if (displayElements.checkIn) displayElements.checkIn.textContent = checkInDate;
                 if (displayElements.checkOut) displayElements.checkOut.textContent = checkOutDate;
                 if (displayElements.shuttleDate) displayElements.shuttleDate.textContent = shuttleDate;
+                if (displayElements.shuttleNumber) displayElements.shuttleNumber.textContent = shuttleNumber;				
                 if (selectedRoomInfo) selectedRoomInfo.style.display = 'block';
 
                 // 檢查是否可以啟用提交按鈕
@@ -400,10 +415,11 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!submitBtn) return;
 
         const roomSelected = document.querySelector('.select-room-btn.btn-success');
-        const shuttleNumberSelect = document.querySelector('select[name="shuttleNumber"]');
-        const shuttleNumberSelected = shuttleNumberSelect ? shuttleNumberSelect.value : false;
+//        const shuttleNumberSelect = document.querySelector('select[name="shuttleNumber"]');
+//        const shuttleNumberSelected = shuttleNumberSelect ? shuttleNumberSelect.value : false;
 
-        if (roomSelected && shuttleNumberSelected) {
+//        if (roomSelected && shuttleNumberSelected) {
+        if (roomSelected) {
             submitBtn.disabled = false;
         } else {
             submitBtn.disabled = true;
@@ -411,10 +427,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // 監聽接駁人數變更
-    const shuttleNumberSelect = document.querySelector('select[name="shuttleNumber"]');
-    if (shuttleNumberSelect) {
-        shuttleNumberSelect.addEventListener('change', checkSubmitButton);
-    }
+//    const shuttleNumberSelect = document.querySelector('select[name="shuttleNumber"]');
+//    if (shuttleNumberSelect) {
+//        shuttleNumberSelect.addEventListener('change', checkSubmitButton);
+//    }
 
     // 座位表單提交驗證
     const seatForm = document.getElementById('seatForm');
