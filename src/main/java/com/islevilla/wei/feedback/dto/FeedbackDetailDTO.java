@@ -25,4 +25,10 @@ public class FeedbackDetailDTO {
     private String fbImageBase64; // base64 字串
     private Integer fbPublic;
     private Integer fbStatus;
+
+    // 新增會員相關欄位
+    private String customerName;     // 顧客姓名
+    private String customerAvatar;   // 顧客頭像 (Base64)
+    private Integer customerId;      // 顧客ID (選用)
+
 }

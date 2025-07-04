@@ -2,167 +2,337 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>微嶼 | Isle Villa 後台首頁</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>顧客評價管理</title>
     <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
 </head>
 <body>
 <!-- ===== 載入sidebar ===== -->
 <!-- 插入手機版側邊欄 -->
-<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+<th:block th:replace="~{fragments/backFragments :: mobileSidebar}"></th:block>
 <!-- 插入桌面版側邊欄 -->
 <div th:replace="~{fragments/backFragments :: sidebar}"></div>
 
 <main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
     <th:block th:fragment="myContent">
         <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
-        <h2 class="mb-4">顧客評價一覽</h2>
-        <table class="table table-hover table-bordered align-middle text-center">
-            <thead class="table-dark">
-            <tr>
-                <th>編號</th>
-                <th>訂單編號</th>
-                <th>整體評價</th>
-                <th>推薦</th>
-                <th>再訪</th>
-                <th>公開</th>
-                <th>狀態</th>
-                <th>操作</th>
-            </tr>
-            </thead>
-            <tbody id="feedbackTableBody"></tbody>
-        </table>
-
-        <!-- 詳情 Modal -->
-        <div aria-hidden="true" aria-labelledby="feedbackModalLabel" class="modal fade" id="feedbackModal"
-             tabindex="-1">
-            <div class="modal-dialog modal-lg modal-dialog-scrollable">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="feedbackModalLabel">評價詳情</h5>
-                        <button aria-label="關閉" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+        <!-- 卡片標題 -->
+        <div class="card-header bg-transparent border-0 pt-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0 fw-bold">
+                    <i class="bi bi-star-fill me-2"></i>顧客評價管理
+                </h4>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- 搜尋與篩選 -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="searchInput" placeholder="搜尋訂單編號、評價內容"/>
                     </div>
-                    <div class="modal-body">
-                        <p><strong>好評：</strong><span id="fbCompliment"></span></p>
-                        <p><strong>建議：</strong><span id="fbSuggestion"></span></p>
-                        <p><strong>填寫時間：</strong><span id="fbCreatedAt"></span></p>
-                        <p><strong>更新時間：</strong><span id="fbUpdatedAt"></span></p>
-                        <p><strong>接駁服務：</strong><span id="fbShuttleRating"></span></p>
-                        <p><strong>櫃台服務：</strong><span id="fbReceptionRating"></span></p>
-                        <p><strong>房間品質：</strong><span id="fbRoomRating"></span></p>
-                        <p><strong>設施：</strong><span id="fbFacilityRating"></span></p>
-                        <p><strong>環境：</strong><span id="fbEnvRating"></span></p>
-                        <p><strong>性價比：</strong><span id="fbValueRating"></span></p>
-                        <p><strong>網站使用：</strong><span id="fbWebsiteRating"></span></p>
-                        <p><strong>圖片：</strong></p>
-                        <img alt="顧客上傳圖片" class="img-fluid border rounded" id="fbImage" src="">
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="statusFilter">
+                        <option value="">全部狀態</option>
+                        <option value="1">上架</option>
+                        <option value="0">下架</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="publicFilter">
+                        <option value="">全部公開狀態</option>
+                        <option value="1">公開</option>
+                        <option value="0">不公開</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="recommendFilter">
+                        <option value="">全部推薦</option>
+                        <option value="1">推薦</option>
+                        <option value="0">不推薦</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 評價表格 -->
+            <div class="table-responsive">
+                <table class="table table-hover" id="feedbackTable">
+                    <thead>
+                    <tr>
+                        <th>編號</th>
+                        <th>訂單編號</th>
+                        <th>整體評價</th>
+                        <th>推薦</th>
+                        <th>再訪</th>
+                        <th>公開</th>
+                        <th>狀態</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="feedbackTableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 詳情 Modal -->
+            <div aria-hidden="true" aria-labelledby="feedbackModalLabel" class="modal fade" id="feedbackModal"
+                 tabindex="-1">
+                <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="feedbackModalLabel">評價詳情</h5>
+                            <button aria-label="關閉" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>好評：</strong><span id="fbCompliment" class="text-muted">無</span></p>
+                                    <p><strong>建議：</strong><span id="fbSuggestion" class="text-muted">無</span></p>
+                                    <p><strong>填寫時間：</strong><span id="fbCreatedAt"></span></p>
+                                    <p><strong>更新時間：</strong><span id="fbUpdatedAt"></span></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>接駁服務：</strong><span id="fbShuttleRating"></span></p>
+                                    <p><strong>櫃台服務：</strong><span id="fbReceptionRating"></span></p>
+                                    <p><strong>房間品質：</strong><span id="fbRoomRating"></span></p>
+                                    <p><strong>設施：</strong><span id="fbFacilityRating"></span></p>
+                                    <p><strong>環境：</strong><span id="fbEnvRating"></span></p>
+                                    <p><strong>性價比：</strong><span id="fbValueRating"></span></p>
+                                    <p><strong>網站使用：</strong><span id="fbWebsiteRating"></span></p>
+                                </div>
+                            </div>
+                            <div class="row mt-3" id="imageContainer" style="display: none;">
+                                <div class="col-12">
+                                    <p><strong>圖片：</strong></p>
+                                    <img alt="顧客上傳圖片" class="img-fluid border rounded" id="fbImage" src="">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
         </div>
-        <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
     </th:block>
 </main>
-<!-- Bootstrap & JavaScript -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- ===== 載入統一的 JavaScript ===== -->
+<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
+
 <script>
+    let feedbackData = [];
+    let dataTable = null;
+
+    // 載入評價資料
     fetch('/api/feedbacks')
         .then(res => res.json())
         .then(data => {
-            const tbody = document.getElementById('feedbackTableBody');
-            const modal = new bootstrap.Modal(document.getElementById('feedbackModal'));
-
-            data.forEach((fb, index) => {
-                const tr = document.createElement('tr');
-
-                // 條件：公開且下架 => 顯示「上架」按鈕；公開且上架 => 顯示「下架」按鈕
-                let actionBtnHtml = '';
-                if (fb.fbPublic === 1) {
-                    if (fb.fbStatus === 1) {
-                        actionBtnHtml = `<button class="btn btn-sm btn-warning toggleStatusBtn" data-id="${fb.fbId}" data-status="0">下架</button>`;
-                    } else {
-                        actionBtnHtml = `<button class="btn btn-sm btn-success toggleStatusBtn" data-id="${fb.fbId}" data-status="1">上架</button>`;
-                    }
-                }
-
-                tr.innerHTML = `
-        <td>${fb.fbId}</td>
-        <td>${fb.roomReservationId}</td>
-        <td>${fb.fbOverallRating} ★</td>
-        <td>${fb.fbRecommend === 1 ? '推薦' : '不推薦'}</td>
-        <td>${fb.fbRevisit === 1 ? '會再訪' : '不會'}</td>
-        <td>${fb.fbPublic === 1 ? '公開' : '不公開'}</td>
-        <td class="fbStatusCell">${fb.fbStatus === 1 ? '上架' : '下架'}</td>
-        <td>
-          <button class="btn btn-sm btn-primary viewDetailBtn" data-index="${index}">查看詳情</button>
-          ${actionBtnHtml}
-        </td>
-      `;
-                tbody.appendChild(tr);
-
-                // 查看詳情按鈕事件
-                tr.querySelector('.viewDetailBtn').addEventListener('click', () => {
-                    document.getElementById('fbCompliment').textContent = fb.fbCompliment || '無';
-                    document.getElementById('fbSuggestion').textContent = fb.fbSuggestion || '無';
-                    document.getElementById('fbCreatedAt').textContent = new Date(fb.fbCreatedAt).toLocaleString();
-                    document.getElementById('fbUpdatedAt').textContent = new Date(fb.fbUpdatedAt).toLocaleString();
-                    document.getElementById('fbShuttleRating').textContent = fb.fbShuttleRating + ' ★';
-                    document.getElementById('fbReceptionRating').textContent = fb.fbReceptionRating + ' ★';
-                    document.getElementById('fbRoomRating').textContent = fb.fbRoomRating + ' ★';
-                    document.getElementById('fbFacilityRating').textContent = fb.fbFacilityRating + ' ★';
-                    document.getElementById('fbEnvRating').textContent = fb.fbEnvRating + ' ★';
-                    document.getElementById('fbValueRating').textContent = fb.fbValueRating + ' ★';
-                    document.getElementById('fbWebsiteRating').textContent = fb.fbWebsiteRating + ' ★';
-                    document.getElementById('fbImage').src = fb.fbImageBase64 || '';
-                    modal.show();
-                });
-
-                // 上架/下架按鈕事件
-                const toggleBtn = tr.querySelector('.toggleStatusBtn');
-                if (toggleBtn) {
-                    toggleBtn.addEventListener('click', () => {
-                        const id = toggleBtn.getAttribute('data-id');
-                        const newStatus = parseInt(toggleBtn.getAttribute('data-status'));
-
-                        fetch(`/api/feedbacks/${id}/status`, {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({status: newStatus})
-                        })
-                            .then(resp => {
-                                if (!resp.ok) throw new Error('狀態更新失敗');
-                                return resp.text();
-                            })
-                            .then(() => {
-                                // 更新狀態欄位文字
-                                tr.querySelector('.fbStatusCell').textContent = newStatus === 1 ? '上架' : '下架';
-
-                                // 更新按鈕文字與 data-status
-                                if (newStatus === 1) {
-                                    toggleBtn.textContent = '下架';
-                                    toggleBtn.classList.remove('btn-success');
-                                    toggleBtn.classList.add('btn-warning');
-                                    toggleBtn.setAttribute('data-status', '0');
-                                } else {
-                                    toggleBtn.textContent = '上架';
-                                    toggleBtn.classList.remove('btn-warning');
-                                    toggleBtn.classList.add('btn-success');
-                                    toggleBtn.setAttribute('data-status', '1');
-                                }
-                            })
-                            .catch(err => {
-                                alert(err.message);
-                            });
-                    });
-                }
-            });
+            feedbackData = data;
+            initializeTable();
         })
         .catch(err => {
             console.error('載入評價失敗', err);
         });
+
+    function initializeTable() {
+        const tbody = document.getElementById('feedbackTableBody');
+        const modal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+
+        // 清空表格
+        tbody.innerHTML = '';
+
+        feedbackData.forEach((fb, index) => {
+            const tr = document.createElement('tr');
+
+            // 條件：公開且下架 => 顯示「上架」按鈕；公開且上架 => 顯示「下架」按鈕
+            let actionBtnHtml = '';
+            if (fb.fbPublic === 1) {
+                if (fb.fbStatus === 1) {
+                    actionBtnHtml = `<button class="btn btn-sm btn-secondary toggleStatusBtn" data-id="${fb.fbId}" data-status="0">下架</button>`;
+                } else {
+                    actionBtnHtml = `<button class="btn btn-sm btn-warning toggleStatusBtn" data-id="${fb.fbId}" data-status="1">上架</button>`;
+                }
+            }
+
+            tr.innerHTML = `
+                <td>${fb.fbId}</td>
+                <td>${fb.roomReservationId}</td>
+                <td><span class="badge bg-warning">${fb.fbOverallRating} ★</span></td>
+                <td>
+                    <span class="badge ${fb.fbRecommend === 1 ? 'bg-info' : 'bg-secondary'}">${fb.fbRecommend === 1 ? '推薦' : '不推薦'}</span>
+                </td>
+                <td>
+                    <span class="badge ${fb.fbRevisit === 1 ? 'bg-info' : 'bg-secondary'}">${fb.fbRevisit === 1 ? '會再訪' : '不會'}</span>
+                </td>
+                <td>
+                    <span class="badge ${fb.fbPublic === 1 ? 'bg-info' : 'bg-secondary'}">${fb.fbPublic === 1 ? '公開' : '不公開'}</span>
+                </td>
+                <td class="fbStatusCell">
+                    <span class="badge ${fb.fbStatus === 1 ? 'bg-info' : 'bg-secondary'}">${fb.fbStatus === 1 ? '上架' : '下架'}</span>
+                </td>
+                <td>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button class="btn btn-sm btn-info viewDetailBtn" data-index="${index}">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        ${actionBtnHtml}
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+
+            // 查看詳情按鈕事件
+            tr.querySelector('.viewDetailBtn').addEventListener('click', () => {
+                document.getElementById('fbCompliment').textContent = fb.fbCompliment || '無';
+                document.getElementById('fbSuggestion').textContent = fb.fbSuggestion || '無';
+                document.getElementById('fbCreatedAt').textContent = new Date(fb.fbCreatedAt).toLocaleString();
+                document.getElementById('fbUpdatedAt').textContent = new Date(fb.fbUpdatedAt).toLocaleString();
+                document.getElementById('fbShuttleRating').textContent = fb.fbShuttleRating + ' ★';
+                document.getElementById('fbReceptionRating').textContent = fb.fbReceptionRating + ' ★';
+                document.getElementById('fbRoomRating').textContent = fb.fbRoomRating + ' ★';
+                document.getElementById('fbFacilityRating').textContent = fb.fbFacilityRating + ' ★';
+                document.getElementById('fbEnvRating').textContent = fb.fbEnvRating + ' ★';
+                document.getElementById('fbValueRating').textContent = fb.fbValueRating + ' ★';
+                document.getElementById('fbWebsiteRating').textContent = fb.fbWebsiteRating + ' ★';
+
+                // 處理圖片顯示
+                const imageContainer = document.getElementById('imageContainer');
+                const fbImage = document.getElementById('fbImage');
+                if (fb.fbImageBase64) {
+                    fbImage.src = fb.fbImageBase64;
+                    imageContainer.style.display = 'block';
+                } else {
+                    imageContainer.style.display = 'none';
+                }
+
+                modal.show();
+            });
+
+            // 上架/下架按鈕事件
+            const toggleBtn = tr.querySelector('.toggleStatusBtn');
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    const id = toggleBtn.getAttribute('data-id');
+                    const newStatus = parseInt(toggleBtn.getAttribute('data-status'));
+
+                    fetch(`/api/feedbacks/${id}/status`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({status: newStatus})
+                    })
+                        .then(resp => {
+                            if (!resp.ok) throw new Error('狀態更新失敗');
+                            return resp.text();
+                        })
+                        .then(() => {
+                            // 更新狀態欄位文字
+                            const statusCell = tr.querySelector('.fbStatusCell');
+                            statusCell.innerHTML = `<span class="badge ${newStatus === 1 ? 'bg-success' : 'bg-danger'}">${newStatus === 1 ? '上架' : '下架'}</span>`;
+
+                            // 更新按鈕文字與 data-status
+                            if (newStatus === 1) {
+                                toggleBtn.textContent = '下架';
+                                toggleBtn.classList.remove('btn-success');
+                                toggleBtn.classList.add('btn-secondary');
+                                toggleBtn.setAttribute('data-status', '0');
+                            } else {
+                                toggleBtn.textContent = '上架';
+                                toggleBtn.classList.remove('btn-warning');
+                                toggleBtn.classList.add('btn-success');
+                                toggleBtn.setAttribute('data-status', '1');
+                            }
+
+                            // 更新原始資料
+                            feedbackData[index].fbStatus = newStatus;
+                        })
+                        .catch(err => {
+                            alert(err.message);
+                        });
+                });
+            }
+        });
+
+        // 初始化 DataTable
+        if (dataTable) {
+            dataTable.destroy();
+        }
+        dataTable = $('#feedbackTable').DataTable({
+            dom: "t<'d-flex justify-content-center my-3'p>",
+            pagingType: 'simple_numbers',
+            lengthChange: false,
+            info: false,
+            language: {
+                paginate: {
+                    previous: '上一頁',
+                    next: '下一頁'
+                }
+            },
+            drawCallback: function () {
+                const $pg = $('#feedbackTable_wrapper .pagination');
+                $pg.find('li.disabled a, li.active a').each(function () {
+                    const txt = $(this).text();
+                    $(this).replaceWith($('<span/>').addClass('page-link').text(txt));
+                });
+            }
+        });
+    }
+
+    // 搜尋功能
+    document.getElementById('searchInput').addEventListener('input', function () {
+        const searchTerm = this.value.toLowerCase();
+        if (dataTable) {
+            dataTable.search(searchTerm).draw();
+        }
+    });
+
+    // 篩選功能
+    ['statusFilter', 'publicFilter', 'recommendFilter'].forEach(id => {
+        document.getElementById(id).addEventListener('change', function () {
+            applyFilters();
+        });
+    });
+
+    function applyFilters() {
+        const statusFilter = document.getElementById('statusFilter').value;
+        const publicFilter = document.getElementById('publicFilter').value;
+        const recommendFilter = document.getElementById('recommendFilter').value;
+
+        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+            const fbData = feedbackData[dataIndex];
+            if (!fbData) return true;
+
+            // 狀態篩選
+            if (statusFilter && fbData.fbStatus != statusFilter) {
+                return false;
+            }
+
+            // 公開狀態篩選
+            if (publicFilter && fbData.fbPublic != publicFilter) {
+                return false;
+            }
+
+            // 推薦篩選
+            if (recommendFilter && fbData.fbRecommend != recommendFilter) {
+                return false;
+            }
+
+            return true;
+        });
+
+        if (dataTable) {
+            dataTable.draw();
+        }
+
+        $.fn.dataTable.ext.search.pop();
+    }
 </script>
 </body>
 </html>
