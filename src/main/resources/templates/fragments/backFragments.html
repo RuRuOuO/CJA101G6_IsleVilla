@@ -34,14 +34,18 @@
                 href="https://fonts.googleapis.com/css2?family=Kaisei+HarunoUmi&family=Noto+Sans+TC:wght@100..900&family=Noto+Serif+TC:wght@200..900&display=swap"
                 rel="stylesheet"
         />
+        <!-- 覆蓋樣式-->
+        <link rel="stylesheet" href="/css/back_custom_style.css">
 
         <style>
             .card-title {
                 color: #000000;
             }
+
             .sidebar {
                 width: 280px;
-                background-color: #223363;
+                /*background-color: #223363;*/
+                background: linear-gradient(to top, #09203f 0%, #537895 200%);
                 z-index: 1040;
                 display: flex;
                 flex-direction: column;
@@ -167,6 +171,7 @@
             .sidebar-toggle {
                 text-decoration: none !important;
             }
+
             /* 縮小分頁按鈕間距 */
             .dataTables_wrapper .pagination .page-item {
                 margin: 0rem;
@@ -174,13 +179,14 @@
 
             .sidebar-active {
                 display: block;
-                background: rgba(255,255,255,0.15) !important;
+                background: rgba(255, 255, 255, 0.15) !important;
                 border-radius: 10px !important;
                 color: #fff !important;
                 transition: background 0.2s;
                 padding: 3px 13px !important;
                 margin: 3px 0;
             }
+
             .btn-toggle-nav a {
                 display: block;
                 padding: 3px 13px;
@@ -190,6 +196,7 @@
             .sidebar-menu > li.mb-1 {
                 margin-bottom: 8px !important;
             }
+
             .sidebar .btn-toggle-nav a:hover,
             .sidebar .btn-toggle-nav a:focus {
                 color: #fff !important;
@@ -224,8 +231,7 @@
 
     </th:block>
 </head>
-<body>
-
+<body class="bg-light">
 <!-- 手機版導航欄 -->
 <nav th:fragment="mobileSidebar" class="mobile-navbar navbar navbar-expand-lg">
     <div class="container-fluid">
@@ -373,14 +379,13 @@
 </nav>
 
 <!-- Sidebar（桌機版） -->
-<div th:fragment="sidebar" class="sidebar p-3 position-fixed top-0 start-0 vh-100">
-    <a
-            class="d-flex justify-content-center align-items-center mt-3 mb-2 link-body-emphasis text-decoration-none text-white"
-            th:href="@{/backend/dashboard}"
-    >
-        <span class="fs-5 text-white" style="font-family: Kaisei HarunoUmi">IsleVilla微嶼 後台管理</span>
-    </a>
-    <hr class="my-4" style="border-color: #e3e6f0; opacity: 0.5;">
+<div th:fragment="sidebar" class="sidebar position-fixed top-0 start-0 vh-100 overflow-auto p-3 shadow-lg">
+    <div class="text-center border-bottom border-light border-opacity-25 pb-3 mb-4">
+        <a class="text-decoration-none text-white" th:href="@{/backend/dashboard}">
+            <h5 class="mt-1 mb-0" style="font-family: Kaisei HarunoUmi">IsleVilla 微嶼</h5>
+            <small class="text-white-50">後台管理系統</small>
+        </a>
+    </div>
     <ul class="list-unstyled ps-0 sidebar-menu" id="sidebarMenu">
         <!-- 員工管理 -->
         <li class="mb-1">
@@ -664,14 +669,9 @@
                 </ul>
             </div>
         </li>
-
-
-
-
     </ul>
 
 
-    
     <!-- 用戶資訊和登出按鈕 -->
     <div class="sidebar-user">
         <div class="d-flex align-items-center mb-3">
@@ -691,15 +691,80 @@
 <!-- Main Content：只留一個 card 作為模板 -->
 
 <th:block th:fragment="mainContent(content)">
-    <main>
-        <div class="content">
-            <div class="card m-2">
-                <div class="container">
-                    <div th:insert="${content}"></div>
+    <div class="content bg-light">
+        <!-- 內建的 Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4 rounded">
+            <div class="container-fluid">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item">
+                            <a href="#" class="text-decoration-none">
+                                <i class="bi bi-house-door me-1"></i>首頁
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">當前頁面</li>
+                    </ol>
+                </nav>
+
+                <div class="navbar-nav ms-auto">
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#"
+                           role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-bell me-2"></i>
+                            <span class="badge bg-danger">3</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><h6 class="dropdown-header">通知</h6></li>
+                            <li><a class="dropdown-item" href="#">新訂單通知</a></li>
+                            <li><a class="dropdown-item" href="#">系統維護通知</a></li>
+                            <li><a class="dropdown-item" href="#">會員註冊通知</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#">查看所有通知</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#"
+                           role="button" data-bs-toggle="dropdown">
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-2"
+                                 style="width: 32px; height: 32px;">
+                                <i class="bi bi-person-fill text-white"></i>
+                            </div>
+                            <span th:text="${#authentication.principal.employeeName}">員工姓名</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><h6 class="dropdown-header">我的帳戶</h6></li>
+                            <li><a class="dropdown-item" href="#">
+                                <i class="bi bi-person me-2"></i>個人資料
+                            </a></li>
+                            <li><a class="dropdown-item" href="#">
+                                <i class="bi bi-gear me-2"></i>設定
+                            </a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <form th:action="@{/backend/logout}" method="post" class="m-0">
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="bi bi-box-arrow-right me-2"></i>登出
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
+        </nav>
+
+        <!-- 主要內容卡片 -->
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-body">
+                <div th:insert="${content}"></div>
             </div>
         </div>
-    </main>
+    </div>
 </th:block>
 
 <!-- Scripts Fragment -->
