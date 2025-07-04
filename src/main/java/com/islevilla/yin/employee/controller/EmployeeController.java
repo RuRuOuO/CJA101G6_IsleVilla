@@ -74,6 +74,7 @@ public class EmployeeController {
         model.addAttribute("selectedDepartmentId", departmentId);
         model.addAttribute("selectedStatus", status);
         model.addAttribute("permissions", permissionService.getAllPermissions());
+        model.addAttribute("sidebarActive", "employee-list");
         return "back-end/employee/listEmployee";
     }
 
