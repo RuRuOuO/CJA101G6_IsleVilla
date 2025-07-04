@@ -11,13 +11,13 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Repository
-public interface BookingRepository extends JpaRepository<RoomRVOrder, Integer> {
+public interface BookingDetailRepository extends JpaRepository<RoomRVDetail, Integer> {
 
     /**
-     * 找出在指定日期區間內有重疊的訂單
+     * 根據訂單列表，找出所有的訂單明細
      */
-    @Query("SELECT o FROM RoomRVOrder o WHERE o.checkInDate < :endDate AND o.checkOutDate > :startDate")
-    List<RoomRVOrder> findOverlappingOrders(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
-
-
+    @Query("SELECT d FROM RoomRVDetail d WHERE d.roomRVOrder IN :orders")
+    List<RoomRVDetail> findDetailsByOrders(@Param("orders") List<RoomRVOrder> orders);
+    
+    
 } 

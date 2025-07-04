@@ -1,455 +1,192 @@
 package com.islevilla.patty.booking.model;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.islevilla.chen.room.model.Room;
-import com.islevilla.chen.room.model.RoomRepository;
 import com.islevilla.chen.roomType.model.RoomType;
 import com.islevilla.chen.roomType.model.RoomTypeRepository;
-import com.islevilla.wei.room.model.RoomRVDetail;
+import com.islevilla.chen.roomTypeAvailability.model.RoomTypeAvailability;
+import com.islevilla.chen.roomTypeAvailability.model.RoomTypeAvailabilityRepository;
 import com.islevilla.wei.room.model.RoomRVOrder;
-import com.islevilla.patty.roompromotionprice.model.RoomPromotionPriceRepository;
+import com.islevilla.wei.room.model.RoomRVOrderRepository;
+import com.islevilla.wei.room.model.RoomRVDetail;
+import com.islevilla.wei.room.model.RoomRVDetailRepository;
+import com.islevilla.chen.room.model.RoomRepository;
+import com.islevilla.chen.room.model.Room;
+import com.islevilla.lai.members.model.Members;
 import com.islevilla.patty.roompromotionprice.model.RoomPromotionPrice;
-import com.islevilla.chen.roomTypePhoto.model.RoomTypePhotoRepository;
-import com.islevilla.chen.roomTypePhoto.model.RoomTypePhoto;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import com.islevilla.patty.roompromotionprice.model.RoomPromotionPriceRepository;
 
 @Service
 public class BookingService {
 
     @Autowired
-    private BookingRepository bookingRepository;
+    private RoomTypeRepository roomTypeRepository;
+
+    @Autowired
+    private RoomTypeAvailabilityRepository roomTypeAvailabilityRepository;
+
+    @Autowired
+    private RoomRVOrderRepository roomRVOrderRepository;
+
+    @Autowired
+    private RoomRVDetailRepository roomRVDetailRepository;
 
     @Autowired
     private RoomRepository roomRepository;
 
     @Autowired
-    private RoomTypeRepository roomTypeRepository;
-
-    @Autowired
     private RoomPromotionPriceRepository roomPromotionPriceRepository;
 
-    @Autowired
-    private RoomTypePhotoRepository roomTypePhotoRepository;
-
-    @PersistenceContext
-    private EntityManager entityManager;
-
-    public List<RoomType> findAvailableRoomTypes(LocalDate checkin, LocalDate checkout, int requiredRooms) {
-        System.out.println("開始查詢空房...");
-        System.out.println("入住日期: " + checkin);
-        System.out.println("退房日期: " + checkout);
-        System.out.println("需要房間數: " + requiredRooms);
-
-        // 1. 找出指定日期區間內所有重疊的訂單
-        List<RoomRVOrder> overlappingOrders = bookingRepository.findOverlappingOrders(
-            checkin, 
-            checkout
-        );
-
-        System.out.println("找到重疊訂單數量: " + overlappingOrders.size());
-
-        if (overlappingOrders.isEmpty()) {
-            // 如果沒有任何重疊訂單，代表所有房間都是空的
-            System.out.println("沒有重疊訂單，所有房間皆可預訂");
-            List<RoomType> allRoomTypes = roomTypeRepository.findAll();
-            System.out.println("總房型數量: " + allRoomTypes.size());
-            return allRoomTypes;
-        }
-
-        // 2. 根據重疊的訂單，找出所有被佔用的房間 ID
-        List<RoomRVDetail> occupiedDetails = bookingRepository.findDetailsByOrders(overlappingOrders);
-        List<Integer> occupiedRoomIds = occupiedDetails.stream()
-                .map(detail -> detail.getRoom().getRoomId())
-                .collect(Collectors.toList());
-        
-        System.out.println("被佔用的房間 ID: " + occupiedRoomIds);
-
-        // 3. 找出所有未被佔用的空閒房間
-        List<Room> availableRooms;
-        if (occupiedRoomIds.isEmpty()) {
-            availableRooms = roomRepository.findAll();
-        } else {
-            // 使用 JPA 標準方法：找出所有房間，然後在 Java 中過濾
-            availableRooms = roomRepository.findAll().stream()
-                    .filter(room -> !occupiedRoomIds.contains(room.getRoomId()))
-                    .collect(Collectors.toList());
-        }
-        
-        System.out.println("找到的空閒房間數量: " + availableRooms.size());
-        System.out.println("空閒房間 ID: " + availableRooms.stream()
-                .map(Room::getRoomId)
-                .collect(Collectors.toList()));
-
-        // 4. 根據空閒房間，統計可提供的房型
-        Map<Integer, Long> roomTypeCounts = availableRooms.stream()
-                .collect(Collectors.groupingBy(Room::getRoomTypeId, Collectors.counting()));
-        
-        System.out.println("可提供房型統計: " + roomTypeCounts);
-
-        // 5. 找出有足夠空房的房型（數量 >= 需要的房間數）
-        List<RoomType> availableRoomTypes = roomTypeCounts.entrySet().stream()
-                .filter(entry -> entry.getValue() >= requiredRooms)
-                .map(entry -> roomTypeRepository.findById(entry.getKey()).orElse(null))
-                .filter(roomType -> roomType != null)
-                .collect(Collectors.toList());
-
-        System.out.println("符合需求的房型數量: " + availableRoomTypes.size());
+    /**
+     * 根據入住日、所需房間數、每間房大人人數，回傳可用房型（超過2大人不顯示雙人房，以此類推）
+     */
+    public List<RoomType> findAvailableRoomTypesByRoomAdultsWithAvailability(LocalDate checkin, int requiredRooms, List<Integer> roomAdults) {
+        List<RoomType> allRoomTypes = roomTypeRepository.findAll();
+        java.util.Date checkinDate = java.sql.Date.valueOf(checkin);
+        // 先依大人人數過濾房型
+        List<RoomType> filteredRoomTypes = allRoomTypes.stream()
+            .filter(roomType -> roomAdults.stream().allMatch(adults -> roomType.getRoomTypeCapacity() >= adults))
+            .collect(Collectors.toList());
+        // 再依可用數量過濾
+        List<RoomType> availableRoomTypes = filteredRoomTypes.stream()
+            .filter(roomType -> {
+                RoomTypeAvailability ava = roomTypeAvailabilityRepository.findByRoomTypeIdAndRoomTypeAvailabilityDate(roomType.getRoomTypeId(), checkinDate);
+                return ava != null && ava.getRoomTypeAvailabilityCount() >= requiredRooms;
+            })
+            .collect(Collectors.toList());
         return availableRoomTypes;
     }
 
-    public List<RoomType> findAvailableRoomTypesByCapacity(LocalDate checkin, LocalDate checkout, int requiredRooms, int totalAdults) {
-        System.out.println("開始查詢空房（根據容納人數）...");
-        System.out.println("入住日期: " + checkin);
-        System.out.println("退房日期: " + checkout);
-        System.out.println("需要房間數: " + requiredRooms);
-        System.out.println("總大人數: " + totalAdults);
-
-        // 1. 找出指定日期區間內所有重疊的訂單
-        List<RoomRVOrder> overlappingOrders = bookingRepository.findOverlappingOrders(
-            checkin, 
-            checkout
-        );
-
-        System.out.println("找到重疊訂單數量: " + overlappingOrders.size());
-
-        if (overlappingOrders.isEmpty()) {
-            // 如果沒有任何重疊訂單，代表所有房間都是空的
-            System.out.println("沒有重疊訂單，所有房間皆可預訂");
-            List<RoomType> allRoomTypes = roomTypeRepository.findAll();
-            // 根據容納人數篩選
-            List<RoomType> filteredRoomTypes = allRoomTypes.stream()
-                    .filter(roomType -> roomType.getRoomTypeCapacity() >= totalAdults)
-                    .collect(Collectors.toList());
-            System.out.println("總房型數量: " + allRoomTypes.size() + ", 符合容納人數的房型數量: " + filteredRoomTypes.size());
-            return filteredRoomTypes;
+    /**
+     * DTO: 房型+所有促銷方案+原價
+     */
+    public static class PromotionOption {
+        public Integer promotionId; // null 代表原價
+        public String title; // 促銷名稱或"原價"
+        public int price; // 折扣價或原價
+        public boolean isOriginal;
+        public PromotionOption(Integer promotionId, String title, int price, boolean isOriginal) {
+            this.promotionId = promotionId;
+            this.title = title;
+            this.price = price;
+            this.isOriginal = isOriginal;
         }
-
-        // 2. 根據重疊的訂單，找出所有被佔用的房間 ID
-        List<RoomRVDetail> occupiedDetails = bookingRepository.findDetailsByOrders(overlappingOrders);
-        List<Integer> occupiedRoomIds = occupiedDetails.stream()
-                .map(detail -> detail.getRoom().getRoomId())
-                .collect(Collectors.toList());
-        
-        System.out.println("被佔用的房間 ID: " + occupiedRoomIds);
-
-        // 3. 找出所有未被佔用的空閒房間
-        List<Room> availableRooms;
-        if (occupiedRoomIds.isEmpty()) {
-            availableRooms = roomRepository.findAll();
-        } else {
-            // 使用 JPA 標準方法：找出所有房間，然後在 Java 中過濾
-            availableRooms = roomRepository.findAll().stream()
-                    .filter(room -> !occupiedRoomIds.contains(room.getRoomId()))
-                    .collect(Collectors.toList());
+    }
+    public static class RoomTypeWithPromotionsAndOriginal {
+        public RoomType roomType;
+        public List<PromotionOption> promotions;
+        public RoomTypeWithPromotionsAndOriginal(RoomType roomType, List<PromotionOption> promotions) {
+            this.roomType = roomType;
+            this.promotions = promotions;
         }
-        
-        System.out.println("找到的空閒房間數量: " + availableRooms.size());
-        System.out.println("空閒房間 ID: " + availableRooms.stream()
-                .map(Room::getRoomId)
-                .collect(Collectors.toList()));
-
-        // 4. 根據空閒房間，統計可提供的房型
-        Map<Integer, Long> roomTypeCounts = availableRooms.stream()
-                .collect(Collectors.groupingBy(Room::getRoomTypeId, Collectors.counting()));
-        
-        System.out.println("可提供房型統計: " + roomTypeCounts);
-
-        // 5. 找出有足夠空房且容納人數足夠的房型
-        List<RoomType> availableRoomTypes = roomTypeCounts.entrySet().stream()
-                .filter(entry -> entry.getValue() >= requiredRooms)
-                .map(entry -> roomTypeRepository.findById(entry.getKey()).orElse(null))
-                .filter(roomType -> roomType != null && roomType.getRoomTypeCapacity() >= totalAdults)
-                .collect(Collectors.toList());
-
-        System.out.println("符合需求和容納人數的房型數量: " + availableRoomTypes.size());
-        return availableRoomTypes;
     }
 
-    public List<RoomType> findAvailableRoomTypesByRoomAdults(LocalDate checkin, LocalDate checkout, int requiredRooms, List<Integer> roomAdults) {
-        System.out.println("開始查詢空房（根據各房間大人數）...");
-        System.out.println("入住日期: " + checkin);
-        System.out.println("退房日期: " + checkout);
-        System.out.println("需要房間數: " + requiredRooms);
-        System.out.println("各房間大人數: " + roomAdults);
-
-        // 1. 找出指定日期區間內所有重疊的訂單
-        List<RoomRVOrder> overlappingOrders = bookingRepository.findOverlappingOrders(
-            checkin, 
-            checkout
-        );
-
-        System.out.println("找到重疊訂單數量: " + overlappingOrders.size());
-
-        if (overlappingOrders.isEmpty()) {
-            // 如果沒有任何重疊訂單，代表所有房間都是空的
-            System.out.println("沒有重疊訂單，所有房間皆可預訂");
-            List<RoomType> allRoomTypes = roomTypeRepository.findAll();
-            
-            // 根據各房間大人數篩選房型
-            List<RoomType> filteredRoomTypes = filterRoomTypesByAdults(allRoomTypes, roomAdults);
-            System.out.println("總房型數量: " + allRoomTypes.size() + ", 符合各房間大人數的房型數量: " + filteredRoomTypes.size());
-            return filteredRoomTypes;
-        }
-
-        // 2. 根據重疊的訂單，找出所有被佔用的房間 ID
-        List<RoomRVDetail> occupiedDetails = bookingRepository.findDetailsByOrders(overlappingOrders);
-        List<Integer> occupiedRoomIds = occupiedDetails.stream()
-                .map(detail -> detail.getRoom().getRoomId())
-                .collect(Collectors.toList());
-        
-        System.out.println("被佔用的房間 ID: " + occupiedRoomIds);
-
-        // 3. 找出所有未被佔用的空閒房間
-        List<Room> availableRooms;
-        if (occupiedRoomIds.isEmpty()) {
-            availableRooms = roomRepository.findAll();
-        } else {
-            // 使用 JPA 標準方法：找出所有房間，然後在 Java 中過濾
-            availableRooms = roomRepository.findAll().stream()
-                    .filter(room -> !occupiedRoomIds.contains(room.getRoomId()))
-                    .collect(Collectors.toList());
-        }
-        
-        System.out.println("找到的空閒房間數量: " + availableRooms.size());
-        System.out.println("空閒房間 ID: " + availableRooms.stream()
-                .map(Room::getRoomId)
-                .collect(Collectors.toList()));
-
-        // 4. 根據空閒房間，統計可提供的房型
-        Map<Integer, Long> roomTypeCounts = availableRooms.stream()
-                .collect(Collectors.groupingBy(Room::getRoomTypeId, Collectors.counting()));
-        
-        System.out.println("可提供房型統計: " + roomTypeCounts);
-
-        // 5. 找出有足夠空房且符合各房間大人數需求的房型
-        List<RoomType> availableRoomTypes = roomTypeCounts.entrySet().stream()
-                .filter(entry -> entry.getValue() >= requiredRooms)
-                .map(entry -> roomTypeRepository.findById(entry.getKey()).orElse(null))
-                .filter(roomType -> roomType != null)
-                .collect(Collectors.toList());
-
-        // 6. 根據各房間大人數進一步篩選
-        List<RoomType> finalRoomTypes = filterRoomTypesByAdults(availableRoomTypes, roomAdults);
-
-        System.out.println("符合需求和各房間大人數的房型數量: " + finalRoomTypes.size());
-        return finalRoomTypes;
-    }
-
-    // 根據各房間大人數篩選房型的輔助方法
-    private List<RoomType> filterRoomTypesByAdults(List<RoomType> roomTypes, List<Integer> roomAdults) {
-        List<RoomType> filtered = roomTypes.stream()
-                .filter(roomType -> {
-                    return roomAdults.stream().allMatch(adults -> {
-                        int capacity = roomType.getRoomTypeCapacity();
-                        if (adults <= 2) {
-                            return capacity == 2 || capacity == 4 || capacity == 6;
-                        } else if (adults <= 4) {
-                            return capacity == 4 || capacity == 6;
-                        } else {
-                            return capacity == 6;
-                        }
-                    });
-                })
-                .collect(Collectors.toList());
-        System.out.println("篩選後房型ID: " + filtered.stream().map(RoomType::getRoomTypeId).toList());
-        return filtered;
-    }
-
-    public List<Room> findAvailableRooms(LocalDate checkin, LocalDate checkout, int requiredRooms) {
-        System.out.println("開始查詢空房...");
-        System.out.println("入住日期: " + checkin);
-        System.out.println("退房日期: " + checkout);
-        System.out.println("需要房間數: " + requiredRooms);
-
-        // 1. 找出指定日期區間內所有重疊的訂單
-        List<RoomRVOrder> overlappingOrders = bookingRepository.findOverlappingOrders(
-            checkin, 
-            checkout
-        );
-
-        System.out.println("找到重疊訂單數量: " + overlappingOrders.size());
-
-        if (overlappingOrders.isEmpty()) {
-            // 如果沒有任何重疊訂單，代表所有房間都是空的
-            System.out.println("沒有重疊訂單，所有房間皆可預訂");
-            List<Room> allRooms = roomRepository.findAll();
-            System.out.println("總房間數量: " + allRooms.size());
-            return allRooms;
-        }
-
-        // 2. 根據重疊的訂單，找出所有被佔用的房間 ID
-        List<RoomRVDetail> occupiedDetails = bookingRepository.findDetailsByOrders(overlappingOrders);
-        List<Integer> occupiedRoomIds = occupiedDetails.stream()
-                .map(detail -> detail.getRoom().getRoomId())
-                .collect(Collectors.toList());
-        
-        System.out.println("被佔用的房間 ID: " + occupiedRoomIds);
-
-        // 3. 找出所有未被佔用的空閒房間
-        List<Room> availableRooms;
-        if (occupiedRoomIds.isEmpty()) {
-            availableRooms = roomRepository.findAll();
-        } else {
-            // 使用 JPA 標準方法：找出所有房間，然後在 Java 中過濾
-            availableRooms = roomRepository.findAll().stream()
-                    .filter(room -> !occupiedRoomIds.contains(room.getRoomId()))
-                    .collect(Collectors.toList());
-        }
-        
-        System.out.println("找到的空閒房間數量: " + availableRooms.size());
-        System.out.println("空閒房間 ID: " + availableRooms.stream()
-                .map(Room::getRoomId)
-                .collect(Collectors.toList()));
-
-        return availableRooms;
-    }
-
-    public List<RoomTypeWithPromotions> findAvailableRoomTypesWithPromotions(LocalDate checkin, LocalDate checkout, int requiredRooms, List<Integer> roomAdults) {
-        List<RoomType> roomTypes = findAvailableRoomTypesByRoomAdults(checkin, checkout, requiredRooms, roomAdults);
-        List<RoomTypeWithPromotions> result = new java.util.ArrayList<>();
-        for (RoomType roomType : roomTypes) {
-            List<RoomPromotionPrice> promotions = roomPromotionPriceRepository.findAllValidPromotionPrices(roomType.getRoomTypeId(), checkin);
-            // 過濾掉 promotion 為 null 的資料
-            promotions = promotions.stream()
-                .filter(promo -> promo.getPromotion() != null)
-                .collect(Collectors.toList());
-            result.add(new RoomTypeWithPromotions(roomType, promotions));
+    /**
+     * 查詢所有可用房型，並組合原價+所有促銷方案
+     */
+    public List<RoomTypeWithPromotionsAndOriginal> findAvailableRoomTypesWithPromotionsAndOriginal(LocalDate checkin, int requiredRooms, List<Integer> roomAdults) {
+        List<RoomType> availableRoomTypes = findAvailableRoomTypesByRoomAdultsWithAvailability(checkin, requiredRooms, roomAdults);
+        List<RoomTypeWithPromotionsAndOriginal> result = new ArrayList<>();
+        for (RoomType roomType : availableRoomTypes) {
+            List<PromotionOption> options = new ArrayList<>();
+            // 原價
+            options.add(new PromotionOption(null, "原價", roomType.getRoomTypePrice(), true));
+            // 查詢所有促銷
+            List<RoomPromotionPrice> promos = roomPromotionPriceRepository.findAllValidPromotionPrices(roomType.getRoomTypeId(), checkin);
+            if (promos != null) {
+                for (RoomPromotionPrice promo : promos) {
+                    if (promo.getRoomDiscountRate() != null) {
+                        int discounted = (int)Math.round(roomType.getRoomTypePrice() * promo.getRoomDiscountRate());
+                        String title = promo.getPromotion() != null ? promo.getPromotion().getRoomPromotionTitle() : "促銷專案";
+                        options.add(new PromotionOption(promo.getRoomPromotionId(), title, discounted, false));
+                    }
+                }
+            }
+            result.add(new RoomTypeWithPromotionsAndOriginal(roomType, options));
         }
         return result;
     }
 
-    public List<RoomTypeWithPromotionsAndPhoto> findAvailableRoomTypesWithPromotionsAndPhoto(LocalDate checkin, LocalDate checkout, int requiredRooms, List<Integer> roomAdults) {
-        List<RoomType> roomTypes = findAvailableRoomTypesByRoomAdults(checkin, checkout, requiredRooms, roomAdults);
-        List<RoomTypeWithPromotionsAndPhoto> result = new java.util.ArrayList<>();
-        for (RoomType roomType : roomTypes) {
-            List<RoomPromotionPrice> promotions = roomPromotionPriceRepository.findAllValidPromotionPrices(roomType.getRoomTypeId(), checkin);
-            // 過濾掉 promotion 為 null 的資料
-            promotions = promotions.stream()
-                .filter(promo -> promo.getPromotion() != null)
-                .collect(Collectors.toList());
-            
-            // 轉換為 PromotionWithDiff 物件
-            List<PromotionWithDiff> promotionWithDiffs = promotions.stream()
-                .map(promo -> {
-                    int originalPrice = roomType.getRoomTypePrice();
-                    // 使用折扣率計算折扣後價格
-                    int discountedPrice = (int) (originalPrice * promo.getRoomDiscountRate());
-                    int diff = originalPrice - discountedPrice;
-                    return new PromotionWithDiff(promo, diff, discountedPrice);
-                })
-                .collect(Collectors.toList());
-            
-            // 取得所有照片ID
-            List<Integer> photoIds = roomTypePhotoRepository.findWithPhotos(roomType.getRoomTypeId())
-                .stream().map(RoomTypePhoto::getRoomTypePhotoId).collect(Collectors.toList());
-            
-            result.add(new RoomTypeWithPromotionsAndPhoto(roomType, promotionWithDiffs, photoIds));
-        }
-        return result;
-    }
+    /**
+     * 建立訂單（簡化版，僅示範核心欄位，請依實際需求擴充）
+     */
+    public void createOrder(String guestName, String guestPhone, String guestEmail, String guestAddress, String specialRequests, String paymentMethod, Map bookingData, Members member) {
+        try {
+            // 解析 bookingData
+            LocalDate checkin = LocalDate.parse((String)bookingData.get("checkin"));
+            LocalDate checkout = LocalDate.parse((String)bookingData.get("checkout"));
+            int totalPrice = Integer.parseInt(bookingData.getOrDefault("totalPrice", "0").toString());
+            List<Map> selectedRooms = (List<Map>)bookingData.get("selectedRooms");
 
-    // JPQL 查詢 room_type_photo 第一張圖 id
-    public Integer findFirstPhotoIdByRoomTypeId(int roomTypeId) {
-        List<Integer> ids = entityManager.createQuery(
-            "SELECT p.roomTypePhotoId FROM RoomTypePhoto p WHERE p.roomType.roomTypeId = :roomTypeId ORDER BY p.roomTypePhotoId ASC", Integer.class)
-            .setParameter("roomTypeId", roomTypeId)
-            .setMaxResults(1)
-            .getResultList();
-        return ids.isEmpty() ? null : ids.get(0);
-    }
+            // 建立 RoomRVOrder
+            RoomRVOrder order = new RoomRVOrder();
+            order.setMembers(member);
+            order.setRoomOrderDate(LocalDate.now());
+            order.setRoomOrderStatus(0); // 0:成立
+            order.setCheckInDate(checkin);
+            order.setCheckOutDate(checkout);
+            order.setRemark(specialRequests);
+            order.setRoomTotalAmount(totalPrice);
+            order.setRvDiscountAmount(0); // 先預設 0
+            order.setRvPaidAmount(totalPrice);
 
-    public void createOrder(String guestName, String guestPhone, String guestEmail, String guestAddress, String specialRequests, String paymentMethod, java.util.Map bookingData, com.islevilla.lai.members.model.Members member) {
-        // 解析 bookingData 取得必要資訊
-        java.time.LocalDate checkin = java.time.LocalDate.parse((String)bookingData.get("checkin"));
-        java.time.LocalDate checkout = java.time.LocalDate.parse((String)bookingData.get("checkout"));
-        int adults = Integer.parseInt(bookingData.getOrDefault("adults", "1").toString());
-        int children = Integer.parseInt(bookingData.getOrDefault("children", "0").toString());
-        int totalPrice = Integer.parseInt(bookingData.getOrDefault("totalPrice", "0").toString());
-        java.util.List<java.util.Map> selectedRooms = (java.util.List<java.util.Map>)bookingData.get("selectedRooms");
-
-        // 建立 RoomRVOrder
-        com.islevilla.wei.room.model.RoomRVOrder order = new com.islevilla.wei.room.model.RoomRVOrder();
-        order.setMembers(member);
-        order.setRoomOrderDate(java.time.LocalDate.now());
-        order.setRoomOrderStatus(0); // 0:成立
-        order.setCheckInDate(checkin);
-        order.setCheckOutDate(checkout);
-        order.setRemark(specialRequests);
-        order.setRoomTotalAmount(totalPrice);
-        order.setRvDiscountAmount(0); // 先預設 0
-        order.setRvPaidAmount(totalPrice);
-        // 明細
-        java.util.List<com.islevilla.wei.room.model.RoomRVDetail> details = new java.util.ArrayList<>();
-        for (java.util.Map room : selectedRooms) {
-            com.islevilla.wei.room.model.RoomRVDetail detail = new com.islevilla.wei.room.model.RoomRVDetail();
-            // 取得 roomId 與 roomTypeId
-            Integer roomId = room.get("roomId") != null ? Integer.parseInt(room.get("roomId").toString()) : null;
-            Integer roomTypeId = room.get("roomTypeId") != null ? Integer.parseInt(room.get("roomTypeId").toString()) : null;
-            if (roomId != null) {
-                detail.setRoom(roomRepository.findById(roomId).orElse(null));
+            List<RoomRVDetail> details = new ArrayList<>();
+            for (Map room : selectedRooms) {
+                RoomRVDetail detail = new RoomRVDetail();
+                Integer roomId = room.get("roomId") != null ? Integer.parseInt(room.get("roomId").toString()) : null;
+                Integer roomTypeId = room.get("roomTypeId") != null ? Integer.parseInt(room.get("roomTypeId").toString()) : null;
+                Integer promotionId = null;
+                if (room.get("promotionId") != null && !room.get("promotionId").toString().equals("null")) {
+                    promotionId = Integer.parseInt(room.get("promotionId").toString());
+                }
+                if (roomId != null) {
+                    Optional<Room> optRoom = roomRepository.findById(roomId);
+                    optRoom.ifPresent(detail::setRoom);
+                }
+                if (roomTypeId != null) {
+                    Optional<RoomType> optRoomType = roomTypeRepository.findById(roomTypeId);
+                    optRoomType.ifPresent(detail::setRoomType);
+                }
+                detail.setGuestCount(Integer.parseInt(room.getOrDefault("adults", "1").toString()));
+                int originalPrice = Integer.parseInt(room.getOrDefault("price", "0").toString());
+                // 根據 promotionId 決定價格
+                if (promotionId != null) {
+                    RoomPromotionPrice promo = roomPromotionPriceRepository.findById(promotionId).orElse(null);
+                    if (promo != null && promo.getRoomDiscountRate() != null) {
+                        int discounted = (int)Math.round(originalPrice * promo.getRoomDiscountRate());
+                        detail.setRoomPrice(originalPrice);
+                        detail.setRvDiscountAmount(originalPrice - discounted);
+                        detail.setRvPaidAmount(discounted);
+                        detail.setRemark("促銷:" + (promo.getPromotion() != null ? promo.getPromotion().getRoomPromotionTitle() : "") + ", 折扣價:" + discounted);
+                        System.out.println("[createOrder] 房型 " + roomTypeId + " 選擇促銷，原價:" + originalPrice + ", 折扣價:" + discounted);
+                    } else {
+                        detail.setRoomPrice(originalPrice);
+                        detail.setRvDiscountAmount(0);
+                        detail.setRvPaidAmount(originalPrice);
+                        detail.setRemark("促銷資料異常，已用原價");
+                    }
+                } else {
+                    detail.setRoomPrice(originalPrice);
+                    detail.setRvDiscountAmount(0);
+                    detail.setRvPaidAmount(originalPrice);
+                    detail.setRemark("原價");
+                }
+                detail.setRoomRVOrder(order);
+                details.add(detail);
             }
-            if (roomTypeId != null) {
-                detail.setRoomType(roomTypeRepository.findById(roomTypeId).orElse(null));
-            }
-            detail.setGuestCount(adults); // 先用總人數
-            detail.setRoomPrice(Integer.parseInt(room.getOrDefault("price", "0").toString()));
-            detail.setRvDiscountAmount(0);
-            detail.setRvPaidAmount(Integer.parseInt(room.getOrDefault("price", "0").toString()));
-            detail.setRoomRVOrder(order);
-            details.add(detail);
+            order.setRoomRVDetails(details);
+            roomRVOrderRepository.save(order); // cascade 寫入明細
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("訂單寫入失敗: " + e.getMessage());
         }
-        order.setRoomRVDetails(details);
-        // 儲存
-        bookingRepository.save(order);
-    }
-
-    public static class RoomTypeWithPromotions {
-        private RoomType roomType;
-        private List<RoomPromotionPrice> promotions;
-        public RoomTypeWithPromotions(RoomType roomType, List<RoomPromotionPrice> promotions) {
-            this.roomType = roomType;
-            this.promotions = promotions;
-        }
-        public RoomType getRoomType() { return roomType; }
-        public List<RoomPromotionPrice> getPromotions() { return promotions; }
-    }
-
-    public static class RoomTypeWithPromotionsAndPhoto {
-        private RoomType roomType;
-        private List<PromotionWithDiff> promotions;
-        private List<Integer> photoIds;
-        public RoomTypeWithPromotionsAndPhoto(RoomType roomType, List<PromotionWithDiff> promotions, List<Integer> photoIds) {
-            this.roomType = roomType;
-            this.promotions = promotions;
-            this.photoIds = photoIds;
-        }
-        public RoomType getRoomType() { return roomType; }
-        public List<PromotionWithDiff> getPromotions() { return promotions; }
-        public List<Integer> getPhotoIds() { return photoIds; }
-    }
-
-    public static class PromotionWithDiff {
-        private RoomPromotionPrice promotion;
-        private int diff;
-        private int discountedPrice;
-        
-        public PromotionWithDiff(RoomPromotionPrice promotion, int diff, int discountedPrice) {
-            this.promotion = promotion;
-            this.diff = diff;
-            this.discountedPrice = discountedPrice;
-        }
-        
-        public RoomPromotionPrice getPromotion() { return promotion; }
-        public int getDiff() { return diff; }
-        public int getDiscountedPrice() { return discountedPrice; }
     }
 } 
