@@ -2,7 +2,7 @@
 let selectedSeats = [];
 let requiredSeats = 0;
 
-// 更新座位選擇狀態
+// 更新座位選擇狀態 (步驟3)
 function updateSeatSelection() {
     const selectedCheckboxes = document.querySelectorAll('input[name="selectedSeatIds"]:checked');
     const selectedSeatsDiv = document.getElementById('selectedSeats');
@@ -54,7 +54,7 @@ function updateSeatSelection() {
     }
 }
 
-// 初始化座位選擇功能
+// 初始化座位選擇功能 (步驟3)
 function initializeSeatSelection() {
     const seatContainer = document.getElementById('seatGrid');
     if (!seatContainer) return;
@@ -166,7 +166,7 @@ function initializeSeatSelection() {
 //
 
 //
-// 班次選擇功能
+// 班次選擇功能 (步驟2)
 function initializeScheduleSelection() {
     const scheduleCards = document.querySelectorAll('.schedule-card');
 
@@ -323,152 +323,103 @@ function showMessage(message, type = 'info') {
 //    }, 5000);
 //});
 
-document.addEventListener('DOMContentLoaded', function() {
-	
-	// 班次選擇功能
-	initializeScheduleSelection()
-	// 初始化座位選擇功能
-	initializeSeatSelection()
-	
+document.addEventListener('DOMContentLoaded', function () {
+
+    // 班次選擇功能
+    initializeScheduleSelection()
+    // 初始化座位選擇功能
+    initializeSeatSelection()
+
     const selectRoomBtns = document.querySelectorAll('.select-room-btn');
     const submitBtn = document.getElementById('submitBtn');
     const selectedRoomInfo = document.getElementById('selectedRoomInfo');
-    
+
     // 接駁方向選項
-    const directionOutward = document.getElementById('direction-outward');
-    const directionReturn = document.getElementById('direction-return');
-	if (selectRoomBtns.length > 0) {
-	    selectRoomBtns.forEach(btn => {
-	        btn.addEventListener('click', function() {
-	            // 移除其他按鈕的 active 狀態
-	            selectRoomBtns.forEach(b => b.classList.remove('btn-success'));
-	            selectRoomBtns.forEach(b => b.classList.add('btn-primary'));
-	            selectRoomBtns.forEach(b => b.textContent = '選擇此訂房');
-	            
-	            // 設定當前按鈕為 active
-	            this.classList.remove('btn-primary');
-	            this.classList.add('btn-success');
-	            this.textContent = '✓ 已選擇';
-	
-	            // 獲取訂房資料
-	            const roomReservationId = this.getAttribute('data-room-reservation-id');
-	            const checkInDate = this.getAttribute('data-check-in-date');
-	            const checkOutDate = this.getAttribute('data-check-out-date');
-	
-	            // 設定隱藏欄位值
-//	            document.getElementById('selectedRoomReservationId').value = roomReservationId;
-				const selectedRoomField = document.getElementById('selectedRoomReservationId');
+    if (selectRoomBtns.length > 0) {
+        selectRoomBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                // 移除其他按鈕的 active 狀態
+                selectRoomBtns.forEach(b => {
+                    b.classList.remove('btn-success');
+                    b.classList.add('btn-primary');
+                    // 恢復原始文字
+                    if (b.getAttribute('data-shuttle-direction') == 0) {
+                        b.textContent = '預約去程';
+                    } else {
+                        b.textContent = '預約回程';
+                    }
+                });
+
+                // 設定當前按鈕為 active
+                this.classList.remove('btn-primary');
+                this.classList.add('btn-success');
+                this.textContent = '✓ 已選擇';
+
+                // 獲取訂房資料
+                const roomReservationId = this.getAttribute('data-room-reservation-id');
+                const checkInDate = this.getAttribute('data-check-in-date');
+                const checkOutDate = this.getAttribute('data-check-out-date');
+                const shuttleDate = this.getAttribute('data-shuttle-date');
+                const shuttleDirection = this.getAttribute('data-shuttle-direction');
+//				const guestCount = this.getAttribute('data-guest-count');
+				const shuttleNumber = this.getAttribute('data-shuttle-number');
+
+                // 設定隱藏欄位值
+                const selectedRoomField = document.getElementById('selectedRoomReservationId');
+                const selectedShuttleDateField = document.getElementById('selectedShuttleDate');
+				const selectedShuttleDirectionField = document.getElementById('selectedShuttleDirection');
+				const selectedShuttleNumberField = document.getElementById('selectedShuttleNumber');
                 if (selectedRoomField) {
                     selectedRoomField.value = roomReservationId;
                 }
-				
-	            // 顯示選擇的訂房資訊
-//	            document.getElementById('displayRoomId').textContent = roomReservationId;
-//	            document.getElementById('displayCheckIn').textContent = checkInDate;
-//	            document.getElementById('displayCheckOut').textContent = checkOutDate;
-//	            selectedRoomInfo.style.display = 'block';
-				
-				const displayElements = {
+                if (selectedShuttleDateField) {
+                    selectedShuttleDateField.value = shuttleDate;
+                }
+				if (selectedShuttleDirectionField) {
+                    selectedShuttleDirectionField.value = shuttleDirection;
+                }
+				if (selectedShuttleNumberField) {
+	                selectedShuttleNumberField.value = shuttleNumber;
+	            }
+
+				// 自動設定接駁人數
+//                const shuttleNumberSelect = document.querySelector('select[name="shuttleNumber"]');
+//                if (shuttleNumberSelect && guestCount) {
+//                    shuttleNumberSelect.value = guestCount;
+//                    console.log('自動設定接駁人數:', guestCount);
+//                }
+								
+                // 顯示選擇的訂房資訊
+                const displayElements = {
                     roomId: document.getElementById('displayRoomId'),
                     checkIn: document.getElementById('displayCheckIn'),
-                    checkOut: document.getElementById('displayCheckOut')
+                    checkOut: document.getElementById('displayCheckOut'),
+                    shuttleDate: document.getElementById('displayShuttleDate'),
+                    shuttleNumber: document.getElementById('displayShuttleNumber')
                 };
 
                 if (displayElements.roomId) displayElements.roomId.textContent = roomReservationId;
                 if (displayElements.checkIn) displayElements.checkIn.textContent = checkInDate;
                 if (displayElements.checkOut) displayElements.checkOut.textContent = checkOutDate;
+                if (displayElements.shuttleDate) displayElements.shuttleDate.textContent = shuttleDate;
+                if (displayElements.shuttleNumber) displayElements.shuttleNumber.textContent = shuttleNumber;				
                 if (selectedRoomInfo) selectedRoomInfo.style.display = 'block';
-	
-	            // 重置接駁方向選擇
-//	            directionOutward.checked = false;
-//	            directionReturn.checked = false;
-//	            document.getElementById('displayShuttleDate').textContent = '';
-//	            document.getElementById('selectedShuttleDate').value = '';
-				
-				if (directionOutward) directionOutward.checked = false;
-                if (directionReturn) directionReturn.checked = false;
-                
-                const displayShuttleDate = document.getElementById('displayShuttleDate');
-                const selectedShuttleDate = document.getElementById('selectedShuttleDate');
-                if (displayShuttleDate) displayShuttleDate.textContent = '';
-                if (selectedShuttleDate) selectedShuttleDate.value = '';
-	
-	            // 檢查是否可以啟用提交按鈕
-	            checkSubmitButton();
-	        });
-	    });
-	}
-    // 監聽接駁方向變更
-//    directionOutward.addEventListener('change', function() {
-//        if (this.checked) {
-//            updateShuttleDate();
-//        }
-//    });
-	if (directionOutward) {
-        directionOutward.addEventListener('change', function() {
-            if (this.checked) {
-                updateShuttleDate();
-            }
+
+                // 檢查是否可以啟用提交按鈕
+                checkSubmitButton();
+            });
         });
-    }
-
-//    directionReturn.addEventListener('change', function() {
-//        if (this.checked) {
-//            updateShuttleDate();
-//        }
-//    });
-	if (directionReturn) {
-        directionReturn.addEventListener('change', function() {
-            if (this.checked) {
-                updateShuttleDate();
-            }
-        });
-    }
-
-    function updateShuttleDate() {
-        const selectedRoom = document.querySelector('.select-room-btn.btn-success');
-        if (!selectedRoom) return;
-
-        const checkInDate = selectedRoom.getAttribute('data-check-in-date');
-        const checkOutDate = selectedRoom.getAttribute('data-check-out-date');
-        
-        let shuttleDate;
-//        if (directionOutward.checked) {
-//            shuttleDate = checkInDate;
-//        } else if (directionReturn.checked) {
-//            shuttleDate = checkOutDate;
-//        }
-		if (directionOutward && directionOutward.checked) {
-            shuttleDate = checkInDate;
-        } else if (directionReturn && directionReturn.checked) {
-            shuttleDate = checkOutDate;
-        }
-
-        if (shuttleDate) {
-//            document.getElementById('selectedShuttleDate').value = shuttleDate;
-//            document.getElementById('displayShuttleDate').textContent = shuttleDate;
-			const selectedShuttleDate = document.getElementById('selectedShuttleDate');
-            const displayShuttleDate = document.getElementById('displayShuttleDate');
-            
-            if (selectedShuttleDate) selectedShuttleDate.value = shuttleDate;
-            if (displayShuttleDate) displayShuttleDate.textContent = shuttleDate;
-			
-            checkSubmitButton();
-        }
     }
 
     function checkSubmitButton() {
-		if (!submitBtn) return;
-		
-        const roomSelected = document.querySelector('.select-room-btn.btn-success');
-//        const directionSelected = directionOutward.checked || directionReturn.checked;
-		const directionSelected = (directionOutward && directionOutward.checked) || 
-                                 (directionReturn && directionReturn.checked);
- 		const shuttleNumberSelect = document.querySelector('select[name="shuttleNumber"]');
-//        const shuttleNumberSelected = document.querySelector('select[name="shuttleNumber"]').value;
-		const shuttleNumberSelected = shuttleNumberSelect ? shuttleNumberSelect.value : false;
+        if (!submitBtn) return;
 
-        if (roomSelected && directionSelected && shuttleNumberSelected) {
+        const roomSelected = document.querySelector('.select-room-btn.btn-success');
+//        const shuttleNumberSelect = document.querySelector('select[name="shuttleNumber"]');
+//        const shuttleNumberSelected = shuttleNumberSelect ? shuttleNumberSelect.value : false;
+
+//        if (roomSelected && shuttleNumberSelected) {
+        if (roomSelected) {
             submitBtn.disabled = false;
         } else {
             submitBtn.disabled = true;
@@ -476,13 +427,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 監聽接駁人數變更
-//    document.querySelector('select[name="shuttleNumber"]').addEventListener('change', checkSubmitButton);
-	const shuttleNumberSelect = document.querySelector('select[name="shuttleNumber"]');
-    if (shuttleNumberSelect) {
-        shuttleNumberSelect.addEventListener('change', checkSubmitButton);
-    }
-	
-	// 座位表單提交驗證
+//    const shuttleNumberSelect = document.querySelector('select[name="shuttleNumber"]');
+//    if (shuttleNumberSelect) {
+//        shuttleNumberSelect.addEventListener('change', checkSubmitButton);
+//    }
+
+    // 座位表單提交驗證
     const seatForm = document.getElementById('seatForm');
     if (seatForm) {
         seatForm.addEventListener('submit', function (e) {
@@ -490,12 +440,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (selectedCount !== requiredSeats) {
                 e.preventDefault();
                 showMessage(`請選擇 ${requiredSeats} 個座位`, 'warning');
-				return false;
+                return false;
             }
         });
     }
-	
-	// 自動關閉Alert
+
+    // 自動關閉Alert
     setTimeout(function () {
         const alerts = document.querySelectorAll('.alert:not(.alert-info):not(.dynamic-alert)');
         alerts.forEach(alert => {

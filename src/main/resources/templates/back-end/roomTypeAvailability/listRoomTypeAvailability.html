@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>微嶼 | 房型庫存總覽</title>
+    
+    <!-- ===== CSRF META ===== -->
+    <meta name="_csrf" th:content="${_csrf?.token}" th:if="${_csrf}"/>
+    <meta name="_csrf_header" th:content="${_csrf?.headerName}" th:if="${_csrf}"/>
+    
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+    <style>
+        /* 點擊效果增強 */
+        .btn:active, .btn-group .btn:active {
+            transform: scale(0.95);
+            transition: transform 0.1s ease;
+        }
+        
+        .table tbody tr:hover {
+            background-color: rgba(0, 123, 255, 0.1);
+            transition: background-color 0.2s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            transform: scale(1.02);
+            transition: all 0.2s ease;
+        }
+        
+        .page-link:active {
+            transform: scale(0.95);
+            transition: transform 0.1s ease;
+        }
+        
+        /* 交叉表格樣式 */
+        .cursor-pointer {
+            cursor: pointer;
+        }
+        
+        .badge.cursor-pointer:hover {
+            transform: scale(1.1);
+            transition: transform 0.2s ease;
+        }
+        
+        .text-muted.cursor-pointer:hover {
+            color: #6f42c1 !important;
+            transform: scale(1.2);
+            transition: all 0.2s ease;
+        }
+        
+        #availabilityTable th {
+            background-color: #f8f9fa !important;
+            border: 1px solid #dee2e6;
+            font-weight: 600;
+        }
+        
+        #availabilityTable td {
+            border: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
+        
+        /* 交叉表格樣式增強 */
+        .table-responsive {
+            max-height: 600px;
+            overflow: auto;
+        }
+        
+        /* 固定房型列 */
+        .sticky-col {
+            position: sticky;
+            left: 0;
+            z-index: 2;
+            background-color: #f8f9fa !important;
+            border-right: 2px solid #007bff !important;
+            min-width: 120px;
+        }
+        
+        /* 表頭固定列樣式 */
+        thead th.sticky-col {
+            z-index: 3;
+            font-weight: 700;
+        }
+        
+        /* 可用性單元格樣式 */
+        .availability-cell {
+            display: inline-block;
+            min-width: 30px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        
+        /* 無數據時的樣式 */
+        .text-muted.availability-cell {
+            background-color: #f8f9fa;
+            border: 1px dashed #dee2e6;
+            color: #6c757d !important;
+        }
+        
+        .text-muted.availability-cell:hover {
+            background-color: #e9ecef;
+            border-color: #0d6efd;
+            color: #0d6efd !important;
+        }
+        
+        /* 日期欄位樣式 */
+        .text-nowrap {
+            white-space: nowrap;
+            min-width: 80px;
+            font-size: 12px;
+        }
+        
+        /* 實時庫存狀態樣式 */
+        .availability-cell {
+            min-width: 40px;
+            font-weight: 700;
+            position: relative;
+        }
+        
+        /* 庫存狀態顏色 */
+        .bg-success { /* 充足：> 5 */
+            background-color: #198754 !important;
+        }
+        
+        .bg-warning { /* 普通：3-5 */
+            background-color: #ffc107 !important;
+            color: #000 !important;
+        }
+        
+        .bg-danger { /* 不足：1-2 */
+            background-color: #dc3545 !important;
+        }
+        
+        .bg-secondary { /* 無庫存：0 */
+            background-color: #6c757d !important;
+        }
+        
+        /* 狀態圖標樣式 */
+        .position-absolute i {
+            font-size: 10px;
+            background: white;
+            border-radius: 50%;
+            padding: 1px;
+        }
+        
+        /* 靜態數據顯示 */
+        .text-muted small {
+            font-size: 10px;
+        }
+        
+        /* 懸停效果增強 */
+        .availability-cell:hover {
+            transform: scale(1.15);
+            z-index: 10;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+<!-- ===== 載入sidebar ===== -->
+<!-- 插入手機版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+<!-- 插入桌面版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+
+<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+    <th:block th:fragment="myContent">
+        <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+        
+        <!-- 頁面標題 -->
+        <div class="card-header bg-transparent border-0 pt-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="card-title mb-1 fw-bold">
+                        <i class="bi bi-calendar-check me-2"></i>實時房型庫存總覽
+                    </h4>
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        顯示實時計算的可用房間數量（房型總數 - 已預訂數量）
+                    </small>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#syncModal">
+                        <i class="bi bi-arrow-clockwise"></i> 同步庫存
+                    </button>
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#batchCreateModal">
+                        <i class="bi bi-plus-circle"></i> 批量創建
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <!-- 月份選擇器 -->
+            <div class="card bg-primary text-white mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-calendar-month me-2"></i>月份選擇
+                    </h5>
+                    
+                    <form th:action="@{/backend/roomTypeAvailability/list}" method="get">
+                        <div class="row align-items-end">
+                            <!-- 房型選擇 -->
+                            <div class="col-lg-4 col-md-6 mb-3">
+                                <label class="form-label text-white">房型篩選</label>
+                                <select class="form-select" name="roomTypeId">
+                                    <option value="">全部房型</option>
+                                    <option th:each="roomType : ${roomTypeList}"
+                                            th:value="${roomType.roomTypeId}"
+                                            th:text="${roomType.roomTypeName}"
+                                            th:selected="${roomType.roomTypeId == selectedRoomTypeId}">
+                                    </option>
+                                </select>
+                            </div>
+                            
+                            <!-- 月份選擇 -->
+                            <div class="col-lg-4 col-md-6 mb-3">
+                                <label class="form-label text-white">選擇月份</label>
+                                <input type="month" class="form-control" name="selectedMonth" 
+                                       th:value="${selectedMonth}">
+                            </div>
+                            
+                            <!-- 搜尋按鈕 -->
+                            <div class="col-lg-4 col-md-12 mb-3">
+                                <button type="submit" class="btn btn-light w-100">
+                                    <i class="bi bi-calendar-check me-2"></i>切換月份
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 成功/錯誤訊息 -->
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle me-2"></i>
+                <span th:text="${successMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+
+
+            <!-- 庫存表格（月份視圖） -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-table me-2"></i>房型庫存月份視圖
+                    </h5>
+                    <small class="text-muted">
+                        顯示月份: <span th:text="${#temporals.format(selectedStartDate, 'yyyy年MM月')}">2024年03月</span>
+                        | 實時庫存計算（房型總數 - 已預訂數量）
+                    </small>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <!-- 檢查是否有房型 -->
+                        <div th:if="${#lists.isEmpty(roomTypeList)}" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fa-3x"></i>
+                            <h5 class="mt-3">暫無房型資料</h5>
+                            <p>請先建立房型資料</p>
+                        </div>
+                        
+                        <!-- 顯示月份表格 -->
+                        <div th:if="${not #lists.isEmpty(roomTypeList)}" class="table-responsive">
+                                <table id="availabilityTable" class="table table-bordered table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="text-center align-middle sticky-col">房型 \ 日期</th>
+                                            <!-- 動態生成日期欄 -->
+                                            <th th:each="date : ${dateList}" 
+                                                class="text-center align-middle text-nowrap"
+                                                th:text="${#temporals.format(date,'M/d') + '(' + #temporals.format(date,'EEE', #locale) + ')'}">
+                                                日期
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    
+                                    <tbody>
+                                        <!-- 每個房型一列 -->
+                                        <tr th:each="roomType : ${roomTypeList}">
+                                            <td class="fw-bold text-center align-middle sticky-col bg-light" 
+                                                th:text="${roomType.roomTypeName}">房型名稱</td>
+                                            
+                                            <!-- 依日期迴圈顯示實時庫存 -->
+                                            <td th:each="date : ${dateList}" class="text-center align-middle">
+                                                <div th:with="rtMap=${matrix[roomType.roomTypeId]},
+                                                              realTimeCount=${rtMap != null ? (rtMap[date] != null ? rtMap[date] : 0) : 0},
+                                                              staticMap=${staticMatrix[roomType.roomTypeId]},
+                                                              staticCount=${staticMap != null ? staticMap[date] : null}">
+                                                    <!-- 實時庫存數量顯示 -->
+                                                    <div class="position-relative">
+                                                        <th:block th:switch="${realTimeCount}">
+                                                            <span th:case="0"
+                                                                  class="badge fs-6 cursor-pointer availability-cell bg-secondary"
+                                                                  th:text="${realTimeCount}"
+                                                                  th:data-room-type-id="${roomType.roomTypeId}"
+                                                                  th:data-availability-date="${#temporals.format(date,'yyyy-MM-dd')}"
+                                                                  th:data-availability-count="${realTimeCount}"
+                                                                  th:data-room-type-name="${roomType.roomTypeName}"
+                                                                  th:data-static-count="${staticCount}"
+                                                                  onclick="editCell(this)"
+                                                                  th:title="'實時可用: ' + ${realTimeCount} + ' 間' + 
+                                                                           (${staticCount} != null ? ' | 靜態設定: ' + ${staticCount} + ' 間' : '') + 
+                                                                           ' | 點擊編輯'">
+                                                            </span>
+                                                            <span th:case="1"
+                                                                  class="badge fs-6 cursor-pointer availability-cell bg-danger"
+                                                                  th:text="${realTimeCount}"
+                                                                  th:data-room-type-id="${roomType.roomTypeId}"
+                                                                  th:data-availability-date="${#temporals.format(date,'yyyy-MM-dd')}"
+                                                                  th:data-availability-count="${realTimeCount}"
+                                                                  th:data-room-type-name="${roomType.roomTypeName}"
+                                                                  th:data-static-count="${staticCount}"
+                                                                  onclick="editCell(this)"
+                                                                  th:title="'實時可用: ' + ${realTimeCount} + ' 間' + 
+                                                                           (${staticCount} != null ? ' | 靜態設定: ' + ${staticCount} + ' 間' : '') + 
+                                                                           ' | 點擊編輯'">
+                                                            </span>
+                                                            <span th:case="2"
+                                                                  class="badge fs-6 cursor-pointer availability-cell bg-danger"
+                                                                  th:text="${realTimeCount}"
+                                                                  th:data-room-type-id="${roomType.roomTypeId}"
+                                                                  th:data-availability-date="${#temporals.format(date,'yyyy-MM-dd')}"
+                                                                  th:data-availability-count="${realTimeCount}"
+                                                                  th:data-room-type-name="${roomType.roomTypeName}"
+                                                                  th:data-static-count="${staticCount}"
+                                                                  onclick="editCell(this)"
+                                                                  th:title="'實時可用: ' + ${realTimeCount} + ' 間' + 
+                                                                           (${staticCount} != null ? ' | 靜態設定: ' + ${staticCount} + ' 間' : '') + 
+                                                                           ' | 點擊編輯'">
+                                                            </span>
+                                                                                                        <span th:case="*"
+                                                  th:class="'badge fs-6 cursor-pointer availability-cell ' + (${realTimeCount != null and realTimeCount > 5} ? 'bg-success' : 'bg-warning')"
+                                                  th:text="${realTimeCount ?: 0}"
+                                                  th:data-room-type-id="${roomType.roomTypeId}"
+                                                  th:data-availability-date="${#temporals.format(date,'yyyy-MM-dd')}"
+                                                  th:data-availability-count="${realTimeCount ?: 0}"
+                                                  th:data-room-type-name="${roomType.roomTypeName}"
+                                                  th:data-static-count="${staticCount}"
+                                                  onclick="editCell(this)"
+                                                  th:title="'實時可用: ' + ${realTimeCount ?: 0} + ' 間' + 
+                                                           (${staticCount} != null ? ' | 靜態設定: ' + ${staticCount} + ' 間' : '') + 
+                                                           ' | 點擊編輯'">
+                                            </span>
+                                                        </th:block>
+                                                        
+                                                        <!-- 狀態指示圖標 -->
+                                                        <small class="position-absolute top-0 start-100 translate-middle">
+                                                                                                        <i th:if="${realTimeCount != null and realTimeCount == 0}" 
+                                               class="bi bi-exclamation-triangle-fill text-danger" 
+                                               title="無可用房間"></i>
+                                            <i th:if="${realTimeCount != null and realTimeCount > 0 and realTimeCount <= 2}" 
+                                               class="bi bi-exclamation-circle-fill text-warning" 
+                                               title="庫存不足"></i>
+                                            <i th:if="${staticCount != null and staticCount != realTimeCount}" 
+                                               class="bi bi-info-circle-fill text-info" 
+                                               title="與靜態設定不同"></i>
+                                                        </small>
+                                                    </div>
+                                                    
+                                                                                        <!-- 靜態與實時對比信息 -->
+                                    <div th:if="${staticCount != null and staticCount != realTimeCount}" 
+                                         class="mt-1">
+                                        <small class="text-muted">
+                                            <i class="bi bi-gear"></i> 
+                                            <span th:text="${staticCount}"></span>
+                                        </small>
+                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                                                  
+                        
+                        <!-- 實時庫存說明 -->
+                        <div class="mt-4 px-3 pb-3">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="fw-bold text-primary">
+                                        <i class="bi bi-palette me-2"></i>庫存狀態顏色說明
+                                    </h6>
+                                    <ul class="list-unstyled mb-0 small">
+                                        <li class="mb-1">
+                                            <span class="badge bg-success me-2">5+</span>
+                                            <strong>充足：</strong>可用房間 > 5 間
+                                        </li>
+                                        <li class="mb-1">
+                                            <span class="badge bg-warning text-dark me-2">3-5</span>
+                                            <strong>普通：</strong>可用房間 3-5 間
+                                        </li>
+                                        <li class="mb-1">
+                                            <span class="badge bg-danger me-2">1-2</span>
+                                            <strong>不足：</strong>可用房間 1-2 間
+                                        </li>
+                                        <li class="mb-1">
+                                            <span class="badge bg-secondary me-2">0</span>
+                                            <strong>無庫存：</strong>已全部預訂
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="fw-bold text-primary">
+                                        <i class="bi bi-gear me-2"></i>功能說明
+                                    </h6>
+                                    <ul class="list-unstyled mb-0 small">
+                                        <li class="mb-1">
+                                            <i class="bi bi-mouse me-1 text-primary"></i>
+                                            <strong>左鍵點擊：</strong>快速編輯房型庫存設定
+                                        </li>
+                                        <li class="mb-1">
+                                            <i class="bi bi-mouse2 me-1 text-success"></i>
+                                            <strong>右鍵點擊：</strong>顯示詳細操作菜單
+                                        </li>
+                                        <li class="mb-1">
+                                            <i class="bi bi-calculator me-1 text-info"></i>
+                                            <strong>實時計算：</strong>房型總數 - 已預訂數量
+                                        </li>
+                                        <li class="mb-1">
+                                            <i class="bi bi-info-circle me-1 text-warning"></i>
+                                            <strong>圖標提示：</strong>庫存狀態和差異警示
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+</main>
+
+<!-- 更新記錄 Modal -->
+<div class="modal fade" id="updateModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-pencil me-2"></i>更新庫存數量
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="/backend/roomTypeAvailability/update" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">房型</label>
+                        <input type="text" class="form-control" id="updateRoomTypeName" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">日期</label>
+                        <input type="date" class="form-control" name="availabilityDate" id="updateAvailabilityDate" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">可用數量</label>
+                        <input type="number" class="form-control" name="availabilityCount" 
+                               id="updateAvailabilityCount" min="0" required>
+                    </div>
+                    <input type="hidden" name="roomTypeId" id="updateRoomTypeId">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">儲存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 同步庫存 Modal -->
+<div class="modal fade" id="syncModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-arrow-clockwise me-2"></i>同步庫存
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="/backend/roomTypeAvailability/sync" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">房型</label>
+                        <select class="form-select" name="syncRoomTypeId" required>
+                            <option value="">請選擇房型</option>
+                            <option th:each="roomType : ${roomTypeList}"
+                                    th:value="${roomType.roomTypeId}"
+                                    th:text="${roomType.roomTypeName}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">目標日期</label>
+                        <input type="date" class="form-control" name="syncTargetDate" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-info">同步</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 批量創建 Modal -->
+<div class="modal fade" id="batchCreateModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-plus-circle me-2"></i>批量創建庫存記錄
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="/backend/roomTypeAvailability/batchCreate" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">房型</label>
+                        <select class="form-select" name="batchRoomTypeId" required>
+                            <option value="">請選擇房型</option>
+                            <option th:each="roomType : ${roomTypeList}"
+                                    th:value="${roomType.roomTypeId}"
+                                    th:text="${roomType.roomTypeName}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">開始日期</label>
+                            <input type="date" class="form-control" name="batchStartDate" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">結束日期</label>
+                            <input type="date" class="form-control" name="batchEndDate" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">預設數量</label>
+                        <input type="number" class="form-control" name="batchDefaultCount" min="0" value="10" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-success">批量創建</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ===== 載入統一 JavaScript ===== -->
+<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
+<!-- DataTables JavaScript -->
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+
+<!-- 房型庫存管理 JavaScript -->
+<script th:src="@{/js/roomTypeAvailability.js}"></script>
+
+
+</body>
+</html> 

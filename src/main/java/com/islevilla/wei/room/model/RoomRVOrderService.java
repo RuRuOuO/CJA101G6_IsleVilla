@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +46,12 @@ public class RoomRVOrderService {
     // 用會員id查詢該會員所有訂單
     public List<RoomRVOrder> getRoomRVOrderByMember(Members member) {
         return roomRVOrderRepository.findByMembers(member);
+    }
+    
+    // 用會員id查詢該會員今天以後的訂單
+    public List<RoomRVOrder> getFutureRoomRVOrderByMember(Members member) {
+    	LocalDate today = LocalDate.now();
+        return roomRVOrderRepository.findByMembersAndCheckInDateGreaterThan(member, today);
     }
 
     // 更新訂單

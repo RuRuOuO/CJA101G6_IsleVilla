@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>微嶼 | Isle Villa - 客房介紹</title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
+    <!-- ===== 載入房型頁面專用CSS ===== -->
+    <link href="/css/roomtype.css" rel="stylesheet" />
+  </head>
+  <body>
+    <!-- ===== 載入Header ===== -->
+    <div th:replace="~{fragments/fragments :: header}"></div>
+    
+    <!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
+    <main class="roomtype-container">
+      <div class="container">
+        <!-- 頁面標題 -->
+        <h1 class="page-title">客房介紹</h1>
+        
+        <!-- 房型卡片容器 -->
+        <div class="roomtype-cards-container">
+          <!-- 如果有房型資料 -->
+          <div th:if="${roomTypeList != null and !roomTypeList.isEmpty()}">
+            <!-- 使用 Thymeleaf th:each 渲染房型卡片 -->
+            <div th:each="roomType : ${roomTypeList}" class="roomtype-card">
+              <!-- 房型圖片區域 -->
+              <div class="roomtype-image-container">
+                <!-- 如果有圖片 -->
+                <img th:if="${roomTypeFirstPhoto.get(roomType.roomTypeId) != null}"
+                     th:src="@{/roomtype/image/{photoId}(photoId=${roomTypeFirstPhoto.get(roomType.roomTypeId)})}"
+                     th:alt="${roomType.roomTypeName}"
+                     class="roomtype-image"
+                     loading="lazy">
+                
+                <!-- 如果沒有圖片，顯示佔位符 -->
+                <div th:unless="${roomTypeFirstPhoto.get(roomType.roomTypeId) != null}" class="roomtype-no-image">
+                  <i class="bi bi-image"></i>
+                  <span>暫無圖片</span>
+                </div>
+              </div>
+              
+              <!-- 房型卡片內容 -->
+              <div class="roomtype-card-body">
+                <h3 class="roomtype-name" th:text="${roomType.roomTypeName}">房型名稱</h3>
+                <div class="roomtype-price" th:text="|NT$ ${#numbers.formatInteger(roomType.roomTypePrice, 0, 'COMMA')}|">NT$ 0</div>
+                <div class="roomtype-capacity">
+                  <i class="bi bi-people"></i>
+                  <span th:text="|容納人數：${roomType.roomTypeCapacity} 人|">容納人數：0 人</span>
+                </div>
+                <button class="btn roomtype-btn" 
+                        th:data-roomtype-id="${roomType.roomTypeId}"
+                        th:data-roomtype-name="${roomType.roomTypeName}"
+                        th:data-roomtype-capacity="${roomType.roomTypeCapacity}"
+                        th:data-roomtype-content="${roomType.roomTypeContent}"
+                        th:data-roomtype-price="${roomType.roomTypePrice}">
+                  查看更多
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 如果沒有房型資料 -->
+          <div th:if="${roomTypeList == null or roomTypeList.isEmpty()}" class="empty-state">
+            <i class="bi bi-house"></i>
+            <h5>暫無房型資料</h5>
+            <p>目前沒有可預訂的房型，請稍後再試</p>
+          </div>
+        </div>
+      </div>
+    </main>
+    
+    <!-- 房型詳細資訊 Modal -->
+    <div class="modal fade" id="roomTypeModal" tabindex="-1" aria-labelledby="roomTypeModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="roomTypeModalTitle">房型名稱</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="modal-roomtype-info">
+              <div class="row">
+                <div class="col-md-6">
+                  <h6>房型資訊</h6>
+                  <p id="modalRoomTypeCapacity" class="modal-capacity">
+                    <i class="bi bi-people"></i> 容納人數：0 人
+                  </p>
+                </div>
+                <div class="col-md-6 text-end">
+                  <h6>房型價格</h6>
+                  <p id="modalRoomTypePrice" class="modal-price">NT$ 0</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="modal-roomtype-content">
+              <h6>房型說明</h6>
+              <div id="modalRoomTypeContent" class="modal-content-text">
+                房型說明內容...
+              </div>
+            </div>
+            
+            <div class="mt-4 text-center">
+              <a href="#" class="btn btn-primary btn-lg px-4">
+                <i class="bi bi-calendar-check me-2"></i>
+                立即預訂
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
+    
+    <!-- ========== 載入Footer及Bootstrap JS ========== -->
+    <div th:replace="~{fragments/fragments :: footer}"></div>
+    
+    <!-- ===== 載入房型頁面專用JS ===== -->
+    <script src="/js/roomtype.js"></script>
+  </body>
+</html>

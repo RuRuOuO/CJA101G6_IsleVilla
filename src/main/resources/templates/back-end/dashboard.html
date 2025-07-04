@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>微嶼 | Isle Villa 後台首頁</title>
+    <title>微嶼後台首頁</title>
     <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
     <!-- Chart.js -->
@@ -37,10 +37,6 @@
             <div>
                 <h4 class="mb-1">歡迎回來！</h4>
                 <p class="text-muted mb-0">今天是 <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy年MM月dd日 EEEE')}">2025年01月01日 星期三</span></p>
-            </div>
-            <div class="text-end">
-                <small class="text-muted">最後更新時間</small><br>
-                <span th:text="${#temporals.format(#temporals.createNow(), 'HH:mm:ss')}">12:00:00</span>
             </div>
         </div>
 
@@ -168,52 +164,6 @@
             </div>
         </div>
 
-        <!-- 快速操作區塊 -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-transparent border-0">
-                        <h5 class="card-title mb-0">
-                            <i class="fas fa-bolt text-warning me-2"></i>快速操作
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-lg-2 col-md-4 col-6">
-                                <a href="/backend/product/addProduct" class="btn btn-outline-primary w-100 quick-action-btn">
-                                    <i class="fas fa-plus me-2"></i>新增商品
-                                </a>
-                            </div>
-                            <div class="col-lg-2 col-md-4 col-6">
-                                <a href="/backend/news/addNews" class="btn btn-outline-info w-100 quick-action-btn">
-                                    <i class="fas fa-newspaper me-2"></i>發布消息
-                                </a>
-                            </div>
-                            <div class="col-lg-2 col-md-4 col-6">
-                                <a href="/backend/coupon/addCoupon" class="btn btn-outline-warning w-100 quick-action-btn">
-                                    <i class="fas fa-ticket-alt me-2"></i>新增優惠券
-                                </a>
-                            </div>
-                            <div class="col-lg-2 col-md-4 col-6">
-                                <a href="/backend/product-order/listAllProductOrder" class="btn btn-outline-success w-100 quick-action-btn">
-                                    <i class="fas fa-list me-2"></i>查看訂單
-                                </a>
-                            </div>
-                            <div class="col-lg-2 col-md-4 col-6">
-                                <a href="/backend/feedback/listAllFeedback" class="btn btn-outline-secondary w-100 quick-action-btn">
-                                    <i class="fas fa-comments me-2"></i>查看回饋
-                                </a>
-                            </div>
-                            <div class="col-lg-2 col-md-4 col-6">
-                                <a href="/backend/member-coupon/listAllMemberCoupon" class="btn btn-outline-danger w-100 quick-action-btn">
-                                    <i class="fas fa-gift me-2"></i>會員優惠券
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- 訂單成立的購物訂單 -->
         <div class="row mb-4">

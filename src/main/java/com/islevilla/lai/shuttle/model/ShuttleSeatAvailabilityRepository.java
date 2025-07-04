@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface ShuttleSeatAvailabilityRepository
@@ -76,4 +78,12 @@ public interface ShuttleSeatAvailabilityRepository
 	Integer getAvailableSeats(@Param("scheduleId") Integer scheduleId, @Param("date") LocalDate date,
 			@Param("direction") Integer direction);
 
+	/**
+	 * 根據班次編號和日期更新座位數量
+	 */
+	@Modifying
+	@Transactional
+	@Query("UPDATE ShuttleSeatAvailability s SET s.seatQuantity = :seatQuantity WHERE s.shuttleScheduleId = :shuttleScheduleId AND s.shuttleDate = :shuttleDate")
+	int updateSeatQuantityByShuttleScheduleIdAndShuttleDate(@Param("shuttleScheduleId") Integer shuttleScheduleId,
+			@Param("shuttleDate") LocalDate shuttleDate, @Param("seatQuantity") Integer seatQuantity);
 }
