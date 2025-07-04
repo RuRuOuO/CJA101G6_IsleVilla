@@ -39,12 +39,12 @@
 				<td th:text="${promotion.roomPromotionId}"></td>
 				<td th:text="${promotion.roomPromotionTitle}"></td>
 				<td th:text="${promotion.promotionStartDate != null ? promotion.promotionStartDate.toLocalDate() : ''}"></td>
-<td th:text="${promotion.promotionEndDate != null ? promotion.promotionEndDate.toLocalDate() : ''}"></td>
+				<td th:text="${promotion.promotionEndDate != null ? promotion.promotionEndDate.toLocalDate() : ''}"></td>
 				<td th:text="${promotion.promotionRemark}"></td>
                 <td>
                     <form method="post" th:action="@{/backend/roompromotionprice/getOneForUpdate}" style="display: inline-block; margin-bottom: 0px;">
                         <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-pencil-fill me-1"></i>修改</button>
-                        <input type="hidden" name="roomPromotionId" th:value="${promotion.roomPromotionId}">
+                        <input type="hidden" name="roomPromotionId" th:value="${roompromotionprice.roomPromotionId}">
                     </form>
                     <form method="post" th:action="@{/backend/roompromotionprice/delete}" style="display: inline-block; margin-bottom: 0px;" onsubmit="return confirm('您確定要刪除這筆優惠專案價格嗎？');">
                         <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash-fill me-1"></i>刪除</button>

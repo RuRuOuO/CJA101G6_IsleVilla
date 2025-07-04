@@ -43,7 +43,7 @@ public class RoomPromotionPriceController {
     @PostMapping("/getOneForUpdate")
     public String getOneForUpdate(@RequestParam("roomPromotionId") Integer id, ModelMap model) {
         model.addAttribute("roomPromotionPrice", roomPromotionPriceSvc.getOneRoomPromotionPrice(id));
-        return "back-end/roompromotionprice/update_promotion_input";
+        return "back-end/roompromotionprice/update_roompromotionprice_input";
     }
 
     @PostMapping("/update")

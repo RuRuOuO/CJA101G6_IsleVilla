@@ -25,6 +25,7 @@ import jakarta.persistence.PersistenceContext;
 @Service
 public class BookingService {
 
+    
     @Autowired
     private BookingRepository bookingRepository;
 
@@ -387,6 +388,11 @@ public class BookingService {
         order.setRoomTotalAmount(totalPrice);
         order.setRvDiscountAmount(0); // 先預設 0
         order.setRvPaidAmount(totalPrice);
+        
+        // 處理優惠專案
+        com.islevilla.patty.promotion.model.Promotion selectedPromotion = null;
+        int totalDiscountAmount = 0;
+        
         // 明細
         java.util.List<com.islevilla.wei.room.model.RoomRVDetail> details = new java.util.ArrayList<>();
         for (java.util.Map room : selectedRooms) {
@@ -394,19 +400,49 @@ public class BookingService {
             // 取得 roomId 與 roomTypeId
             Integer roomId = room.get("roomId") != null ? Integer.parseInt(room.get("roomId").toString()) : null;
             Integer roomTypeId = room.get("roomTypeId") != null ? Integer.parseInt(room.get("roomTypeId").toString()) : null;
+            Integer promotionId = room.get("promotionId") != null ? Integer.parseInt(room.get("promotionId").toString()) : null;
+            
             if (roomId != null) {
                 detail.setRoom(roomRepository.findById(roomId).orElse(null));
             }
             if (roomTypeId != null) {
                 detail.setRoomType(roomTypeRepository.findById(roomTypeId).orElse(null));
             }
+            
             detail.setGuestCount(adults); // 先用總人數
-            detail.setRoomPrice(Integer.parseInt(room.getOrDefault("price", "0").toString()));
-            detail.setRvDiscountAmount(0);
-            detail.setRvPaidAmount(Integer.parseInt(room.getOrDefault("price", "0").toString()));
+            int roomPrice = Integer.parseInt(room.getOrDefault("price", "0").toString());
+            detail.setRoomPrice(roomPrice);
+            
+            // 處理優惠專案折扣
+            if (promotionId != null) {
+                // 查詢優惠專案
+                com.islevilla.patty.promotion.model.Promotion promotion = 
+                    entityManager.find(com.islevilla.patty.promotion.model.Promotion.class, promotionId);
+                if (promotion != null) {
+                    selectedPromotion = promotion;
+                    // 計算折扣金額（原價 - 優惠價）
+                    if (detail.getRoomType() != null) {
+                        int originalPrice = detail.getRoomType().getRoomTypePrice();
+                        int discountAmount = originalPrice - roomPrice;
+                        detail.setRvDiscountAmount(discountAmount);
+                        totalDiscountAmount += discountAmount;
+                    }
+                }
+            } else {
+                detail.setRvDiscountAmount(0);
+            }
+            
+            detail.setRvPaidAmount(roomPrice);
             detail.setRoomRVOrder(order);
             details.add(detail);
         }
+        
+        // 設定訂單的優惠專案和折扣金額
+        if (selectedPromotion != null) {
+            order.setPromotion(selectedPromotion);
+            order.setRvDiscountAmount(totalDiscountAmount);
+        }
+        
         order.setRoomRVDetails(details);
         // 儲存
         bookingRepository.save(order);

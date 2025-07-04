@@ -26,6 +26,8 @@ import com.islevilla.chen.roomType.model.RoomTypeService;
 import com.islevilla.chen.roomType.model.RoomType;
 import com.islevilla.chen.roomTypeAvailability.model.RoomTypeAvailabilityService;
 import com.islevilla.chen.roomTypeAvailability.model.RoomTypeAvailability;
+import com.islevilla.patty.roompromotionprice.model.RoomPromotionPriceRepository;
+import com.islevilla.patty.roompromotionprice.model.RoomPromotionPrice;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -42,6 +44,9 @@ public class BookingController {
     
     @Autowired
     private RoomTypeAvailabilityService roomTypeAvailabilityService;
+    
+    @Autowired
+    private RoomPromotionPriceRepository roomPromotionPriceRepository;
 
     @GetMapping("/booking")
     public String showBookingPage() {
@@ -89,38 +94,59 @@ public class BookingController {
             roomAdults = List.of(2);
         }
 
-        // 使用 chen 的房型資料和空房查詢
+        // 使用 chen 的房型資料和空房查詢，並加入優惠專案查詢
         try {
             // 1. 查詢所有上架中的房型
             List<RoomType> allRoomTypes = roomTypeService.findByRoomTypeSaleStatus((byte) 1);
             System.out.println("查詢到房型數量: " + allRoomTypes.size());
             
-            // 2. 檢查每個房型在指定日期範圍內是否有足夠的空房
-            List<RoomType> availableRoomTypes = new ArrayList<>();
+            // 2. 為每個房型查詢當天有效的優惠專案，並檢查空房狀態
+            List<RoomTypeWithPromotions> roomTypesWithPromotions = new ArrayList<>();
             
             for (RoomType roomType : allRoomTypes) {
+                System.out.println("處理房型: " + roomType.getRoomTypeId() + " - " + roomType.getRoomTypeName());
+                
                 Integer roomTypeId = roomType.getRoomTypeId();
                 Integer requiredCount = roomCount; // 需要的房間數
                 
-                // 檢查在入住期間是否有足夠的空房
-                boolean hasAvailableRooms = roomTypeAvailabilityService.hasAvailableRoomsInRange(
-                    roomTypeId, checkin, checkout, requiredCount);
-                
-                if (hasAvailableRooms) {
-                    availableRoomTypes.add(roomType);
-                    System.out.println("房型 " + roomType.getRoomTypeName() + " 在 " + checkin + " 至 " + checkout + " 期間有足夠空房");
-                } else {
-                    System.out.println("房型 " + roomType.getRoomTypeName() + " 在 " + checkin + " 至 " + checkout + " 期間空房不足");
+                // 查詢該房型在入住日期有效的優惠專案
+                List<RoomPromotionPrice> promotions = new ArrayList<>();
+                try {
+                    promotions = roomPromotionPriceRepository.findAllValidPromotionPrices(
+                        roomType.getRoomTypeId(), checkin);
+                    
+                    // 過濾掉 promotion 為 null 的資料
+                    promotions = promotions.stream()
+                        .filter(promo -> promo.getPromotion() != null)
+                        .collect(java.util.stream.Collectors.toList());
+                } catch (Exception e) {
+                    System.err.println("查詢房型 " + roomType.getRoomTypeName() + " 優惠專案時發生錯誤: " + e.getMessage());
+                    promotions = new ArrayList<>();
                 }
+                
+                // 檢查在入住期間是否有足夠的空房
+                boolean hasAvailableRooms = false;
+                try {
+                    hasAvailableRooms = roomTypeAvailabilityService.hasAvailableRoomsInRange(
+                        roomTypeId, checkin, checkout, requiredCount);
+                } catch (Exception e) {
+                    System.err.println("檢查房型 " + roomType.getRoomTypeName() + " 空房時發生錯誤: " + e.getMessage());
+                    hasAvailableRooms = false; // 預設為無空房
+                }
+                
+                System.out.println("房型 " + roomType.getRoomTypeName() + " 有 " + promotions.size() + " 個有效優惠專案，空房狀態: " + (hasAvailableRooms ? "有空房" : "無空房"));
+                
+                roomTypesWithPromotions.add(new RoomTypeWithPromotions(roomType, promotions, hasAvailableRooms));
             }
             
-            System.out.println("符合空房條件的房型數量: " + availableRoomTypes.size());
+            System.out.println("最終處理的房型數量: " + roomTypesWithPromotions.size());
             
-            // 將查詢結果加入 model
-            model.addAttribute("roomTypes", availableRoomTypes);
+            // 將查詢結果加入 model，使用 roomTypes 變數名稱
+            model.addAttribute("roomTypes", roomTypesWithPromotions);
             
         } catch (Exception e) {
             System.err.println("查詢房型或空房失敗: " + e.getMessage());
+            e.printStackTrace();
             model.addAttribute("roomTypes", List.of());
         }
         
@@ -133,6 +159,46 @@ public class BookingController {
         return "front-end/booking/online-booking";
     }
 
+    // 內部類別：房型與優惠專案的組合
+    public static class RoomTypeWithPromotions {
+        private RoomType roomType;
+        private List<RoomPromotionPrice> promotions;
+        private boolean hasAvailableRooms;
+        
+        public RoomTypeWithPromotions(RoomType roomType, List<RoomPromotionPrice> promotions, boolean hasAvailableRooms) {
+            this.roomType = roomType;
+            this.promotions = promotions;
+            this.hasAvailableRooms = hasAvailableRooms;
+        }
+        
+        public RoomType getRoomType() { return roomType; }
+        public List<RoomPromotionPrice> getPromotions() { return promotions; }
+        public boolean hasAvailableRooms() { return hasAvailableRooms; }
+        
+        // 計算折扣後價格的輔助方法
+        public int getDiscountedPrice(RoomPromotionPrice promotion) {
+            if (promotion.getRoomDiscountRate() != null) {
+                return (int) (roomType.getRoomTypePrice() * promotion.getRoomDiscountRate());
+            }
+            return roomType.getRoomTypePrice();
+        }
+        
+        // 計算折扣金額的輔助方法
+        public int getDiscountAmount(RoomPromotionPrice promotion) {
+            return roomType.getRoomTypePrice() - getDiscountedPrice(promotion);
+        }
+        
+        // 獲取空房狀態文字
+        public String getAvailabilityStatus() {
+            return hasAvailableRooms ? "有空房" : "無空房";
+        }
+        
+        // 獲取空房狀態的 CSS 類別
+        public String getAvailabilityStatusClass() {
+            return hasAvailableRooms ? "text-success" : "text-danger";
+        }
+    }
+
     /**
      * 查詢 chen 的房型資料
      */
@@ -141,11 +207,11 @@ public class BookingController {
         try {
             // 查詢所有上架中的房型 (saleStatus = 1)
             List<RoomType> roomTypes = roomTypeService.findByRoomTypeSaleStatus((byte) 1);
-            model.addAttribute("roomTypes", roomTypes);
+            model.addAttribute("basicRoomTypes", roomTypes);
             System.out.println("查詢到房型數量: " + roomTypes.size());
         } catch (Exception e) {
             System.err.println("查詢房型失敗: " + e.getMessage());
-            model.addAttribute("roomTypes", List.of());
+            model.addAttribute("basicRoomTypes", List.of());
         }
         return "front-end/booking/online-booking";
     }
