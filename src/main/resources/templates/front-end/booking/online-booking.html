@@ -126,12 +126,19 @@
                                     <div>
                                         <div class="fw-bold">原價</div>
                                         <div class="text-primary">
-                                        <span class="room-type-price"
-                                                th:attr="data-price=${roomTypeWithPromotions.roomType.roomTypePrice ?: 0}"
-                                                th:text="|${roomTypeWithPromotions.roomType.roomTypePrice ?: 0} 元/晚 × ${nights ?: 1} 晚 = ${(roomTypeWithPromotions.roomType.roomTypePrice ?: 0) * (nights ?: 1)} 元|">
-                                        </span>
-                                                                              </div>
+                                            <span class="room-type-price"
+                                                  th:attr="data-price=${roomTypeWithPromotions.roomType.roomTypePrice ?: 0}"
+                                                  th:text="|${roomTypeWithPromotions.roomType.roomTypePrice ?: 0} 元/晚 × ${nights ?: 1} 晚 = ${(roomTypeWithPromotions.roomType.roomTypePrice ?: 0) * (nights ?: 1)} 元|">
+                                            </span>
+                                        </div>
                                     </div>
+                                    <button type="button" class="btn btn-dark btn-select-room ms-2"
+                                            th:attr="data-room-name=${roomTypeWithPromotions.roomType.roomTypeName},
+                                                     data-room-price=${roomTypeWithPromotions.roomType.roomTypePrice ?: 0},
+                                                     data-room-id=${roomTypeWithPromotions.roomType.roomTypeId},
+                                                     data-room-type-id=${roomTypeWithPromotions.roomType.roomTypeId}">
+                                        選擇
+                                    </button>
                                 </div>
                             </div>
                             <!-- 優惠專案詳細資訊 -->
