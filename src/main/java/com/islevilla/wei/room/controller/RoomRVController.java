@@ -1,35 +1,24 @@
 package com.islevilla.wei.room.controller;
 
 import com.islevilla.lai.members.model.Members;
-import com.islevilla.lai.members.model.MembersRepository;
-import com.islevilla.lai.members.model.MembersService;
-import com.islevilla.wei.PageUtil;
-import com.islevilla.wei.news.model.News;
 import com.islevilla.wei.room.model.RoomRVDetail;
 import com.islevilla.wei.room.model.RoomRVDetailService;
 import com.islevilla.wei.room.model.RoomRVOrder;
 import com.islevilla.wei.room.model.RoomRVOrderService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
-import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class RoomRVController {
-    @Autowired
-    MembersRepository membersRepository;
-    @Autowired
-    MembersService membersService;
     @Autowired
     private RoomRVOrderService roomRVOrderService;
     @Autowired
@@ -43,28 +32,37 @@ public class RoomRVController {
         if (loginMember == null) {
             return "redirect:/member/login";
         }
-        // 查詢訂單
+
+        // 查詢該會員的所有訂單
         List<RoomRVOrder> orderList = roomRVOrderService.getRoomRVOrderByMember(loginMember);
-        if (!orderList.isEmpty()) {
-            model.addAttribute("orderList", orderList);
+        model.addAttribute("orderList", orderList);
+
+        // 建立 detailMap 並塞入每筆訂單的明細
+        Map<Integer, List<RoomRVDetail>> detailMap = new HashMap<>();
+        for (RoomRVOrder order : orderList) {
+            List<RoomRVDetail> details = roomRVDetailService.getDetailsByRoomRVOrderId(order.getRoomReservationId());
+            detailMap.put(order.getRoomReservationId(), details);
         }
-        if (!orderList.isEmpty()) {
-            int firstOrderId = orderList.get(0).getRoomReservationId();
-            List<RoomRVDetail> detailList = roomRVDetailService.getDetailsByRoomRVOrderId(firstOrderId);
-            model.addAttribute("detailList", detailList);
-        }
+        model.addAttribute("detailMap", detailMap);
 
         return "front-end/member/member-room-list";
     }
 
-    // 前台渲染訂單明細
-    @GetMapping("/member/room/{id}")
-    public String getRoomRVOrdersFromMember(@PathVariable Integer id, Model model) {
-        // 查詢訂單
-        List<RoomRVOrder> orderList = List.of(roomRVOrderService.getById(id));
-        model.addAttribute("orderList", orderList);
-        return "front-end/member/member-room-detail";
-    }
+//    // 前台渲染訂單明細
+//    @GetMapping("/member/room/{id}")
+//    public String getRoomRVOrdersFromMember(@PathVariable Integer id, Model model) {
+//        // 查詢訂單
+//        List<RoomRVOrder> orderList = List.of(roomRVOrderService.getById(id));
+//        // model.addAttribute("orderList", orderList);
+//        Map<Integer, List<RoomRVDetail>> detailMap = new HashMap<>();
+//        for (RoomRVOrder order : orderList) {
+//            List<RoomRVDetail> details = roomRVDetailService.getDetailsByRoomRVOrderId(order.getRoomReservationId());
+//            detailMap.put(order.getRoomReservationId(), details);
+//        }
+//        model.addAttribute("orderList", orderList);
+//        model.addAttribute("detailMap", detailMap);
+//        return "front-end/member/member-room-detail";
+//    }
 
     // 前台取消訂單
     @PostMapping("/member/room/{id}/cancel")
@@ -101,7 +99,7 @@ public class RoomRVController {
     // 後台顯示全部訂單 // 使用前端分頁
     @GetMapping("/backend/room-reservation/list")
     public String roomRVOrderList(Model model) {
-        List<RoomRVOrder> orderList = roomRVOrderService.findAll();
+        List<RoomRVOrder> orderList = roomRVOrderService.getAllOrders();
         model.addAttribute("orderList", orderList);
         return "back-end/roomRVOrder/listAllRoomRVOrder";
     }

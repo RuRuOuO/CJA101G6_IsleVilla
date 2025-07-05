@@ -15,6 +15,7 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Integer> {
 
     List<Feedback> findByFbPublicAndFbStatus(Integer fbPublic, Integer fbStatus);
 
-    // 在 FeedbackRepository 中加入
     boolean existsByRoomRVOrder_RoomReservationId(Integer roomReservationId);
+
+
 }

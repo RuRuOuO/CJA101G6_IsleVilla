@@ -65,11 +65,12 @@
             </div>
 
             <!-- 預約須知 -->
-            <div class="alert alert-info mb-4">
+            <div th:if="${currentStep < 5}" class="alert alert-info mb-4">
                 <h6><i class="fas fa-info-circle me-2"></i>預約須知</h6>
                 <ul class="mb-0">
-                    <li>請選擇您已完成付款的訂房記錄</li>
-                    <li>接駁日期必須在您的住宿期間內</li>
+                    <li>系統只會顯示「已完成付款」且「未申請取消」的訂房紀錄</li>
+                    <li>去/回程的接駁日期與您的入住/退房日期相同</li>
+                    <li>接駁人數與您實際的入住人數相同</li>
                     <li>系統將自動驗證訂房狀態，已取消的訂房無法預約接駁</li>
                 </ul>
             </div>
@@ -109,7 +110,7 @@
                                                 <th>訂房編號</th>
                                                 <th>入住日期</th>
                                                 <th>退房日期</th>
-                                                <th>狀態</th>
+<!--                                                 <th>狀態</th> -->
                                                 <th>操作</th>
                                             </tr>
                                         </thead>
@@ -118,28 +119,43 @@
                                                 <td th:text="${room.roomReservationId}"></td>
                                                 <td th:text="${#temporals.format(room.checkInDate, 'yyyy-MM-dd')}"></td>
                                                 <td th:text="${#temporals.format(room.checkOutDate, 'yyyy-MM-dd')}"></td>
-                                                <td>
-                                                    <span class="badge bg-success">已完成付款</span>
-                                                </td>
+<!--                                                 <td> -->
+<!--                                                     <span class="badge bg-success">已完成付款</span> -->
+<!--                                                 </td> -->
                                                 <td>
 													<!-- 選擇訂房按鈕 -->
-													<button type="button" class="btn btn-primary btn-sm select-room-btn"
+													<button type="button"
+															th:class="${departureReservedMap[room.roomReservationId] ? 'btn btn-secondary btn-sm' : 'btn btn-primary btn-sm select-room-btn'}"
+															th:disabled="${departureReservedMap[room.roomReservationId]}"
 													        th:attr="data-room-reservation-id=${room.roomReservationId},
 													                 data-check-in-date=${#temporals.format(room.checkInDate, 'yyyy-MM-dd')}, 
 													                 data-check-out-date=${#temporals.format(room.checkOutDate, 'yyyy-MM-dd')},
 													                 data-shuttle-date=${#temporals.format(room.checkInDate, 'yyyy-MM-dd')},
 													                 data-shuttle-direction=0,
 													                 data-shuttle-number=${guestCountMap[room.roomReservationId]}">
-													    預約去程
+													    <span th:if="${departureReservedMap[room.roomReservationId]}">
+			                                                <i class="fas fa-check-circle me-1"></i>已預約去程
+			                                            </span>
+			                                            <span th:unless="${departureReservedMap[room.roomReservationId]}">
+			                                                預約去程
+			                                            </span>
 													</button>
-													<button type="button" class="btn btn-primary btn-sm select-room-btn"
+													<button
+															type="button"
+															th:class="${arrivalReservedMap[room.roomReservationId] ? 'btn btn-secondary btn-sm' : 'btn btn-primary btn-sm select-room-btn'}"
+													        th:disabled="${arrivalReservedMap[room.roomReservationId]}"
 													        th:attr="data-room-reservation-id=${room.roomReservationId},
 													                 data-check-in-date=${#temporals.format(room.checkInDate, 'yyyy-MM-dd')}, 
 													                 data-check-out-date=${#temporals.format(room.checkOutDate, 'yyyy-MM-dd')}, 
 													                 data-shuttle-date=${#temporals.format(room.checkOutDate, 'yyyy-MM-dd')},
 													                 data-shuttle-direction=1,
 													                 data-shuttle-number=${guestCountMap[room.roomReservationId]}">
-													    預約回程
+													    <span th:if="${arrivalReservedMap[room.roomReservationId]}">
+			                                                <i class="fas fa-check-circle me-1"></i>已預約回程
+			                                            </span>
+			                                            <span th:unless="${arrivalReservedMap[room.roomReservationId]}">
+			                                                預約回程
+			                                            </span>
 													</button>
                                                 </td>
                                             </tr>
@@ -406,6 +422,9 @@
             <div th:if="${reservationSuccess}" class="alert alert-success mt-4">
                 <h4><i class="fas fa-check-circle me-2"></i>預約成功！</h4>
                 <p>您的接駁預約已成功提交，預約編號為 <strong th:text="${newShuttleReservationId}"></strong></p>
+                <a th:href="@{/member/shuttle/list}" class="btn btn-outline-primary btn-sm ms-2">
+                    <i class="fas fa-search me-2"></i>檢視預約紀錄
+                </a>
                 <a th:href="@{/shuttle/reservation}" class="btn btn-primary">
                     <i class="fas fa-plus me-2"></i>新增預約
                 </a>

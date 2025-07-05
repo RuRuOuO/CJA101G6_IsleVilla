@@ -19,8 +19,10 @@ import com.islevilla.lai.members.model.Members;
 import com.islevilla.lai.shuttle.model.SeatDTO;
 import com.islevilla.lai.shuttle.model.ShuttleRVFrontEndService;
 import com.islevilla.lai.shuttle.model.ShuttleReservation;
+import com.islevilla.lai.shuttle.model.ShuttleReservationSeatService;
 import com.islevilla.lai.shuttle.model.ShuttleReservationService;
 import com.islevilla.lai.shuttle.model.ShuttleScheduleWithAvailabilityDTO;
+import com.islevilla.lai.shuttle.model.ShuttleSeatAvailabilityService;
 import com.islevilla.lai.shuttle.model.TempShuttleRVRequestDTO;
 import com.islevilla.lai.shuttle.model.TempShuttleRVSummaryDTO;
 import com.islevilla.wei.room.model.RoomRVDetailService;
@@ -43,28 +45,17 @@ public class ShuttleReservationController {
 	private ShuttleReservationService shuttleReservationService;
 
 	@Autowired
+	private ShuttleReservationSeatService shuttleReservationSeatService;
+
+	@Autowired
 	private ShuttleRVFrontEndService shuttleRVFrontEndService;
 
-//	// 顯示登入頁面
-//	@GetMapping("/shuttle/reservation")
-//	public String showShuttleReservationPage(HttpSession session, Model model) {
-//		// 檢查是否已登入
-//		Members member = (Members) session.getAttribute("member");
-//		if (member == null) {
-//			// 如果沒有登入，直接跳轉到登入頁面
-//			System.out.println("找不到登入紀錄，即將跳轉到登入頁面......");
-//			return "redirect:/member/login";
-//		}
-//		System.out.println("進入接駁預約頁面");
-//		// 將會員資訊傳給頁面顯示
-//		model.addAttribute("member", member);
-//		return "front-end/shuttle/shuttle-reservation";
-//	}
+	@Autowired
+	private ShuttleSeatAvailabilityService shuttleSeatAvailabilityService;
 
 	// 前台渲染會員接駁預約
 	@GetMapping("/member/shuttle/list")
 	public String getShuttleRVFromMember(Model model, HttpSession session) {
-//  public String getShuttleRVFromMember(Model model) {
 		Members member = (Members) session.getAttribute("member");
 
 		if (member == null) {
@@ -77,6 +68,36 @@ public class ShuttleReservationController {
 			model.addAttribute("shuttleReservationList", shuttleReservationList);
 		}
 		return "front-end/member/member-shuttle-list";
+	}
+
+	// 後台 - 會員取消接駁預約
+	@PostMapping("/member/shuttle/list/cancel")
+	public String cancelShuttleRVFromMember(@RequestParam("shuttleReservationId") Integer shuttleReservationId,
+			Model model, HttpSession session) {
+		Members member = (Members) session.getAttribute("member");
+
+		if (member == null) {
+			return "redirect:/member/login";
+		}
+		boolean succeed = false;
+		try {
+			ShuttleReservation reservation = shuttleReservationService.cancelReservation(shuttleReservationId);
+			shuttleReservationSeatService.deleteByShuttleReservationId(shuttleReservationId);
+			succeed = shuttleSeatAvailabilityService.cancelReservation(
+					reservation.getShuttleSchedule().getShuttleScheduleId(), reservation.getShuttleDate(),
+					reservation.getShuttleNumber());
+		} catch (RuntimeException e) {
+			System.out.println(e);
+		} catch (Exception e2) {
+			System.out.println(e2);
+		}
+		if (succeed) {
+			System.out.println("取消預約成功！");
+		} else {
+			System.out.println("取消預約失敗！");
+		}
+
+		return "redirect:/member/shuttle/list";
 	}
 
 	/**
@@ -100,25 +121,47 @@ public class ShuttleReservationController {
 
 			// 為每筆訂房記錄查詢總入住人數
 			Map<Integer, Integer> guestCountMap = new HashMap<>();
+			Map<Integer, Boolean> departureReservedMap = new HashMap<>();
+			Map<Integer, Boolean> arrivalReservedMap = new HashMap<>();
 			for (RoomRVOrder roomOrder : memberRoomReservations) {
 				try {
+					// 查詢入住人數
 					Integer guestCount = roomRVDetailService.getGuestCountByRoomRVOrder(roomOrder);
 					guestCountMap.put(roomOrder.getRoomReservationId(), guestCount != null ? guestCount : 0);
 					System.out.println("訂房編號 " + roomOrder.getRoomReservationId() + " 的總入住人數: " + guestCount);
+
+					// 查詢接駁預約狀態
+					boolean isDepartureReserved = shuttleReservationService
+							.existsByRoomRVOrderAndShuttleReservationStatusDeparture(roomOrder);
+					boolean isArrivalReserved = shuttleReservationService
+							.existsByRoomRVOrderAndShuttleReservationStatusArrival(roomOrder);
+
+					departureReservedMap.put(roomOrder.getRoomReservationId(), isDepartureReserved);
+					arrivalReservedMap.put(roomOrder.getRoomReservationId(), isArrivalReserved);
+
+					System.out.println("訂房編號 " + roomOrder.getRoomReservationId() + " 去程預約狀態: " + isDepartureReserved
+							+ ", 回程預約狀態: " + isArrivalReserved);
+
 				} catch (Exception e) {
-					System.out.println("查詢訂房編號 " + roomOrder.getRoomReservationId() + " 入住人數時發生錯誤: " + e.getMessage());
+					System.out.println("查詢訂房編號 " + roomOrder.getRoomReservationId() + " 資料時發生錯誤: " + e.getMessage());
 					guestCountMap.put(roomOrder.getRoomReservationId(), 0);
+					departureReservedMap.put(roomOrder.getRoomReservationId(), false);
+					arrivalReservedMap.put(roomOrder.getRoomReservationId(), false);
 				}
 			}
 
 			model.addAttribute("memberRoomReservations", memberRoomReservations);
 			model.addAttribute("guestCountMap", guestCountMap);
+			model.addAttribute("departureReservedMap", departureReservedMap);
+			model.addAttribute("arrivalReservedMap", arrivalReservedMap);
 
 		} catch (Exception e) {
 			System.out.println("查詢會員訂房記錄時發生錯誤: " + e.getMessage());
 			e.printStackTrace();
 			model.addAttribute("memberRoomReservations", new ArrayList<>());
 			model.addAttribute("guestCountMap", new HashMap<>());
+			model.addAttribute("departureReservedMap", new HashMap<>());
+			model.addAttribute("arrivalReservedMap", new HashMap<>());
 		}
 
 		// 初始化表單物件
@@ -229,10 +272,9 @@ public class ShuttleReservationController {
 		return "front-end/shuttle/shuttle-reservation";
 	}
 
-	/**
+	/*
 	 * 步驟2 - 選擇班次 -> 步驟3 - 選擇座位
 	 */
-
 	@PostMapping("/shuttle/reservation/select-seats")
 	public String selectSchedule(@RequestParam Integer reservationRequestId,
 			@RequestParam(required = false) Integer selectedScheduleId, @RequestParam(required = false) String action,
