@@ -268,21 +268,11 @@
         console.log('頁面載入完成');
         
         // 取得 Thymeleaf 傳來的查詢條件
-        var checkin = /*2025-07-21*/ '';
-        var checkout = /*2025-07-22*/ '';
+        var checkin =  '';
+        var checkout = '';
         if (checkin) document.getElementById('checkin').value = checkin;
         if (checkout) document.getElementById('checkout').value = checkout;
         
-        // ======（移除根據 URL 參數設定人數選項的 JS）======
-        // var urlParams = new URLSearchParams(window.location.search);
-        // var adultsFromUrl = urlParams.get('mainAdults');
-        // var childrenFromUrl = urlParams.get('children');
-        // if (adultsFromUrl) {
-        //     document.getElementById('main-adults').value = adultsFromUrl;
-        // }
-        // if (childrenFromUrl) {
-        //     document.getElementById('main-children').value = childrenFromUrl;
-        // }
         
         flatpickr("#main-date-range", {
             mode: "range",
