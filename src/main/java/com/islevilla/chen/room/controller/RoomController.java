@@ -21,6 +21,7 @@ import com.islevilla.chen.room.model.Room;
 import com.islevilla.chen.room.model.RoomService;
 import com.islevilla.chen.roomType.model.RoomType;
 import com.islevilla.chen.roomType.model.RoomTypeService;
+import com.islevilla.chen.roomTypeAvailability.model.RoomTypeAvailabilityService;
 import com.islevilla.chen.util.exception.BusinessException;
 import com.islevilla.chen.util.map.RoomTypeName;
 
@@ -36,6 +37,9 @@ public class RoomController {
 	
 	@Autowired
 	private RoomTypeService roomTypeService;
+	
+	@Autowired
+	private RoomTypeAvailabilityService roomTypeAvailabilityService;
 	
 	@Autowired
 	private RoomTypeName roomTypeName;
@@ -87,6 +91,11 @@ public String showAddRoom(Model model) {
 		
 		try {
 	        roomService.addRoom(room);
+			//增加新房間後，更新該房型的統計資料
+	        roomService.updateRoomTypeBasicStatistics(room.getRoomTypeId());
+	        // 更新該房型的統計資料後改寫roomTypeAvailability資料庫
+	        roomTypeAvailabilityService.recalculateAvailability(roomService.updateRoomTypeBasicStatistics(room.getRoomTypeId()));
+	        
 			System.out.println("資料送出成功");
 			model.addAttribute("successMessage", "房間新增成功！");
 			model.addAttribute("room", room); 
@@ -233,14 +242,29 @@ public String showUpdateRoom(@PathVariable Integer roomId, Model model) {
 			model.addAttribute("room", room);
 			return "/back-end/room/updateRoom";
 		}else{
+			// 取得原始房間資料以比較房型是否改變
+			Room originalRoom = roomService.findById(room.getRoomId());
+			Integer originalRoomTypeId = originalRoom.getRoomTypeId();
+			
 			roomService.updateRoom(room);
-
-			System.out.println("資料送出成功");
-			model.addAttribute("successMessage", "房間資料更新成功！");
-			model.addAttribute("room", room);
-			return "back-end/room/updateRoom";
+			
+			//增加新房間後，更新"新"房型的統計資料
+	        roomService.updateRoomTypeBasicStatistics(room.getRoomTypeId());
+	        // 更新"新"房型的統計資料後改寫roomTypeAvailability資料庫
+	        roomTypeAvailabilityService.recalculateAvailability(roomService.updateRoomTypeBasicStatistics(room.getRoomTypeId()));
+			
+			//增加新房間後，更新舊房型的統計資料
+	        roomService.updateRoomTypeBasicStatistics(originalRoomTypeId);
+	        // 更新舊房型的統計資料後改寫roomTypeAvailability資料庫
+	        roomTypeAvailabilityService.recalculateAvailability(roomService.updateRoomTypeBasicStatistics(originalRoomTypeId));;
 		}
+
+		System.out.println("資料送出成功");
+		model.addAttribute("successMessage", "房間資料更新成功！");
+		model.addAttribute("room", room);
+		return "back-end/room/updateRoom";
 	}
+
 	
 	//刪除
 	@GetMapping("/deleteRoom/{roomId}")
@@ -248,7 +272,15 @@ public String showUpdateRoom(@PathVariable Integer roomId, Model model) {
 						   @RequestHeader(value = "Referer", required = false) String referer,
 						   RedirectAttributes redirectAttr) {
 		 try {
+		        // 在刪除前取得房間資料以獲取房型ID
+		        Room roomToDelete = roomService.findById(roomId);
+		        Integer roomTypeId = roomToDelete.getRoomTypeId();
+		        
 		        roomService.deleteRoom(roomId);
+		        
+		        // 刪除房間後，重新計算該房型的統計資料
+		        roomTypeAvailabilityService.recalculateAvailability(roomService.updateRoomTypeBasicStatistics(roomTypeId));
+		        
 		        redirectAttr.addFlashAttribute("successMessage", "房間刪除成功！");
 		    } catch (Exception e) { //外鍵約束錯誤會發生在控制器，service不用寫
 		        redirectAttr.addFlashAttribute("errorMessage", "此房間尚有訂單資料，無法刪除");
