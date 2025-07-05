@@ -25,8 +25,12 @@ public class RoomRVDetailService {
         }
         return roomRVDetailRepository.findByRoomRVOrder(roomRVOrder);
     }
-    
+
     public Integer getGuestCountByRoomRVOrder(RoomRVOrder roomRVOrder) {
-    	return roomRVDetailRepository.countGuestByRoomRVOrder(roomRVOrder);
+        return roomRVDetailRepository.countGuestByRoomRVOrder(roomRVOrder);
+    }
+
+    public void updateRoomRVDetail(RoomRVDetail roomRVDetail) {
+        roomRVDetailRepository.save(roomRVDetail);
     }
 }

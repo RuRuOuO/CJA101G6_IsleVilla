@@ -48,22 +48,6 @@ public class RoomRVController {
         return "front-end/member/member-room-list";
     }
 
-//    // 前台渲染訂單明細
-//    @GetMapping("/member/room/{id}")
-//    public String getRoomRVOrdersFromMember(@PathVariable Integer id, Model model) {
-//        // 查詢訂單
-//        List<RoomRVOrder> orderList = List.of(roomRVOrderService.getById(id));
-//        // model.addAttribute("orderList", orderList);
-//        Map<Integer, List<RoomRVDetail>> detailMap = new HashMap<>();
-//        for (RoomRVOrder order : orderList) {
-//            List<RoomRVDetail> details = roomRVDetailService.getDetailsByRoomRVOrderId(order.getRoomReservationId());
-//            detailMap.put(order.getRoomReservationId(), details);
-//        }
-//        model.addAttribute("orderList", orderList);
-//        model.addAttribute("detailMap", detailMap);
-//        return "front-end/member/member-room-detail";
-//    }
-
     // 前台取消訂單
     @PostMapping("/member/room/{id}/cancel")
     public String cancelOrderFront(@PathVariable Integer id) {

@@ -37,13 +37,6 @@
                 <h4 class="card-title mb-0 fw-bold">
                     <i class="bi bi-house-door me-2"></i>住房管理
                 </h4>
-                <!--                <button-->
-                <!--                        class="btn btn-success"-->
-                <!--                        data-bs-toggle="modal"-->
-                <!--                        data-bs-target="#addEmployeeModal"-->
-                <!--                >-->
-                <!--                    <i class="bi bi-plus-circle me-2"></i>新增員工-->
-                <!--                </button>-->
             </div>
         </div>
 
@@ -173,15 +166,21 @@
                                         </button>
 
                                         <!-- 入住按鈕 -->
-                                        <form th:action="@{/backend/room-reservation/{orderId}/checkin(orderId=${order.roomReservationId})}"
-                                              method="post" th:if="${order.roomOrderStatus==0}" class="d-inline">
-                                            <button type="submit"
-                                                    class="btn btn-sm btn-success"
-                                                    title="辦理入住"
-                                                    onclick="return confirm('確定為訂單 #'+this.form.action.split('/').pop()+'辦理入住？');">
-                                                <i class="bi bi-house-check"></i>
-                                            </button>
-                                        </form>
+                                        <!--                                        <form th:action="@{/backend/room-reservation/{orderId}/checkin(orderId=${order.roomReservationId})}"-->
+                                        <!--                                              method="post" th:if="${order.roomOrderStatus==0}" class="d-inline">-->
+                                        <!--                                            <button type="submit"-->
+                                        <!--                                                    class="btn btn-sm btn-success"-->
+                                        <!--                                                    title="辦理入住"-->
+                                        <!--                                                    onclick="return confirm('確定為訂單 #'+this.form.action.split('/').pop()+'辦理入住？');">-->
+                                        <!--                                                <i class="bi bi-house-check"></i>-->
+                                        <!--                                            </button>-->
+                                        <!--                                        </form>-->
+                                        <a th:if="${order.roomOrderStatus==0}"
+                                           th:href="@{/backend/room-reservation/{orderId}/select-rooms(orderId=${order.roomReservationId})}"
+                                           class="btn btn-sm btn-success"
+                                           title="辦理入住">
+                                            <i class="bi bi-house-check"></i>
+                                        </a>
 
                                         <!-- 退房按鈕 -->
                                         <form th:action="@{/backend/room-reservation/{orderId}/checkout(orderId=${order.roomReservationId})}"
