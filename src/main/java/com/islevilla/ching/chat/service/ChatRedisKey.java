@@ -1,3 +1,4 @@
+
 package com.islevilla.ching.chat.service;
 
 // Redis Key 統一管理
@@ -12,14 +13,14 @@ public final class ChatRedisKey {
 	}
 
 	// 聊天室ID集合（Set）
-	 public static final String CHAT_ROOMS_SET = PREFIX + "rooms:set";
+	public static final String CHAT_ROOMS_SET = PREFIX + "rooms:set";
 
 	// 指定聊天室資料（JSON String
 	public static String chatRoom(int roomId) {
 		return PREFIX + "room:" + roomId;
 	}
 
-	// 指定聊天室訊息列表（List<String>）
+	// 指定聊天室訊息列表（List<String>
 	public static String chatMessages(int roomId) {
 		return PREFIX + "msg:" + roomId;
 	}
@@ -43,14 +44,14 @@ public final class ChatRedisKey {
 	public static String chatMemberRoom(int memberId) {
 		return PREFIX + "member:room:" + memberId;
 	}
-	
-	// 最後訊息時間戳（Long millis → String） 
-    public static String chatLastMessageTime(int roomId) {
-        return PREFIX + "room:lastMessageTime:" + roomId;
-    }
 
-    // 聊天室結案時間戳（Long millis → String) 
-    public static String chatRoomEndTime(int roomId) {
-        return PREFIX + "room:endTime:" + roomId;
-    }
+	// 最後訊息時間戳（Long millis → String）
+	public static String chatLastMessageTime(int roomId) {
+		return PREFIX + "room:lastMessageTime:" + roomId;
+	}
+
+	// 聊天室結案時間戳（Long millis → String)
+	public static String chatRoomEndTime(int roomId) {
+		return PREFIX + "room:endTime:" + roomId;
+	}
 }

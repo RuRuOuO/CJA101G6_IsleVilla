@@ -50,7 +50,7 @@ public class ChatRedisService {
 		return new ChatRoomResult(room, true);
 	}
 
-	// 查詢單一聊天室（即時補名稱）
+	// 查詢單一聊天室
 	public ChatRoomDTO getChatRoom(Integer roomId) {
 		String json = redisStr.opsForValue().get(ChatRedisKey.chatRoom(roomId));
 		if (json == null)
@@ -86,6 +86,8 @@ public class ChatRedisService {
 		}).collect(Collectors.toList());
 	}
 
+	
+	
 	/* ================= 訊息管理 ================= */
 
 	// 儲存訊息
@@ -94,10 +96,10 @@ public class ChatRedisService {
 		chatRoomUpdateService.updateLastMessageTime(roomId, message.getMessageTime());
 
 		if (message.getSenderType() == 0)
-			// 會員發送 → 增加客服的未讀
+			// 會員發送 會增加客服的未讀
 			redisStr.opsForValue().increment(ChatRedisKey.chatUnreadEmployee(roomId));
 		else
-			// 客服發送 → 增加會員的未讀
+			// 客服發送 會增加會員的未讀
 			redisStr.opsForValue().increment(ChatRedisKey.chatUnreadMember(roomId));
 	}
 
@@ -121,6 +123,7 @@ public class ChatRedisService {
 		return getMessageHistory(roomId, false);
 	}
 
+	
 	/* ================= 未讀管理 ================= */
 
 	// 查詢會員未讀
@@ -129,22 +132,25 @@ public class ChatRedisService {
 		return count == null ? 0 : Integer.parseInt(count);
 	}
 
-	// 客服未讀（共用）
+	// 客服未讀（共用
 	public Integer getUnreadCountForEmployee(Integer roomId) {
 		String count = redisStr.opsForValue().get(ChatRedisKey.chatUnreadEmployee(roomId));
 		return count == null ? 0 : Integer.parseInt(count);
 	}
 
+	// 依會員抓房間ID
 	public Integer getChatRoomIdByMember(Integer memberId) {
 		String id = redisStr.opsForValue().get(ChatRedisKey.chatMemberRoom(memberId));
 		return id == null ? null : Integer.parseInt(id);
 	}
-
+	
+	// 抓會員ID
 	public Integer getMemberId(Integer roomId) {
 		ChatRoomDTO room = getChatRoom(roomId);
 		return room == null ? null : room.getMemberId();
 	}
 
+	// 抓管理員ID
 	public Integer getEmployeeId(Integer roomId) {
 		ChatRoomDTO room = getChatRoom(roomId);
 		return room == null ? null : room.getEmployeeId();
