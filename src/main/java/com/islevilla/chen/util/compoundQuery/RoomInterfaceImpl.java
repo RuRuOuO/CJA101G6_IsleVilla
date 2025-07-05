@@ -26,7 +26,7 @@ public class RoomInterfaceImpl implements RoomInterface {
 
         //根據條件是否為 null，動態拼接 JPQL
         if (roomId != null) {
-            jpql.append(" AND r.roomId = :roomId");  // ⚠️ 注意這裡要看你的關聯命名
+            jpql.append(" AND r.roomId = :roomId");  
         }
         if (roomTypeId != null) {
             jpql.append(" AND r.roomTypeId = :roomTypeId");

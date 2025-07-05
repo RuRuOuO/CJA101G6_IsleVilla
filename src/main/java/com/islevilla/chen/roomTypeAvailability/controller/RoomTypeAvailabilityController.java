@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -39,6 +40,31 @@ public class RoomTypeAvailabilityController {
     @Autowired
     private RoomTypeName roomTypeName;
     
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+  //顯示網頁
+    @GetMapping("/list")
+    @PreAuthorize("hasAuthority('room')")
+    public String showList(
+    		@RequestParam(value = "roomTypeId", required = false) Integer roomTypeId,
+		    @Param("year") int year,
+		    @Param("month") int month,
+            Model model) {
+    	
+        List<RoomTypeAvailability> list;
+
+
+        if (roomTypeId == 0) {
+        	list=roomTypeAvailabilityService.findAllByYearMonth(year, month);
+        }else {
+        	list= roomTypeAvailabilityService.findByRoomTypeIdAndYearMonth(roomTypeId, year, month);
+        }
+
+    	System.out.println("進入頁面");
+
+    	model.addAttribute("selectedRoomTypeId", roomTypeId); 
+    	model.addAttribute("RoomTypeAvailabilityList", list); 
+    	model.addAttribute("roomTypeNameList", roomTypeName.getRoomTypeNameList());  //下拉選單
+    	model.addAttribute("roomTypeName", roomTypeName.getRoomTypeNameMap()); 
+    	return "back-end/RoomTypeAvailability/listRoomTypeAvailability";
+    }
     
 }
