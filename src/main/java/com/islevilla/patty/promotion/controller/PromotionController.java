@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Controller
-@RequestMapping("/promotion")
+@RequestMapping("/backend/promotion")
 @RequiredArgsConstructor
 public class PromotionController {
 
@@ -31,7 +31,7 @@ public class PromotionController {
             return "back-end/promotion/addPromotion";
         }
         promotionSvc.addPromotion(promotion);
-        return "redirect:/promotion/listAll";
+        return "redirect:/backend/promotion/listAll";
     }
 
     @PostMapping("/getOneForUpdate")
@@ -46,7 +46,7 @@ public class PromotionController {
             return "back-end/promotion/update_promotion_input";
         }
         promotionSvc.updatePromotion(promotion);
-        return "back-end/promotion/listOnePromotion";
+        return "redirect:/backend/promotion/listAll";
     }
 
     @GetMapping("/listAll")
@@ -56,9 +56,9 @@ public class PromotionController {
         return "back-end/promotion/listAllPromotion";
     }
 
-//    @PostMapping("/delete")
-//    public String delete(@RequestParam("roomPromotionId") Integer id, ModelMap model) {
-//        promotionSvc.deletePromotion(id);
-//        return "redirect:/promotion/listAll";
-//    }
+    @PostMapping("/delete")
+    public String delete(@RequestParam("roomPromotionId") Integer id, ModelMap model) {
+        promotionSvc.deletePromotion(id);
+        return "redirect:/backend/promotion/listAll";
+    }
 }

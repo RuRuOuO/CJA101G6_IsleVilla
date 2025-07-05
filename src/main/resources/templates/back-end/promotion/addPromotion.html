@@ -1,136 +1,87 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>優惠專案新增 - addPromotion.html</title>
-
-<head th:insert="~{/back-end/promotion/included-fragment}"></head>
-<style type="text/css">
-	
-	button {
-		padding: 5px;
-	}
-	form {
-		display: table;
-	}
-	form div {
-		display: table-row;
-	}
-	label, input, span, select {
-		display: table-cell;
-		margin: 5px;
-		text-align: left;		
-	}
-	input[type=text], input[type=password], select, textarea {
-		width: 200px;
-		margin: 5px;
-	}
-	form div div {
-		display: table-cell;
-	}
-	.center {
-        margin-left: auto;
-        margin-right: auto;
-    }
-</style>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>微嶼後台 | 優惠專案新增 </title>
+    <!-- ===== 載入統一樣式 ===== -->
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
 </head>
 <body>
+<!-- ===== 載入sidebar ===== -->
+<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+<div th:replace="~{fragments/backFragments :: sidebar}"></div>
 
-<nav class="navbar navbar-expand-md navbar-dark bg-success fixed-top justify-content-center">
-		 <div align="center"> <h2>優惠專案新增 - addPromotion.html</h2>
-		 <h3><a class="navbar-brand" th:href="@{/promotion/select_page}"><img th:src="@{/images/back1.gif}">回查詢頁</a></h3></div>
-</nav>
+<!-- ===== 頁面主內容 ===== -->
+<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+    <th:block th:fragment="myContent">
+        <h2 class="card-title">新增優惠專案</h2>
+        <h5 class="card-subtitle mb-4 text-muted">所有欄位皆為必填</h5>
 
-	<div align="center">
-		<h3><b>所有欄位皆為必填欄位</b></h3>
-		<form th:action="@{insert}" method="post" th:object="${promotion}" enctype="multipart/form-data">
-							
-			
-			<div>
-			<label>優惠專案名稱:</label>
-			<input type="text" th:field="*{roomPromotionTitle}" onclick="hideContent('roomPromotionTitle.errors');" /><br/>
-			<span  th:if="${#fields.hasErrors('roomPromotionTitle')}" th:errors="*{roomPromotionTitle}" class="error" id="roomPromotionTitle.errors"></span>
-			</div>
-			
-			<div>
-			<label>專案開始日期:</label>
-			<input type="date" th:field="*{promotionStartDate}" onclick="hideContent('promotionStartDate.errors');" /><br/>
-			<span  th:if="${#fields.hasErrors('promotionStartDate')}" th:errors="*{promotionStartDate}" class="error" id="promotionStartDate.errors"></span>
-			</div>
-			
-			<div>
-			<label>專案結束日期:</label>
-			<input type="date" th:field="*{promotionEndDate}" onclick="hideContent('promotionEndDate.errors');" /><br/>
-			<span  th:if="${#fields.hasErrors('promotionEndDate')}" th:errors="*{promotionEndDate}" class="error" id="promotionEndDate.errors"></span>
-			</div>
-			
-			<div>
-			<label>備註:</label>
-			<input type="text" th:field="*{promotionRemark}" onclick="hideContent('promotionRemark.errors');" /><br/>
-			<span  th:if="${#fields.hasErrors('promotionRemark')}" th:errors="*{promotionRemark}" class="error" id="promotionRemark.errors"></span>
-			</div>
+        <form th:action="@{/backend/promotion/insert}" method="post" th:object="${promotion}">
+            <div class="mb-3">
+                <label for="roomPromotionTitle" class="form-label">優惠專案名稱:</label>
+                <input type="text" id="roomPromotionTitle" th:field="*{roomPromotionTitle}" class="form-control"/>
+                <div th:if="${#fields.hasErrors('roomPromotionTitle')}" th:errors="*{roomPromotionTitle}" class="text-danger"></div>
+            </div>
 
-			<div>
-				<div></div>
-				<div><button type="submit" id="submit"> 送出新增 </button></div>
-				<div></div>
-			</div>		
-		</form>
-	
-	</div>
+            <div class="mb-3">
+                <label for="promotionStartDate" class="form-label">專案開始日期:<span class="text-danger">*</span></label>
+                <input type="date" id="promotionStartDate" th:field="*{promotionStartDate}" class="form-control" required/>
+                <div class="invalid-feedback">請選擇開始日期</div>
+                <div th:if="${#fields.hasErrors('promotionStartDate')}" th:errors="*{promotionStartDate}" class="text-danger"></div>
+            </div>
 
+            <div class="mb-3">
+                <label for="promotionEndDate" class="form-label">專案結束日期:</label>
+                <input type="date" id="promotionEndDate" th:field="*{promotionEndDate}" class="form-control"/>
+                <div th:if="${#fields.hasErrors('promotionEndDate')}" th:errors="*{promotionEndDate}" class="text-danger"></div>
+            </div>
 
-<!-- JavaScript part -->
-<script type="text/javascript">
-//清除提示信息
-function hideContent(d) {
-     document.getElementById(d).style.display = "none";
-}
+            <div class="mb-3">
+                <label for="promotionRemark" class="form-label">備註:</label>
+                <input type="text" id="promotionRemark" th:field="*{promotionRemark}" class="form-control"/>
+                <div th:if="${#fields.hasErrors('promotionRemark')}" th:errors="*{promotionRemark}" class="text-danger"></div>
+            </div>
 
-//照片上傳-預覽用
-<!-- var filereader_support = typeof FileReader != 'undefined';
-if (!filereader_support) {
-	alert("No FileReader support");
-}
-acceptedTypes = {
-		'image/png' : true,
-		'image/jpeg' : true,
-		'image/gif' : true
-};
-function previewImage() {
-	var upfile1 = document.getElementById("upFiles");
-	upfile1.addEventListener("change", function(event) {
-		var files = event.target.files || event.dataTransfer.files;
-		for (var i = 0; i < files.length; i++) {
-			previewfile(files[i])
-		}
-	}, false);
-}
-function previewfile(file) {
-	if (filereader_support === true && acceptedTypes[file.type] === true) {
-		var reader = new FileReader();
-		reader.onload = function(event) {
-			var image = new Image();
-			image.src = event.target.result;
-			image.width = 100;
-			image.height = 75;
-			image.border = 2;
-			if (blob_holder.hasChildNodes()) {
-				blob_holder.removeChild(blob_holder.childNodes[0]);
-			}
-			blob_holder.appendChild(image);
-		};
-		reader.readAsDataURL(file);
-		document.getElementById('submit').disabled = false;
-	} else {
-		blob_holder.innerHTML = "<div  style='text-align: left;'>" + "● filename: " + file.name
-				+ "<br>" + "● ContentTyp: " + file.type
-				+ "<br>" + "● size: " + file.size + "bytes"
-				+ "<br>" + "● 上傳ContentType限制: <b> <font color=red>image/png、image/jpeg、image/gif </font></b></div>";
-		document.getElementById('submit').disabled = true;
-	}
-}-->
+            <div>
+                <button type="submit" class="btn btn-primary">送出新增</button>
+                <a th:href="@{/backend/promotion/listAll}" class="btn btn-secondary">取消</a>
+            </div>
+        </form>
+    </th:block>
+</main>
+
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        const startDateInput = document.getElementById('promotionStartDate');
+        const endDateInput = document.getElementById('promotionEndDate');
+        const form = startDateInput.closest('form');
+
+        // 1. 設定開始日期的最小值為今天
+        const today = new Date().toISOString().split('T')[0];
+        startDateInput.setAttribute('min', today);
+
+        // 2. 當開始日期變更時，動態設定結束日期的最小值
+        startDateInput.addEventListener('change', function() {
+            if (startDateInput.value) {
+                endDateInput.setAttribute('min', startDateInput.value);
+                // 如果結束日期在新的開始日期之前，清空結束日期
+                if (endDateInput.value && endDateInput.value < startDateInput.value) {
+                    endDateInput.value = '';
+                }
+            }
+        });
+
+        // 3. Bootstrap 驗證，沒選日期時顯示紅字
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
 </script>
 
 </body>

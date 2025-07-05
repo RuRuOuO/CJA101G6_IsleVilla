@@ -4,9 +4,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>優惠專案管理</title>
+<title>優惠專案價格管理</title>
 
-<head th:insert="~{/back-end/promotion/included-fragment}"></head>
+<head th:insert="~{/back-end/roompromotionprice/included-fragment}"></head>
 <style type="text/css">
 	
     span {
@@ -20,11 +20,11 @@
 <body>
 
 <nav class="navbar navbar-expand-md navbar-dark bg-success fixed-top justify-content-center">
-		 <div align="center"> <h2>優惠專案管理</h2>
-		 <h3><a class="navbar-brand" th:href="@{/backend/promotion/select_page}"><img th:src="@{/images/back1.gif}">回查詢頁<label th:text="${success}"></label></a></h3></div>
+		 <div align="center"> <h2>優惠專案價格管理</h2>
+		 <h3><a class="navbar-brand" th:href="@{/backend/roompromotionprice/select_page}"><img th:src="@{/images/back1.gif}">回查詢頁<label th:text="${success}"></label></a></h3></div>
 </nav>
 
-	<div align="center" th:fragment="listOnePromotion-div"> <!-- 此div被select_page.html第158行insert用 -->
+	<div align="center" th:fragment="listOneRoomPromotionPrice-div"> <!-- 此div被select_page.html第158行insert用 -->
 		<h3><span>查詢結果 :</span></h3>
 		<span>優惠專案編號:</span><span th:text="${promotion.roomPromotionId}"></span><br/>
 		<span>優惠專案名稱:</span><span th:text="${promotion.roomPromotionTitle}"></span><br/>

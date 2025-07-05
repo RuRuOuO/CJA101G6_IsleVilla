@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>微嶼 | Isle Villa 後台首頁</title>
+  <title>微嶼後台 | 優惠專案價格</title>
   <!-- ===== 載入統一樣式 ===== -->
   <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
 </head>
@@ -18,8 +18,8 @@
   <th:block th:fragment="myContent">
     <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
     <div class="container">
-      <h2 class="card-title">優惠專案管理</h2>
-      <a class="btn btn-primary" th:href="@{/backend/promotion/add}">新增專案</a>
+      <h2 class="card-title">優惠專案價格管理</h2>
+      <a class="btn btn-primary" th:href="@{/backend/roompromotionprice/add}">新增專案價格</a>
 
 
       <table class="table table-striped">
@@ -34,7 +34,7 @@
         </tr>
         </thead>
         <tbody>
-        <th:block th:each="promotion : ${promotionListData}">
+        <th:block th:each="roomPromotionPrice : ${roomPromotionPriceListData}">
 			<tr>
 				<td th:text="${promotion.roomPromotionId}"></td>
 				<td th:text="${promotion.roomPromotionTitle}"></td>
@@ -42,13 +42,13 @@
 				<td th:text="${promotion.promotionEndDate != null ? promotion.promotionEndDate.toLocalDate() : ''}"></td>
 				<td th:text="${promotion.promotionRemark}"></td>
                 <td>
-                    <form method="post" th:action="@{/backend/promotion/getOneForUpdate}" style="display: inline-block; margin-bottom: 0px;">
+                    <form method="post" th:action="@{/backend/roompromotionprice/getOneForUpdate}" style="display: inline-block; margin-bottom: 0px;">
                         <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-pencil-fill me-1"></i>修改</button>
-                        <input type="hidden" name="roomPromotionId" th:value="${promotion.roomPromotionId}">
+                        <input type="hidden" name="roomPromotionId" th:value="${roompromotionprice.roomPromotionId}">
                     </form>
-                    <form method="post" th:action="@{/backend/promotion/delete}" style="display: inline-block; margin-bottom: 0px;" onsubmit="return confirm('您確定要刪除這筆優惠專案嗎？');">
+                    <form method="post" th:action="@{/backend/roompromotionprice/delete}" style="display: inline-block; margin-bottom: 0px;" onsubmit="return confirm('您確定要刪除這筆優惠專案價格嗎？');">
                         <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash-fill me-1"></i>刪除</button>
-                        <input type="hidden" name="roomPromotionId" th:value="${promotion.roomPromotionId}">
+                        <input type="hidden" name="roomPromotionId" th:value="${roompromotionprice.roomPromotionId}">
                     </form>
                 </td>
 			</tr>
