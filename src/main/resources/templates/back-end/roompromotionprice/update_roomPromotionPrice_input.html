@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>優惠專案價格修改</title>
+<!-- ===== 載入統一樣式 ===== -->
+<th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+</head>
+<body>
+
+<!-- ===== 載入sidebar ===== -->
+<!-- 插入手機版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+<!-- 插入桌面版側邊欄 -->
+<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+
+<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+    <th:block th:fragment="myContent">
+		<h2 class="card-title">優惠專案價格修改</h2>
+		<h5 class="card-subtitle mb-4 text-muted">所有欄位皆為必填</h5>
+
+		<form th:action="@{/backend/roompromotionprice/update}" method="post" th:object="${roompromotionprice}" enctype="multipart/form-data">
+			
+			<div class="mb-3">
+				<label for="roomPromotionTitle" class="form-label">優惠專案名稱:</label>
+				<input type="text" id="roomPromotionTitle" th:field="*{roomPromotionTitle}" class="form-control-plaintext" readonly />
+			</div>
+
+			<div>
+			<label>房型:</label>
+			<select th:field="*{roomType.roomTypeId}">
+				<option th:each="roomType : ${roomTypeListData}" th:value="${roomType.roomTypeId}" th:text="${roomType.roomTypeName}" />
+			</select>
+       <!-- <span th:if="${#fields.hasErrors('deptVO.deptno')}" th:errors="*{deptVO.deptno}" class="error" id="deptVO.deptno.errors"></span> -->
+			</div>
+			
+			<div>
+			<label>價格:</label>
+			<input type="text" th:field="*{roomDiscountRate}" onclick="hideContent('roomDiscountRate.errors');" /><br/>
+			<span  th:if="${#fields.hasErrors('roomDiscountRate')}" th:errors="*{roomDiscountRate}" class="error" id="roomDiscountRate.errors"></span>
+			</div>
+			
+			<div>
+				<button type="submit" id="submit" class="btn btn-primary">送出修改</button>
+				<a th:href="@{/backend/roompromotionprice/listAll}" class="btn btn-secondary">取消</a>
+			</div>		
+		</form>
+    </th:block>
+</main>
+
+</body>
+</html>

@@ -26,11 +26,12 @@ public class Promotion implements Serializable {
     @NotNull(message = "開始日期請勿空白")
     @Column(name = "promotion_start_date")
     private Date promotionStartDate;
-
+    
+    @NotNull(message = "結束日期請勿空白")
     @Column(name = "promotion_end_date")
     private Date promotionEndDate;
 
-    @Pattern(regexp = "^[(\u4e00-\u9fa5)(a-zA-Z0-9)]{2,10}$", message = "備註只能是中、英文或數字，長度2~10")
+    @Pattern(regexp = "^[(\u4e00-\u9fa5)(a-zA-Z0-9)]{2,20}$", message = "備註只能是中、英文或數字，長度2~20")
     @Column(name = "promotion_remark")
     private String promotionRemark;
 }
