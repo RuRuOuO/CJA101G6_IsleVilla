@@ -345,7 +345,7 @@
                 roomDiv.innerHTML = `
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <strong>${room.name}</strong>
+                            <strong>${room.name}${room.promotionTitle ? ' <span class="badge bg-success ms-1">' + room.promotionTitle + '</span>' : ''}</strong>
                             <div class="text-muted">${price} 元/晚 × ${nights} 晚 = <span class="text-primary">${subtotal} 元</span></div>
                         </div>
                     </div>

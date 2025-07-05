@@ -465,4 +465,22 @@ public class RoomTypeAvailabilityService {
 		}
 		return roomTypeAvailabilityRepository.findByDateRange(startDate, endDate, pageable);
 	}
+	
+	/**
+	 * 訂房送出後調整空房庫存
+	 */
+	@Transactional
+	public void decreaseAvailability(Integer roomTypeId, LocalDate date, int count) {
+		Optional<RoomTypeAvailability> opt = roomTypeAvailabilityRepository
+			.findByRoomTypeAvailabilityId_RoomTypeIdAndRoomTypeAvailabilityId_RoomTypeAvailabilityDate(roomTypeId, date);
+		if (opt.isPresent()) {
+			RoomTypeAvailability availability = opt.get();
+			int newCount = availability.getRoomTypeAvailabilityCount() - count;
+			if (newCount < 0) newCount = 0;
+			availability.setRoomTypeAvailabilityCount(newCount);
+			roomTypeAvailabilityRepository.save(availability);
+		} else {
+			throw new RuntimeException("查無庫存資料: 房型ID=" + roomTypeId + ", 日期=" + date);
+		}
+	}
 }

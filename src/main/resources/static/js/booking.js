@@ -175,4 +175,57 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('送出前 roomAdultsInput.value:', roomAdultsInput.value);
         });
     }
+
+    // 將 renderCart 提升為全域
+    window.renderCart = function renderCart() {
+        console.log('renderCart:', cartRoomsArr);
+        const selectedRoomsContainer = document.getElementById('selected-rooms');
+        const bookingButtonContainer = document.getElementById('booking-button-container');
+        if (cartRoomsArr.length === 0) {
+            selectedRoomsContainer.innerHTML = '<div class="text-muted text-center">尚未選擇房型</div>';
+            bookingButtonContainer.style.display = 'none';
+        } else {
+            const checkin = document.getElementById('checkin').value;
+            const checkout = document.getElementById('checkout').value;
+            let nights = 1;
+            if (checkin && checkout) {
+                const d1 = new Date(checkin);
+                const d2 = new Date(checkout);
+                nights = Math.max(1, Math.round((d2-d1)/(1000*60*60*24)));
+            }
+            selectedRoomsContainer.innerHTML = cartRoomsArr.map(function(room, index) {
+                const price = parseInt(room.price || 0);
+                const subtotal = price * nights;
+                if(room.promotionTitle) console.log('badge:', room.promotionTitle);
+                return '<div class="border rounded p-2 mb-2">' +
+                       '<div class="d-flex justify-content-between align-items-start">' +
+                       '<div class="flex-grow-1">' +
+                       '<div class="fw-bold small">' + room.name + (room.promotionTitle ? ' <span class="badge bg-success ms-1">' + room.promotionTitle + '</span>' : '') + '</div>' +
+                       '<div class="text-primary">' + price + ' 元/晚 × ' + nights + ' 晚 = ' + subtotal + ' 元</div>' +
+                       '</div>' +
+                       '<button type="button" class="btn btn-sm btn-outline-danger" onclick="removeRoom(' + index + ')">' +
+                       '<i class="bi bi-x"></i>' +
+                       '</button>' +
+                       '</div>' +
+                       '</div>';
+            }).join('');
+            bookingButtonContainer.style.display = 'block';
+        }
+    }
+
+    // 事件委派
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-select-room');
+        if (btn) {
+            e.preventDefault();
+            const roomName = btn.getAttribute('data-room-name');
+            const price = btn.getAttribute('data-room-price');
+            const roomId = btn.getAttribute('data-room-id');
+            const roomTypeId = btn.getAttribute('data-room-type-id');
+            const promotionTitle = btn.getAttribute('data-promotion-title') || '';
+            cartRoomsArr.push({ name: roomName, price, roomId, roomTypeId, promotionTitle });
+            console.log('加入房型:', { name: roomName, price, roomId, roomTypeId, promotionTitle });
+            renderCart();
+        }
+    });
 }); 
