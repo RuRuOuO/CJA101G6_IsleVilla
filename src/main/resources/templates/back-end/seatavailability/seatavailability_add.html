@@ -1,77 +1,73 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>新增座位列表 | 後台管理</title>
-<!-- ===== 載入統一樣式 ===== -->
-<th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>新增座位列表 | 後台管理</title>
+  <!-- ===== 載入統一樣式 ===== -->
+  <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
 </head>
 <body>
-	<!-- ===== 載入 sidebar ===== -->
-	<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
-	<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+  <!-- ===== 載入 sidebar ===== -->
+  <div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+  <div th:replace="~{fragments/backFragments :: sidebar}"></div>
 
-	<main
-		th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
-		<th:block th:fragment="myContent">
-			<!-- //////////////////// 表單內容 //////////////////// -->
-			<h1 class="mb-4">✏️ 新增座位可用情況</h1>
+  <main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+    <th:block th:fragment="myContent">
+      <!-- //////////////////// 表單內容 //////////////////// -->
 
-			<div class="card shadow-sm border-1 mx-auto"
-				style="max-width: 720px;">
-				<div class="card-body">
-					<form th:action="@{/backend/seatavailability/add}"
-						th:object="${seatavailability}" method="post"
-						class="needs-validation" novalidate>
+<!--       <div class="card shadow-sm border-1 mx-auto" style="max-width: 720px;"> -->
+        <div class="card-body text-start">
+        <h1 class="mb-4">✏️ 新增座位可用情況</h1>
+          <form th:action="@{/backend/seatavailability/add}"
+                th:object="${seatavailability}" method="post"
+                class="needs-validation" novalidate>
 
-						<!-- 接駁日期 -->
-						<div class="mb-3">
-							<label for="shuttleDate" class="form-label">接駁日期</label> <input
-								type="date" th:field="*{shuttleDate}" class="form-control"
-								id="shuttleDate" required>
-							<div class="invalid-feedback">請選擇日期</div>
-						</div>
+            <!-- 接駁日期 -->
+            <div class="mb-3">
+              <label for="shuttleDate" class="form-label">接駁日期</label>
+              <input type="date" th:field="*{shuttleDate}" class="form-control"
+                     id="shuttleDate" required style="max-width: 280px;">
+              <div class="invalid-feedback">請選擇日期</div>
+            </div>
 
-						<!-- 班次選單 -->
-						<div class="mb-3">
-							<label for="shuttleScheduleId" class="form-label">選擇班次</label> <select
-								th:field="*{shuttleScheduleId}" class="form-select"
-								id="shuttleScheduleId" required>
-								<option value="" disabled
-									th:if="${seatavailability.shuttleScheduleId == null}" selected>請選擇班次</option>
-								<option th:each="schedule : ${scheduleList}"
-									th:value="${schedule.shuttleScheduleId}"
-									th:text="'#' + ${schedule.shuttleScheduleId} + '｜' + (${schedule.shuttleDirection == 0 ? '去' : '回'}) + ' - ' + ${#temporals.format(schedule.shuttleDepartureTime, 'HH:mm')} + ' ~ ' + ${#temporals.format(schedule.shuttleArrivalTime, 'HH:mm')}">
-								</option>
-							</select>
-							<div class="invalid-feedback">請選擇一個班次</div>
-						</div>
+            <!-- 班次選單 -->
+            <div class="mb-3">
+              <label for="shuttleScheduleId" class="form-label">選擇班次</label>
+              <select th:field="*{shuttleScheduleId}" class="form-select"
+                      id="shuttleScheduleId" required style="max-width: 280px;">
+                <option value="" disabled
+                        th:if="${seatavailability.shuttleScheduleId == null}" selected>請選擇班次</option>
+                <option th:each="schedule : ${scheduleList}"
+                        th:value="${schedule.shuttleScheduleId}"
+                        th:text="'#' + ${schedule.shuttleScheduleId} + '｜' + (${schedule.shuttleDirection == 0 ? '去' : '回'}) + ' - ' + ${#temporals.format(schedule.shuttleDepartureTime, 'HH:mm')} + ' ~ ' + ${#temporals.format(schedule.shuttleArrivalTime, 'HH:mm')}">
+                </option>
+              </select>
+              <div class="invalid-feedback">請選擇一個班次</div>
+            </div>
 
-						<!-- 可用座位 -->
-						<div class="mb-3">
-							<label for="seatQuantity" class="form-label">可用座位數</label> <input
-								type="number" th:field="*{seatQuantity}" class="form-control"
-								id="seatQuantity" min="1" max="100" required>
-							<div class="invalid-feedback">座位數量請輸入 1～100 之間的整數</div>
-						</div>
+            <!-- 可用座位 -->
+            <div class="mb-3">
+              <label for="seatQuantity" class="form-label">可用座位數</label>
+              <input type="number" th:field="*{seatQuantity}" class="form-control"
+                     id="seatQuantity" min="1" max="100" required style="max-width: 280px;">
+              <div class="invalid-feedback">座位數量請輸入 1～100 之間的整數</div>
+            </div>
 
-						<!-- 按鈕 -->
-						<div class="d-flex justify-content-start mt-4">
-							<button type="submit" class="btn btn-primary">送出</button>
-							<a th:href="@{/backend/seatavailability/list}"
-								class="btn btn-secondary ms-3">取消及返回列表</a>
-						</div>
-					</form>
-				</div>
-			</div>
-		</th:block>
-	</main>
+            <!-- 按鈕 -->
+            <div class="d-flex justify-content-start mt-4">
+              <button type="submit" class="btn btn-primary">送出</button>
+              <a th:href="@{/backend/seatavailability/list}" class="btn btn-secondary ms-3">取消及返回列表</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </th:block>
+  </main>
 
-	<!-- Bootstrap 驗證 JS -->
-	<script
-		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-	<script>
+  <!-- Bootstrap 驗證 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
     (() => {
       'use strict';
       const forms = document.querySelectorAll('.needs-validation');
