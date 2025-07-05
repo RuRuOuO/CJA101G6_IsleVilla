@@ -78,19 +78,16 @@
 	ws.onerror = (err) => console.error(" WebSocket 錯誤", err);
 	
 	ws.onmessage = event => {
-	    const msg = JSON.parse(event.data);
-	    if (msg.type === 'newMessage') {
-	        const roomId = msg.roomId;
-	        console.log(`新訊息來自聊天室 ${roomId}`);
-	        updateUnreadCount(roomId);
-	        checkAndUpdateStatus(roomId);
-	        updateLastMessageTime(roomId);
-	    } else if (msg.type === 'newRoom') {
-	        const room = msg.room;
-	        console.log(`新聊天室已創立: ${room.chatRoomId}`);
-	        appendNewRoomToTable(room); // 自製函數加入新行
-	    }
-	};
+		  const msg = JSON.parse(event.data);
+		  if (msg.type === 'newMessage') {
+		    const roomId = msg.roomId;
+		    updateUnreadCount(roomId);
+		    checkAndUpdateStatus(roomId);
+		    updateLastMessageTime(roomId);
+		  } else if (msg.type === 'newRoom') {
+		    appendNewRoomToTable(msg.room);
+		  }
+		};
 	
 	function appendNewRoomToTable(room) {
 	    const tbody = document.querySelector("#chatroom-table tbody");
@@ -100,17 +97,29 @@
 	        <td>\${room.chatRoomId}</td>
 	        <td>\${room.memberName || '未知會員'}</td>
 	        <td>\${room.employeeName || '-'}</td>
-	        <td class="unread-cell">1 🔴</td>
-	        <td>-</td>
 	        <td class="status"><span class="status-pending">等待處理</span></td>
+	        <td>-</td>
+	        <td class="unread-cell">0</td>
 	        <td class="actions">
-	            <a href="/backend/chat/room/\${room.chatRoomId}" class="btn-action btn-enter">進入</a>
-	            <button class="btn-action btn-import" onclick="importRoom(\${room.chatRoomId})">匯入SQL</button>
+	          <a href="/backend/chat/room/${room.chatRoomId}" class="btn-action btn-enter">進入</a>
+	          <button class="btn-action btn-import" onclick="importRoom(${room.chatRoomId})">匯入SQL</button>
 	        </td>
-	    `;
-	    tbody.prepend(tr);
-	    updateLastMessageTime(room.chatRoomId); // 立即更新最新訊息時間
-	}
+	      `;
+	      tbody.prepend(tr);
+
+	      // 查詢未讀數後再加紅點
+	      updateUnreadCount(room.chatRoomId);
+	      updateLastMessageTime(room.chatRoomId);
+	    }
+	
+	function renderUnreadCount(count, cell) {
+		  if (!cell) return;
+		  if (count > 0) {
+		    cell.innerHTML = `${count} <span class="unread-dot"></span>`;
+		  } else {
+		    cell.textContent = "0";
+		  }
+		}
 	
 	function checkAndUpdateStatus(roomId) {
 	    fetch(`/api/chat/room/${roomId}/status`)
@@ -121,18 +130,24 @@
 	        });
 	}
 	
+	document.addEventListener("DOMContentLoaded", function () {
+		  const rows = document.querySelectorAll("tr[data-room-id]");
+		  rows.forEach(row => {
+		    const roomId = row.dataset.roomId;
+		    updateUnreadCount(roomId); // ✅ 為每筆聊天室更新紅點
+		  });
+		});
+	
 	function updateUnreadCount(roomId) {
 	    fetch(`/api/chat/room/${roomId}/unread/employee`)
 	        .then(res => res.json())
 	        .then(data => {
 	        	 console.log('取得未讀數：', data); // ✅ 新增這行看看有沒有資料
-	            const count = data.unreadCount;
-	            const cell = document.querySelector(`tr[data-room-id='${roomId}'] td.unread-cell`);
-	            if (cell) {
-	            	cell.innerHTML = count > 0 ? `${count} <span class="unread-dot"></span>` : '0';
-	            }
-	        });
-	}
+	        	 const count = data.unreadCount;
+	        	 const cell = document.querySelector(`tr[data-room-id='${roomId}'] td.unread-cell`);
+	             renderUnreadCount(count, cell); // 👈 使用統一邏輯
+	           });
+	       }
 	
 	function completeRoom(roomId) {
 	    if (confirm("確定將聊天室 " + roomId + " 設為已結案？")) {
@@ -216,7 +231,7 @@
 	        actionsCell.innerHTML = `
 	        	  <a href="/backend/chat/history/${roomId}" class="btn-action btn-history">歷史</a>
 		          <a href="/backend/chat/room/${roomId}" class="btn-action btn-enter">進入</a>
-		          <button class="btn-action btn-reopen" onclick="reopenRoom(${roomId})">重新開啟</button>
+		          <button class="btn-action btn-complete" onclick="completeRoom(${roomId})">結案</button>
 		          <button class="btn-action btn-import" onclick="importRoom(${roomId})">匯入SQL</button>
 	        `;
 	    } else if (status === 2) {
