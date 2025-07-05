@@ -83,7 +83,8 @@
                 left: 0;
                 right: 0;
                 z-index: 1100;
-                background-color: #223363;
+                /*background-color: #223363;*/
+                background: linear-gradient(to right, #09203f 0%, #537895 200%);
                 padding: 0.5rem 1rem;
             }
 
@@ -101,7 +102,8 @@
             }
 
             .mobile-navbar .navbar-collapse {
-                background-color: #223363;
+                /*background-color: #223363;*/
+                background: linear-gradient(to right, #09203f 0%, #537895 200%);
                 margin-top: 0.5rem;
                 border-radius: 0.375rem;
             }
@@ -283,8 +285,7 @@
                     </button>
                     <div class="collapse" id="mobile-room">
                         <ul class="btn-toggle-nav list-unstyled">
-                            <li><a th:href="@{/backend/check-in-out/list}">住房管理</a></li>
-                            <li><a th:href="@{/backend/room-reservation/list}">訂房訂單管理</a></li>
+                            <li><a th:href="@{/backend/check-in-out/list}">住房管理</a></li>-->
                             <li><a th:href="@{/backend/room/selectRoomPage}">房間管理</a></li>
                             <li><a th:href="@{/backend/roomType/listRoomType}">房型管理</a></li>
                             <li><a th:href="@{/backend/roomTypeAvailability/list}">房型庫存管理</a></li>
@@ -358,7 +359,6 @@
                     </div>
                 </li>
 
-
                 <!-- 用戶資訊和登出 -->
                 <li class="nav-item">
                     <div class="border-top pt-3 mt-3">
@@ -386,7 +386,7 @@
             <small class="text-white-50">後台管理系統</small>
         </a>
     </div>
-    <ul class="list-unstyled ps-0 sidebar-menu" id="sidebarMenu">
+    <ul class="sidebar-menu list-unstyled ps-0" style="max-height: calc(100vh - 160px); overflow-y: auto;">
         <!-- 員工管理 -->
         <li class="mb-1">
             <button
@@ -448,15 +448,6 @@
                                 <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
                             </span>
                             <span class="ms-2">住房管理</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a th:href="@{/backend/room-reservation/list}"
-                           class="d-flex align-items-center link-body-emphasis text-white">
-                            <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
-                                <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
-                            </span>
-                            <span class="ms-2">訂房訂單管理</span>
                         </a>
                     </li>
                     <li>
@@ -693,67 +684,50 @@
 <th:block th:fragment="mainContent(content)">
     <div class="content bg-light">
         <!-- 內建的 Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4 rounded">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4 rounded px-2">
             <div class="container-fluid">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item">
-                            <a href="#" class="text-decoration-none">
-                                <i class="bi bi-house-door me-1"></i>首頁
-                            </a>
-                        </li>
-                        <li class="breadcrumb-item active" aria-current="page">當前頁面</li>
-                    </ol>
-                </nav>
+                <a th:href="@{/backend/dashboard}" class="text-decoration-none ">
+                    <i class="bi bi-house-door me-1"></i>
+                    首頁
+                </a>
 
-                <div class="navbar-nav ms-auto">
-                    <div class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#"
-                           role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-bell me-2"></i>
-                            <span class="badge bg-danger">3</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><h6 class="dropdown-header">通知</h6></li>
-                            <li><a class="dropdown-item" href="#">新訂單通知</a></li>
-                            <li><a class="dropdown-item" href="#">系統維護通知</a></li>
-                            <li><a class="dropdown-item" href="#">會員註冊通知</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="#">查看所有通知</a></li>
-                        </ul>
-                    </div>
+                <div class="navbar-nav ms-auto d-flex align-items-center gap-3">
+                    <!-- 員工列表 -->
+                    <a class="nav-link d-flex align-items-center" th:href="@{/backend/employee/list}" title="員工列表">
+<!--                        <i class="bi bi-person-circle me-1"></i>-->
+                        員工列表
+                    </a>
+                    <li class="nav-item divider align-self-center px-1">/</li>
 
-                    <div class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#"
-                           role="button" data-bs-toggle="dropdown">
-                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-2"
-                                 style="width: 32px; height: 32px;">
-                                <i class="bi bi-person-fill text-white"></i>
-                            </div>
-                            <span th:text="${#authentication.principal.employeeName}">員工姓名</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><h6 class="dropdown-header">我的帳戶</h6></li>
-                            <li><a class="dropdown-item" href="#">
-                                <i class="bi bi-person me-2"></i>個人資料
-                            </a></li>
-                            <li><a class="dropdown-item" href="#">
-                                <i class="bi bi-gear me-2"></i>設定
-                            </a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <form th:action="@{/backend/logout}" method="post" class="m-0">
-                                    <button type="submit" class="dropdown-item">
-                                        <i class="bi bi-box-arrow-right me-2"></i>登出
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
+                    <!-- 住房管理 -->
+                    <a class="nav-link d-flex align-items-center" th:href="@{/backend/check-in-out/list}"
+                       title="住房管理">
+<!--                        <i class="fas fa-bed me-1"></i>-->
+                        住房管理
+                    </a>
+                    <li class="nav-item divider align-self-center px-1">/</li>
+
+                    <!-- 訂單管理 -->
+                    <a class="nav-link d-flex align-items-center"
+                       th:href="@{/backend/product-order/listAllProductOrder}" title="訂單管理">
+<!--                        <i class="bi bi-cart-fill me-1"></i>-->
+                        訂單管理
+                    </a>
+                    <li class="nav-item divider align-self-center px-1">/</li>
+
+                    <!-- 接駁列表 -->
+                    <a class="nav-link d-flex align-items-center" th:href="@{/backend/reservation/list}"
+                       title="接駁預約列表">
+<!--                        <i class="fas fa-ship me-1"></i>-->
+                        接駁列表
+                    </a>
+                    <li class="nav-item divider align-self-center px-1">/</li>
+
+                    <!-- 客服管理 -->
+                    <a class="nav-link d-flex align-items-center" th:href="@{/backend/chat/room/list}" title="客服管理">
+<!--                        <i class="bi bi-chat-dots-fill me-1"></i>-->
+                        客服管理
+                    </a>
                 </div>
             </div>
         </nav>
