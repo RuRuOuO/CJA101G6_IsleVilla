@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>接駁服務預約取消確認</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #dc3545;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #dc3545;
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .header p {
+            color: #666;
+            margin: 10px 0 0 0;
+        }
+
+        .cancel-info {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #721c24;
+        }
+
+        .cancel-info h3 {
+            margin-top: 0;
+            color: #dc3545;
+            font-size: 18px;
+        }
+
+        .booking-info {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #495057;
+            min-width: 120px;
+        }
+
+        .info-value {
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .cancelled-status {
+            background-color: #dc3545;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            display: inline-block;
+            margin: 10px 0;
+        }
+
+        .important-notice {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .important-notice h4 {
+            margin-top: 0;
+            color: #b45309;
+        }
+
+        .contact-info {
+            background-color: #e3f2fd;
+            border: 1px solid #bbdefb;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .contact-info h4 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .highlight-red {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .refund-info {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+
+        @media (max-width: 480px) {
+            .info-row {
+                flex-direction: column;
+            }
+
+            .info-label {
+                min-width: auto;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>❌ 接駁服務預約取消確認</h1>
+            <p>親愛的 <span th:text="${memberName}">會員</span>，您的預約已成功取消！</p>
+        </div>
+
+        <div class="cancel-info">
+            <h3>✅ 預約取消成功</h3>
+            <p><strong>您的接駁服務預約已成功取消。</strong></p>
+            <p>取消時間：<span th:text="${#temporals.format(cancellationTime, 'yyyy-MM-dd HH:mm:ss')}">2025-07-06
+                    14:30:00</span></p>
+            <div class="cancelled-status">已取消</div>
+        </div>
+
+        <div class="booking-info">
+            <h4 style="margin-top: 0; color: #495057;">📋 已取消的預約資訊</h4>
+            <div class="info-row">
+                <span class="info-label">預約編號：</span>
+                <span class="info-value" th:text="${shuttleReservationId}">4</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">取消時間：</span>
+                <span class="info-value"
+                    th:text="${#temporals.format(cancellationTime, 'yyyy-MM-dd HH:mm:ss')}">2025-07-06 14:30:00</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">訂房編號：</span>
+                <span class="info-value" th:text="${roomReservationId}">2</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">班次編號：</span>
+                <span class="info-value" th:text="${scheduleId}">1</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">接駁日期：</span>
+                <span class="info-value" th:text="${#temporals.format(shuttleDate, 'yyyy-MM-dd')}">2025-07-15</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">方向：</span>
+                <span class="info-value" th:text="${shuttleDirection == 'outbound' ? '去程' : '回程'}">去程</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">接駁時間：</span>
+                <span class="info-value" th:text="${#temporals.format(shuttleTime, 'HH:mm')}">08:00</span>
+            </div>
+        </div>
+
+        <div class="refund-info">
+            <strong>💰 退款資訊</strong><br>
+            如有費用產生，退款將於 3-5 個工作天內退還至原付款帳戶。
+        </div>
+
+        <div class="important-notice">
+            <h4>📢 重要提醒</h4>
+            <ul style="margin: 10px 0 0 0; padding-left: 20px;">
+                <li>您的座位已釋出，其他旅客可重新預約</li>
+                <li>如需重新預約，請透過系統重新操作</li>
+                <li>建議您盡早重新預約，以確保有合適的座位</li>
+                <li>如對取消預約有任何疑問，請聯繫客服</li>
+            </ul>
+        </div>
+
+        <div class="contact-info">
+            <h4>📞 需要協助嗎？</h4>
+            <p>如有任何疑問或需要重新預約，歡迎與我們聯絡：</p>
+            <p>
+                <strong>客服電話：</strong>(02) 1234-5678<br>
+                <strong>客服信箱：</strong>info@islevilla.com<br>
+                <strong>服務時間：</strong>09:00 - 18:00（週一至週日）
+            </p>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="http://islevilla.ddns.net/shuttle/reservation" style="background-color: #007bff; color: white; padding: 12px 30px; 
+                      text-decoration: none; border-radius: 5px; display: inline-block;">
+                🚢 重新預約接駁服務
+            </a>
+        </div>
+
+        <div class="footer">
+            <p>此郵件由系統自動發送，請勿直接回覆。</p>
+            <p>感謝您的使用，期待再次為您服務！</p>
+            <p style="margin-top: 15px; color: #999;">© 2025 微嶼 IsleVilla 接駁服務系統</p>
+        </div>
+    </div>
+</body>
+
+</html>

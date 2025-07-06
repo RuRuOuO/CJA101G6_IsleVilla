@@ -131,15 +131,6 @@ public class ShuttleReservationService {
 		throw new RuntimeException("預約記錄不存在");
 	}
 
-	// 刪除預約記錄
-	@Transactional
-	public void deleteReservation(Integer id) {
-		if (!shuttleReservationRepository.existsById(id)) {
-			throw new RuntimeException("預約記錄不存在");
-		}
-		shuttleReservationRepository.deleteById(id);
-	}
-
 	// 檢查預約記錄是否存在
 	public boolean existsById(Integer id) {
 		return shuttleReservationRepository.existsById(id);

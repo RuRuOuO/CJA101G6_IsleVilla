@@ -49,7 +49,7 @@ public interface RoomRVOrderRepository extends JpaRepository<RoomRVOrder, Intege
 
     List<RoomRVOrder> findByMembersAndRoomOrderStatus(Members members, Integer status);
     
-    List<RoomRVOrder> findByMembersAndCheckInDateGreaterThan(Members members, LocalDate checkInDate);
+    List<RoomRVOrder> findByMembersAndCheckInDateGreaterThanAndRoomOrderStatus(Members members, LocalDate checkInDate, Integer roomOrderStatus);
     
     List<RoomRVOrder> findByMembersAndCheckOutDateGreaterThan(Members members, LocalDate checkOutDate);
 
