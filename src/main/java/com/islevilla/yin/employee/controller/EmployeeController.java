@@ -130,6 +130,9 @@ public class EmployeeController {
                 }
             }
             if (employeePhoto != null && !employeePhoto.isEmpty()) {
+                if (employeePhoto.getSize() > 512000) {
+                    return "error: 員工照片檔案大小不可超過500KB";
+                }
                 employee.setEmployeePhoto(employeePhoto.getBytes());
             }
             employeeService.addEmployee(employee);
@@ -180,6 +183,9 @@ public class EmployeeController {
                 }
             }
             if (employeePhoto != null && !employeePhoto.isEmpty()) {
+                if (employeePhoto.getSize() > 512000) {
+                    return "error: 員工照片檔案大小不可超過500KB";
+                }
                 employee.setEmployeePhoto(employeePhoto.getBytes());
             }
             employeeService.updateEmployee(employee);

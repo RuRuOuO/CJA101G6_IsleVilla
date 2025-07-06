@@ -117,8 +117,8 @@ public class ChatAdminPageController {
 		// 從redis撈資料出來 選定聊天室的歷史訊息
 		List<ChatMessageDTO> messages = chatRedisService.getMessageHistory(roomId);
 
-		System.out.println("room = " + room);
-		System.out.println("messages = " + messages.size());
+		  System.out.println("Room = " + room.getChatRoomId());
+		    System.out.println("Messages size = " + messages.size());
 		
 		model.addAttribute("room", room);
 		model.addAttribute("messages", messages);

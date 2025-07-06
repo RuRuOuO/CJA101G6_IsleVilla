@@ -179,14 +179,25 @@
                 margin: 0rem;
             }
 
+            /* 將 sidebar-active 改為右側白色線條 */
             .sidebar-active {
-                display: block;
-                background: rgba(255, 255, 255, 0.15) !important;
-                border-radius: 10px !important;
+                position: relative;
+                background: none !important;
+                border-radius: 0 !important;
                 color: #fff !important;
                 transition: background 0.2s;
                 padding: 3px 13px !important;
                 margin: 3px 0;
+            }
+            .sidebar-active::after {
+                content: '';
+                position: absolute;
+                top: 8px;
+                left: 0;
+                bottom: 8px;
+                width: 4px;
+                border-radius: 2px;
+                background: #fff;
             }
 
             .btn-toggle-nav a {
