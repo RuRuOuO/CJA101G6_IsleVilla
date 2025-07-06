@@ -78,13 +78,16 @@ table.dataTable td {
 		th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
 		<th:block th:fragment="myContent">
 
-			<div class="card-header bg-transparent border-0 pt-4">
-				<div class="d-flex justify-content-between align-items-center">
-					<h4 class="card-title mb-0 fw-bold">
-						<i class="bi bi-calendar-week me-2"></i>接駁船時段列表
-					</h4>
-				</div>
-			</div>
+<div class="card-header bg-transparent border-0 pt-4">
+  <div class="d-flex justify-content-between align-items-center flex-wrap">
+    <h4 class="card-title mb-0 fw-bold">
+      <i class="bi bi-calendar-week me-2"></i>接駁船時段列表
+    </h4>
+    <a class="btn btn-success" th:href="@{/backend/shuttle/add}">
+      <i class="bi bi-plus-circle me-1"></i>新增時段
+    </a>
+  </div>
+</div>
 
 			<div class="card-body">
 
@@ -95,14 +98,7 @@ table.dataTable td {
 					<i class="bi bi-check-circle-fill me-2"></i> <span
 						th:text="${successMessage}">操作成功</span>
 				</div>
-
-				<!-- 操作按鈕 -->
-				<div class="d-flex gap-2 mb-3">
-					<a class="btn btn-primary" th:href="@{/backend/shuttle/add}"> <i
-						class="bi bi-plus-circle me-1"></i>新增時段
-					</a>
-				</div>
-
+				
 				<!-- 篩選條件 -->
 				<div class="d-flex gap-2 mb-3" style="flex-wrap: wrap;">
 					<select id="directionFilter" class="form-select"
