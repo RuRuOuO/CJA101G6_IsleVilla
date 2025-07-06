@@ -1,7 +1,9 @@
 package com.islevilla.ching.shuttleReservationSeat.controller;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,9 +27,24 @@ public class BackShuttleReservationSeatController {
 	// 顯示所有預約
 	@GetMapping("/list")
 	public String listReservationSeat(Model model) {
-		List<BackShuttleReservationSeat> list = backShuttleReservationSeatService.getAllShuttleReservationSeatDesc();
-		model.addAttribute("shuttleReservationSeatList", list);
-		return "back-end/backshuttlereservationseat/backshuttlereservationseat_list";
+	    List<BackShuttleReservationSeat> list = backShuttleReservationSeatService.getAllShuttleReservationSeatDesc();
+
+	    Map<Integer, List<String>> seatNumberMap = new LinkedHashMap<>();
+	    Map<Integer, String> dateMap = new LinkedHashMap<>();
+	    
+	    for (BackShuttleReservationSeat seat : list) {
+	        Integer reservationId = seat.getShuttleReservationId();
+	        String seatNumber = seat.getSeat().getSeatNumber();
+	        String dateStr = seat.getBackshuttleReservation().getShuttleDate().toString(); // or format it
+
+	        seatNumberMap.computeIfAbsent(reservationId, k -> new ArrayList<>()).add(seatNumber);
+	        dateMap.putIfAbsent(reservationId, dateStr); // 避免重複塞入
+	    }
+
+	    model.addAttribute("groupedSeatMap", seatNumberMap); 
+	    model.addAttribute("seatNameMap", dateMap);   
+
+	    return "back-end/backshuttlereservationseat/backshuttlereservationseat_list";
 	}
 
 	// 顯示查詢頁面
@@ -70,6 +87,7 @@ public class BackShuttleReservationSeatController {
 		return "back-end/backshuttlereservationseat/backshuttlereservationseat_getbackresseat";
 	}
 
+	
 	// 單筆查詢
 	@GetMapping("/getbackresseat/get")
 	public String getReservationSeatById(

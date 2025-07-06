@@ -76,16 +76,12 @@ public class Members {
 	@OneToMany(mappedBy = "members", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@ToString.Exclude // 排除此屬性避免循環引用
 	private List<RoomRVOrder> roomRVOrder;
-	
+
 	// 一對多：一個會員有多個接駁預約
 	@OneToMany(mappedBy = "members", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@ToString.Exclude // 排除此屬性避免循環引用
 	private List<ShuttleReservation> shuttleReservation;
-	
-	
-	
-	
-	
+
 	@PrePersist
 	protected void onCreate() {
 		LocalDateTime now = LocalDateTime.now();

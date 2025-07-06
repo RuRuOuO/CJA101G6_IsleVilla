@@ -10,4 +10,3 @@ public class ChatRoomResult {
 	private ChatRoomDTO room;
     private boolean newlyCreated;
 }
-

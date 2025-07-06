@@ -16,7 +16,7 @@ public interface ShuttleReservationRepository extends JpaRepository<ShuttleReser
 
 	// 根據會員查詢預約記錄
 	List<ShuttleReservation> findByMembers(Members member);
-	
+
 	List<ShuttleReservation> findByMembers_MemberId(Integer memberId);
 
 	// 根據訂房ID查詢預約記錄
@@ -24,9 +24,6 @@ public interface ShuttleReservationRepository extends JpaRepository<ShuttleReser
 
 	// 根據接駁日期查詢預約記錄
 	List<ShuttleReservation> findByShuttleDate(LocalDate shuttleDate);
-
-//	// 根據班次ID和日期查詢預約記錄
-//	List<ShuttleReservation> findByShuttleScheduleIdAndShuttleDate(Integer shuttleScheduleId, LocalDate shuttleDate);
 
 	// 根據班次和日期查詢預約記錄
 	List<ShuttleReservation> findByShuttleScheduleAndShuttleDate(ShuttleSchedule shuttleSchedule,
@@ -56,31 +53,22 @@ public interface ShuttleReservationRepository extends JpaRepository<ShuttleReser
 			+ "AND sr.shuttleSchedule = :shuttleSchedule AND sr.shuttleReservationStatus = 1")
 	Long countReservationsByDateAndSchedule(@Param("shuttleDate") LocalDate shuttleDate,
 			@Param("shuttleSchedule") ShuttleSchedule shuttleSchedule);
-	
-	// 查詢特定日期和班次的預約數量
-//	@Query("SELECT COUNT(sr) FROM ShuttleReservation sr WHERE sr.shuttleDate = :shuttleDate "
-//			+ "AND sr.shuttleScheduleId = :scheduleId AND sr.shuttleReservationStatus = 1")
-//	Long countReservationsByDateAndSchedule(@Param("shuttleDate") LocalDate shuttleDate,
-//			@Param("scheduleId") Integer scheduleId);
-	
-	// 查詢特定日期和班次ID的預約數量（使用班次ID）  
+
+	// 查詢特定日期和班次ID的預約數量（使用班次ID）
 	@Query("SELECT COUNT(sr) FROM ShuttleReservation sr WHERE sr.shuttleDate = :shuttleDate "
 			+ "AND sr.shuttleSchedule.shuttleScheduleId = :scheduleId AND sr.shuttleReservationStatus = 1")
 	Integer countReservationsByDateAndScheduleId(@Param("shuttleDate") LocalDate shuttleDate,
 			@Param("scheduleId") Integer scheduleId);
-	
-    /**
-     * 查詢特定日期和班次ID的接駁總人數
-     * 只計算狀態為正常(1)的預約
-     */
-    @Query("SELECT COALESCE(SUM(sr.shuttleNumber), 0) FROM ShuttleReservation sr " +
-           "WHERE sr.shuttleDate = :shuttleDate " +
-           "AND sr.shuttleSchedule.shuttleScheduleId = :shuttleScheduleId " +
-           "AND sr.shuttleReservationStatus = 1")
-    Integer getTotalShuttleNumberByShuttleDateAndShuttleScheduleId(
-            @Param("shuttleDate") LocalDate shuttleDate,
-            @Param("shuttleScheduleId") Integer shuttleScheduleId);
-    
+
+	/**
+	 * 查詢特定日期和班次ID的接駁總人數 只計算狀態為正常(1)的預約
+	 */
+	@Query("SELECT COALESCE(SUM(sr.shuttleNumber), 0) FROM ShuttleReservation sr "
+			+ "WHERE sr.shuttleDate = :shuttleDate " + "AND sr.shuttleSchedule.shuttleScheduleId = :shuttleScheduleId "
+			+ "AND sr.shuttleReservationStatus = 1")
+	Integer getTotalShuttleNumberByShuttleDateAndShuttleScheduleId(@Param("shuttleDate") LocalDate shuttleDate,
+			@Param("shuttleScheduleId") Integer shuttleScheduleId);
+
 	// 查詢會員在特定日期的預約
 	List<ShuttleReservation> findByMembersAndShuttleDateAndShuttleReservationStatus(Members member,
 			LocalDate shuttleDate, Integer status);
@@ -99,6 +87,8 @@ public interface ShuttleReservationRepository extends JpaRepository<ShuttleReser
 	List<ShuttleReservation> findByShuttleDateBetweenAndShuttleReservationStatus(LocalDate startDate, LocalDate endDate,
 			Integer status);
 
-	
+	// 根據訂房訂單、接駁方向和接駁預約狀態檢查是否存在
+	boolean existsByRoomRVOrderAndShuttleDirectionAndShuttleReservationStatus(RoomRVOrder roomRVOrder,
+			Integer shuttleDirection, Integer shuttleReservationStatus);
 
 }

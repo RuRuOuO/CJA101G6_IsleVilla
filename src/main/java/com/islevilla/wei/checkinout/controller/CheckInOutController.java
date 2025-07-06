@@ -23,9 +23,13 @@ public class CheckInOutController {
     // 後台checkIn頁面
     @GetMapping("/backend/check-in-out/list")
     public String checkInOutDashboard(Model model) {
-        List<RoomRVOrder> orderList = roomRVOrderService.getOperableOrders();
+        List<RoomRVOrder> orderList = roomRVOrderService.getAllOrders();
         if (!orderList.isEmpty()) {
             model.addAttribute("orderList", orderList);
+        }
+        List<RoomRVOrder> orderListToday = roomRVOrderService.getTodayCheckInOrOutOrders();
+        if (!orderListToday.isEmpty()) {
+            model.addAttribute("orderListToday", orderListToday);
         }
         return "back-end/check-in-out/check-in-out-list";
     }
