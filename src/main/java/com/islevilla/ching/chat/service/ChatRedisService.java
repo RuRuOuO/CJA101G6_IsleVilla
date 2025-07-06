@@ -92,6 +92,18 @@ public class ChatRedisService {
 
 	// 儲存訊息
 	public void saveMessage(Integer roomId, ChatMessageDTO message) {
+		
+		// 1️⃣ 如果 senderName 缺失，依 senderType 查出正確名稱補上
+	    if (message.getSenderName() == null || message.getSenderName().isBlank()) {
+	        if (message.getSenderType() == 0) {
+	            message.setSenderName(getMemberName(message.getSenderId()));
+	        } else if (message.getSenderType() == 1) {
+	            message.setSenderName(getEmployeeName(message.getSenderId()));
+	        } else {
+	            message.setSenderName("未知使用者");
+	        }
+	    }
+	    
 		redisStr.opsForList().rightPush(ChatRedisKey.chatMessages(roomId), gson.toJson(message));
 		chatRoomUpdateService.updateLastMessageTime(roomId, message.getMessageTime());
 
@@ -117,7 +129,39 @@ public class ChatRedisService {
 				.filter(msg -> msg.getMessageTime() != null && msg.getMessageTime() > endTime)
 				.collect(Collectors.toList());
 	}
+	
+//	public List<ChatMessageDTO> getMessageHistory(Integer roomId, boolean afterEnd) {
+//	    List<String> list = redisStr.opsForList().range(ChatRedisKey.chatMessages(roomId), 0, -1);
+//	    if (list == null) return new ArrayList<>();
+//
+//	    Long endTime = afterEnd ? chatRoomUpdateService.getRoomEndTime(roomId) : null;
+//
+//	    return list.stream()
+//	        .map(s -> gson.fromJson(s, ChatMessageDTO.class))
+//	        .peek(msg -> {
+//	            String name = msg.getSenderName();
+//	            if (name == null || name.isBlank() || name.contains("${")) {
+//	                Integer type = msg.getSenderType();
+//	                Integer id = msg.getSenderId();
+//	                if (type != null && id != null) {
+//	                    if (type == 0) {
+//	                        msg.setSenderName(getMemberName(id));
+//	                    } else if (type == 1) {
+//	                        msg.setSenderName(getEmployeeName(id));
+//	                    } else {
+//	                        msg.setSenderName("未知使用者");
+//	                    }
+//	                } else {
+//	                    msg.setSenderName("未知使用者");
+//	                }
+//	            }
+//	        })
+//	        .filter(msg -> !afterEnd || (msg.getMessageTime() != null && msg.getMessageTime() > endTime))
+//	        .collect(Collectors.toList());
+//	}
 
+	
+	
 	// 預設查詢全部訊息
 	public List<ChatMessageDTO> getMessageHistory(Integer roomId) {
 		return getMessageHistory(roomId, false);
@@ -157,7 +201,7 @@ public class ChatRedisService {
 	}
 
 	// 從資料庫查會員名稱
-	private String getMemberName(Integer memberId) {
+	public String getMemberName(Integer memberId) {
 		try {
 			return jdbcTemplate.queryForObject("SELECT member_name FROM members WHERE member_id = ?", String.class,
 					memberId);
@@ -167,7 +211,7 @@ public class ChatRedisService {
 	}
 
 	// 從資料庫查客服名稱
-	private String getEmployeeName(Integer employeeId) {
+	public String getEmployeeName(Integer employeeId) {
 		try {
 			return jdbcTemplate.queryForObject("SELECT employee_name FROM employee WHERE employee_id = ?", String.class,
 					employeeId);

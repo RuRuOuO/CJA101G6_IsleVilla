@@ -57,7 +57,7 @@ table.dataTable tbody tr:hover {
 	border: 1px solid #ced4da;
 	border-radius: 6px;
 	background-color: #fff;
-	width: 260px;
+	width: 210px;
 	overflow: hidden;
 	margin: 1.5rem 0;
 }
@@ -120,12 +120,22 @@ td.text-start {
 			</div>
 
 			<div class="card-body">
-				<div class="search-wrapper">
-					<i class="fas fa-search search-icon"></i> <input type="text"
-						id="seatSearch" class="form-control search-input"
-						placeholder="請輸入預約編號或座位編號" />
-				</div>
+				<div class="search-container"
+					style="display: flex; gap: 1rem; flex-wrap: wrap;">
+					<!-- 預約編號搜尋 -->
+					<div class="search-wrapper" style="width: 210px;">
+						<i class="fas fa-hashtag search-icon"></i> <input type="text"
+							id="idSearch" class="form-control search-input"
+							placeholder="請輸入預約編號查詢" />
+					</div>
 
+					<!-- 關鍵字模糊搜尋 -->
+					<div class="search-wrapper">
+						<i class="fas fa-search search-icon"></i> <input type="text"
+							id="seatSearch" class="form-control search-input"
+							placeholder="請輸入關鍵字查詢" />
+					</div>
+				</div>
 				<div class="table-responsive">
 					<table id="seatTable"
 						class="table table-hover align-middle text-center">
@@ -188,7 +198,18 @@ td.text-start {
 				lengthChange : false
 			});
 
-			$('#seatSearch').on('keyup', function() {
+			// ✅ 預約編號精準查詢（只查第0欄，完整比對）
+			$('#idSearch').on('keyup', function () {
+				const value = this.value.trim();
+				if (value === '') {
+					table.column(0).search('').draw();
+				} else {
+					table.column(0).search('^' + value + '$', true, false).draw();
+				}
+			});
+
+			// ✅ 關鍵字模糊查詢（全欄位）
+			$('#seatSearch').on('keyup', function () {
 				table.search(this.value).draw();
 			});
 		});
