@@ -42,11 +42,14 @@ public interface RoomRVOrderRepository extends JpaRepository<RoomRVOrder, Intege
 
     List<RoomRVOrder> findByRoomOrderStatusIn(List<Integer> roomRVOrderStatusIn);
 
+    // 查詢今天入住或退房的訂單
+    List<RoomRVOrder> findByCheckInDateOrCheckOutDate(LocalDate checkInDate, LocalDate checkOutDate);
+
     List<RoomRVOrder> findByMembers(Members member);
 
     List<RoomRVOrder> findByMembersAndRoomOrderStatus(Members members, Integer status);
     
-    List<RoomRVOrder> findByMembersAndCheckInDateGreaterThan(Members members, LocalDate checkInDate);
+    List<RoomRVOrder> findByMembersAndCheckInDateGreaterThanAndRoomOrderStatus(Members members, LocalDate checkInDate, Integer roomOrderStatus);
     
     List<RoomRVOrder> findByMembersAndCheckOutDateGreaterThan(Members members, LocalDate checkOutDate);
 

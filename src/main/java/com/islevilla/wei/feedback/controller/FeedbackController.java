@@ -130,6 +130,18 @@ public class FeedbackController {
         // 手動設定嵌套欄位（roomReservationId）
         if (fb.getRoomRVOrder() != null) {
             dto.setRoomReservationId(fb.getRoomRVOrder().getRoomReservationId());
+
+            // 獲取會員資料
+            Members member = fb.getRoomRVOrder().getMembers();
+            if (member != null) {
+                dto.setCustomerName(member.getMemberName());
+
+                // 設定會員頭像
+                if (member.getMemberPhoto() != null) {
+                    String base64Avatar = Base64.getEncoder().encodeToString(member.getMemberPhoto());
+                    dto.setCustomerAvatar("data:image/jpeg;base64," + base64Avatar);
+                }
+            }
         }
 
         // 手動設定圖片欄位
@@ -137,7 +149,6 @@ public class FeedbackController {
             String base64Image = Base64.getEncoder().encodeToString(fb.getFbImage());
             dto.setFbImageBase64("data:image/jpeg;base64," + base64Image);
         }
-
         return dto;
     }
 }

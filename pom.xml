@@ -62,6 +62,12 @@
             <artifactId>spring-boot-starter-log4j2</artifactId>
             <!-- <version>3.4.1</version> -->
         </dependency>
+        
+        <!-- Spring Boot Mail -->
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
 
         <!-- ========================================================================================== -->
         <!-- ●前面的jpa已經包含有hibernate，以下為純 hibernate 使用● -->

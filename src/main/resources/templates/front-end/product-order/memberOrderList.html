@@ -10,129 +10,149 @@
 <!-- ===== 載入Header ===== -->
 <div th:replace="~{fragments/fragments :: header}"></div>
 <main>
-    <div class="container py-5">
-        <h1 class="text-center mb-4">會員專區</h1>
-        <div class="row">
-            <!-- ===== 載入側邊欄 ===== -->
-            <div th:replace="~{fragments/fragments :: memberSidebar(activeTab='product')}"></div>
-            <!-- 右側內容區 -->
-            <div class="col-md-9">
-                <!-- 訂單列表 -->
-                <div th:if="${memOrderList!=null and !memOrderList.isEmpty()}">
-                    <div class="row">
-                        <div class="col-12 col-lg-6 mb-4" th:each="order : ${memOrderList}">
-                            <div class="card h-100 shadow-sm">
-                                <div class="card-header bg-light">
-                                    <h6 class="card-title mb-0">
-                                        <i class="fas fa-file-alt me-2"></i>
-                                        訂單編號：<span th:text="${order.productOrderId}" class="text-primary"></span>
-                                    </h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row mb-3">
-                                        <div class="col-6">
-                                            <small class="text-muted">訂單日期</small>
-                                            <div th:text="${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm')}"></div>
-                                        </div>
-                                        <div class="col-6">
-                                            <small class="text-muted">訂單狀態</small>
-                                            <div>
+    <!-- Hero Section -->
+    <section class="pt-5">
+        <div class="container text-center">
+            <h1 class="mb-4">會員專區</h1>
+            <p class="mb-4">
+                <i class="bi bi-box-seam-fill me-2"></i>
+                您的商品訂單
+            </p>
+        </div>
+    </section>
+    <section class="py-4">
+        <div class="container">
+            <div class="row">
+                <!-- ===== 載入側邊欄 ===== -->
+                <div th:replace="~{fragments/fragments :: memberSidebar(activeTab='product')}"></div>
+                <!-- 右側內容區 -->
+                <div class="col-md-9">
+                    <!-- 訂單列表 -->
+                    <div th:if="${memOrderList!=null and !memOrderList.isEmpty()}">
+                        <div class="row">
+                            <div class="col-12 col-lg-6 mb-4" th:each="order : ${memOrderList}">
+                                <div class="card h-100 shadow-sm">
+                                    <div class="card-header bg-light">
+                                        <h6 class="card-title mb-0">
+                                            <i class="fas fa-file-alt me-2"></i>
+                                            訂單編號：<span th:text="${order.productOrderId}"
+                                                           class="text-primary"></span>
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <small class="text-muted">訂單日期</small>
+                                                <div th:text="${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm')}"></div>
+                                            </div>
+                                            <div class="col-6">
+                                                <small class="text-muted">訂單狀態</small>
+                                                <div>
                                                 <span th:switch="${order.orderStatus}" class="badge">
                                                     <span th:case="'0'" class="badge bg-success">訂單成立</span>
                                                     <span th:case="'1'" class="badge bg-primary">配送中</span>
                                                     <span th:case="'2'" class="badge bg-secondary">已完成</span>
                                                     <span th:case="'*'" class="badge bg-dark">未知</span>
                                                 </span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <div class="row mb-3">
-                                        <div class="col-6">
-                                            <small class="text-muted">付款方式</small>
-                                            <div>
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <small class="text-muted">付款方式</small>
+                                                <div>
                                                 <span th:switch="${order.paymentMethod}" class="badge">
                                                     <span th:case="'0'">信用卡</span>
                                                     <span th:case="'1'">現金付款</span>
                                                     <span th:case="'*'">未知</span>
                                                 </span>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <small class="text-muted">配送方式</small>
-                                            <div>
+                                            <div class="col-6">
+                                                <small class="text-muted">配送方式</small>
+                                                <div>
                                                 <span th:switch="${order.shippingMethod}" class="badge">
                                                     <span th:case="'0'">宅配</span>
                                                     <span th:case="'1'">飯店自取</span>
                                                     <span th:case="'*'">未知</span>
                                                 </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <small class="text-muted">聯絡人</small>
+                                            <div><i class="fas fa-user me-1"></i><span
+                                                    th:text="${order.contactName}"></span>
+                                            </div>
+                                            <div><i class="fas fa-phone me-1"></i><span
+                                                    th:text="${order.contactPhone}"></span>
+                                            </div>
+                                            <div><i class="fas fa-map-marker-alt me-1"></i><span
+                                                    th:text="${order.contactAddress}"></span></div>
+                                        </div>
+
+                                        <div class="mb-3" th:if="${order.note != null && order.note != ''}">
+                                            <small class="text-muted">訂單備註</small>
+                                            <div class="text-muted"><span th:text="${order.note}"></span></div>
+                                        </div>
+
+                                        <div class="mb-3" th:if="${order.coupon != null}">
+                                            <small class="text-muted">優惠券</small>
+                                            <div class="text-success">
+                                                <i class="fas fa-tag me-1"></i>
+                                                <span th:text="${order.coupon.couponCode}"></span>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <small class="text-muted">訂單金額</small>
+                                                <h6 class="mb-0">NT$ <span th:text="${order.productOrderAmount}"></span>
+                                                </h6>
+                                            </div>
+                                            <div>
+                                                <small class="text-muted">折扣金額</small>
+                                                <h6 class="text-danger mb-0">-NT$ <span
+                                                        th:text="${order.discountAmount}"></span></h6>
+                                            </div>
+                                            <div>
+                                                <small class="text-muted">實付金額</small>
+                                                <h5 class="text-success mb-0">NT$ <span
+                                                        th:text="${order.productPaidAmount}"></span></h5>
                                             </div>
                                         </div>
                                     </div>
-
-                                    <div class="mb-3">
-                                        <small class="text-muted">聯絡人</small>
-                                        <div><i class="fas fa-user me-1"></i><span th:text="${order.contactName}"></span></div>
-                                        <div><i class="fas fa-phone me-1"></i><span th:text="${order.contactPhone}"></span></div>
-                                        <div><i class="fas fa-map-marker-alt me-1"></i><span th:text="${order.contactAddress}"></span></div>
+                                    <div class="card-footer bg-transparent">
+                                        <button type="button" class="btn btn-outline-primary btn-sm w-100"
+                                                data-bs-toggle="modal"
+                                                th:data-bs-target="'#orderModal' + ${order.productOrderId}">
+                                            <i class="fas fa-eye me-1"></i>查看詳情
+                                        </button>
                                     </div>
-
-                                    <div class="mb-3" th:if="${order.note != null && order.note != ''}">
-                                        <small class="text-muted">訂單備註</small>
-                                        <div class="text-muted"><span th:text="${order.note}"></span></div>
-                                    </div>
-
-                                    <div class="mb-3" th:if="${order.coupon != null}">
-                                        <small class="text-muted">優惠券</small>
-                                        <div class="text-success">
-                                            <i class="fas fa-tag me-1"></i>
-                                            <span th:text="${order.coupon.couponCode}"></span>
-                                        </div>
-                                    </div>
-
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <small class="text-muted">訂單金額</small>
-                                            <h6 class="mb-0">NT$ <span th:text="${order.productOrderAmount}"></span></h6>
-                                        </div>
-                                        <div>
-                                            <small class="text-muted">折扣金額</small>
-                                            <h6 class="text-danger mb-0">-NT$ <span th:text="${order.discountAmount}"></span></h6>
-                                        </div>
-                                        <div>
-                                            <small class="text-muted">實付金額</small>
-                                            <h5 class="text-success mb-0">NT$ <span th:text="${order.productPaidAmount}"></span></h5>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card-footer bg-transparent">
-                                    <button type="button" class="btn btn-outline-primary btn-sm w-100"
-                                            data-bs-toggle="modal"
-                                            th:data-bs-target="'#orderModal' + ${order.productOrderId}">
-                                        <i class="fas fa-eye me-1"></i>查看詳情
-                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- 無訂單提示 -->
-                <div th:unless="${memOrderList!=null and !memOrderList.isEmpty()}" class="text-center py-5">
-                    <div class="mb-4">
-                        <i class="fas fa-inbox fa-3x text-muted"></i>
+                    <!-- 無訂單提示 -->
+                    <div th:unless="${memOrderList!=null and !memOrderList.isEmpty()}" class="text-center py-5">
+                        <div class="mb-4">
+                            <i class="fas fa-inbox fa-3x text-muted"></i>
+                        </div>
+                        <h5 class="text-muted">尚無訂單建立</h5>
+                        <p class="text-muted">您還沒有任何商品訂單紀錄</p>
                     </div>
-                    <h5 class="text-muted">尚無訂單建立</h5>
-                    <p class="text-muted">您還沒有任何商品訂單紀錄</p>
-                </div>
 
-                <div class="text-center mt-4">
-                    <a href="/product" class="btn btn-success me-2">繼續購物</a>
-                    <a href="/" class="btn btn-primary">回首頁</a>
+                    <div class="text-center mt-4">
+                        <a href="/product" class="btn btn-success me-2">繼續購物</a>
+                        <a href="/" class="btn btn-primary">回首頁</a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 </main>
 <footer th:replace="~{fragments/fragments :: footer}"></footer>
 <!-- 訂單詳情 Modal -->
@@ -229,11 +249,13 @@
                                 </div>
                                 <div class="d-flex justify-content-between">
                                     <h6 class="text-muted mb-0">折扣金額：</h6>
-                                    <h5 class="text-danger mb-0">-NT$ <span th:text="${order.discountAmount}"></span></h5>
+                                    <h5 class="text-danger mb-0">-NT$ <span th:text="${order.discountAmount}"></span>
+                                    </h5>
                                 </div>
                                 <div class="d-flex justify-content-between">
                                     <h6 class="text-muted mb-0">實付金額：</h6>
-                                    <h5 class="text-success mb-0">NT$ <span th:text="${order.productPaidAmount}"></span></h5>
+                                    <h5 class="text-success mb-0">NT$ <span th:text="${order.productPaidAmount}"></span>
+                                    </h5>
                                 </div>
                             </div>
                         </div>

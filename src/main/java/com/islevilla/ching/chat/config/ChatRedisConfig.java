@@ -1,3 +1,4 @@
+
 package com.islevilla.ching.chat.config;
 
 import org.springframework.context.annotation.Bean;
@@ -10,13 +11,13 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class ChatRedisConfig {
 
-	// Redis 連線 使用db01
+	// Redis 連線 使用db0
 	@Bean
     public RedisConnectionFactory redisConnectionFactory() {
         return new LettuceConnectionFactory("localhost", 6379); // 預設就是 DB0
     }
 
-	// Redis String Template（Key & Value 都是 String）
+	// Redis Key & Value <String, String>
     @Bean
     public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory factory) {
         RedisTemplate<String, String> template = new RedisTemplate<>();

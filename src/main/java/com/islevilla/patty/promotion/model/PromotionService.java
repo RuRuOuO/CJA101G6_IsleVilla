@@ -27,6 +27,17 @@ public class PromotionService {
 	public void updatePromotion(Promotion promotion) {
 		repository.save(promotion);
 	}
+	
+	public void deletePromotion(Integer id) {
+	    if (repository.existsById(id)) {
+	        repository.deleteById(id);
+	    } else {
+	        throw new RuntimeException("找不到指定的優惠專案 ID：" + id);
+	    }
+	}
+
+	
+
 
 
 	public Promotion getOnePromotion(Integer roomPromotionId) {
@@ -38,9 +49,5 @@ public class PromotionService {
 	public List<Promotion> getAll() {
 		return repository.findAll();
 	}
-
-//	public List<Promotion> getAll(Map<String, String[]> map) {
-//		return HibernateUtil_CompositeQuery_Promotion.getAllC(map,sessionFactory.openSession());
-//	}
 
 }

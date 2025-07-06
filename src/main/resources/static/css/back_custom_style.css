@@ -1,0 +1,121 @@
+/* ==================== 全域設定 ==================== */
+
+/* 字型與圓角設定 */
+* {
+    font-family: "Noto Sans TC", sans-serif;
+}
+
+pre {
+    font-family: "Noto Sans TC", sans-serif;
+    font-size: 1rem; /* 可視需求調整大小 */
+    white-space: pre-wrap; /* 保留換行但讓內容可換行避免過寬 */
+    word-break: break-word;
+}
+
+/* ==================== 按鈕樣式 ==================== */
+
+/* 按鈕基本樣式 */
+.sidebar .btn {
+    box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar .btn:hover {
+    /*border: 1px solid white !important;*/
+    box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.3);
+    filter: brightness(1.05);
+    /*font-weight:bold;*/
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+    .sticky-col {
+        min-width: 100px;
+        font-size: 0.8rem;
+    }
+
+    #availabilityTable td {
+        min-width: 60px;
+        padding: 6px 4px;
+    }
+
+    .availability-cell {
+        padding: 4px 6px !important;
+        font-size: 0.8rem !important;
+    }
+
+    .text-nowrap {
+        font-size: 0.7rem;
+    }
+}
+
+/* ==== 統一覆蓋文字顏色 ==== */
+/*.text-primary     { color: #f46a6a !important; }*/
+/*.text-info        { color: #38a3d1 !important; }*/
+/*.text-success     { color: #3ac47d !important; }*/
+/*.text-warning     { color: #f4b400 !important; }*/
+/*.text-danger      { color: #e74c3c !important; }*/
+/*.text-secondary   { color: #95a5a6 !important; }*/
+/*.text-muted       { color: #a0a0a0 !important; }*/
+
+/*!* ==== 統一覆蓋背景顏色 ==== *!*/
+/*.bg-primary       { background-color: #f46a6a !important; }*/
+/*.bg-info          { background-color: #38a3d1 !important; }*/
+/*.bg-success       { background-color: #3ac47d !important; }*/
+/*.bg-warning       { background-color: #f4b400 !important; }*/
+/*.bg-danger        { background-color: #e74c3c !important; }*/
+/*.bg-secondary     { background-color: #95a5a6 !important; }*/
+
+/*.btn-primary       { background-color: #f46a6a !important; }*/
+/*.btn-info          { background-color: #38a3d1 !important; }*/
+/*.btn-success       { background-color: #3ac47d !important; }*/
+/*.btn-warning       { background-color: #f4b400 !important; }*/
+/*.btn-danger        { background-color: #e74c3c !important; }*/
+/*.btm-secondary     { background-color: #95a5a6 !important; }*/
+
+/*!* ==== 統一覆蓋邊框與按鈕顏色 ==== *!*/
+/*.btn-outline-primary {*/
+/*    color: #f46a6a !important;*/
+/*    border-color: #f46a6a !important;*/
+/*}*/
+/*.btn-outline-info {*/
+/*    color: #38a3d1 !important;*/
+/*    border-color: #38a3d1 !important;*/
+/*}*/
+/*.btn-outline-success {*/
+/*    color: #3ac47d !important;*/
+/*    border-color: #3ac47d !important;*/
+/*}*/
+/*.btn-outline-warning {*/
+/*    color: #f4b400 !important;*/
+/*    border-color: #f4b400 !important;*/
+/*}*/
+/*.btn-outline-danger {*/
+/*    color: #e74c3c !important;*/
+/*    border-color: #e74c3c !important;*/
+/*}*/
+/*.btn-outline-secondary {*/
+/*    color: #95a5a6 !important;*/
+/*    border-color: #95a5a6 !important;*/
+/*}*/
+
+/*!* ==== 表格背景色（thead 等） ==== *!*/
+/*.table-light thead th,*/
+/*.table-light th {*/
+/*    background-color: #f0f0f0 !important;*/
+/*    color: #333 !important;*/
+/*}*/
+
+/* ==================== 導覽列樣式 ==================== */
+/* 導覽列間距 */
+.navbar-nav {
+    display: flex;
+    gap: 1rem;
+}
+
+/* 導覽列分隔線 */
+.nav-item.divider {
+    pointer-events: none;
+    user-select: none;
+    opacity: 0.5;
+    font-size: 0.5rem;
+}

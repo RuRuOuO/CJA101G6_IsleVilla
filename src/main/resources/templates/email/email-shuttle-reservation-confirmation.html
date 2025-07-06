@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>接駁服務預約確認</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #007bff;
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .header p {
+            color: #666;
+            margin: 10px 0 0 0;
+        }
+
+        .booking-info {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #495057;
+            min-width: 120px;
+        }
+
+        .info-value {
+            color: #007bff;
+            font-weight: 500;
+        }
+
+        .highlight {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #2196f3;
+        }
+
+        .seats-container {
+            background-color: #e8f5e8;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .seats-title {
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+
+        .seats-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .seat {
+            background-color: #4caf50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .contact-info {
+            background-color: #f1f3f4;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 480px) {
+            .info-row {
+                flex-direction: column;
+            }
+
+            .info-label {
+                min-width: auto;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚢 接駁服務預約確認</h1>
+            <p>親愛的 <span th:text="${memberName}">會員</span>，您的預約已成功完成！</p>
+        </div>
+
+        <div class="highlight">
+            <strong>預約成功！</strong> 感謝您使用我們的接駁服務，以下是您的預約詳細資訊：
+        </div>
+
+        <div class="booking-info">
+            <div class="info-row">
+                <span class="info-label">預約編號：</span>
+                <span class="info-value" th:text="${shuttleReservationId}">發生錯誤</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">完成預約時間：</span>
+                <span class="info-value" th:text="${#temporals.format(bookingTime, 'yyyy-MM-dd HH:mm:ss')}">發生錯誤</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">訂房編號：</span>
+                <span class="info-value" th:text="${roomReservationId}">發生錯誤</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">班次編號：</span>
+                <span class="info-value" th:text="${scheduleId}">發生錯誤</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">接駁日期：</span>
+                <span class="info-value" th:text="${#temporals.format(shuttleDate, 'yyyy-MM-dd')}">發生錯誤</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">接駁時間：</span>
+                <span class="info-value" th:text="${#temporals.format(shuttleTime, 'HH:mm')}">發生錯誤</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">方向：</span>
+                <span class="info-value" th:text="${shuttleDirection == 'outbound' ? '去程' : '回程'}">發生錯誤</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">接駁人數：</span>
+                <span class="info-value" th:text="${#lists.size(seatNumbers)}">發生錯誤</span>
+            </div>
+        </div>
+
+        <div class="seats-container">
+            <div class="seats-title">🪑 預約座位</div>
+            <div class="seats-list">
+                <span class="seat" th:each="seat : ${seatNumbers}" th:text="${seat}">發生錯誤</span>
+            </div>
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ 重要提醒：</strong>
+            <ul style="margin: 10px 0 0 0; padding-left: 20px;">
+                <li>請於預約時間前 10 分鐘到達接駁地點</li>
+                <li>請攜帶訂房確認單或預約編號以便核對</li>
+                <li>如需取消或異動，請提前 24 小時聯絡我們</li>
+                <li>逾時未到達將視為自動取消，恕不另行通知</li>
+            </ul>
+        </div>
+
+        <div class="contact-info">
+            <strong>📞 聯絡資訊</strong><br>
+            如有任何疑問，歡迎與我們聯絡：<br>
+            電話：(02) 1234-5678<br>
+            信箱：info@islevilla.com<br>
+            服務時間：09:00 - 18:00（週一至週日）
+        </div>
+
+        <div class="footer">
+            <p>此郵件由系統自動發送，請勿直接回覆。</p>
+            <p>感謝您的使用，祝您旅途愉快！</p>
+            <p style="margin-top: 15px; color: #999;">© 2025 微嶼IsleVilla 接駁服務系統</p>
+        </div>
+    </div>
+</body>
+
+</html>

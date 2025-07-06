@@ -108,36 +108,39 @@
 <!-- ===== 載入Header ===== -->
 <div th:replace="~{fragments/fragments :: header}"></div>
 <!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
-<main class="container mb-5 mt-5">
-    <!-- 商品分類 -->
-    <h2 class="text-center mb-4">商品分類</h2>
-    <div class="row category-row">
-
-        <div class="col-2 category-item">
-            <a th:href="@{/product/list}">
-                <button class="btn btn-outline-primary">
-                    <p>全部商品</p>
-                </button>
-            </a>
+<main>
+    <!-- Hero Section -->
+    <section class="hero-section pt-5">
+        <div class="container text-center">
+            <h1 class="mb-4">購物商城</h1>
+            <p class="mb-4">
+                <i class="fa-solid fa-bag-shopping me-2"></i>
+                歡迎來到 微嶼Islevilla 購物商城
+            </p>
         </div>
-        <!-- 使用Thymeleaf動態生成分類列表 -->
-        <div th:each="category : ${category}" class="col-2 category-item">
-            <a th:href="@{/product/list(productCategoryId=${category.productCategoryId})}">
-                <button class="btn btn-outline-primary">
-                    <p th:text="${category.productCategoryName}">商品類別名稱</p>
-                </button>
-            </a>
-        </div>
+    </section>
+    <section class="py-4">
+        <div class="container">
+            <div class="row category-row">
+                <div class="col-6 col-md-3 col-lg-2 category-item">
+                    <a th:href="@{/product/list}">
+                        <button class="btn category-card">
+                            <p>全部商品</p>
+                        </button>
+                    </a>
+                </div>
+                <!-- 使用Thymeleaf動態生成分類列表 -->
+                <div th:each="category : ${category}" class="col-6 col-md-3 col-lg-2 category-item">
+                    <a th:href="@{/product/list(productCategoryId=${category.productCategoryId})}">
+                        <button class="btn category-card">
+                            <p th:text="${category.productCategoryName}">商品類別名稱</p>
+                        </button>
+                    </a>
+                </div>
 
 
-        <!--空行-->
-        <div class="w-100 d-none d-md-block my-5"></div>
 
-        <!-- 商品卡片 -->
-        <h2 class="text-center">商品列表</h2>
-        <p class="text-center">歡迎來到 微嶼Islevilla 購物商城</p>
-
-        <div class="container mt-4">
+        <div class="container mt-5">
             <div class="row g-4">
                 <!-- 商品卡片 1 -->
                 <!-- 迴圈渲染：products 為 Controller 傳入的 List<Product> -->
@@ -162,25 +165,26 @@
                                    class="btn btn-secondary btn-sm text-center"
                                    style="flex: 1 1 0; min-width: 0; white-space: nowrap;">查看詳情</a>
                                 <!-- 加入購物車按鈕 -->
-                                <form th:action="@{/addToCart}" method="post" class="add-to-cart-form" style="flex: 1 1 0; min-width: 0;">
+                                <form id="addToCartForm" th:action="@{/addToCart}" method="post" style="display: none;">
                                     <input type="hidden" name="productId" th:value="${prod.productId}" />
                                     <input type="hidden" name="quantity" value="1" />
                                     <input type="hidden" name="stock" th:value="${prod.productQuantity}" />
-                                    <button type="submit" class="btn btn-primary btn-sm text-center w-100"
-                                            style="white-space: nowrap;">
-                                        加入購物車
-                                    </button>
                                 </form>
+
+                                <!-- Button outside the form -->
+                                <button type="submit"
+                                        class="btn btn-primary btn-sm text-center"
+                                        style="flex: 1 1 0; min-width: 0; white-space: nowrap;"
+                                        form="addToCartForm">
+                                    加入購物車
+                                </button>
                             </div>
                         </div>
-
-
-
                     </div>
                 </div>
-
             </div>
         </div>
+    </div>
 </main>
 
 <!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
