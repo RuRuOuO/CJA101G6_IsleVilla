@@ -119,10 +119,21 @@ public String showSelectPage(Model model) {
 	// 房型下拉選單選項
     List<RoomType> roomTypeList=roomTypeName.getRoomTypeNameList();
     
+    // 新增：查詢所有房間資料
+    List<Room> roomList = roomService.findAll();
+    
+    // 新增：創建房型名稱對應表
+    Map<Integer, String> roomTypeNameMap=roomTypeName.getRoomTypeNameMap();
+    
 	System.out.println("進入頁面");
     model.addAttribute("room", room);
     model.addAttribute("roomTypeList", roomTypeList);
     model.addAttribute("roomStatusMap", roomStatusMap);
+    
+    // 新增：將房間列表和房型名稱對應表加到 model
+    model.addAttribute("roomList", roomList);
+    model.addAttribute("roomTypeNameMap", roomTypeNameMap);
+    
 	return "/back-end/room/selectRoomPage";
 }	
 	
