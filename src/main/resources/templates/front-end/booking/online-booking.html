@@ -167,7 +167,8 @@
                                                 data-room-price=${roomTypeWithPromotions.getDiscountedPrice(promotion)},
                                                 data-room-id=${roomTypeWithPromotions.roomType.roomTypeId},
                                                 data-room-type-id=${roomTypeWithPromotions.roomType.roomTypeId},
-                                                data-promotion-title=${promotion.promotion.roomPromotionTitle != null ? promotion.promotion.roomPromotionTitle : ''}">
+                                                data-promotion-title=${promotion.promotion.roomPromotionTitle != null ? promotion.promotion.roomPromotionTitle : ''},
+                                                data-promotion-id=${promotion.promotion.roomPromotionId != null ? promotion.promotion.roomPromotionId : ''}">
                                         選擇
                                     </a>
                                 </div>
@@ -528,8 +529,9 @@ document.addEventListener('click', function(e) {
         const roomId = btn.getAttribute('data-room-id');
         const roomTypeId = btn.getAttribute('data-room-type-id');
         const promotionTitle = btn.getAttribute('data-promotion-title') || '';
-        cartRoomsArr.push({ name: roomName, price, roomId, roomTypeId, promotionTitle });
-        console.log('加入房型:', { name: roomName, price, roomId, roomTypeId, promotionTitle });
+        const promotionId = btn.getAttribute('data-promotion-id') || '';
+        cartRoomsArr.push({ name: roomName, price, roomId, roomTypeId, promotionTitle, promotionId });
+        console.log('加入房型:', { name: roomName, price, roomId, roomTypeId, promotionTitle, promotionId });
         renderCart();
     }
 });
