@@ -24,7 +24,7 @@
         <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
         <div class="container mt-4">
 
-    <!-- 查詢條件區塊 -->
+    <!-- 查詢條件區塊 --> 
     <form method="get" action="/backend/roomTypeAvailability/list" class="mb-4">
 
         <div class="row align-items-end">
@@ -92,7 +92,7 @@
                 </tr>
                 <!-- 檢查判斷清單是否為空，如果沒有任何房型資料，則顯示提示 -->
                 <tr th:if="${#lists.isEmpty(roomTypes)}">
-                    <td th:colspan="${#lists.size(daysInMonth) + 1}" class="text-center text-muted">查無資料，或請選擇一個房型進行查詢</td>
+                    <td th:colspan="${#lists.size(daysInMonth)}" class="text-center text-muted">查無資料，或請選擇一個房型進行查詢</td>
                 </tr>
             </tbody>
         </table>

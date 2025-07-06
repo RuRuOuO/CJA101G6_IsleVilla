@@ -68,7 +68,7 @@ public class RoomTypeAvailabilityService {
 				
 				daliyRoomTypeAvailability.setRoomTypeAvailabilityId(roomTypeAvailabilityId);
 				daliyRoomTypeAvailability.setRoomType(roomType); // 設定 RoomType 實體
-				daliyRoomTypeAvailability.setRoomTypeAvailabilityCount(roomTypeCount.getRoomCountDTO());
+				            daliyRoomTypeAvailability.setRoomTypeAvailabilityCount(roomTypeCount.getRoomAvailableDTO());
 
 				roomTypeAvailabilityRepository.save(daliyRoomTypeAvailability);
 			}			

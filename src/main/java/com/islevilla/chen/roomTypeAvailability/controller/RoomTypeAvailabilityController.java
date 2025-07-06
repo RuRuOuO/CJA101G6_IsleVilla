@@ -37,12 +37,19 @@ public class RoomTypeAvailabilityController {
     @PreAuthorize("hasAuthority('room')")
     public String showList(
             @RequestParam(value = "roomTypeId", defaultValue = "0") Integer roomTypeId,
-            @RequestParam(value = "year", required = false) Integer year,
-            @RequestParam(value = "month", required = false) Integer month,
+            @RequestParam(value = "yearMonth", required = false) String yearMonthStr,
             Model model) {
 
-        // 沒有提供年月就用當前年月
-        if (year == null || month == null) {
+        Integer year;
+        Integer month;
+
+        // 如果提供了 yearMonth 參數，則解析它
+        if (yearMonthStr != null && !yearMonthStr.isEmpty()) {
+            YearMonth parsedYearMonth = YearMonth.parse(yearMonthStr);
+            year = parsedYearMonth.getYear();
+            month = parsedYearMonth.getMonthValue();
+        } else {
+            // 沒有提供年月就用當前年月
             YearMonth currentYearMonth = YearMonth.now();
             year = currentYearMonth.getYear();
             month = currentYearMonth.getMonthValue();

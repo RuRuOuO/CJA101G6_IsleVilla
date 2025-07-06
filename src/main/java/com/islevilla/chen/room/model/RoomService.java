@@ -67,11 +67,19 @@ public class RoomService {
     public RoomTypeCount updateRoomTypeBasicStatistics(Integer roomTypeId) {
         // 計算該房型的總房間數
         List<RoomTypeCount> totalRooms = roomRepository.countRoomsByRoomTypeId();
-        Integer totalRoom = totalRooms.get(roomTypeId).getRoomCountDTO();
+        Integer totalRoom = totalRooms.stream()
+                                    .filter(rc -> rc.getRoomTypeIdDTO().equals(roomTypeId))
+                                    .map(RoomTypeCount::getRoomCountDTO)
+                                    .findFirst()
+                                    .orElse(0);
         
         // 計算無法使用的房間數 (狀態 2:待維修, 4:停用)
         List<RoomTypeCount> totalUnables = roomRepository.countRoomsByRoomTypeIdWithStatus();
-        Integer totalUnable = totalUnables.get(roomTypeId).getRoomUnableDTO();
+        Integer totalUnable = totalUnables.stream()
+                                        .filter(rc -> rc.getRoomTypeIdDTO().equals(roomTypeId))
+                                        .map(RoomTypeCount::getRoomUnableDTO)
+                                        .findFirst()
+                                        .orElse(0);
         
         // 基本可用數量 = 總數 - 無法使用
         Integer Available = totalRoom - totalUnable;
