@@ -42,4 +42,11 @@ public class ProductService {
     public List<Product> getProductByCategoryIdAndStatus(Integer categoryId, Byte status) {
         return productRepository.findByProductCategoryProductCategoryIdAndProductStatus(categoryId, status);
     }
+    /**
+     * 以悲觀鎖查詢商品，確保同時只有一個交易能修改庫存。
+     * 用於下單流程防止超賣。
+     */
+    public Product getProductByIdForUpdate(Integer productId) {
+        return productRepository.findByIdForUpdate(productId);
+    }
 }

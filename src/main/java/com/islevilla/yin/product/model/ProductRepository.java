@@ -1,6 +1,10 @@
 package com.islevilla.yin.product.model;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import jakarta.persistence.LockModeType;
 
 import java.util.List;
 
@@ -10,4 +14,13 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     List<Product> findByProductStatus(Byte status);
     
     List<Product> findByProductCategoryProductCategoryIdAndProductStatus(Integer productCategoryId, Byte status);
+
+    /**
+     * 以悲觀鎖(PESSIMISTIC_WRITE)查詢商品，防止高併發下超賣。
+     * 此方法會鎖定資料庫該筆商品記錄，直到交易結束，確保同一時間只有一個交易能修改庫存。
+     * 用於下單時即時檢查與扣減庫存，避免庫存負數。
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT p FROM Product p WHERE p.productId = :productId")
+    Product findByIdForUpdate(@Param("productId") Integer productId);
 }
