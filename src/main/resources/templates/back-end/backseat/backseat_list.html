@@ -1,175 +1,206 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>座位列表 | 後台管理</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>座位列表 | 後台管理</title>
 
-  <!-- 共用樣式 -->
-  <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+<!-- 共用樣式 -->
+<th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+<link rel="stylesheet"
+	href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+	rel="stylesheet" />
 
-  <style>
-    table {
-      font-size: 0.9rem;
-    }
-    th, td {
-      padding: 4px 8px !important;
-      text-align: center;
-      vertical-align: middle;
-    }
-    thead th {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(4px);
-      border: none;
-      border-radius: 8px;
-      font-weight: bold;
-    }
-    .badge {
-      font-size: 0.8rem;
-      padding: 3px 6px;
-    }
-    .card {
-      padding: 1rem !important;
-    }
-    .filter-info {
-      font-size: 0.85rem;
-      color: #6c757d;
-      margin-top: 1rem;
-      margin-bottom: 0.5rem;
-      padding-left: 2px;
-      font-weight: 500;
-    }
+<style>
+table {
+	font-size: 0.9rem;
+}
 
-    /* 搜尋框帶 icon */
-    .search-wrapper {
-      display: flex;
-      align-items: center;
-      border: 1px solid #ced4da;
-      border-radius: 6px;
-      background-color: #fff;
-      width: 215px;
-      overflow: hidden;
-    }
+th, td {
+	padding: 4px 8px !important;
+	text-align: center;
+	vertical-align: middle;
+}
 
-    .search-wrapper .search-icon {
-      padding: 0.6rem 0.75rem;
-      color: #6c757d;
-      font-size: 1.1rem;
-      background-color: #f8f9fa;
-      border-right: 1px solid #ced4da;
-    }
+thead th {
+	background: rgba(255, 255, 255, 0.85);
+	backdrop-filter: blur(4px);
+	border: none;
+	border-radius: 8px;
+	font-weight: bold;
+}
 
-    .search-wrapper .search-input {
-      border: none;
-      outline: none;
-      box-shadow: none;
-      flex-grow: 1;
-      padding: 0.55rem 0.75rem;
-      font-size: 0.95rem;
-    }
+.badge {
+	font-size: 0.8rem;
+	padding: 3px 6px;
+}
 
-    .search-wrapper .search-input::placeholder {
-      color: #6c757d;
-    }
-  </style>
+.card {
+	padding: 1rem !important;
+}
+
+.filter-info {
+	font-size: 0.85rem;
+	color: #6c757d;
+	margin-top: 1rem;
+	margin-bottom: 0.5rem;
+	padding-left: 2px;
+	font-weight: 500;
+}
+
+/* 搜尋框帶 icon */
+.search-wrapper {
+	display: flex;
+	align-items: center;
+	border: 1px solid #ced4da;
+	border-radius: 6px;
+	background-color: #fff;
+	width: 175px;
+	overflow: hidden;
+}
+
+.search-wrapper .search-icon {
+	padding: 0.6rem 0.75rem;
+	color: #6c757d;
+	font-size: 1.1rem;
+	background-color: #f8f9fa;
+	border-right: 1px solid #ced4da;
+}
+
+.search-wrapper .search-input {
+	border: none;
+	outline: none;
+	box-shadow: none;
+	flex-grow: 1;
+	padding: 0.55rem 0.75rem;
+	font-size: 0.95rem;
+}
+
+.search-wrapper .search-input::placeholder {
+	color: #6c757d;
+}
+.search-wrapper.wide {
+  width: 190px;
+}
+</style>
 </head>
 
 <body>
-  <!-- 側邊欄 -->
-  <th:block th:replace="~{fragments/backFragments :: mobileSidebar}"></th:block>
-  <div th:replace="~{fragments/backFragments :: sidebar}"></div>
+	<!-- 側邊欄 -->
+	<th:block th:replace="~{fragments/backFragments :: mobileSidebar}"></th:block>
+	<div th:replace="~{fragments/backFragments :: sidebar}"></div>
 
-  <!-- 主內容 -->
-  <main th:replace="~{fragments/backFragments :: mainContent(~{::content})}">
-    <th:block th:fragment="content">
+	<!-- 主內容 -->
+	<main
+		th:replace="~{fragments/backFragments :: mainContent(~{::content})}">
+		<th:block th:fragment="content">
 
-      <!-- ===== 標題列 ===== -->
-      <div class="card-header bg-transparent border-0 pt-4">
-        <div class="d-flex justify-content-between align-items-center">
-          <h4 class="card-title mb-0 fw-bold">
-            <i class="bi bi-grid-3x3-gap me-2"></i>座位管理
-          </h4>
-        </div>
-      </div>
+			<!-- ===== 標題列 ===== -->
+			<div class="card-header bg-transparent border-0 pt-4">
+				<div class="d-flex justify-content-between align-items-center">
+					<h4 class="card-title mb-0 fw-bold">
+						<i class="bi bi-grid-3x3-gap me-2"></i>座位管理
+					</h4>
+				</div>
+			</div>
 
-      <!-- ===== 表格區塊 ===== -->
-      <div class="card-body">
-        <!-- 查詢欄位：含 icon -->
-        <div class="search-wrapper mb-3">
-          <i class="bi bi-search search-icon"></i>
-          <input type="text" id="seatSearch" class="form-control search-input" placeholder="搜尋座位編號或號碼" />
-        </div>
+			<!-- ===== 表格區塊 ===== -->
+			<div class="card-body">
+				<div class="d-flex flex-wrap gap-3 mb-3">
+					<!-- 座位編號查詢（精確） -->
+					<div class="search-wrapper">
+						<i class="bi bi-search search-icon"></i> <input type="text"
+							id="seatSearch" class="form-control search-input"
+							placeholder="請輸入座位編號" />
+					</div>
 
-        <!-- 表格 -->
-        <div class="table-responsive">
-          <table id="seatTable" class="table table-hover align-middle text-center" style="background-color: transparent;">
-            <thead>
-              <tr>
-                <th class="text-center">座位編號</th>
-                <th class="text-center">座位號碼</th>
-                <th class="text-center">狀態</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr th:each="seat : ${backSeatList}">
-                <td th:text="${seat.seatId}">1</td>
-                <td th:text="${seat.seatNumber}">A01</td>
-                <td>
-                  <span th:if="${seat.seatStatus == 1}" class="badge bg-success">正常</span>
-                  <span th:if="${seat.seatStatus == 0}" class="badge bg-danger">故障</span>
-                </td>
-              </tr>
-              <tr th:if="${#lists.isEmpty(backSeatList)}">
-                <td colspan="3" class="text-center">尚無座位資料</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+					<!-- 座位號碼查詢（模糊） -->
+					<div class="search-wrapper wide">
+						<i class="fas fa-chair search-icon"></i> <input type="text"
+							id="seatNumberSearch" class="form-control search-input"
+							placeholder="座位查詢 例：A03" />
+					</div>
+				</div>
+				<!-- 表格 -->
+				<div class="table-responsive">
+					<table id="seatTable"
+						class="table table-hover align-middle text-center"
+						style="background-color: transparent;">
+						<thead>
+							<tr>
+								<th class="text-center">座位編號</th>
+								<th class="text-center">座位號碼</th>
+								<th class="text-center">狀態</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="seat : ${backSeatList}">
+								<td th:text="${seat.seatId}">1</td>
+								<td th:text="${seat.seatNumber}">A01</td>
+								<td><span th:if="${seat.seatStatus == 1}"
+									class="badge bg-success">正常</span> <span
+									th:if="${seat.seatStatus == 0}" class="badge bg-danger">故障</span>
+								</td>
+							</tr>
+							<tr th:if="${#lists.isEmpty(backSeatList)}">
+								<td colspan="3" class="text-center">尚無座位資料</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
 
-    </th:block>
-  </main>
+		</th:block>
+	</main>
 
-  <!-- 共用 JS -->
-  <th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
-  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+	<!-- 共用 JS -->
+	<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
+	<script
+		src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+	<script
+		src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
-  <!-- 查詢邏輯 -->
-  <script>
-    $(document).ready(function () {
-      const table = $('#seatTable').DataTable({
-        dom: 'lrtip',
-        language: {
-          search: "搜尋：",
-          lengthMenu: "每頁顯示 _MENU_ 筆資料",
-          zeroRecords: "找不到資料",
-          info: "顯示第 _START_ 到 _END_ 筆，共 _TOTAL_ 筆",
-          infoEmpty: "無資料",
-          paginate: {
-            previous: "上一頁",
-            next: "下一頁"
-          }
-        },
-        ordering: true,
-        lengthChange: false,
-        pageLength: 20
-      });
+	<!-- 查詢邏輯 -->
+	<script>
+		$(document).ready(
+				function() {
+					const table = $('#seatTable').DataTable({
+						dom : 'lrtip',
+						language : {
+							search : "搜尋：",
+							lengthMenu : "每頁顯示 _MENU_ 筆資料",
+							zeroRecords : "找不到資料",
+							info : "顯示第 _START_ 到 _END_ 筆，共 _TOTAL_ 筆",
+							infoEmpty : "無資料",
+							paginate : {
+								previous : "上一頁",
+								next : "下一頁"
+							}
+						},
+						ordering : true,
+						lengthChange : false,
+						pageLength : 20
+					});
 
-      // 自訂搜尋條件
-      $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-        const keyword = $('#seatSearch').val().toLowerCase();
-        const seatId = data[0].toLowerCase();
-        const seatNumber = data[1].toLowerCase();
-        return seatId.includes(keyword) || seatNumber.includes(keyword);
-      });
-
-      $('#seatSearch').on('keyup', function () {
-        table.draw();
-      });
-    });
-  </script>
+					// ✅ 僅查座位編號（第0欄），且必須完全比對
+					$('#seatSearch').on(
+							'keyup',
+							function() {
+								const keyword = this.value.trim();
+								if (keyword === '') {
+									table.column(0).search('').draw(); // 清除搜尋
+								} else {
+									table.column(0).search('^' + keyword + '$',
+											true, false).draw(); // 精準比對
+								}
+							});
+					// ✅ 座位號碼（第 1 欄）模糊查詢
+					$('#seatNumberSearch').on('keyup', function() {
+						table.column(1).search(this.value).draw();
+					});
+				});
+	</script>
 </body>
 </html>

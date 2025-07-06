@@ -43,7 +43,7 @@ table.dataTable td {
 	border: 1px solid #ced4da;
 	border-radius: 6px;
 	background-color: #fff;
-	width: 145px;
+	width: 160px;
 	overflow: hidden;
 }
 
@@ -111,7 +111,7 @@ table.dataTable td {
 					<div class="search-wrapper">
 						<i class="fa-solid fa-magnifying-glass search-icon"></i> <input type="text"
 							id="searchInput" class="form-control search-input"
-							placeholder="關鍵字搜尋" />
+							placeholder="時段編號查詢" />
 					</div>
 				</div>
 
@@ -189,10 +189,15 @@ table.dataTable td {
 				pageLength : 10
 			});
 
-			// 🔍 自訂搜尋欄
 			$('#searchInput').on('keyup', function() {
-				table.search(this.value).draw();
-			});
+				  const keyword = this.value.trim();
+				  if (keyword === '') {
+				    table.column(0).search('').draw(); // 清除搜尋
+				  } else {
+				    table.column(0).search('^' + keyword + '$', true, false).draw(); // 精準比對
+				  }
+				});
+
 
 			// 🧭 方向篩選
 			$('#directionFilter').on('change', function() {

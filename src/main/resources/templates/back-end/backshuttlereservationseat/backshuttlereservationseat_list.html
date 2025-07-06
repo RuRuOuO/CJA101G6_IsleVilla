@@ -129,11 +129,12 @@ td.text-start {
 							placeholder="請輸入預約編號查詢" />
 					</div>
 
-					<!-- 關鍵字模糊搜尋 -->
+
+					<!-- 座位查詢 -->
 					<div class="search-wrapper">
-						<i class="fas fa-search search-icon"></i> <input type="text"
+						<i class="fas fa-chair search-icon"></i> <input type="text"
 							id="seatSearch" class="form-control search-input"
-							placeholder="請輸入關鍵字查詢" />
+							placeholder="座位查詢 例：C01" />
 					</div>
 				</div>
 				<div class="table-responsive">
@@ -175,44 +176,48 @@ td.text-start {
 		src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
 	<script>
-		$(document).ready(function() {
-			const table = $('#seatTable').DataTable({
-				dom : 'lrtip',
-				language : {
-					"sProcessing" : "處理中...",
-					"sLengthMenu" : "顯示 _MENU_ 項結果",
-					"sZeroRecords" : "沒有符合的結果",
-					"sInfo" : "顯示第 _START_ 至 _END_ 項結果，共 _TOTAL_ 項",
-					"sInfoEmpty" : "顯示第 0 至 0 項結果，共 0 項",
-					"sInfoFiltered" : "(從 _MAX_ 項結果中過濾)",
-					"sSearch" : "搜尋：",
-					"oPaginate" : {
-						"sFirst" : "第一頁",
-						"sPrevious" : "上一頁",
-						"sNext" : "下一頁",
-						"sLast" : "最後一頁"
-					}
-				},
-				ordering : true,
-				paging : true,
-				lengthChange : false
-			});
+		$(document).ready(
+				function() {
+					const table = $('#seatTable').DataTable({
+						dom : 'lrtip',
+						language : {
+							"sProcessing" : "處理中...",
+							"sLengthMenu" : "顯示 _MENU_ 項結果",
+							"sZeroRecords" : "沒有符合的結果",
+							"sInfo" : "顯示第 _START_ 至 _END_ 項結果，共 _TOTAL_ 項",
+							"sInfoEmpty" : "顯示第 0 至 0 項結果，共 0 項",
+							"sInfoFiltered" : "(從 _MAX_ 項結果中過濾)",
+							"sSearch" : "搜尋：",
+							"oPaginate" : {
+								"sFirst" : "第一頁",
+								"sPrevious" : "上一頁",
+								"sNext" : "下一頁",
+								"sLast" : "最後一頁"
+							}
+						},
+						ordering : true,
+						paging : true,
+						lengthChange : false
+					});
 
-			// ✅ 預約編號精準查詢（只查第0欄，完整比對）
-			$('#idSearch').on('keyup', function () {
-				const value = this.value.trim();
-				if (value === '') {
-					table.column(0).search('').draw();
-				} else {
-					table.column(0).search('^' + value + '$', true, false).draw();
-				}
-			});
+					// ✅ 預約編號精準查詢（只查第0欄，完整比對）
+					$('#idSearch').on(
+							'keyup',
+							function() {
+								const value = this.value.trim();
+								if (value === '') {
+									table.column(0).search('').draw();
+								} else {
+									table.column(0).search('^' + value + '$',
+											true, false).draw();
+								}
+							});
 
-			// ✅ 關鍵字模糊查詢（全欄位）
-			$('#seatSearch').on('keyup', function () {
-				table.search(this.value).draw();
-			});
-		});
+					// ✅ 座位模糊查詢（只查第2欄）
+					$('#seatSearch').on('keyup', function() {
+						table.column(2).search(this.value).draw(); // 第2欄為座位欄
+					});
+				});
 	</script>
 </body>
 </html>
