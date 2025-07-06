@@ -48,7 +48,20 @@ public class RoomService {
 	    return roomRepository.searchRooms(roomId,roomTypeId, roomStatus);
 	}
 	
-    
+	//====自動生成用的====
+	//計算房型數量List(key=roomTypeId, value=roomCount)
+	@Transactional(readOnly = true)
+    public List<RoomTypeCount> getRoomCountsByType() {
+        return roomRepository.countRoomsByRoomTypeId();
+    }
+	//長期不可用房間狀態的房型數量(key=roomTypeId, value=roomCount)
+	@Transactional(readOnly = true)
+    public List<RoomTypeCount> getRoomCountsByTypeWithStatus() {
+        return roomRepository.countRoomsByRoomTypeIdWithStatus();
+    }
+	//====自動生成用的====
+	
+	
     //更新特定房型的基本統計
     @Transactional
     public RoomTypeCount updateRoomTypeBasicStatistics(Integer roomTypeId) {

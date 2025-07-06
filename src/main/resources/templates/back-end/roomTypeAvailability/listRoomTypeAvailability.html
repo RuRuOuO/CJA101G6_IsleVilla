@@ -11,11 +11,7 @@
     
     <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
- 
-</head>
+    </head>
 <body>
 <!-- ===== 載入sidebar ===== -->
 <!-- 插入手機版側邊欄 -->
@@ -26,9 +22,83 @@
 <main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
     <th:block th:fragment="myContent">
         <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
-        
-      
+        <div class="container mt-4">
 
+    <!-- 查詢條件區塊 -->
+    <form method="get" action="/backend/roomTypeAvailability/list" class="mb-4">
+
+        <div class="row align-items-end">
+            <!-- 房型下拉選單 -->
+            <div class="col-md-4">
+                <label for="roomTypeId" class="form-label">房型</label>
+                <select id="roomTypeId" name="roomTypeId" class="form-select">
+                    <option value="0" th:selected="${selectedRoomTypeId == 0}">全部房型</option>
+                    <option th:each="roomType : ${roomTypeNameList}" 
+					        th:value="${roomType.roomTypeId}" 
+					        th:text="${roomType.roomTypeName}" 
+                            th:selected="${roomType.roomTypeId == selectedRoomTypeId}">
+                    </option>
+                </select>
+            </div>
+
+            <!-- 年月選擇器 -->
+            <div class="col-md-4">
+                <label for="yearMonth" class="form-label">月份</label>
+                <input type="month" id="yearMonth" name="yearMonth" 
+                       th:value="${selectedYear} + '-' + ${selectedMonth < 10 ? '0' + selectedMonth : selectedMonth}" 
+                       class="form-control">
+            </div>
+
+            <!-- 查詢按鈕 -->
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary w-100">查詢</button>
+            </div>
+        </div>
+
+    </form>
+
+    <!-- 每日明細表格 -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover text-center">
+            <thead class="table-light">
+                <tr>
+                    <th style="min-width: 120px;">房型</th>
+                    <!-- 動態生成當月所有日期的表頭 -->
+                    <th th:each="day : ${daysInMonth}" th:text="${selectedMonth} + '/' + ${day}"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 遍歷所有房型來生成每一列 -->
+                <tr th:each="roomType : ${roomTypes}">
+                    <!-- 第一格顯示房型名稱 -->
+                    <td th:text="${roomType.roomTypeName}"></td>
+                    <!-- 再次遍歷當月所有日期，以找到對應的庫存 -->
+                    <td th:each="day : ${daysInMonth}">
+                        <!-- Debugging: Print roomTypeId, quantityMap, and day -->
+<!--                         <span th:text="'RoomType ID: ' + ${roomType.roomTypeId}"></span><br/> -->
+<!--                         <span th:text="'Quantity Map: ' + ${availabilityMatrix[roomType.roomTypeId]}"></span><br/> -->
+<!--                         <span th:text="'Current Day: ' + ${day}"></span><br/> -->
+                        <!-- 
+                            從 availabilityMatrix 中根據 房型ID 和 日期 查找庫存量。
+                            如果 availabilityMatrix 中有這個房型，並且這個房型中有這一天的庫存，則顯示庫存。
+                            否則顯示 0。
+                        -->
+                        <span  
+                              th:text="${availabilityMatrix[roomType.roomTypeId][T(java.lang.Integer).parseInt(day)]!=null ? availabilityMatrix[roomType.roomTypeId][T(java.lang.Integer).parseInt(day)] : '-'}"></span><br/>
+<!--                               <span th:text="'Quantity Map: ' + ${availabilityMatrix[4][4]}"></span> -->
+<!--                               <span th:text="${availabilityMatrix[roomType.roomTypeId][T(java.lang.Integer).parseInt(day)]}"></span> -->
+<!--                               <span class="test" th:text="${day=='4'}"></span> -->
+                    </td>
+                </tr>
+                <!-- 檢查判斷清單是否為空，如果沒有任何房型資料，則顯示提示 -->
+                <tr th:if="${#lists.isEmpty(roomTypes)}">
+                    <td th:colspan="${#lists.size(daysInMonth) + 1}" class="text-center text-muted">查無資料，或請選擇一個房型進行查詢</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
 <!-- ===== 載入統一 JavaScript ===== -->
 <th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
 
