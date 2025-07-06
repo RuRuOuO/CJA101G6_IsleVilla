@@ -26,8 +26,8 @@ public class ShuttleReservationSeatService {
 
 	// 根據複合主鍵查詢座位預約關聯
 	public Optional<ShuttleReservationSeat> findById(Integer shuttleReservationId, Integer seatId) {
-		ShuttleReservationSeat.ShuttleReservationSeatId id = 
-			new ShuttleReservationSeat.ShuttleReservationSeatId(shuttleReservationId, seatId);
+		ShuttleReservationSeat.ShuttleReservationSeatId id = new ShuttleReservationSeat.ShuttleReservationSeatId(
+				shuttleReservationId, seatId);
 		return shuttleReservationSeatRepository.findById(id);
 	}
 
@@ -41,9 +41,19 @@ public class ShuttleReservationSeatService {
 		return shuttleReservationSeatRepository.findByShuttleReservationId(shuttleReservationId);
 	}
 
+	// 根據預約查詢所有座位
+	public List<ShuttleReservationSeat> findByShuttleReservation(ShuttleReservation shuttleReservation) {
+		return shuttleReservationSeatRepository.findByShuttleReservation(shuttleReservation);
+	}
+
 	// 根據座位ID查詢所有預約
 	public List<ShuttleReservationSeat> findBySeatId(Integer seatId) {
 		return shuttleReservationSeatRepository.findBySeatId(seatId);
+	}
+
+	// 根據座位查詢所有預約
+	public List<ShuttleReservationSeat> findBySeat(Seat seat) {
+		return shuttleReservationSeatRepository.findBySeat(seat);
 	}
 
 	// 檢查座位預約關聯是否存在
@@ -53,8 +63,8 @@ public class ShuttleReservationSeatService {
 
 	// 刪除座位預約關聯
 	public void deleteById(Integer shuttleReservationId, Integer seatId) {
-		ShuttleReservationSeat.ShuttleReservationSeatId id = 
-			new ShuttleReservationSeat.ShuttleReservationSeatId(shuttleReservationId, seatId);
+		ShuttleReservationSeat.ShuttleReservationSeatId id = new ShuttleReservationSeat.ShuttleReservationSeatId(
+				shuttleReservationId, seatId);
 		shuttleReservationSeatRepository.deleteById(id);
 	}
 
@@ -93,9 +103,7 @@ public class ShuttleReservationSeatService {
 
 	// 為特定預約新增多個座位
 	public List<ShuttleReservationSeat> addSeatsToReservation(Integer shuttleReservationId, List<Integer> seatIds) {
-		return seatIds.stream()
-			.map(seatId -> addSeatToReservation(shuttleReservationId, seatId))
-			.toList();
+		return seatIds.stream().map(seatId -> addSeatToReservation(shuttleReservationId, seatId)).toList();
 	}
-	
+
 }

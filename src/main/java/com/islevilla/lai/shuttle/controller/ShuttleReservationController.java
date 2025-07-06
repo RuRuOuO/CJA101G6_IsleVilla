@@ -15,10 +15,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.islevilla.lai.email.model.ShuttleEmailService;
 import com.islevilla.lai.members.model.Members;
 import com.islevilla.lai.shuttle.model.SeatDTO;
 import com.islevilla.lai.shuttle.model.ShuttleRVFrontEndService;
 import com.islevilla.lai.shuttle.model.ShuttleReservation;
+import com.islevilla.lai.shuttle.model.ShuttleReservationSeat;
 import com.islevilla.lai.shuttle.model.ShuttleReservationSeatService;
 import com.islevilla.lai.shuttle.model.ShuttleReservationService;
 import com.islevilla.lai.shuttle.model.ShuttleScheduleWithAvailabilityDTO;
@@ -40,6 +42,9 @@ public class ShuttleReservationController {
 
 	@Autowired
 	private RoomRVDetailService roomRVDetailService;
+
+	@Autowired
+	private ShuttleEmailService shuttleEmailService;
 
 	@Autowired
 	private ShuttleReservationService shuttleReservationService;
@@ -66,11 +71,22 @@ public class ShuttleReservationController {
 		List<ShuttleReservation> shuttleReservationList = shuttleReservationService.getReservationsByMember(member);
 		if (!shuttleReservationList.isEmpty()) {
 			model.addAttribute("shuttleReservationList", shuttleReservationList);
+			Map<Integer, List<ShuttleReservationSeat>> seatMap = new HashMap<>();
+			for (ShuttleReservation shuttleReservation : shuttleReservationList) {
+				List<ShuttleReservationSeat> shuttleRVSeat = shuttleReservationSeatService
+						.findByShuttleReservation(shuttleReservation);
+				if (!shuttleRVSeat.isEmpty()) {
+					seatMap.put(shuttleReservation.getShuttleReservationId(), shuttleRVSeat);
+				}
+			}
+			if (!seatMap.isEmpty()) {
+				model.addAttribute("seatMap", seatMap);
+			}
 		}
 		return "front-end/member/member-shuttle-list";
 	}
 
-	// 後台 - 會員取消接駁預約
+	// 前台 - 會員取消接駁預約
 	@PostMapping("/member/shuttle/list/cancel")
 	public String cancelShuttleRVFromMember(@RequestParam("shuttleReservationId") Integer shuttleReservationId,
 			Model model, HttpSession session) {
@@ -79,18 +95,26 @@ public class ShuttleReservationController {
 		if (member == null) {
 			return "redirect:/member/login";
 		}
+
 		boolean succeed = false;
 		try {
+			// 發送取消預約郵件
+			shuttleEmailService.sendShuttleReservationCancellation(shuttleReservationId);
+			System.out.println("取消預約確認郵件發送成功");
+
 			ShuttleReservation reservation = shuttleReservationService.cancelReservation(shuttleReservationId);
 			shuttleReservationSeatService.deleteByShuttleReservationId(shuttleReservationId);
 			succeed = shuttleSeatAvailabilityService.cancelReservation(
 					reservation.getShuttleSchedule().getShuttleScheduleId(), reservation.getShuttleDate(),
 					reservation.getShuttleNumber());
 		} catch (RuntimeException e) {
-			System.out.println(e);
+			System.out.println("取消預約業務邏輯錯誤：" + e.getMessage());
+			e.printStackTrace();
 		} catch (Exception e2) {
-			System.out.println(e2);
+			System.out.println("取消預約系統錯誤：" + e2.getMessage());
+			e2.printStackTrace();
 		}
+
 		if (succeed) {
 			System.out.println("取消預約成功！");
 		} else {
@@ -229,14 +253,15 @@ public class ShuttleReservationController {
 			boolean isValid = shuttleRVFrontEndService.validateMemberAndRoomReservation(
 					reservationRequest.getMemberId(), reservationRequest.getRoomReservationId(),
 					reservationRequest.getShuttleDate(), reservationRequest.getShuttleDirection());
-			System.out.println("檢查點2");
+			System.out.println("檢查點2：" + isValid);
 
 			if (!isValid) {
-				System.out.println("會員編號、訂房編號不匹配，或接駁日期不在住宿期間內，或訂房已取消");
+				System.out.println("會員編號、訂房編號不匹配，或接駁日期不在住宿期間內，或訂房已入住，或訂房已取消");
 				model.addAttribute("error", "會員編號、訂房編號不匹配，或接駁日期不在住宿期間內，或訂房已取消");
 				model.addAttribute("reservationRequest", reservationRequest);
 				model.addAttribute("currentStep", 1);
-				return "front-end/shuttle/shuttle-reservation";
+				redirectAttributes.addFlashAttribute("error", "會員編號、訂房編號不匹配，或接駁日期不在住宿期間內，或訂房已取消");
+				return "redirect:/shuttle/reservation";
 			}
 
 			// 儲存預約請求並取得ID
