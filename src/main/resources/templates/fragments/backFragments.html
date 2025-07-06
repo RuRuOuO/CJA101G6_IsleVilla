@@ -179,14 +179,25 @@
                 margin: 0rem;
             }
 
+            /* 將 sidebar-active 改為右側白色線條 */
             .sidebar-active {
-                display: block;
-                background: rgba(255, 255, 255, 0.15) !important;
-                border-radius: 10px !important;
+                position: relative;
+                background: none !important;
+                border-radius: 0 !important;
                 color: #fff !important;
                 transition: background 0.2s;
                 padding: 3px 13px !important;
                 margin: 3px 0;
+            }
+            .sidebar-active::after {
+                content: '';
+                position: absolute;
+                top: 8px;
+                left: 0;
+                bottom: 8px;
+                width: 4px;
+                border-radius: 2px;
+                background: #fff;
             }
 
             .btn-toggle-nav a {
@@ -254,7 +265,7 @@
         <div class="collapse navbar-collapse" id="mobileNavbarCollapse">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <!-- 員工管理 -->
-                <li class="nav-item">
+                <li class="nav-item" sec:authorize="hasAuthority('operation')">
                     <button
                             class="btn btn-toggle"
                             data-bs-toggle="collapse"
@@ -268,12 +279,13 @@
                         <ul class="btn-toggle-nav list-unstyled">
                             <li><a th:href="@{/backend/employee/list}">員工列表</a></li>
                             <li><a th:href="@{/backend/department/list}">部門管理</a></li>
+                            <li><a th:href="@{/backend/operation-log/list}">log檢視</a></li>
                         </ul>
                     </div>
                 </li>
 
                 <!-- 住房管理 -->
-                <li class="nav-item">
+                <li class="nav-item" sec:authorize="hasAuthority('room')">
                     <button
                             class="btn btn-toggle"
                             data-bs-toggle="collapse"
@@ -316,7 +328,7 @@
                 </li>
 
                 <!-- 接駁管理 -->
-                <li class="nav-item">
+                <li class="nav-item" sec:authorize="hasAuthority('shuttle')">
                     <button
                             class="btn btn-toggle"
                             data-bs-toggle="collapse"
@@ -338,7 +350,7 @@
                 </li>
 
                 <!-- 其他管理 -->
-                <li class="nav-item">
+                <li class="nav-item" sec:authorize="hasAuthority('service')">
                     <button
                             class="btn btn-toggle"
                             data-bs-toggle="collapse"
@@ -354,7 +366,6 @@
                             <li><a th:href="@{/backend/feedback/list}">顧客回饋</a></li>
                             <li><a th:href="@{/backend/member/list}">會員管理</a></li>
                             <li><a th:href="@{/backend/chat/room/list}">客服管理</a></li>
-                            <li><a th:href="@{/backend/operation-log/list}">log檢視</a></li>
                         </ul>
                     </div>
                 </li>
@@ -388,7 +399,7 @@
     </div>
     <ul class="sidebar-menu list-unstyled ps-0" style="max-height: calc(100vh - 160px); overflow-y: auto;">
         <!-- 員工管理 -->
-        <li class="mb-1">
+        <li class="mb-1"  sec:authorize="hasAuthority('operation')">
             <button
                     class="btn btn-toggle d-flex align-items-center w-100 rounded border-0 text-white"
                     data-bs-toggle="collapse"
@@ -423,12 +434,21 @@
                             <span class="ms-2">部門管理</span>
                         </a>
                     </li>
+                    <li>
+                        <a th:href="@{/backend/operation-log/list}"
+                           class="d-flex align-items-center link-body-emphasis text-white">
+                            <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
+                                <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
+                            </span>
+                            <span class="ms-2">log檢視</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </li>
 
         <!-- 住房管理 -->
-        <li class="mb-1">
+        <li class="mb-1"  sec:authorize="hasAuthority('room')">
             <button
                     class="btn btn-toggle d-flex align-items-center w-100 rounded border-0 text-white"
                     data-bs-toggle="collapse"
@@ -536,7 +556,7 @@
         </li>
 
         <!-- 接駁管理 -->
-        <li class="mb-1">
+        <li class="mb-1"  sec:authorize="hasAuthority('shuttle')">
             <button
                     class="btn btn-toggle d-flex align-items-center w-100 rounded border-0 text-white"
                     data-bs-toggle="collapse"
@@ -599,7 +619,7 @@
         </li>
 
         <!-- 其他管理 -->
-        <li class="mb-1">
+        <li class="mb-1" sec:authorize="hasAuthority('service')">
             <button
                     class="btn btn-toggle d-flex align-items-center w-100 rounded border-0 text-white"
                     data-bs-toggle="collapse"
@@ -648,15 +668,7 @@
                             <span class="ms-2">客服管理</span>
                         </a>
                     </li>
-                    <li>
-                        <a th:href="@{/backend/operation-log/list}"
-                           class="d-flex align-items-center link-body-emphasis text-white">
-                            <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
-                                <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
-                            </span>
-                            <span class="ms-2">log檢視</span>
-                        </a>
-                    </li>
+
                 </ul>
             </div>
         </li>

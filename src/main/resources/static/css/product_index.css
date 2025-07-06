@@ -6,7 +6,6 @@
 .category-item button {
     width: 100%;
     padding: 15px 0;
-    border-radius: 5px; /* 圓角 */
     border: 2px solid black; /* 邊框 */
     text-align: center;
 }
@@ -38,3 +37,63 @@
     flex: 0 0 auto;
     width: 160px;
 }
+.category-card {
+    background: #2c2c2c;
+    border: 1px solid #e8e8e8;
+    padding: 2rem 2.5rem;
+    min-width: 160px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.category-card:hover {
+    background: #f8f8f8;
+    border-color: #ccc;
+}
+
+.category-card p {
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 300;
+    letter-spacing: 1px;
+}
+
+/* RWD 響應式設計 - 手機版分類按鈕直排顯示 */
+@media (max-width: 768px) {
+    .category-row {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .category-item {
+        width: 100%;
+        max-width: 300px;
+        margin: 5px 0;
+    }
+    
+    .category-card {
+        min-width: unset;
+        width: 100%;
+        padding: 1.5rem 1rem;
+    }
+    
+    .category-card p {
+        font-size: 0.9rem;
+    }
+}
+
+/* 平板版調整 */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .category-item {
+        width: 50%;
+        max-width: 200px;
+    }
+    
+    .category-card {
+        min-width: unset;
+        padding: 1.5rem 1.5rem;
+    }
+}
+

@@ -77,27 +77,27 @@ CREATE TABLE members (
 
 INSERT INTO members (member_email, member_password_hash, member_name,  member_birthdate,  member_gender,
 					 member_phone, member_address,       member_photo, member_created_at, member_updated_at, member_last_login_time, member_status)
-VALUES ('member01@gmail.com', '$argon2i$v=19$m=65536,t=3,p=1$Zi9GtJ8A1kAbFRInjhIofg$1p4djCm5PXCC650dGk+z0vKc7JX/LlhY0dRJ79FDMHo', -- 密碼：asd123456
+VALUES ('cja101groupsix+01@gmail.com', '$argon2i$v=19$m=65536,t=3,p=1$Zi9GtJ8A1kAbFRInjhIofg$1p4djCm5PXCC650dGk+z0vKc7JX/LlhY0dRJ79FDMHo', -- 密碼：asd123456
         '王小明', '1997-03-05', 0, '0900000001', '台北市信義路100號3樓之一', NULL, '2023-07-01 10:15:30', '2025-04-10 14:20:00', '2025-05-19 18:45:10', 1),
-	   ('member02@gmail.com', '$argon2i$v=19$m=65536,t=3,p=1$Zi9GtJ8A1kAbFRInjhIofg$1p4djCm5PXCC650dGk+z0vKc7JX/LlhY0dRJ79FDMHo', -- 密碼：asd123456
+	   ('cja101groupsix+02@gmail.com', '$argon2i$v=19$m=65536,t=3,p=1$Zi9GtJ8A1kAbFRInjhIofg$1p4djCm5PXCC650dGk+z0vKc7JX/LlhY0dRJ79FDMHo', -- 密碼：asd123456
         '林小華', '1998-03-05', 1, '0900000002', '台中市西屯路88號',         NULL, '2023-07-15 08:30:00', '2025-04-11 09:15:00', '2025-05-19 12:00:00', 1),
-	   ('member03@gmail.com', '$argon2i$v=19$m=65536,t=3,p=1$Zi9GtJ8A1kAbFRInjhIofg$1p4djCm5PXCC650dGk+z0vKc7JX/LlhY0dRJ79FDMHo', -- 密碼：asd123456
+	   ('cja101groupsix+03@gmail.com', '$argon2i$v=19$m=65536,t=3,p=1$Zi9GtJ8A1kAbFRInjhIofg$1p4djCm5PXCC650dGk+z0vKc7JX/LlhY0dRJ79FDMHo', -- 密碼：asd123456
         '陳大文', '1999-03-05', 0, '0900000003', '高雄市中山路99號',         NULL, '2023-08-01 16:45:00', '2025-04-12 19:30:00', '2025-05-19 21:10:00', 1),
-	   ('member04@gmail.com', '$argon2i$v=19$m=65536,t=3,p=1$Zi9GtJ8A1kAbFRInjhIofg$1p4djCm5PXCC650dGk+z0vKc7JX/LlhY0dRJ79FDMHo', -- 密碼：asd123456
+	   ('cja101groupsix+04@gmail.com', '$argon2i$v=19$m=65536,t=3,p=1$Zi9GtJ8A1kAbFRInjhIofg$1p4djCm5PXCC650dGk+z0vKc7JX/LlhY0dRJ79FDMHo', -- 密碼：asd123456
         '張怡君', '2000-03-05', 1, '0900000004', '新竹市經國路66號',         NULL, '2023-08-15 11:00:00', '2025-04-13 13:20:00', '2024-05-19 17:55:00', 1),
-	   ('member05@gmail.com', '$argon2i$v=19$m=65536,t=3,p=1$Zi9GtJ8A1kAbFRInjhIofg$1p4djCm5PXCC650dGk+z0vKc7JX/LlhY0dRJ79FDMHo', -- 密碼：asd123456
+	   ('cja101groupsix+05@gmail.com', '$argon2i$v=19$m=65536,t=3,p=1$Zi9GtJ8A1kAbFRInjhIofg$1p4djCm5PXCC650dGk+z0vKc7JX/LlhY0dRJ79FDMHo', -- 密碼：asd123456
         '周志強', '2001-03-05', 0, '0900000005', '桃園市復興路10號',         NULL, '2023-09-01 09:00:00', '2025-04-14 10:30:00', '2025-05-19 15:40:00', 1),
-	   ('member06@gmail.com', '$argon2i$v=19$m=65536,t=3,p=1$Zi9GtJ8A1kAbFRInjhIofg$1p4djCm5PXCC650dGk+z0vKc7JX/LlhY0dRJ79FDMHo', -- 密碼：asd123456
+	   ('cja101groupsix+06@gmail.com', '$argon2i$v=19$m=65536,t=3,p=1$Zi9GtJ8A1kAbFRInjhIofg$1p4djCm5PXCC650dGk+z0vKc7JX/LlhY0dRJ79FDMHo', -- 密碼：asd123456
         '蔡美麗', '2002-03-05', 0, '0900000006', '台南市永康區中正街5號',    NULL, '2023-09-15 07:50:00', '2025-04-15 08:30:00', '2025-05-19 20:00:00', 1),
-	   ('member07@gmail.com', '$argon2i$v=19$m=65536,t=3,p=1$Zi9GtJ8A1kAbFRInjhIofg$1p4djCm5PXCC650dGk+z0vKc7JX/LlhY0dRJ79FDMHo', -- 密碼：asd123456
+	   ('cja101groupsix+07@gmail.com', '$argon2i$v=19$m=65536,t=3,p=1$Zi9GtJ8A1kAbFRInjhIofg$1p4djCm5PXCC650dGk+z0vKc7JX/LlhY0dRJ79FDMHo', -- 密碼：asd123456
         '何玉芬', '2003-03-05', 0, '0900000007', '台北市大安區光復南路11號', NULL, '2023-10-01 14:10:00', '2025-04-16 16:45:00', '2025-05-19 18:15:00', 1),
-	   ('member08@gmail.com', '$argon2i$v=19$m=65536,t=3,p=1$Zi9GtJ8A1kAbFRInjhIofg$1p4djCm5PXCC650dGk+z0vKc7JX/LlhY0dRJ79FDMHo', -- 密碼：asd123456
+	   ('cja101groupsix+08@gmail.com', '$argon2i$v=19$m=65536,t=3,p=1$Zi9GtJ8A1kAbFRInjhIofg$1p4djCm5PXCC650dGk+z0vKc7JX/LlhY0dRJ79FDMHo', -- 密碼：asd123456
         '黃金龍', '2004-03-05', 1, '0900000008', '嘉義市博愛路3段77號',      NULL, '2023-10-15 18:00:00', '2025-04-17 19:20:00', '2025-05-19 22:30:00', 1),
-	   ('member09@gmail.com', '$argon2i$v=19$m=65536,t=3,p=1$Zi9GtJ8A1kAbFRInjhIofg$1p4djCm5PXCC650dGk+z0vKc7JX/LlhY0dRJ79FDMHo', -- 密碼：asd123456
+	   ('cja101groupsix+09@gmail.com', '$argon2i$v=19$m=65536,t=3,p=1$Zi9GtJ8A1kAbFRInjhIofg$1p4djCm5PXCC650dGk+z0vKc7JX/LlhY0dRJ79FDMHo', -- 密碼：asd123456
         '劉阿成', '2005-03-05', 1, '0900000009', '台中市南區建國南路20號',   NULL, '2023-11-01 12:15:00', '2025-04-18 13:10:00', '2025-05-19 14:55:00', 0),
-	   ('member10@gmail.com', '$argon2i$v=19$m=65536,t=3,p=1$Zi9GtJ8A1kAbFRInjhIofg$1p4djCm5PXCC650dGk+z0vKc7JX/LlhY0dRJ79FDMHo', -- 密碼：asd123456
+	   ('cja101groupsix+10@gmail.com', '$argon2i$v=19$m=65536,t=3,p=1$Zi9GtJ8A1kAbFRInjhIofg$1p4djCm5PXCC650dGk+z0vKc7JX/LlhY0dRJ79FDMHo', -- 密碼：asd123456
         '楊淑惠', '2006-03-05', 1, '0900000010', '基隆市安樂區文德路88號',   NULL, '2023-11-15 09:05:00', '2024-04-19 11:30:00', '2025-05-19 16:45:00', 0),
-	   ('member11@gmail.com', '$argon2i$v=19$m=65536,t=3,p=1$Zi9GtJ8A1kAbFRInjhIofg$1p4djCm5PXCC650dGk+z0vKc7JX/LlhY0dRJ79FDMHo', -- 密碼：asd123456
+	   ('cja101groupsix+11@gmail.com', '$argon2i$v=19$m=65536,t=3,p=1$Zi9GtJ8A1kAbFRInjhIofg$1p4djCm5PXCC650dGk+z0vKc7JX/LlhY0dRJ79FDMHo', -- 密碼：asd123456
         '測試用', '1912-01-01', 0, '0900000011', '台北市信義路100號3樓之二', NULL, '2023-07-01 10:15:30', '2025-04-20 14:30:00', '2025-05-19 18:46:10', 1);
 
 -- DROP TABLE IF EXISTS members;
@@ -1393,23 +1393,23 @@ CREATE TABLE operation_log (
 INSERT INTO operation_log (employee_id, operation_time, log_description)
 VALUES (2, '2025-05-01 09:15:00', '登入系統'),
        (8, '2025-05-01 09:22:00', '登入系統'),
-	   (8, '2025-05-01 09:30:00', '新增商品'),
+       (8, '2025-05-01 09:30:00', '新增商品資料'),
        (3, '2025-05-01 09:55:00', '登入系統'),
-       (3, '2025-05-01 10:00:00', '瀏覽客服內容'),
+       (3, '2025-05-01 10:00:00', '修改接駁船時段資料'),
        (3, '2025-05-01 10:15:00', '登出系統'),
-       (8, '2025-05-01 10:30:00', '新增商品'),
-       (8, '2025-05-01 11:00:00', '刪除商品'),
+       (8, '2025-05-01 10:30:00', '新增商品資料'),
+       (8, '2025-05-01 11:00:00', '刪除商品資料'),
        (8, '2025-05-01 11:30:00', '登出系統'),
        (2, '2025-05-01 11:30:00', '登出系統'),
        (7, '2025-05-01 12:50:00', '登入系統'),
-       (7, '2025-05-01 13:00:00', '瀏覽房務'),
+       (7, '2025-05-01 13:00:00', '修改接駁船座位狀態資料'),
        (5, '2025-05-01 13:25:00', '登入系統'),
        (6, '2025-05-01 13:27:00', '登入系統'),
-       (5, '2025-05-01 13:30:00', '瀏覽接駁紀錄'),
+       (5, '2025-05-01 13:30:00', '新增房間資料'),
        (5, '2025-05-01 13:41:00', '登出系統'),
-       (6, '2025-05-01 14:00:00', '瀏覽接駁紀錄'),
+       (6, '2025-05-01 14:00:00', '新增房間資料'),
        (6, '2025-05-01 14:13:00', '登出系統'),
-       (7, '2025-05-01 14:30:00', '新增房型'),
+       (7, '2025-05-01 14:30:00', '刪除接駁船座位狀態資料'),
        (7, '2025-05-01 14:53:00', '登出系統');
 
 -- DROP TABLE IF EXISTS operation_log;
