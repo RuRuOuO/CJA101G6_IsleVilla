@@ -173,7 +173,7 @@
                     <li th:each="category : ${category}" class="nav-item">
                         <a th:href="@{/product/list(productCategoryId=${category.productCategoryId})}"
                            class="nav-link link-dark"
-                           th:classappend="${category.productCategoryId} == ${selectedCategoryId} ? ' active' : ''"
+                           th:classappend="${category.productCategoryId == selectedCategoryId} ? ' active' : ''"
                            th:text="${category.productCategoryName}"></a>
                     </li>
                 </ul>
