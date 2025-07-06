@@ -1,69 +1,208 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>微嶼 | Isle Villa 後台首頁</title>
-<!-- ===== 載入統一樣式 ===== -->
+<title>接駁船時段列表 | Isle Villa 後台</title>
+
+<!-- 統一樣式 -->
 <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+
+<!-- DataTables CSS -->
+<link rel="stylesheet"
+	href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+/* 表頭樣式透明 + 圓角 */
+thead th {
+	background: rgba(255, 255, 255, 0.85);
+	backdrop-filter: blur(4px);
+	border: none;
+	border-radius: 8px;
+	font-weight: bold;
+	text-align: center;
+	vertical-align: middle;
+	padding: 12px;
+}
+
+/* 移除 DataTable 預設底線 */
+table.dataTable thead>tr>th {
+	border-bottom: none;
+}
+
+/* 表格本體置中 */
+table.dataTable td {
+	text-align: center;
+	vertical-align: middle;
+}
+
+.search-wrapper {
+	display: flex;
+	align-items: center;
+	border: 1px solid #ced4da;
+	border-radius: 6px;
+	background-color: #fff;
+	width: 145px;
+	overflow: hidden;
+}
+
+.search-wrapper .search-icon {
+	padding: 0.6rem 0.75rem;
+	color: #6c757d;
+	font-size: 1.1rem;
+	background-color: #f8f9fa;
+	border-right: 1px solid #ced4da;
+}
+
+.search-wrapper .search-input {
+	border: none;
+	outline: none;
+	box-shadow: none;
+	flex-grow: 1;
+	padding: 0.55rem 0.75rem;
+	font-size: 0.95rem;
+}
+
+.search-wrapper .search-input::placeholder {
+	color: #6c757d;
+}
+</style>
 </head>
+
 <body>
-	<!-- ===== 載入sidebar ===== -->
 	<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
 	<div th:replace="~{fragments/backFragments :: sidebar}"></div>
 
-	<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+	<main
+		th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
 		<th:block th:fragment="myContent">
-			<h1 class="mb-4">⛴️ 接駁船時段列表</h1>
 
-			<!-- 顯示操作成功訊息（若有） -->
-			<div th:if="${successMessage}" class="alert alert-success" role="alert">
-				<i class="fa-solid fa-circle-check me-2"></i>
-				<span th:text="${successMessage}">操作成功</span>
+			<div class="card-header bg-transparent border-0 pt-4">
+				<div class="d-flex justify-content-between align-items-center">
+					<h4 class="card-title mb-0 fw-bold">
+						<i class="bi bi-calendar-week me-2"></i>接駁船時段列表
+					</h4>
+				</div>
 			</div>
 
-			<div class="d-flex align-items-center mb-3">
-				<a class="btn btn-primary" th:href="@{/backend/shuttle/add}">
-					<i class="fa-solid fa-plus text-white me-1"></i>新增時段
-				</a>
-				<a class="btn btn-primary ms-2" href="/backend/shuttle/getshuttle">
-					<i class="fa-solid fa-magnifying-glass me-1"></i>查詢時段
-				</a>
-			</div>
+			<div class="card-body">
 
-			<div class="table-responsive">
-				<table class="table table-bordered text-center align-middle">
-					<thead class="table-secondary">
-						<tr>
-							<th style="width: 100px;">時段編號</th>
-							<th style="width: 80px;">方向</th>
-							<th>出發時間</th>
-							<th>抵達時間</th>
-							<th>操作</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr th:each="shuttle : ${shuttleList}">
-							<td th:text="${shuttle.shuttleScheduleId}">1</td>
-							<td th:text="${shuttle.shuttleDirection == 0 ? '去程' : '回程'}">去程</td>
-							<td th:text="${#temporals.format(shuttle.shuttleDepartureTime, 'HH:mm')}">08:00</td>
-							<td th:text="${#temporals.format(shuttle.shuttleArrivalTime, 'HH:mm')}">09:00</td>
-							<td>
-								<a class="btn btn-sm btn-primary me-1"
-								   th:href="@{/backend/shuttle/edit/{id}(id=${shuttle.shuttleScheduleId})}">
-									<i class="fa-solid fa-pen-to-square me-1"></i>編輯
-								</a>
-								<a class="btn btn-sm btn-danger"
-								   th:href="@{/backend/shuttle/delete/{id}(id=${shuttle.shuttleScheduleId})}"
-								   onclick="return confirm('確定要刪除嗎？');">
-									<i class="fa-solid fa-trash me-1"></i>刪除
-								</a>
-							</td>
-						</tr>
-					</tbody>
-				</table>
+				<!-- 成功訊息 -->
+				<div th:if="${successMessage}"
+					class="alert alert-success d-flex align-items-center mb-4"
+					role="alert">
+					<i class="bi bi-check-circle-fill me-2"></i> <span
+						th:text="${successMessage}">操作成功</span>
+				</div>
+
+				<!-- 操作按鈕 -->
+				<div class="d-flex gap-2 mb-3">
+					<a class="btn btn-primary" th:href="@{/backend/shuttle/add}"> <i
+						class="bi bi-plus-circle me-1"></i>新增時段
+					</a>
+				</div>
+
+				<!-- 篩選條件 -->
+				<div class="d-flex gap-2 mb-3" style="flex-wrap: wrap;">
+					<select id="directionFilter" class="form-select"
+						style="width: 160px;">
+						<option value="">全部方向</option>
+						<option value="去程">去程</option>
+						<option value="回程">回程</option>
+					</select>
+
+					<div class="search-wrapper">
+						<i class="fa-solid fa-magnifying-glass search-icon"></i> <input type="text"
+							id="searchInput" class="form-control search-input"
+							placeholder="關鍵字搜尋" />
+					</div>
+				</div>
+
+				<!-- 表格 -->
+				<div class="table-responsive">
+					<table id="shuttleTable"
+						class="table table-hover align-middle text-center">
+						<thead>
+							<tr>
+								<th class="text-center">時段編號</th>
+								<th class="text-center">方向</th>
+								<th class="text-center">出發時間</th>
+								<th class="text-center">抵達時間</th>
+								<th class="text-center">操作</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="shuttle : ${shuttleList}">
+								<td th:text="${shuttle.shuttleScheduleId}">1</td>
+								<td th:text="${shuttle.shuttleDirection == 0 ? '去程' : '回程'}">去程</td>
+								<td
+									th:text="${#temporals.format(shuttle.shuttleDepartureTime, 'HH:mm')}">08:00</td>
+								<td
+									th:text="${#temporals.format(shuttle.shuttleArrivalTime, 'HH:mm')}">09:00</td>
+								<td>
+									<div class="d-flex justify-content-center gap-1 flex-wrap">
+										<a class="btn btn-sm btn-primary"
+											th:href="@{/backend/shuttle/edit/{id}(id=${shuttle.shuttleScheduleId})}">
+											<i class="bi bi-pencil me-1"></i>編輯
+										</a> <a class="btn btn-sm btn-danger"
+											th:href="@{/backend/shuttle/delete/{id}(id=${shuttle.shuttleScheduleId})}"
+											onclick="return confirm('確定要刪除嗎？');"> <i
+											class="bi bi-trash me-1"></i>刪除
+										</a>
+									</div>
+								</td>
+							</tr>
+							<tr th:if="${#lists.isEmpty(shuttleList)}">
+								<td colspan="5" class="text-center">尚無接駁船時段資料</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</th:block>
 	</main>
+
+	<!-- 共用 JS -->
+	<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
+
+	<!-- DataTables JS -->
+	<script
+		src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+	<script
+		src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+	<!-- 初始化 DataTable -->
+	<script>
+		$(document).ready(function() {
+			const table = $('#shuttleTable').DataTable({
+				dom : 'lrtip', // 去除內建搜尋框
+				language : {
+					search : "搜尋：",
+					lengthMenu : "每頁顯示 _MENU_ 筆資料",
+					zeroRecords : "找不到資料",
+					info : "顯示第 _START_ 到 _END_ 筆，共 _TOTAL_ 筆",
+					infoEmpty : "無資料",
+					paginate : {
+						previous : "上一頁",
+						next : "下一頁"
+					}
+				},
+				ordering : true,
+				lengthChange : false,
+				pageLength : 10
+			});
+
+			// 🔍 自訂搜尋欄
+			$('#searchInput').on('keyup', function() {
+				table.search(this.value).draw();
+			});
+
+			// 🧭 方向篩選
+			$('#directionFilter').on('change', function() {
+				table.column(1).search(this.value).draw();
+			});
+		});
+	</script>
 </body>
 </html>

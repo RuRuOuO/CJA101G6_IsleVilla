@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import com.islevilla.ching.shuttleSeatAvailability.model.SeatAvailability;
+
 @Service
 public class ShuttleService {
 
@@ -69,5 +71,10 @@ public class ShuttleService {
 	// 查詢回程班次
 	public List<ShuttleSchedule> getReturnShuttles() {
 	    return shuttleScheduleRepository.findByShuttleDirection(1);
+	}
+
+	public List<ShuttleSchedule> getSchedulesUsedInSeatAvailability(List<SeatAvailability> allSeats) {
+
+		return null;
 	}
 }

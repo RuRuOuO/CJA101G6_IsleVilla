@@ -184,8 +184,8 @@
                 <div class="mb-3">
                     <label class="form-label">商品圖片（可拖曳）</label>
                     <input type="file" class="form-control" id="addProductPhotoInput" accept="image/*" multiple style="max-width:300px;" onchange="addNewProductPhotos_add(this)">
+                    <small class="text-muted">圖片大小限制 500KB 以內，可分批上傳、可拖曳排序，右上角可刪除</small>
                     <div class="mt-2 d-flex flex-wrap gap-2" id="addProductPhotoPreview"></div>
-                    <small class="text-muted">可分批上傳、可拖曳排序，右上角可刪除</small>
                 </div>
             </div>
             <div class="modal-footer">
@@ -267,7 +267,7 @@
                     <label class="form-label">商品圖片（可拖曳）</label>
                     <div id="productPhotoSortArea" class="d-flex flex-wrap gap-2"></div>
                     <input type="file" class="form-control mt-2" id="editProductPhotoInput" accept="image/*" multiple style="max-width:300px;" onchange="addNewProductPhotos(this)">
-                    <small class="text-muted">可拖曳排序，右上角可刪除，點選可新增圖片</small>
+                    <small class="text-muted">圖片大小限制 500KB 以內，可拖曳排序，右上角可刪除，點選可新增圖片</small>
                 </div>
             </div>
             <div class="modal-footer">
@@ -366,8 +366,8 @@
         if (input.files) {
             Array.from(input.files).forEach(file => {
                 if (!file.type.startsWith('image/')) return;
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('圖片大小不可超過 5MB！');
+                if (file.size > 500 * 1024) {
+                    alert('圖片大小不可超過 500KB！');
                     return;
                 }
                 const url = URL.createObjectURL(file);
@@ -575,8 +575,8 @@
         if (input.files) {
             Array.from(input.files).forEach(file => {
                 if (!file.type.startsWith('image/')) return;
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('圖片大小不可超過 5MB！');
+                if (file.size > 500 * 1024) {
+                    alert('圖片大小不可超過 500KB！');
                     return;
                 }
                 const url = URL.createObjectURL(file);

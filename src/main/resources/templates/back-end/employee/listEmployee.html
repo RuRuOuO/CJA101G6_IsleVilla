@@ -214,6 +214,7 @@
                     <div class="mb-3">
                         <label class="form-label">員工照片</label>
                         <input type="file" class="form-control" name="employeePhoto" accept="image/*" onchange="previewEmployeePhoto(this, 'addEmployeePhotoPreview')">
+                        <small class="text-muted">圖片大小限制 500KB 以內</small>
                         <div class="mt-2">
                             <img id="addEmployeePhotoPreview" src="" style="width:120px;height:120px;object-fit:cover;display:none;" alt="預覽"/>
                         </div>
@@ -354,6 +355,7 @@
                     <div class="mb-3">
                         <label class="form-label">員工照片</label>
                         <input type="file" class="form-control" name="employeePhoto" accept="image/*" onchange="previewEmployeePhoto(this, 'editEmployeePhotoPreview')">
+                        <small class="text-muted">圖片大小限制 500KB 以內</small>
                         <div class="mt-2">
                             <img id="editEmployeePhotoPreview" src="" style="width:120px;height:120px;object-fit:cover;display:none;" alt="預覽"/>
                         </div>
@@ -947,8 +949,8 @@ function previewEmployeePhoto(input, previewId) {
     const file = input.files[0];
     const preview = document.getElementById(previewId);
     if (file) {
-        if (file.size > 5 * 1024 * 1024) { // 5MB
-            alert('圖片大小不可超過 5MB！');
+        if (file.size > 500 * 1024) { // 500KB
+            alert('圖片大小不可超過 500KB！');
             input.value = '';
             preview.style.display = 'none';
             return;
