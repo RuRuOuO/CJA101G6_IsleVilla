@@ -1,7 +1,6 @@
 package com.islevilla.lai.shuttle.model;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -11,9 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.islevilla.lai.email.model.ShuttleEmailService;
 import com.islevilla.lai.members.model.Members;
 import com.islevilla.lai.members.model.MembersRepository;
-import com.islevilla.lai.members.model.MembersService;
 import com.islevilla.wei.room.model.RoomRVOrder;
 import com.islevilla.wei.room.model.RoomRVOrderRepository;
 
@@ -28,6 +27,9 @@ public class ShuttleRVFrontEndService {
 
 	@Autowired
 	private SeatRepository seatRepository;
+
+	@Autowired
+	private ShuttleEmailService shuttleEmailService;
 
 	@Autowired
 	private ShuttleReservationRepository shuttleRVRepository;
@@ -47,14 +49,18 @@ public class ShuttleRVFrontEndService {
 	// Controller: 步驟1到步驟2的驗證
 	public boolean validateMemberAndRoomReservation(Integer memberId, Integer roomReservationId, LocalDate shuttleDate,
 			Integer shuttleDirection) {
+		System.out.println("會員編號：" + memberId + "\n訂房編號：" + roomReservationId + "\n接駁日期：" + shuttleDate);
 		switch (shuttleDirection) {
 		case 0:
+			System.out.println("接駁方向：去程");
 			return roomRVOrderRepository
 					.validateMemberAndRoomReservationOutward(memberId, roomReservationId, shuttleDate).isPresent();
 		case 1:
+			System.out.println("接駁方向：回程");
 			return roomRVOrderRepository
 					.validateMemberAndRoomReservationReturn(memberId, roomReservationId, shuttleDate).isPresent();
 		default:
+			System.out.println("接駁方向：未知");
 			return false;
 		}
 
@@ -91,7 +97,7 @@ public class ShuttleRVFrontEndService {
 				.collect(Collectors.toList());
 	}
 
-	/**
+	/*
 	 * 計算可用座位數
 	 */
 	private Integer calculateAvailableSeats(Integer scheduleId, LocalDate shuttleDate) {
@@ -104,13 +110,8 @@ public class ShuttleRVFrontEndService {
 		return totalSeats;
 	}
 
-	/**
+	/*
 	 * 增加座位數量 (取消預約接駁時使用)
-	 * 
-	 * @param shuttleScheduleId 班次編號
-	 * @param shuttleDate       日期
-	 * @param increaseAmount    要增加的座位數量
-	 * @return 是否操作成功
 	 */
 	@Transactional
 	public boolean increaseSeatQuantity(Integer shuttleScheduleId, LocalDate shuttleDate, Integer increaseAmount) {
@@ -143,11 +144,6 @@ public class ShuttleRVFrontEndService {
 
 	/**
 	 * 減少座位數量 (預約成功時使用)
-	 * 
-	 * @param shuttleScheduleId 班次編號
-	 * @param shuttleDate       日期
-	 * @param decreaseAmount    要減少的座位數量
-	 * @return 是否操作成功
 	 */
 	@Transactional
 	public boolean decreaseSeatQuantity(Integer shuttleScheduleId, LocalDate shuttleDate, Integer decreaseAmount) {
@@ -366,6 +362,15 @@ public class ShuttleRVFrontEndService {
 
 		// 清理暫存的預約請求
 		tempShuttleRVRequestRepository.delete(request);
+
+		// 發送預約確認郵件
+		try {
+			shuttleEmailService.sendShuttleReservationConfirmation(reservation.getShuttleReservationId());
+			System.out.println("預約確認郵件發送成功");
+		} catch (Exception e) {
+			System.err.println("預約確認郵件發送失敗：" + e.getMessage());
+			// 郵件發送失敗不影響預約流程，繼續執行
+		}
 
 		return reservation.getShuttleReservationId();
 	}
