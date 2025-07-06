@@ -1,135 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<link rel="stylesheet" href="/css/onlineservice.css">
 <title>會員線上客服</title>
-<style>
-body {
-	font-family: "Noto Sans TC", sans-serif;
-	background-color: #f9f9f9;
-	padding: 20px;
-}
-
-h2 {
-	margin-bottom: 1rem;
-	text-align: center;
-}
-
-.container {
-	position: relative;
-	max-width: 600px;
-	margin: auto;
-}
-
-.back-btn {
-	position: absolute;
-	top: -40px;
-	right: 0;
-	padding: 6px 12px;
-	background-color: #f39c12;
-	color: white;
-	border: none;
-	border-radius: 4px;
-	cursor: pointer;
-}
-
-.back-btn:hover {
-	background-color: #e67e22;
-}
-
-#chat {
-	border: 1px solid #ccc;
-	width: 100%;
-	height: 500px;
-	overflow-y: auto;
-	padding: 10px;
-	background: white;
-	margin-bottom: 10px;
-	border-radius: 8px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-}
-
-.msg {
-	display: flex;
-	width: 100%;
-}
-
-.msg.left {
-	justify-content: flex-start;
-}
-
-.msg.right {
-	justify-content: flex-end;
-}
-
-.bubble {
-	display: inline-block;
-	max-width: 70%;
-	padding: 10px 14px;
-	border-radius: 12px;
-	word-break: break-word;
-	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-}
-
-.left .bubble {
-	background-color: #e6f0fa;
-	border-top-left-radius: 4px;
-}
-
-.right .bubble {
-	background-color: #d4edda;
-	border-top-right-radius: 4px;
-}
-
-.bubble .name {
-	font-weight: bold;
-	display: block;
-	margin-bottom: 3px;
-	color: #3498db;
-}
-
-.right .bubble .name {
-	color: #2ecc71;
-}
-
-.bubble .time {
-	font-size: 0.7rem;
-	color: #999;
-	display: block;
-	margin-top: 4px;
-	text-align: right;
-}
-
-.input-area {
-	display: flex;
-	gap: 10px;
-	box-sizing: border-box;
-}
-
-input[type="text"] {
-	flex: 1;
-	padding: 8px;
-	font-size: 16px;
-	border: 1px solid #ccc;
-	border-radius: 4px;
-}
-
-button {
-	padding: 8px 16px;
-	background-color: #3498db;
-	color: white;
-	border: none;
-	border-radius: 4px;
-	cursor: pointer;
-}
-
-button:hover {
-	background-color: #2980b9;
-}
-</style>
 </head>
 
 <body>
@@ -155,12 +30,12 @@ button:hover {
 		</div>
 	</div>
 
-<script th:inline="javascript">
+	<script th:inline="javascript">
 /*<![CDATA[*/
 const roomId = [[${roomId}]];
 const senderId = [[${senderId}]];
 const senderType = [[${senderType}]];
-const senderName = '[[${senderName}]]';  // 加上單引號包住字串
+const senderName = [[${senderName}]];  // 加上單引號包住字串
 /*]]>*/
 </script>
 

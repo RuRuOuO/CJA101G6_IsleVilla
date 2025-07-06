@@ -148,6 +148,9 @@ public class ChatRoomApiController {
 		return success("聊天室已刪除");
 	}
 
+	
+	
+	
 	/* =================== 存入SQL =================== */
 	@PostMapping("/room/{roomId}/import")
 	public Map<String, Object> importRoomToSql(@PathVariable Integer roomId, HttpSession session) {
@@ -183,6 +186,8 @@ public class ChatRoomApiController {
 		String formatted = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
 		return Map.of("lastMessageTime", formatted);
 	}
+	
+	
 	/* =================== 共用回傳 =================== */
 
 	private Map<String, Object> success(String msg) {

@@ -1,78 +1,133 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>微嶼 | Isle Villa 後台首頁</title>
+  <title>微嶼 | Isle Villa 新增接駁時段</title>
+
+  <!-- 共用樣式 -->
   <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+
+  <!-- 自訂樣式 -->
+  <style>
+  .card-header {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(4px);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+
+  .form-label {
+    font-weight: bold;
+    color: #333;
+  }
+
+  select.form-select,
+  input.form-control,
+  textarea.form-control {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    text-align: left;
+    text-align-last: left;
+    width: 180px; /* ✅ 固定寬度改這裡即可 */
+    display: inline-block;
+  }
+
+  .text-danger {
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+  }
+</style>
 </head>
+
 <body>
   <div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
   <div th:replace="~{fragments/backFragments :: sidebar}"></div>
 
   <main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
     <th:block th:fragment="myContent">
-      <h2 class="mb-4" th:text="${formMode == 'add'} ? '✏️ 新增接駁時段' : '🛠️ 修改接駁時段'"></h2>
 
-      <form
-        th:action="${formMode == 'add'} ? @{/backend/shuttle/add} : @{/backend/shuttle/edit}"
-        th:object="${shuttleSchedule}" method="post"
-        class="needs-validation" novalidate>
 
-        <!-- ✅ 正確主鍵欄位 -->
-        <input type="hidden" th:field="*{shuttleScheduleId}" />
-
-        <!-- ✅ 全域錯誤提示（只顯示第一筆） -->
-        <div class="text-danger mb-3" th:if="${#fields.hasGlobalErrors()}"
-             th:text="${#fields.globalErrors()[0]}"></div>
-
-        <!-- 方向 -->
-        <div class="mb-3">
-          <label for="shuttleDirection" class="form-label">方向</label>
-          <select th:field="*{shuttleDirection}" class="form-select" id="shuttleDirection"
-                  th:disabled="${formMode == 'edit'}" required>
-            <option value="0" th:selected="${shuttleSchedule.shuttleDirection == 0}">去程</option>
-            <option value="1" th:selected="${shuttleSchedule.shuttleDirection == 1}">回程</option>
-          </select>
-
-          <!-- Hidden input：disabled 的 select 不會提交 -->
-          <input type="hidden" name="shuttleDirection"
-                 th:value="${shuttleSchedule.shuttleDirection}" th:if="${formMode == 'edit'}"/>
-
-          <div class="text-danger" th:if="${#fields.hasErrors('shuttleDirection')}"
-               th:errors="*{shuttleDirection}"></div>
+        <!-- 表單標題 -->
+        <div class="card-header bg-transparent border-0 pt-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0 fw-bold" th:text="${formMode == 'add'} ? '✏️ 新增接駁時段' : '🛠️ 修改接駁時段'"></h4>
+          </div>
         </div>
 
-        <!-- 出發時間 -->
-        <div class="mb-3">
-          <label for="shuttleDepartureTime" class="form-label">出發時間（時）</label>
-          <select th:field="*{shuttleDepartureTime}" class="form-control"
-                  id="shuttleDepartureTime" required>
-            <option th:each="hour : ${#numbers.sequence(0,23)}"
-                    th:value="${hour < 10 ? '0' + hour + ':00' : hour + ':00'}"
-                    th:text="${hour < 10 ? '0' + hour : hour} + ':00'"></option>
-          </select>
-          <div class="text-danger" th:if="${#fields.hasErrors('shuttleDepartureTime')}"
-               th:errors="*{shuttleDepartureTime}"></div>
-        </div>
+        <!-- 表單內容 -->
+        <div class="card-body">
+          <form th:action="${formMode == 'add'} ? @{/backend/shuttle/add} : @{/backend/shuttle/edit}"
+                th:object="${shuttleSchedule}" method="post"
+                class="needs-validation" novalidate>
 
-        <!-- 抵達時間 -->
-        <div class="mb-3">
-          <label for="shuttleArrivalTime" class="form-label">抵達時間（時）</label>
-          <select th:field="*{shuttleArrivalTime}" class="form-control"
-                  id="shuttleArrivalTime" required>
-            <option th:each="hour : ${#numbers.sequence(0,23)}"
-                    th:value="${hour < 10 ? '0' + hour + ':00' : hour + ':00'}"
-                    th:text="${hour < 10 ? '0' + hour : hour} + ':00'"></option>
-          </select>
-          <div class="text-danger" th:if="${#fields.hasErrors('shuttleArrivalTime')}"
-               th:errors="*{shuttleArrivalTime}"></div>
-        </div>
+            <!-- 主鍵欄位 -->
+            <input type="hidden" th:field="*{shuttleScheduleId}" />
 
-        <!-- 送出/取消 -->
-        <button type="submit" class="btn btn-primary me-2">送出</button>
-        <a th:href="@{/backend/shuttle/list}" class="btn btn-secondary">取消</a>
-      </form>
+            <!-- 全域錯誤 -->
+            <div class="text-danger mb-3" th:if="${#fields.hasGlobalErrors()}"
+                 th:text="${#fields.globalErrors()[0]}"></div>
+
+            <!-- 方向 -->
+            <div class="mb-3 row align-items-center">
+              <label for="shuttleDirection" class="col-sm-3 col-form-label">方向</label>
+              <div class="col-sm-6">
+                <select th:field="*{shuttleDirection}" class="form-select" id="shuttleDirection"
+                        th:disabled="${formMode == 'edit'}" required>
+                  <option value="0" th:selected="${shuttleSchedule.shuttleDirection == 0}">去程</option>
+                  <option value="1" th:selected="${shuttleSchedule.shuttleDirection == 1}">回程</option>
+                </select>
+                <input type="hidden" name="shuttleDirection"
+                       th:value="${shuttleSchedule.shuttleDirection}" th:if="${formMode == 'edit'}"/>
+                <div class="text-danger" th:if="${#fields.hasErrors('shuttleDirection')}"
+                     th:errors="*{shuttleDirection}"></div>
+              </div>
+            </div>
+
+            <!-- 出發時間 -->
+            <div class="mb-3 row align-items-center">
+              <label for="shuttleDepartureTime" class="col-sm-3 col-form-label">出發時間（時）</label>
+              <div class="col-sm-6">
+                <select th:field="*{shuttleDepartureTime}" class="form-select" id="shuttleDepartureTime" required>
+                  <option th:each="hour : ${#numbers.sequence(0,23)}"
+                          th:value="${hour < 10 ? '0' + hour + ':00' : hour + ':00'}"
+                          th:text="${hour < 10 ? '0' + hour : hour} + ':00'"></option>
+                </select>
+                <div class="text-danger" th:if="${#fields.hasErrors('shuttleDepartureTime')}"
+                     th:errors="*{shuttleDepartureTime}"></div>
+              </div>
+            </div>
+
+            <!-- 抵達時間 -->
+            <div class="mb-3 row align-items-center">
+              <label for="shuttleArrivalTime" class="col-sm-3 col-form-label">抵達時間（時）</label>
+              <div class="col-sm-6">
+                <select th:field="*{shuttleArrivalTime}" class="form-select" id="shuttleArrivalTime" required>
+                  <option th:each="hour : ${#numbers.sequence(0,23)}"
+                          th:value="${hour < 10 ? '0' + hour + ':00' : hour + ':00'}"
+                          th:text="${hour < 10 ? '0' + hour : hour} + ':00'"></option>
+                </select>
+                <div class="text-danger" th:if="${#fields.hasErrors('shuttleArrivalTime')}"
+                     th:errors="*{shuttleArrivalTime}"></div>
+              </div>
+            </div>
+
+            <!-- 按鈕列 -->
+            <div class="mt-4 row">
+              <div class="col-sm-9 offset-sm-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                  <i class="bi bi-send"></i> 送出
+                </button>
+                <a th:href="@{/backend/shuttle/list}" class="btn btn-secondary">
+                  <i class="bi bi-x-circle"></i> 取消
+                </a>
+              </div>
+            </div>
+
+          </form>
+        </div>
+      </div>
+
     </th:block>
   </main>
 </body>

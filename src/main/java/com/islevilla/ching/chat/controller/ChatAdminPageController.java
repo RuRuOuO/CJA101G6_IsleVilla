@@ -1,3 +1,4 @@
+
 package com.islevilla.ching.chat.controller;
 
 import java.util.Comparator;
@@ -80,7 +81,7 @@ public class ChatAdminPageController {
 			return "back-end/chat/error";
 		}
 
-		// 如果狀態是等待處理 → 自動轉回進行中
+		// 如果狀態是等待處理 會轉回進行中
 		if (room.getChatStatus() == 3) {
 			room.setChatStatus(1);
 		}
@@ -91,7 +92,7 @@ public class ChatAdminPageController {
 		chatRoomUpdateService.saveChatRoom(room); // Redis 更新
 
 		// 清除未讀
-		chatRoomUpdateService.clearUnreadForEmployee(roomId); // 修正使用正確 Service
+		chatRoomUpdateService.clearUnreadForEmployee(roomId); 
 
 		// 查訊息歷史
 		List<ChatMessageDTO> messages = chatRedisService.getMessageHistory(roomId);
@@ -116,8 +117,8 @@ public class ChatAdminPageController {
 		// 從redis撈資料出來 選定聊天室的歷史訊息
 		List<ChatMessageDTO> messages = chatRedisService.getMessageHistory(roomId);
 
-		System.out.println("room = " + room);
-		System.out.println("messages = " + messages.size());
+		  System.out.println("Room = " + room.getChatRoomId());
+		    System.out.println("Messages size = " + messages.size());
 		
 		model.addAttribute("room", room);
 		model.addAttribute("messages", messages);

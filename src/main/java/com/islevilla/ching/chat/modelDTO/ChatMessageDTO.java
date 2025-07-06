@@ -1,3 +1,4 @@
+
 package com.islevilla.ching.chat.modelDTO;
 
 import lombok.AllArgsConstructor;

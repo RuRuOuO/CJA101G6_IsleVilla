@@ -53,7 +53,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 		} else {
 			Integer roomId = getParam(session, "roomId");
 			chatRoomSessions.computeIfAbsent(roomId, k -> new ArrayList<>()).add(session);
-			log.info("✅ 已加入聊天室 {} 的 session：{}", roomId, session.getId());
+			log.info("已加入聊天室 {} 的 session：{}", roomId, session.getId());
 		}
 	}
 
@@ -106,7 +106,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 		}
 	}
 
-	// 廣播到聊天室列表(更新未讀)
 	// 廣播至聊天室列表頁（更新列表顯示）
 	private void broadcastToRoomList(String type, Integer roomId, ChatRoomDTO roomData) {
 		try {
@@ -148,7 +147,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 		return null;
 	}
 
-	// 外部觸發：新增聊天室時廣播
+	// 新增聊天室時廣播
 	public void notifyNewRoom(ChatRoomDTO newRoom) {
 		broadcastToRoomList("newRoom", null, newRoom);
 	}
