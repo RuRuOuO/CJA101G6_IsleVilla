@@ -60,81 +60,40 @@
     letter-spacing: 1px;
 }
 
-/* 細節裝飾 */
-.products-section::before {
-    content: '';
-    display: block;
-    width: 1px;
-    height: 60px;
-    background: #e8e8e8;
-    margin: 0 auto 3rem;
+/* RWD 響應式設計 - 手機版分類按鈕直排顯示 */
+@media (max-width: 768px) {
+    .category-row {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .category-item {
+        width: 100%;
+        max-width: 300px;
+        margin: 5px 0;
+    }
+    
+    .category-card {
+        min-width: unset;
+        width: 100%;
+        padding: 1.5rem 1rem;
+    }
+    
+    .category-card p {
+        font-size: 0.9rem;
+    }
 }
 
-/* 文藝風格的引用裝飾 */
-.products-intro::before {
-    content: '"';
-    font-size: 2rem;
-    color: #ccc;
-    display: block;
-    text-align: center;
-    margin-bottom: 0.5rem;
+/* 平板版調整 */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .category-item {
+        width: 50%;
+        max-width: 200px;
+    }
+    
+    .category-card {
+        min-width: unset;
+        padding: 1.5rem 1.5rem;
+    }
 }
 
-.products-intro::after {
-    content: '"';
-    font-size: 2rem;
-    color: #ccc;
-    display: block;
-    text-align: center;
-    margin-top: 0.5rem;
-}
-
-.category-underline {
-    width: 180px;
-    height: 2px;
-    background: #222;
-    margin: 0 auto 1.5rem auto;
-    border-radius: 2px;
-}
-
-.category-list-divider {
-    width: 2px;
-    height: 60px;
-    background: #e8e8e8;
-    margin: 0 auto 2rem auto;
-}
-
-.product-list-title {
-    position: relative;
-    margin-top: 3rem;
-    margin-bottom: 2.5rem;
-}
-.product-list-title::after {
-    content: '';
-    display: block;
-    width: 180px;
-    height: 2px;
-    background: #222;
-    margin: 0.5rem auto 0 auto;
-    border-radius: 2px;
-}
-
-/* 分隔線：分類和列表標題之間 */
-.product-list-title::before {
-    content: '';
-    display: block;
-    width: 2px;
-    height: 60px;
-    background: #e8e8e8;
-    margin: 2.5rem auto 2.5rem auto;
-}
-
-.products-intro {
-    position: relative;
-    font-size: 1.1rem;
-    margin-bottom: 2rem;
-    margin-top: 2rem;
-}
-
-/* 移除多餘的底線/分隔線 class */
-.category-underline, .product-list-underline, .category-list-divider { display: none !important; }
