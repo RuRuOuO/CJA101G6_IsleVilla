@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -26,12 +25,12 @@
 		</div>
 	</div>
 
-	<script th:inline="javascript">
+<script th:inline="javascript">
 /*<![CDATA[*/
-const roomId = Number(/*[[${roomId}]]*/);
-const senderId = /*[[${senderId}]]*/;
-const senderName = /*[['${senderName}']]*/ "";
-const senderType = /*[[${senderType}]]*/;
+const roomId = [[${roomId}]];
+const senderId = [[${senderId}]];
+const senderType = [[${senderType}]];
+const senderName = [[${senderName}]]; 
 const chatStatus = /*[[${room.chatStatus}]]*/;
 /*]]>*/
 </script>
