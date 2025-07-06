@@ -160,21 +160,30 @@ public class CheckoutController {
             
             // 創建訂單明細
             for (CartDTO cartItem : cartItems) {
-                Product product = productService.getProductById(cartItem.getProductId());
-                if (product != null) {
-                    ProductOrderDetail detail = new ProductOrderDetail();
-                    ProductOrderDetailId detailId = new ProductOrderDetailId();
-                    detailId.setProductOrderId(order.getProductOrderId());
-                    detailId.setProductId(cartItem.getProductId());
-                    detail.setId(detailId);
-                    detail.setProductOrder(order);
-                    detail.setProduct(product);
-                    detail.setProductOrderQuantity(cartItem.getQuantity());
-                    detail.setProductOrderPrice(cartItem.getProductPrice());
-                    detail.setProductOrderName(cartItem.getProductName());
-                    
-                    productOrderDetailService.addOrderDetail(detail);
+                // 使用悲觀鎖查詢商品，確保同時只有一個交易能修改庫存，防止超賣
+                Product product = productService.getProductByIdForUpdate(cartItem.getProductId());
+                if (product.getProductQuantity() < cartItem.getQuantity()) {
+                    // 設定錯誤訊息並回到結帳頁
+                    model.addAttribute("error", "商品庫存不足，請重新選購！");
+                    return "front-end/product/checkout";
                 }
+                // 扣減庫存
+                int newQuantity = product.getProductQuantity() - cartItem.getQuantity();
+                product.setProductQuantity(newQuantity);
+                productService.updateProduct(product);
+
+                ProductOrderDetail detail = new ProductOrderDetail();
+                ProductOrderDetailId detailId = new ProductOrderDetailId();
+                detailId.setProductOrderId(order.getProductOrderId());
+                detailId.setProductId(cartItem.getProductId());
+                detail.setId(detailId);
+                detail.setProductOrder(order);
+                detail.setProduct(product);
+                detail.setProductOrderQuantity(cartItem.getQuantity());
+                detail.setProductOrderPrice(cartItem.getProductPrice());
+                detail.setProductOrderName(cartItem.getProductName());
+                
+                productOrderDetailService.addOrderDetail(detail);
             }
             
             // 如果有使用優惠券，標記為已使用
