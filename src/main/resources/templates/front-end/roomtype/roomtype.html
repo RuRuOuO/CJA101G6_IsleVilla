@@ -21,10 +21,8 @@
         
         <!-- 房型卡片容器 -->
         <div class="roomtype-cards-container">
-          <!-- 如果有房型資料 -->
-          <div th:if="${roomTypeList != null and !roomTypeList.isEmpty()}">
-            <!-- 使用 Thymeleaf th:each 渲染房型卡片 -->
-            <div th:each="roomType : ${roomTypeList}" class="roomtype-card">
+          <!-- 如果有房型資料，使用 Thymeleaf th:each 渲染房型卡片 -->
+          <div th:each="roomType : ${roomTypeList}" th:if="${roomTypeList != null and !roomTypeList.isEmpty()}" class="roomtype-card">
               <!-- 房型圖片區域 -->
               <div class="roomtype-image-container">
                 <!-- 如果有圖片 -->
@@ -45,10 +43,7 @@
               <div class="roomtype-card-body">
                 <h3 class="roomtype-name" th:text="${roomType.roomTypeName}">房型名稱</h3>
                 <div class="roomtype-price" th:text="|NT$ ${#numbers.formatInteger(roomType.roomTypePrice, 0, 'COMMA')}|">NT$ 0</div>
-                <div class="roomtype-capacity">
-                  <i class="bi bi-people"></i>
-                  <span th:text="|容納人數：${roomType.roomTypeCapacity} 人|">容納人數：0 人</span>
-                </div>
+
                 <button class="btn roomtype-btn" 
                         th:data-roomtype-id="${roomType.roomTypeId}"
                         th:data-roomtype-name="${roomType.roomTypeName}"
@@ -59,7 +54,6 @@
                 </button>
               </div>
             </div>
-          </div>
           
           <!-- 如果沒有房型資料 -->
           <div th:if="${roomTypeList == null or roomTypeList.isEmpty()}" class="empty-state">
@@ -73,40 +67,77 @@
     
     <!-- 房型詳細資訊 Modal -->
     <div class="modal fade" id="roomTypeModal" tabindex="-1" aria-labelledby="roomTypeModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg">
+      <div class="modal-dialog modal-xl">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="roomTypeModalTitle">房型名稱</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <div class="modal-roomtype-info">
-              <div class="row">
-                <div class="col-md-6">
-                  <h6>房型資訊</h6>
-                  <p id="modalRoomTypeCapacity" class="modal-capacity">
-                    <i class="bi bi-people"></i> 容納人數：0 人
-                  </p>
-                </div>
-                <div class="col-md-6 text-end">
-                  <h6>房型價格</h6>
-                  <p id="modalRoomTypePrice" class="modal-price">NT$ 0</p>
+            <div class="row">
+              <!-- 左側：圖片輪播 -->
+              <div class="col-lg-6">
+                <div class="roomtype-carousel-container">
+                  <div id="roomTypeCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner" id="modalCarouselInner">
+                      <!-- 圖片將由JavaScript動態載入 -->
+                      <div class="carousel-item active">
+                        <div class="carousel-placeholder">
+                          <i class="bi bi-image"></i>
+                          <span>載入中...</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- 左右切換按鈕 -->
+                    <button class="carousel-control-prev" type="button" data-bs-target="#roomTypeCarousel" data-bs-slide="prev">
+                      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                      <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#roomTypeCarousel" data-bs-slide="next">
+                      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                      <span class="visually-hidden">Next</span>
+                    </button>
+                    
+                    <!-- 圖片指示器 -->
+                    <div class="carousel-indicators" id="modalCarouselIndicators">
+                      <!-- 指示器將由JavaScript動態載入 -->
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-            
-            <div class="modal-roomtype-content">
-              <h6>房型說明</h6>
-              <div id="modalRoomTypeContent" class="modal-content-text">
-                房型說明內容...
+              
+              <!-- 右側：房型資訊 -->
+              <div class="col-lg-6">
+                <div class="modal-roomtype-info">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <h6>房型資訊</h6>
+                      <p id="modalRoomTypeCapacity" class="modal-capacity">
+                        <i class="bi bi-people"></i> 容納人數：0 人
+                      </p>
+                    </div>
+                    <div class="col-md-6 text-end">
+                      <h6>房型價格</h6>
+                      <p id="modalRoomTypePrice" class="modal-price">NT$ 0</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="modal-roomtype-content">
+                  <h6>房型說明</h6>
+                  <div id="modalRoomTypeContent" class="modal-content-text">
+                    房型說明內容...
+                  </div>
+                </div>
+                
+                <div class="mt-4 text-center">
+                  <a th:href="@{/booking}" class="btn btn-primary btn-lg px-4">
+                    <i class="bi bi-calendar-check me-2"></i>
+                    立即預訂
+                  </a>
+                </div>
               </div>
-            </div>
-            
-            <div class="mt-4 text-center">
-              <a href="#" class="btn btn-primary btn-lg px-4">
-                <i class="bi bi-calendar-check me-2"></i>
-                立即預訂
-              </a>
             </div>
           </div>
         </div>
@@ -118,7 +149,7 @@
     <!-- ========== 載入Footer及Bootstrap JS ========== -->
     <div th:replace="~{fragments/fragments :: footer}"></div>
     
-    <!-- ===== 載入房型頁面專用JS ===== -->
-    <script src="/js/roomtype.js"></script>
+    <!-- ===== 載入前端房型展示專用JS ===== -->
+    <script src="/js/roomtype-frontend.js"></script>
   </body>
 </html>

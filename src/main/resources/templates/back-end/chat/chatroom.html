@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -71,7 +72,7 @@ h2 {
 	padding: 10px 14px;
 	border-radius: 16px;
 	word-break: break-word;
-	box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
 .left .bubble {
@@ -140,22 +141,25 @@ button:hover {
 </head>
 <body>
 
-<h2>與會員 [[${room.memberName}]] 連線中 | 編號 <span th:text="${roomId}">0</span></h2>
+	<h2>
+		與會員 [[${room.memberName}]] 連線中 | 編號 <span th:text="${roomId}">0</span>
+	</h2>
 
-<div class="container">
-	<button class="back-btn" onclick="gochatlist()">返回聊天室列表</button>
+	<div class="container">
+		<button class="back-btn" onclick="gochatlist()">返回聊天室列表</button>
 
-	<div id="status-banner"></div>
+		<div id="status-banner"></div>
 
-	<div id="chat"></div>
+		<div id="chat"></div>
 
-	<div class="input-area">
-		<input id="msg" type="text" placeholder="輸入訊息..." onkeydown="handleKey(event)" />
-		<button onclick="sendMessage()">送出</button>
+		<div class="input-area">
+			<input id="msg" type="text" placeholder="輸入訊息..."
+				onkeydown="handleKey(event)" />
+			<button onclick="sendMessage()">送出</button>
+		</div>
 	</div>
-</div>
 
-<script th:inline="javascript">
+	<script th:inline="javascript">
 /*<![CDATA[*/
 const roomId = Number(/*[[${roomId}]]*/);
 const senderId = /*[[${senderId}]]*/;
@@ -165,7 +169,7 @@ const chatStatus = /*[[${room.chatStatus}]]*/;
 /*]]>*/
 </script>
 
-<script>
+	<script>
 const input = document.getElementById("msg");
 const banner = document.getElementById("status-banner");
 
@@ -268,9 +272,22 @@ function formatTime(timestamp) {
     return `${hh}:${mm}`;
 }
 
-// 返回聊天室列表
+// 返回聊天室列表 並清除未讀紀錄
 function gochatlist() {
-    window.location.href = "/backend/chat/room/list";
+    fetch(`/api/chat/room/${roomId}/unread/employee/clear`, {
+        method: 'POST'
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log("已清除客服未讀訊息", data);
+        // 清除完再導回聊天室列表
+        window.location.href = "/backend/chat/room/list";
+    })
+    .catch(err => {
+        console.error("清除未讀訊息失敗", err);
+        // 出錯也照樣導頁，不影響體驗
+        window.location.href = "/backend/chat/room/list";
+    });
 }
 
 // Enter發送
@@ -287,6 +304,8 @@ function disableInput(message) {
     document.querySelector("button").disabled = true;
     banner.textContent = message;
 }
+
+
 </script>
 
 </body>

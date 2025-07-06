@@ -47,34 +47,68 @@
                                         </h6>
                                     </div>
                                     <div class="card-body">
-                                        <div class="mb-3">
-                                            <small class="text-muted">訂房編號</small>
-                                            <div th:text="${shuttleReservation.roomRVOrder.roomReservationId}"></div>
+                                        <div class="row mb-3">
+	                                        <div class="col col-6">
+	                                            <small class="text-muted">訂房編號</small>
+	                                            <div th:text="${shuttleReservation.roomRVOrder.roomReservationId}"></div>
+	                                        </div>
+	                                        <div class="col col-6">
+	                                            <small class="text-muted">班次編號</small>
+	                                            <div th:text="${shuttleReservation.shuttleSchedule.shuttleScheduleId}"></div>
+	                                        </div>
                                         </div>
-                                        <div class="mb-3">
-                                            <small class="text-muted">接駁日期</small>
-                                            <div th:text="${#temporals.format(shuttleReservation.shuttleDate, 'yyyy-MM-dd')}"></div>
+                                        <div class="row mb-3">
+	                                        <div class="col col-6">
+	                                            <small class="text-muted">接駁日期</small>
+	                                            <div th:text="${#temporals.format(shuttleReservation.shuttleDate, 'yyyy-MM-dd')}"></div>
+	                                        </div>
+	                                        <div class="col col-6">
+	                                            <small class="text-muted">方向</small>
+	                                            <div th:switch="${shuttleReservation.shuttleDirection}">
+	                                                <span th:case="'0'" class="badge bg-primary">去程</span>
+	                                                <span th:case="'1'" class="badge bg-info">回程</span>
+	                                                <span th:case="*" class="badge bg-dark">未知</span>
+	                                            </div>
+                                        	</div>
                                         </div>
-                                        <div class="mb-3">
-                                            <small class="text-muted">班次編號</small>
-                                            <div th:text="${shuttleReservation.shuttleSchedule.shuttleScheduleId}"></div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <small class="text-muted">方向</small>
-                                            <div th:switch="${shuttleReservation.shuttleDirection}">
-                                                <span th:case="'0'" class="badge bg-info">去程</span>
-                                                <span th:case="'1'" class="badge bg-secondary">回程</span>
-                                                <span th:case="*">未知</span>
-                                            </div>
+                                        <div class="row mb-3">
+	                                        <div class="col col-6">
+	                                            <small class="text-muted">接駁時間</small>
+	                                            <div th:text="${#temporals.format(shuttleReservation.shuttleSchedule.shuttleDepartureTime, 'HH:mm')}"></div>
+	                                        </div>
+	                                        <div class="col col-6">
+	                                            <small class="text-muted">接駁人數</small>
+	                                            <div th:text="${shuttleReservation.shuttleNumber}"></div>
+	                                        </div>
                                         </div>
                                         <div class="mb-0">
                                             <small class="text-muted">預約狀態</small>
                                             <div th:switch="${shuttleReservation.shuttleReservationStatus}">
-                                                <span th:case="'0'" class="badge bg-secondary">已取消</span>
-                                                <span th:case="'1'" class="badge bg-success">正常</span>
-                                                <span th:case="*"
-                                                      class="badge bg-dark">未知</span>
+                                                <span th:case="'0'" class="badge bg-danger">已取消</span>
+                                                <div th:case="'1'">
+	                                                <span th:if="${shuttleReservation.shuttleDate.isAfter(T(java.time.LocalDate).now())}"
+														  class="badge bg-success">正常</span>
+													<span th:unless="${shuttleReservation.shuttleDate.isAfter(T(java.time.LocalDate).now())}"
+														  class="badge bg-secondary">已完成</span>
+                                                </div>
+                                                <span th:case="*" class="badge bg-dark">未知</span>
                                             </div>
+                                        </div>
+                                    </div>
+                                    <div th:if="${shuttleReservation.shuttleReservationStatus==1 and shuttleReservation.shuttleDate.isAfter(T(java.time.LocalDate).now())}" class="card-footer bg-transparent">
+                                        <div class="d-flex gap-2">
+<!--                                             <button type="button" class="btn btn-outline-primary btn-sm flex-fill" -->
+<!--                                                     data-bs-toggle="modal" -->
+<!--                                                     th:data-bs-target="'#orderModal' + ${order.roomReservationId}"> -->
+<!--                                                 <i class="fas fa-eye me-1"></i>查看詳情 -->
+<!--                                             </button> -->
+                                            <form th:action="@{'/member/shuttle/list/cancel'}" method="post" class="flex-fill">
+                                                <input type="hidden" th:name="shuttleReservationId" th:value="${shuttleReservation.shuttleReservationId}">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm w-100"
+                                                        onclick="return confirm('確定取消訂單嗎？')">
+                                                    <i class="fas fa-times me-1"></i>取消預約
+                                                </button>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>

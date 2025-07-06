@@ -16,7 +16,7 @@
         <div class="container text-center">
             <h1 class="mb-4">會員專區</h1>
             <p class="mb-4">
-                <i class="bi bi-calendar-check me-2"></i>
+                <i class="bi bi-calendar-check-fill me-2"></i>
                 您的訂房訂單
             </p>
         </div>
@@ -86,7 +86,7 @@
                                             <div>
                                                 <small class="text-muted">總金額</small>
                                                 <h5 class="text-primary mb-0">NT$ <span
-                                                        th:text="${order.roomTotalAmount}"></span></h5>
+                                                        th:text="${order.rvPaidAmount}"></span></h5>
                                             </div>
                                         </div>
                                     </div>
@@ -205,7 +205,7 @@
                                 <hr>
                                 <div class="d-flex ">
                                     <h6 class="text-muted mb-0">訂單總金額：</h6>
-                                    <h5 class="text-primary mb-0">NT$ <span th:text="${order.roomTotalAmount}"></span>
+                                    <h5 class="text-primary mb-0">NT$ <span th:text="${order.rvPaidAmount}"></span>
                                     </h5>
                                 </div>
                             </div>
@@ -219,7 +219,8 @@
                         <h6 class="mb-0"><i class="fas fa-bed me-2"></i>房間明細</h6>
                     </div>
                     <div class="card-body">
-                        <div th:each="detail : ${detailList}" class="border rounded p-3 mb-3">
+                        <div th:if="${detailMap != null}" th:each="detail : ${detailMap[order.roomReservationId]}"
+                             class="border rounded p-3 mb-3">
                             <div class="row">
                                 <div class="col-md-4 mb-2">
                                     <small class="text-muted">明細編號</small>
@@ -227,7 +228,8 @@
                                 </div>
                                 <div class="col-md-4 mb-2">
                                     <small class="text-muted">房號</small>
-                                    <div th:text="${detail.room.roomId}"></div>
+                                    <div th:if="${detail.room != null}" th:text="${detail.room.roomId}"></div>
+                                    <div th:if="${detail.room == null}">-</div>
                                 </div>
                                 <div class="col-md-4 mb-2">
                                     <small class="text-muted">房型</small>

@@ -37,6 +37,12 @@ public class RoomRVOrderService {
         return roomRVOrderRepository.findByRoomOrderStatusIn(Arrays.asList(0, 1));
     }
 
+    // 查詢今日要入住或退房的訂單
+    public List<RoomRVOrder> getTodayCheckInOrOutOrders() {
+        LocalDate today = LocalDate.now();
+        return roomRVOrderRepository.findByCheckInDateOrCheckOutDate(today, today);
+    }
+
     // 用id查詢單筆
     public RoomRVOrder getById(Integer id) {
         Optional<RoomRVOrder> roomRVOrder = roomRVOrderRepository.findById(id);

@@ -168,49 +168,49 @@ tr:hover {
 		</thead>
 		<tbody>
 			<tr th:if="${#lists.isEmpty(rooms)}">
-				<td colspan="7">❗ 目前沒有任何聊天室</td>
+				<td colspan="7">目前沒有任何聊天室</td>
 			</tr>
 
-			<tr th:each="room : ${rooms}" th:attr="data-room-id=${room.chatRoomId}">
+			<tr th:each="room : ${rooms}"
+				th:attr="data-room-id=${room.chatRoomId}">
 				<td th:text="${room.chatRoomId}">聊天室編號</td>
 				<td th:text="${room.memberName}">會員名稱</td>
 				<td th:text="${room.employeeName}">客服名稱</td>
-				<td class="status">
-					<span th:if="${room.chatStatus == 1}" class="status-open">進行中</span>
-					<span th:if="${room.chatStatus == 2}" class="status-complete">已結案</span>
+				<td class="status"><span th:if="${room.chatStatus == 1}"
+					class="status-open">進行中</span> <span
+					th:if="${room.chatStatus == 2}" class="status-complete">已結案</span>
 					<span th:if="${room.chatStatus == 3}" class="status-pending">等待處理</span>
 				</td>
 
-				<td>
-					<span th:text="${room.lastMessageTime != null ? #dates.format(room.lastMessageTime, 'yyyy-MM-dd HH:mm') : '-'}">-</span>
+				<td><span
+					th:text="${room.lastMessageTime != null ? #dates.format(room.lastMessageTime, 'yyyy-MM-dd HH:mm') : '-'}">-</span>
 				</td>
 
-				<td class="unread-cell">
-					<span th:text="${room.unreadCount}">0</span>
-					<span th:if="${room.unreadCount != null and room.unreadCount > 0}" class="unread-dot">🔴</span>
-				</td>
+				<td class="unread-cell"><span th:text="${room.unreadCount}">0</span>
+					<span th:if="${room.unreadCount != null and room.unreadCount > 0}"
+					class="unread-dot">🔴</span></td>
 
-				<td class="actions">
-				<a th:href="@{'/backend/chat/history/' + ${room.chatRoomId}}" class="btn-action btn-history">歷史</a>
-				
-					<a th:href="@{'/backend/chat/room/' + ${room.chatRoomId}}" class="btn-action btn-enter">進入</a>
+				<td class="actions"><a
+					th:href="@{'/backend/chat/history/' + ${room.chatRoomId}}"
+					class="btn-action btn-history">歷史</a> <a
+					th:href="@{'/backend/chat/room/' + ${room.chatRoomId}}"
+					class="btn-action btn-enter">進入</a>
 
-					<button th:if="${room.chatStatus == 1}" 
-					        class="btn-action btn-complete"
-					        th:onclick="|completeRoom(${room.chatRoomId})|">結案</button>
+					<button th:if="${room.chatStatus == 1}"
+						class="btn-action btn-complete"
+						th:onclick="|completeRoom(${room.chatRoomId})|">結案</button>
 
 					<button class="btn-action btn-import"
-					        th:onclick="|importRoom(${room.chatRoomId})|">匯入SQL</button>
+						th:onclick="|importRoom(${room.chatRoomId})|">匯入SQL</button>
 
 					<button th:if="${room.chatStatus == 2}"
-					        class="btn-action btn-reopen"
-					        th:onclick="|reopenRoom(${room.chatRoomId})|">重新開啟</button>
-				</td>
+						class="btn-action btn-reopen"
+						th:onclick="|reopenRoom(${room.chatRoomId})|">重新開啟</button></td>
 			</tr>
 		</tbody>
 	</table>
 
-<script>
+	<script>
 const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/chatroomList`);
 
 ws.onopen = () => console.log(" WebSocket 已連線聊天室列表");
@@ -371,6 +371,21 @@ function updateStatus(roomId, status) {
           <button class="btn-action btn-import" onclick="importRoom(${roomId})">匯入SQL</button>
         `;
     }
+}
+
+// 管理員返回列表頁時清除該聊天室的未讀數
+const urlParams = new URLSearchParams(window.location.search);
+const lastRoomId = urlParams.get('lastRoomId');
+
+if (lastRoomId) {
+    console.log("返回列表頁，清除聊天室 " + lastRoomId + " 未讀");
+    fetch(`/api/chat/room/${lastRoomId}/unread/employee/clear`, {
+        method: 'POST'
+    }).then(res => res.json())
+      .then(data => {
+          console.log(data.message || "已清除未讀");
+          updateUnreadCount(lastRoomId); // 順便更新 🔴 數字
+      });
 }
 </script>
 

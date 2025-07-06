@@ -34,14 +34,18 @@
                 href="https://fonts.googleapis.com/css2?family=Kaisei+HarunoUmi&family=Noto+Sans+TC:wght@100..900&family=Noto+Serif+TC:wght@200..900&display=swap"
                 rel="stylesheet"
         />
+        <!-- 覆蓋樣式-->
+        <link rel="stylesheet" href="/css/back_custom_style.css">
 
         <style>
             .card-title {
                 color: #000000;
             }
+
             .sidebar {
                 width: 280px;
-                background-color: #223363;
+                /*background-color: #223363;*/
+                background: linear-gradient(to top, #09203f 0%, #537895 200%);
                 z-index: 1040;
                 display: flex;
                 flex-direction: column;
@@ -79,7 +83,8 @@
                 left: 0;
                 right: 0;
                 z-index: 1100;
-                background-color: #223363;
+                /*background-color: #223363;*/
+                background: linear-gradient(to right, #09203f 0%, #537895 200%);
                 padding: 0.5rem 1rem;
             }
 
@@ -97,7 +102,8 @@
             }
 
             .mobile-navbar .navbar-collapse {
-                background-color: #223363;
+                /*background-color: #223363;*/
+                background: linear-gradient(to right, #09203f 0%, #537895 200%);
                 margin-top: 0.5rem;
                 border-radius: 0.375rem;
             }
@@ -167,9 +173,46 @@
             .sidebar-toggle {
                 text-decoration: none !important;
             }
+
             /* 縮小分頁按鈕間距 */
             .dataTables_wrapper .pagination .page-item {
                 margin: 0rem;
+            }
+
+            .sidebar-active {
+                display: block;
+                background: rgba(255, 255, 255, 0.15) !important;
+                border-radius: 10px !important;
+                color: #fff !important;
+                transition: background 0.2s;
+                padding: 3px 13px !important;
+                margin: 3px 0;
+            }
+
+            .btn-toggle-nav a {
+                display: block;
+                padding: 3px 13px;
+                margin: 3px 0;
+            }
+
+            .sidebar-menu > li.mb-1 {
+                margin-bottom: 8px !important;
+            }
+
+            .sidebar .btn-toggle-nav a:hover,
+            .sidebar .btn-toggle-nav a:focus {
+                color: #fff !important;
+            }
+
+            .sidebar .btn-toggle-nav a.sidebar-active:hover,
+            .sidebar .btn-toggle-nav a.sidebar-active:focus {
+                color: #fff !important;
+            }
+
+            .btn-toggle-nav, .btn-toggle-nav, .btn-toggle-nav li, .sidebar-menu ul, .sidebar-menu li {
+                list-style: none !important;
+                padding-left: 0 !important;
+                margin-left: 0 !important;
             }
         </style>
 
@@ -190,8 +233,7 @@
 
     </th:block>
 </head>
-<body>
-
+<body class="bg-light">
 <!-- 手機版導航欄 -->
 <nav th:fragment="mobileSidebar" class="mobile-navbar navbar navbar-expand-lg">
     <div class="container-fluid">
@@ -243,8 +285,7 @@
                     </button>
                     <div class="collapse" id="mobile-room">
                         <ul class="btn-toggle-nav list-unstyled">
-                            <li><a th:href="@{/backend/check-in-out/list}">住房管理</a></li>
-                            <li><a th:href="@{/backend/room-reservation/list}">訂房訂單管理</a></li>
+                            <li><a th:href="@{/backend/check-in-out/list}">住房管理</a></li>-->
                             <li><a th:href="@{/backend/room/selectRoomPage}">房間管理</a></li>
                             <li><a th:href="@{/backend/roomType/listRoomType}">房型管理</a></li>
                             <li><a th:href="@{/backend/roomTypeAvailability/list}">房型庫存管理</a></li>
@@ -318,7 +359,6 @@
                     </div>
                 </li>
 
-
                 <!-- 用戶資訊和登出 -->
                 <li class="nav-item">
                     <div class="border-top pt-3 mt-3">
@@ -339,36 +379,49 @@
 </nav>
 
 <!-- Sidebar（桌機版） -->
-<div th:fragment="sidebar" class="sidebar p-3 position-fixed top-0 start-0 vh-100">
-    <a
-            class="d-flex justify-content-center align-items-center mt-3 mb-2 link-body-emphasis text-decoration-none text-white"
-            th:href="@{/backend/dashboard}"
-    >
-        <span class="fs-5 text-white" style="font-family: Kaisei HarunoUmi">IsleVilla微嶼 後台管理</span>
-    </a>
-    <hr class="my-4" style="border-color: #e3e6f0; opacity: 0.5;">
-    <ul class="list-unstyled ps-0 sidebar-menu" id="sidebarMenu">
+<div th:fragment="sidebar" class="sidebar position-fixed top-0 start-0 vh-100 overflow-auto p-3 shadow-lg">
+    <div class="text-center border-bottom border-light border-opacity-25 pb-3 mb-4">
+        <a class="text-decoration-none text-white" th:href="@{/backend/dashboard}">
+            <h5 class="mt-1 mb-0" style="font-family: Kaisei HarunoUmi">IsleVilla 微嶼</h5>
+            <small class="text-white-50">後台管理系統</small>
+        </a>
+    </div>
+    <ul class="sidebar-menu list-unstyled ps-0" style="max-height: calc(100vh - 160px); overflow-y: auto;">
         <!-- 員工管理 -->
         <li class="mb-1">
             <button
-                    class="btn btn-toggle d-flex justify-content-between align-items-center w-100 rounded border-0 text-white"
+                    class="btn btn-toggle d-flex align-items-center w-100 rounded border-0 text-white"
                     data-bs-toggle="collapse"
                     data-bs-target="#dashboard-employee"
-                    aria-expanded="false"
+                    th:aria-expanded="${sidebarActive == 'employee-list' or sidebarActive == 'department-list'}"
             >
-                員工管理
-                <i class="bi bi-chevron-down fs-6"></i>
+                <i class="bi bi-person-circle" style="color: #fff; font-size: 1.3rem;"></i>
+                <span class="ms-2">員工管理</span>
+                <i class="bi bi-chevron-down ms-auto" style="font-size: 0.9rem;"></i>
             </button>
-            <div class="collapse" id="dashboard-employee">
-                <ul
-                        class="btn-toggle-nav list-unstyled fw-normal pb-2 ps-4 lh-lg"
-                >
+            <div class="collapse" id="dashboard-employee"
+                 th:classappend="${sidebarActive == 'employee-list' or sidebarActive == 'department-list'} ? ' show'">
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-2 lh-lg">
                     <li>
                         <a th:href="@{/backend/employee/list}"
-                           class="link-body-emphasis text-white">員工列表</a>
+                           class="d-flex align-items-center link-body-emphasis text-white"
+                           th:classappend="${sidebarActive == 'employee-list'} ? ' sidebar-active'">
+
+                            <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
+                                <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
+                            </span>
+                            <span class="ms-2">員工列表</span>
+                        </a>
                     </li>
                     <li>
-                        <a th:href="@{/backend/department/list}" class="link-body-emphasis text-white">部門管理</a>
+                        <a th:href="@{/backend/department/list}"
+                           class="d-flex align-items-center link-body-emphasis text-white"
+                           th:classappend="${sidebarActive == 'department-list'} ? ' sidebar-active'">
+                            <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
+                                <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
+                            </span>
+                            <span class="ms-2">部門管理</span>
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -377,37 +430,52 @@
         <!-- 住房管理 -->
         <li class="mb-1">
             <button
-                    class="btn btn-toggle d-flex justify-content-between align-items-center w-100 rounded border-0 text-white"
+                    class="btn btn-toggle d-flex align-items-center w-100 rounded border-0 text-white"
                     data-bs-toggle="collapse"
                     data-bs-target="#dashboard-room"
                     aria-expanded="false"
             >
-                住房管理
-                <i class="bi bi-chevron-down fs-6"></i>
+                <i class="bi bi-house-fill" style="color: #fff; font-size: 1.3rem;"></i>
+                <span class="ms-2">住房管理</span>
+                <i class="bi bi-chevron-down ms-auto" style="font-size: 0.9rem;"></i>
             </button>
             <div class="collapse" id="dashboard-room">
-                <ul
-                        class="btn-toggle-nav list-unstyled fw-normal pb-2 ps-4 lh-lg"
-                >
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-2 lh-lg">
                     <li>
                         <a th:href="@{/backend/check-in-out/list}"
-                           class="link-body-emphasis text-white">住房管理</a>
-                    </li>
-                    <li>
-                        <a th:href="@{/backend/room-reservation/list}"
-                           class="link-body-emphasis text-white">訂房訂單管理</a>
+                           class="d-flex align-items-center link-body-emphasis text-white">
+                            <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
+                                <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
+                            </span>
+                            <span class="ms-2">住房管理</span>
+                        </a>
                     </li>
                     <li>
                         <a th:href="@{/backend/room/selectRoomPage}"
-                           class="link-body-emphasis text-white">房間管理</a>
+                           class="d-flex align-items-center link-body-emphasis text-white">
+                            <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
+                                <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
+                            </span>
+                            <span class="ms-2">房間管理</span>
+                        </a>
                     </li>
                     <li>
                         <a th:href="@{/backend/roomType/listRoomType}"
-                           class="link-body-emphasis text-white">房型管理</a>
+                           class="d-flex align-items-center link-body-emphasis text-white">
+                            <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
+                                <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
+                            </span>
+                            <span class="ms-2">房型管理</span>
+                        </a>
                     </li>
                     <li>
                         <a th:href="@{/backend/roomTypeAvailability/list}"
-                           class="link-body-emphasis text-white">房型庫存管理</a>
+                           class="d-flex align-items-center link-body-emphasis text-white">
+                            <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
+                                <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
+                            </span>
+                            <span class="ms-2">房型庫存管理</span>
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -416,29 +484,52 @@
         <!-- 購物管理 -->
         <li class="mb-1" sec:authorize="hasAuthority('product')">
             <button
-                    class="btn btn-toggle d-flex justify-content-between align-items-center w-100 rounded border-0 text-white"
+                    class="btn btn-toggle d-flex align-items-center w-100 rounded border-0 text-white"
                     data-bs-toggle="collapse"
                     data-bs-target="#dashboard-product"
                     aria-expanded="false"
             >
-                購物管理
-                <i class="bi bi-chevron-down fs-6"></i>
+                <i class="bi bi-bag-fill" style="color: #fff; font-size: 1.3rem;"></i>
+                <span class="ms-2">購物管理</span>
+                <i class="bi bi-chevron-down ms-auto" style="font-size: 0.9rem;"></i>
             </button>
             <div class="collapse" id="dashboard-product">
-                <ul
-                        class="btn-toggle-nav list-unstyled fw-normal pb-1 ps-4 lh-lg"
-                >
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 lh-lg">
                     <li>
-                        <a th:href="@{/backend/product/list}" class="link-body-emphasis text-white">商品管理</a>
+                        <a th:href="@{/backend/product/list}"
+                           class="d-flex align-items-center link-body-emphasis text-white">
+                            <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
+                                <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
+                            </span>
+                            <span class="ms-2">商品管理</span>
+                        </a>
                     </li>
                     <li>
-                        <a th:href="@{/backend/product/category/list}" class="link-body-emphasis text-white">商品分類管理</a>
+                        <a th:href="@{/backend/product/category/list}"
+                           class="d-flex align-items-center link-body-emphasis text-white">
+                            <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
+                                <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
+                            </span>
+                            <span class="ms-2">商品分類管理</span>
+                        </a>
                     </li>
                     <li>
-                        <a th:href="@{/backend/product-order/listAllProductOrder}" class="link-body-emphasis text-white">訂單管理</a>
+                        <a th:href="@{/backend/product-order/listAllProductOrder}"
+                           class="d-flex align-items-center link-body-emphasis text-white">
+                            <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
+                                <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
+                            </span>
+                            <span class="ms-2">訂單管理</span>
+                        </a>
                     </li>
                     <li>
-                        <a th:href="@{/backend/coupon/list}" class="link-body-emphasis text-white">優惠券管理</a>
+                        <a th:href="@{/backend/coupon/list}"
+                           class="d-flex align-items-center link-body-emphasis text-white">
+                            <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
+                                <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
+                            </span>
+                            <span class="ms-2">優惠券管理</span>
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -447,37 +538,61 @@
         <!-- 接駁管理 -->
         <li class="mb-1">
             <button
-                    class="btn btn-toggle d-flex justify-content-between align-items-center w-100 rounded border-0 text-white"
+                    class="btn btn-toggle d-flex align-items-center w-100 rounded border-0 text-white"
                     data-bs-toggle="collapse"
                     data-bs-target="#dashboard-shuttle"
                     aria-expanded="false"
             >
-                接駁管理
-                <i class="bi bi-chevron-down fs-6"></i>
+                <i class="bi bi-water" style="color: #fff; font-size: 1.3rem;"></i>
+                <span class="ms-2">接駁管理</span>
+                <i class="bi bi-chevron-down ms-auto" style="font-size: 0.9rem;"></i>
             </button>
             <div class="collapse" id="dashboard-shuttle">
-                <ul
-                        class="btn-toggle-nav list-unstyled fw-normal pb-2 ps-4 lh-lg"
-                >
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-2 lh-lg">
                     <li>
                         <a th:href="@{/backend/reservation/list}"
-                           class="link-body-emphasis text-white">接駁預約列表</a>
+                           class="d-flex align-items-center link-body-emphasis text-white">
+                            <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
+                                <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
+                            </span>
+                            <span class="ms-2">接駁預約列表</span>
+                        </a>
                     </li>
                     <li>
                         <a th:href="@{/backend/backshuttlereservationseat/list}"
-                           class="link-body-emphasis text-white">接駁預約座位列表</a>
+                           class="d-flex align-items-center link-body-emphasis text-white">
+                            <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
+                                <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
+                            </span>
+                            <span class="ms-2">接駁預約座位列表</span>
+                        </a>
                     </li>
                     <li>
                         <a th:href="@{/backend/seatavailability/list}"
-                           class="link-body-emphasis text-white">座位狀況列表</a>
+                           class="d-flex align-items-center link-body-emphasis text-white">
+                            <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
+                                <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
+                            </span>
+                            <span class="ms-2">座位狀況列表</span>
+                        </a>
                     </li>
                     <li>
                         <a th:href="@{/backend/backseat/list}"
-                           class="link-body-emphasis text-white">座位列表</a>
+                           class="d-flex align-items-center link-body-emphasis text-white">
+                            <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
+                                <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
+                            </span>
+                            <span class="ms-2">座位列表</span>
+                        </a>
                     </li>
                     <li>
                         <a th:href="@{/backend/shuttle/list}"
-                           class="link-body-emphasis text-white">接駁船時段列表</a>
+                           class="d-flex align-items-center link-body-emphasis text-white">
+                            <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
+                                <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
+                            </span>
+                            <span class="ms-2">接駁船時段列表</span>
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -486,48 +601,68 @@
         <!-- 其他管理 -->
         <li class="mb-1">
             <button
-                    class="btn btn-toggle d-flex justify-content-between align-items-center w-100 rounded border-0 text-white"
+                    class="btn btn-toggle d-flex align-items-center w-100 rounded border-0 text-white"
                     data-bs-toggle="collapse"
                     data-bs-target="#dashboard-home"
                     aria-expanded="false"
             >
-                其他管理
-                <i class="bi bi-chevron-down fs-6"></i>
+                <i class="bi bi-gear" style="color: #fff; font-size: 1.3rem;"></i>
+                <span class="ms-2">其他管理</span>
+                <i class="bi bi-chevron-down ms-auto" style="font-size: 0.9rem;"></i>
             </button>
             <div class="collapse" id="dashboard-home">
-                <ul
-                        class="btn-toggle-nav list-unstyled fw-normal pb-2 ps-4 lh-lg"
-                >
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-2 lh-lg">
                     <li>
                         <a th:href="@{/backend/news/list}"
-                           class="link-body-emphasis text-white">最近消息</a>
+                           class="d-flex align-items-center link-body-emphasis text-white">
+                            <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
+                                <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
+                            </span>
+                            <span class="ms-2">最近消息</span>
+                        </a>
                     </li>
                     <li>
                         <a th:href="@{/backend/feedback/list}"
-                           class="link-body-emphasis text-white">顧客回饋</a>
+                           class="d-flex align-items-center link-body-emphasis text-white">
+                            <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
+                                <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
+                            </span>
+                            <span class="ms-2">顧客回饋</span>
+                        </a>
                     </li>
                     <li>
                         <a th:href="@{/backend/member/list}"
-                           class="link-body-emphasis text-white">會員管理</a>
+                           class="d-flex align-items-center link-body-emphasis text-white">
+                            <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
+                                <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
+                            </span>
+                            <span class="ms-2">會員管理</span>
+                        </a>
                     </li>
                     <li>
                         <a th:href="@{/backend/chat/room/list}"
-                           class="link-body-emphasis text-white">客服管理</a>
+                           class="d-flex align-items-center link-body-emphasis text-white">
+                            <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
+                                <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
+                            </span>
+                            <span class="ms-2">客服管理</span>
+                        </a>
                     </li>
                     <li>
-                        <a th:href="@{/backend/operation-log/list}" class="link-body-emphasis text-white">log檢視</a>
+                        <a th:href="@{/backend/operation-log/list}"
+                           class="d-flex align-items-center link-body-emphasis text-white">
+                            <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
+                                <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
+                            </span>
+                            <span class="ms-2">log檢視</span>
+                        </a>
                     </li>
                 </ul>
             </div>
         </li>
-
-
-
-
     </ul>
 
 
-    
     <!-- 用戶資訊和登出按鈕 -->
     <div class="sidebar-user">
         <div class="d-flex align-items-center mb-3">
@@ -547,15 +682,63 @@
 <!-- Main Content：只留一個 card 作為模板 -->
 
 <th:block th:fragment="mainContent(content)">
-    <main>
-        <div class="content">
-            <div class="card m-2">
-                <div class="container">
-                    <div th:insert="${content}"></div>
+    <div class="content bg-light">
+        <!-- 內建的 Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4 rounded px-2">
+            <div class="container-fluid">
+                <a th:href="@{/backend/dashboard}" class="text-decoration-none ">
+                    <i class="bi bi-house-door me-1"></i>
+                    首頁
+                </a>
+
+                <div class="navbar-nav ms-auto d-flex align-items-center gap-3">
+                    <!-- 員工列表 -->
+                    <a class="nav-link d-flex align-items-center" th:href="@{/backend/employee/list}" title="員工列表">
+<!--                        <i class="bi bi-person-circle me-1"></i>-->
+                        員工列表
+                    </a>
+                    <li class="nav-item divider align-self-center px-1">/</li>
+
+                    <!-- 住房管理 -->
+                    <a class="nav-link d-flex align-items-center" th:href="@{/backend/check-in-out/list}"
+                       title="住房管理">
+<!--                        <i class="fas fa-bed me-1"></i>-->
+                        住房管理
+                    </a>
+                    <li class="nav-item divider align-self-center px-1">/</li>
+
+                    <!-- 訂單管理 -->
+                    <a class="nav-link d-flex align-items-center"
+                       th:href="@{/backend/product-order/listAllProductOrder}" title="訂單管理">
+<!--                        <i class="bi bi-cart-fill me-1"></i>-->
+                        訂單管理
+                    </a>
+                    <li class="nav-item divider align-self-center px-1">/</li>
+
+                    <!-- 接駁列表 -->
+                    <a class="nav-link d-flex align-items-center" th:href="@{/backend/reservation/list}"
+                       title="接駁預約列表">
+<!--                        <i class="fas fa-ship me-1"></i>-->
+                        接駁列表
+                    </a>
+                    <li class="nav-item divider align-self-center px-1">/</li>
+
+                    <!-- 客服管理 -->
+                    <a class="nav-link d-flex align-items-center" th:href="@{/backend/chat/room/list}" title="客服管理">
+<!--                        <i class="bi bi-chat-dots-fill me-1"></i>-->
+                        客服管理
+                    </a>
+                </div>
             </div>
+        </nav>
+
+        <!-- 主要內容卡片 -->
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-body">
+                <div th:insert="${content}"></div>
             </div>
         </div>
-    </main>
+    </div>
 </th:block>
 
 <!-- Scripts Fragment -->

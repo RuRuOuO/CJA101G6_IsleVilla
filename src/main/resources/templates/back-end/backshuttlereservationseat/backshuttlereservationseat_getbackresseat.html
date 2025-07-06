@@ -1,148 +1,123 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
-
 <head>
     <meta charset="UTF-8">
     <title>接駁預約座位查詢 | 後台管理</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
 </head>
-
 <body>
 
-    <!-- 側邊欄 -->
-    <div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
-    <div th:replace="~{fragments/backFragments :: sidebar}"></div>
+<!-- 側邊欄 -->
+<th:block th:replace="~{fragments/backFragments :: mobileSidebar}"></th:block>
+<div th:replace="~{fragments/backFragments :: sidebar}"></div>
 
-    <!-- 主內容 -->
-    <main th:replace="~{fragments/backFragments :: mainContent(~{::content})}">
-        <th:block th:fragment="content">
+<!-- 主內容 -->
+<main th:replace="~{fragments/backFragments :: mainContent(~{::content})}">
+    <th:block th:fragment="content">
 
-            <h1 class="mb-4">🚐 接駁預約座位查詢</h1>
+        <!-- ===== 卡片標題列 ===== -->
+        <div class="card-header bg-transparent border-0 pt-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0 fw-bold">
+                    <i class="bi bi-bus-front me-2"></i>接駁預約座位查詢
+                </h4>
+            </div>
+        </div>
 
-            <!-- 查詢表單 -->
-            <div class="card shadow-sm p-4 mb-3">
-                <form class="row g-3" method="get"
-                    th:action="@{/backend/backshuttlereservationseat/getbackresseat/get}">
-
-                    <!-- 預約編號 -->
-                    <div class="col-12">
-                        <label for="shuttleReservationId" class="form-label">依 預約編號 查詢：</label>
-                        <select class="form-select" id="shuttleReservationId" name="shuttleReservationId"
+        <!-- ===== 查詢表單 ===== -->
+        <div class="card-body">
+            <form class="row g-3 mb-4" method="get" th:action="@{/backend/backshuttlereservationseat/getbackresseat/get}">
+                <div class="col-md-4">
+                    <label for="shuttleReservationId" class="form-label">依 預約編號 查詢：</label>
+                    <select class="form-select" id="shuttleReservationId" name="shuttleReservationId"
                             onchange="handleSelectChange('shuttleReservationId')">
-                            <option value="" th:selected="${selectedShuttleReservationId == null}">
-                                請選擇預約編號
-                            </option>
-                            <option th:each="id : ${reservationIdList != null ? #lists.sort(reservationIdList) : {}}"
+                        <option value="" th:selected="${selectedShuttleReservationId == null}">請選擇預約編號</option>
+                        <option th:each="id : ${reservationIdList != null ? #lists.sort(reservationIdList) : {}}"
                                 th:value="${id}" th:text="'編號: ' + ${id}"
-                                th:selected="${id} == ${selectedShuttleReservationId}">
-                            </option>
-                        </select>
-                    </div>
+                                th:selected="${id} == ${selectedShuttleReservationId}"></option>
+                    </select>
+                </div>
 
-                    <!-- 座位ID -->
-                    <div class="col-12">
-                        <label for="seatId" class="form-label mt-2">依 座位ID 查詢：</label>
-                        <select class="form-select" id="seatId" name="seatId"
+                <div class="col-md-4">
+                    <label for="seatId" class="form-label">依 座位ID 查詢：</label>
+                    <select class="form-select" id="seatId" name="seatId"
                             onchange="handleSelectChange('seatId')">
-                            <option value="" th:selected="${selectedSeatId == null}">
-                                請選擇座位號碼
-                            </option>
-                            <option th:each="sid : ${seatIdList != null ? #lists.sort(seatIdList) : {}}"
+                        <option value="" th:selected="${selectedSeatId == null}">請選擇座位號碼</option>
+                        <option th:each="sid : ${seatIdList != null ? #lists.sort(seatIdList) : {}}"
                                 th:value="${sid}" th:text="'座位ID: ' + ${sid}"
-                                th:selected="${sid} == ${selectedSeatId}">
-                            </option>
-                        </select>
-                    </div>
+                                th:selected="${sid} == ${selectedSeatId}"></option>
+                    </select>
+                </div>
 
-                    <!-- 座位號碼 -->
-                    <div class="col-12">
-                        <label for="seatNumber" class="form-label mt-2">依 座位名稱 查詢：</label>
-                        <select class="form-select" id="seatNumber" name="seatNumber"
+                <div class="col-md-4">
+                    <label for="seatNumber" class="form-label">依 座位名稱 查詢：</label>
+                    <select class="form-select" id="seatNumber" name="seatNumber"
                             onchange="handleSelectChange('seatNumber')">
-                            <option value="" th:selected="${selectedSeatNumber == null}">
-                                請選擇座位名稱
-                            </option>
-                            <option th:each="seat : ${seatNumberList != null ? #lists.sort(seatNumberList) : {}}"
+                        <option value="" th:selected="${selectedSeatNumber == null}">請選擇座位名稱</option>
+                        <option th:each="seat : ${seatNumberList != null ? #lists.sort(seatNumberList) : {}}"
                                 th:value="${seat}" th:text="${seat}"
-                                th:selected="${seat} == ${selectedSeatNumber}">
-                            </option>
-                        </select>
-                    </div>
+                                th:selected="${seat} == ${selectedSeatNumber}"></option>
+                    </select>
+                </div>
 
-                    <!-- 查詢按鈕 -->
-                    <div class="col-12 d-flex gap-2 mt-3">
-                        <button type="submit" class="btn btn-primary">查詢</button>
-                        <a th:href="@{/backend/backshuttlereservationseat/getbackresseat}" class="btn btn-secondary">清除查詢</a>
-                        <a th:href="@{/backend/backshuttlereservationseat/list}" class="btn btn-secondary">返回列表</a>
-                    </div>
-                </form>
+                <div class="col-12 d-flex gap-2 mt-2">
+                    <button type="submit" class="btn btn-primary">查詢</button>
+                    <a th:href="@{/backend/backshuttlereservationseat/getbackresseat}" class="btn btn-secondary">清除查詢</a>
+                    <a th:href="@{/backend/backshuttlereservationseat/list}" class="btn btn-secondary">返回列表</a>
+                </div>
+            </form>
+
+            <!-- ===== 查詢結果表格 ===== -->
+            <div th:if="${shuttleReservationSeatList != null}">
+                <h5 class="fw-bold mb-3">查詢結果：</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>預約編號</th>
+                                <th>座位編號</th>
+                                <th>座位名稱</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="item : ${shuttleReservationSeatList}">
+                                <td th:text="${item.shuttleReservationId}">預約編號</td>
+                                <td th:text="${item.seatId}">座位編號</td>
+                                <td th:text="${item.seat.seatNumber}">座位名稱</td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(shuttleReservationSeatList)}">
+                                <td colspan="3" class="text-center">尚無資料</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <!-- 查詢結果 -->
-            <div class="card shadow-sm p-4 mt-4" th:if="${shuttleReservationSeatList != null}">
-                <h5>查詢結果：</h5>
+        </div>
+    </th:block>
+</main>
 
-<!--                 顯示查詢條件 -->
-<!--                 <p th:if="${selectedShuttleReservationId != null}"> -->
-<!--                     <strong>預約編號：</strong> <span th:text="${selectedShuttleReservationId}"></span> -->
-<!--                 </p> -->
-<!--                 <p th:if="${selectedSeatId != null}"> -->
-<!--                     <strong>座位ID：</strong> <span th:text="${selectedSeatId}"></span> -->
-<!--                 </p> -->
-<!--                 <p th:if="${selectedSeatNumber != null}"> -->
-<!--                     <strong>座位名稱：</strong> <span th:text="${selectedSeatNumber}"></span> -->
-<!--                 </p> -->
+<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
 
-                <!-- 結果表格 -->
-                <table class="table table-bordered table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th>預約編號</th>
-                            <th>座位號碼</th>
-                            <th>座位名稱</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="item : ${shuttleReservationSeatList}">
-                            <td th:text="${item.shuttleReservationId}">預約編號</td>
-                            <td th:text="${item.seatId}">座位號碼</td>
-                            <td th:text="${item.seat.seatNumber}">座位名稱</td>
-                        </tr>
-                        <tr th:if="${#lists.isEmpty(shuttleReservationSeatList)}">
-                            <td colspan="3" class="text-center">尚無資料</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+<!-- ===== 互斥選擇功能 ===== -->
+<script>
+    function handleSelectChange(changedId) {
+        const ids = ["shuttleReservationId", "seatId", "seatNumber"];
+        const changedValue = document.getElementById(changedId).value;
 
-        </th:block>
-    </main>
-
-    <th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
-
-    <!-- 互斥選擇功能 -->
-    <script>
-        function handleSelectChange(changedId) {
-            const ids = ["shuttleReservationId", "seatId", "seatNumber"];
-            const changedValue = document.getElementById(changedId).value;
-
-            ids.forEach(id => {
-                const elem = document.getElementById(id);
-                if (id !== changedId) {
-                    elem.disabled = changedValue !== "";
-                }
-            });
-
-            // 如果清空選擇，全部解鎖
-            if (changedValue === "") {
-                ids.forEach(id => {
-                    document.getElementById(id).disabled = false;
-                });
+        ids.forEach(id => {
+            const elem = document.getElementById(id);
+            if (id !== changedId) {
+                elem.disabled = changedValue !== "";
             }
+        });
+
+        if (changedValue === "") {
+            ids.forEach(id => document.getElementById(id).disabled = false);
         }
-    </script>
+    }
+</script>
 
 </body>
-
 </html>
