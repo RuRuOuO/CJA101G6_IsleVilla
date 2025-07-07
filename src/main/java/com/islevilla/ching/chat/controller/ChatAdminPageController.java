@@ -58,6 +58,7 @@ public class ChatAdminPageController {
 
 		model.addAttribute("rooms", rooms);
 		model.addAttribute("employeeName", employee.getEmployeeName());
+		model.addAttribute("sidebarActive", "chat-list");
 
 		return "back-end/chat/chatroomlist";
 	}

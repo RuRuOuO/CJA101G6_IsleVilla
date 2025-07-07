@@ -43,6 +43,7 @@ public class BackShuttleReservationSeatController {
 
 	    model.addAttribute("groupedSeatMap", seatNumberMap); 
 	    model.addAttribute("seatNameMap", dateMap);   
+	    model.addAttribute("sidebarActive", "backshuttlereservationseat-list");
 
 	    return "back-end/backshuttlereservationseat/backshuttlereservationseat_list";
 	}
