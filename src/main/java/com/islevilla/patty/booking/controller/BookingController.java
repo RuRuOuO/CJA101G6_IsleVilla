@@ -156,7 +156,12 @@ public class BookingController {
                     hasAvailableRooms = false; // 預設為無空房
                 }
                 
-                System.out.println("房型 " + roomType.getRoomTypeName() + " 有 " + promotions.size() + " 個有效優惠專案，空房狀態: " + (hasAvailableRooms ? "有空房" : "無空房"));
+                System.out.println("房型 " + roomType.getRoomTypeName() + " 有 " + promotions.size() + " 個有效優惠專案");
+                if (!promotions.isEmpty()) {
+                    for (RoomPromotionPrice p : promotions) {
+                        System.out.println("  promotionId=" + p.getPromotion().getRoomPromotionId() + " title=" + p.getPromotion().getRoomPromotionTitle());
+                    }
+                }
                 
                 RoomTypeWithPromotions rtp = new RoomTypeWithPromotions(roomType, promotions, hasAvailableRooms, firstPhotoId);
                 rtp.setPhotoIds(photoIds); // 設定所有圖片ID

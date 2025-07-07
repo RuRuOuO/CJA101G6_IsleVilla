@@ -25,12 +25,20 @@ public interface RoomPromotionPriceRepository extends JpaRepository<RoomPromotio
 //	@Query(value = "from Promotion where roomPromotionId=?1 and roomPromotionTitle like?2 and promotionStartDate=?3 and promotionEndDate=?4 order by roomPromotionId")
 //	List<Promotion> findByOthers(int roompromotionId , String roompromotionTitle , java.sql.Date promotionStartDate, java.sql.Date promotionEndDate);
 
-	@Query("SELECT r FROM RoomPromotionPrice r WHERE r.roomType.roomTypeId = :roomTypeId AND r.promotionStartDate <= :checkin AND r.promotionEndDate >= :checkin")
-	List<RoomPromotionPrice> findAllValidPromotionPrices(@Param("roomTypeId") Integer roomTypeId, @Param("checkin") java.time.LocalDate checkin);
+	// @Query("SELECT r FROM RoomPromotionPrice r WHERE r.roomType.roomTypeId = :roomTypeId AND r.promotionStartDate <= :checkin AND r.promotionEndDate >= :checkin")
+	// List<RoomPromotionPrice> findAllValidPromotionPrices(@Param("roomTypeId") Integer roomTypeId, @Param("checkin") java.time.LocalDate checkin);
 
 	@Query("SELECT rpp FROM RoomPromotionPrice rpp JOIN FETCH rpp.roomType JOIN FETCH rpp.promotion")
 	List<RoomPromotionPrice> findAllWithRoomTypeAndPromotion();
 	
 	@Query("SELECT rpp FROM RoomPromotionPrice rpp JOIN FETCH rpp.roomType JOIN FETCH rpp.promotion")
 	List<RoomPromotionPrice> findAllWithJoins();
+
+	@Query("SELECT r FROM RoomPromotionPrice r " +
+	       "JOIN FETCH r.roomType " +
+	       "JOIN FETCH r.promotion " +
+	       "WHERE r.roomType.roomTypeId = :roomTypeId " +
+	       "AND r.promotion.promotionStartDate <= :checkin " +
+	       "AND r.promotion.promotionEndDate >= :checkin")
+	List<RoomPromotionPrice> findAllValidPromotionPrices(@Param("roomTypeId") Integer roomTypeId, @Param("checkin") java.time.LocalDate checkin);
 }
