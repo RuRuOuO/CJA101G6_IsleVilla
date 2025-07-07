@@ -537,14 +537,14 @@
                     class="btn btn-toggle d-flex align-items-center w-100 rounded border-0 text-white"
                     data-bs-toggle="collapse"
                     data-bs-target="#dashboard-product"
-                    th:aria-expanded="${sidebarActive == 'product-list' or sidebarActive == 'product-category-list' or sidebarActive == 'product-order-list' or sidebarActive == 'coupon_list'}"
+                    th:aria-expanded="${sidebarActive == 'product-list' or sidebarActive == 'product-category-list' or sidebarActive == 'product-order-list' or sidebarActive == 'coupon-list'}"
             >
                 <i class="bi bi-bag-fill" style="color: #fff; font-size: 1.3rem;"></i>
                 <span class="ms-2">購物管理</span>
                 <i class="bi bi-chevron-down ms-auto" style="font-size: 0.9rem;"></i>
             </button>
             <div class="collapse" id="dashboard-product"
-                th:block th:classappend="${sidebarActive == 'product-list' or sidebarActive == 'product-category-list' or sidebarActive == 'product-order-list' or sidebarActive == 'coupon_list'} ? ' show'">
+                th:classappend="${sidebarActive == 'product-list' or sidebarActive == 'product-category-list' or sidebarActive == 'product-order-list' or sidebarActive == 'coupon-list'} ? ' show'">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 lh-lg">
                     <li>
                         <a th:href="@{/backend/product/list}"
@@ -742,55 +742,6 @@
 
 <th:block th:fragment="mainContent(content)">
     <div class="content bg-light">
-        <!-- 內建的 Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4 rounded px-2">
-            <div class="container-fluid">
-                <a th:href="@{/backend/dashboard}" class="text-decoration-none ">
-                    <i class="bi bi-house-door me-1"></i>
-                    首頁
-                </a>
-
-                <div class="navbar-nav ms-auto d-flex align-items-center gap-3">
-                    <!-- 員工列表 -->
-                    <a class="nav-link d-flex align-items-center" th:href="@{/backend/employee/list}" title="員工列表">
-<!--                        <i class="bi bi-person-circle me-1"></i>-->
-                        員工列表
-                    </a>
-                    <li class="nav-item divider align-self-center px-1">/</li>
-
-                    <!-- 住房管理 -->
-                    <a class="nav-link d-flex align-items-center" th:href="@{/backend/check-in-out/list}"
-                       title="住房管理">
-<!--                        <i class="fas fa-bed me-1"></i>-->
-                        住房管理
-                    </a>
-                    <li class="nav-item divider align-self-center px-1">/</li>
-
-                    <!-- 訂單管理 -->
-                    <a class="nav-link d-flex align-items-center"
-                       th:href="@{/backend/product-order/listAllProductOrder}" title="訂單管理">
-<!--                        <i class="bi bi-cart-fill me-1"></i>-->
-                        訂單管理
-                    </a>
-                    <li class="nav-item divider align-self-center px-1">/</li>
-
-                    <!-- 接駁列表 -->
-                    <a class="nav-link d-flex align-items-center" th:href="@{/backend/reservation/list}"
-                       title="接駁預約列表">
-<!--                        <i class="fas fa-ship me-1"></i>-->
-                        接駁列表
-                    </a>
-                    <li class="nav-item divider align-self-center px-1">/</li>
-
-                    <!-- 客服管理 -->
-                    <a class="nav-link d-flex align-items-center" th:href="@{/backend/chat/room/list}" title="客服管理">
-<!--                        <i class="bi bi-chat-dots-fill me-1"></i>-->
-                        客服管理
-                    </a>
-                </div>
-            </div>
-        </nav>
-
         <!-- 主要內容卡片 -->
         <div class="card shadow-sm border-0 rounded-3">
             <div class="card-body">
@@ -802,17 +753,7 @@
 
 <!-- Scripts Fragment -->
 <th:block th:fragment="scripts">
-    <!-- jQuery 3.6.0 -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
-    <!-- Bootstrap 5 JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- DataTables JavaScript -->
-    <script src="https://cdn.datatables.net/v/bs5/dt-1.13.4/datatables.min.js"></script>
-    
-    <!-- Font Awesome (替換為 CDN 版本) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+
 </th:block>
 </body>
 </html>
