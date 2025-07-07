@@ -46,6 +46,10 @@ public class CouponService {
     public List<Coupon> findByCouponCodeContaining(String keyword) {
         return couponRepository.findByCouponCodeContaining(keyword);
     }
+
+    public List<Coupon> findByCouponStatus(Byte couponStatus) {
+        return couponRepository.findByCouponStatus(couponStatus);
+    }
 }
 
 

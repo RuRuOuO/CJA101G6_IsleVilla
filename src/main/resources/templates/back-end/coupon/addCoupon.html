@@ -37,7 +37,14 @@
 
             <!-- <input type="date" class="form-control" id="endDate"
                    th:field="*{endDate}" th:value="${endDateStr}" required> -->
-        <!-- </div>
+        </div>
+        <div class="form-group">
+            <label for="couponStatus">狀態</label>
+            <select class="form-control" id="couponStatus" th:field="*{couponStatus}" required>
+                <option th:value="1">可使用</option>
+                <option th:value="0">已停用</option>
+            </select>
+        </div>
         <button type="submit" class="btn btn-success">新增</button>
         <a href="/backend/coupon/list" class="btn btn-secondary">返回列表</a>
     </form>

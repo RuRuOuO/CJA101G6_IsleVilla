@@ -24,7 +24,6 @@ public class CouponController {
     public String listAllCoupons(
             // 查詢條件
             @RequestParam(required = false) String couponCode,
-            @RequestParam(required = false) Integer minSpend,
             // 排序參數
             @RequestParam(required = false, defaultValue = "couponId") String sortBy,
             @RequestParam(required = false, defaultValue = "asc") String sortOrder,
@@ -33,14 +32,12 @@ public class CouponController {
         
         if (couponCode != null && !couponCode.isEmpty()) {
             couponList = couponService.findByCouponCodeContaining(couponCode);
-        } else if (minSpend != null) {
-            couponList = couponService.findByMinSpend(minSpend);
         } else {
             couponList = couponService.getAll();
         }
         
-        // 排序處理
-        if ("desc".equalsIgnoreCase(sortOrder)) {
+        // 排序處理 sortOrder決定是升冪或降冪，sortBy決定是哪個欄位
+        if ("desc".equalsIgnoreCase(sortOrder)) { // 降冪
             switch (sortBy) {
                 case "couponCode":
                     couponList.sort((c1, c2) -> c2.getCouponCode().compareTo(c1.getCouponCode()));
@@ -62,7 +59,7 @@ public class CouponController {
                     break;
             }
         } else {
-            switch (sortBy) {
+            switch (sortBy) { // 升冪
                 case "couponCode":
                     couponList.sort((c1, c2) -> c1.getCouponCode().compareTo(c2.getCouponCode()));
                     break;
@@ -84,7 +81,7 @@ public class CouponController {
             }
         }
         
-        // 日期格式化
+        // 日期格式化成字串，把所有要顯示在前端頁面的資料放進 model，最後回傳到優惠券列表頁面。
         java.time.format.DateTimeFormatter dtf = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd");
         java.util.Map<Integer, String> startDateMap = new java.util.HashMap<>();
         java.util.Map<Integer, String> endDateMap = new java.util.HashMap<>();
@@ -92,6 +89,7 @@ public class CouponController {
             startDateMap.put(c.getCouponId(), c.getStartDate() != null ? c.getStartDate().format(dtf) : "");
             endDateMap.put(c.getCouponId(), c.getEndDate() != null ? c.getEndDate().format(dtf) : "");
         }
+        model.addAttribute("sidebarActive", "coupon-list");
         model.addAttribute("couponListData", couponList);
         model.addAttribute("startDateMap", startDateMap);
         model.addAttribute("endDateMap", endDateMap);
@@ -101,11 +99,11 @@ public class CouponController {
         return "back-end/coupon/listAllCoupon";
     }
 
-    // 顯示查詢頁面
-    @GetMapping("/select_page")
-    public String showSelectPage() {
-        return "back-end/coupon/select_page";
-    }
+//     // 顯示查詢頁面
+//     @GetMapping("/select_page")
+//     public String showSelectPage() {
+//         return "back-end/coupon/select_page";
+//     }
 
     // 更新優惠券
     @PostMapping("/update")
@@ -163,6 +161,7 @@ public class CouponController {
         dbCoupon.setMinSpend(coupon.getMinSpend());
         dbCoupon.setStartDate(coupon.getStartDate());
         dbCoupon.setEndDate(coupon.getEndDate());
+        dbCoupon.setCouponStatus(coupon.getCouponStatus());
         couponService.save(dbCoupon);
         
         return "redirect:/backend/coupon/list";
@@ -175,15 +174,15 @@ public class CouponController {
         return "redirect:/backend/coupon/list";
     }
 
-    // 顯示新增優惠券頁面
-    @GetMapping("/add")
-    public String showAddCouponPage(Model model) {
-        Coupon coupon = new Coupon();
-        coupon.setStartDate(java.time.LocalDate.now());
-        model.addAttribute("coupon", coupon);
-        model.addAttribute("startDateStr", coupon.getStartDate().toString());
-        return "back-end/coupon/addCoupon";
-    }
+    // // 顯示新增優惠券頁面
+    // @GetMapping("/add")
+    // public String showAddCouponPage(Model model) {
+    //     Coupon coupon = new Coupon();
+    //     coupon.setStartDate(java.time.LocalDate.now());
+    //     model.addAttribute("coupon", coupon);
+    //     model.addAttribute("startDateStr", coupon.getStartDate().toString());
+    //     return "back-end/coupon/addCoupon";
+    // }
 
     // 處理新增優惠券表單
     @PostMapping("/add")
