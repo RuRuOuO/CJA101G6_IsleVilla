@@ -68,26 +68,26 @@ public interface RoomRVOrderRepository extends JpaRepository<RoomRVOrder, Intege
             @Param("status") Integer status
     );
     
-// ==================== 給 RoomTypeAvailability 庫存計算相關查詢 ====================
-    
-    /*
-     * 查詢特定日期有效的訂單 (該日期在入住和退房日期之間)
-     * 訂單狀態：0=已確認, 1=已入住, 2=已退房 (排除已取消等狀態)
-     */
-    @Query("SELECT rro FROM RoomRVOrder rro WHERE " +
-           "rro.checkInDate <= :targetDate AND rro.checkOutDate > :targetDate " +
-           "AND rro.roomOrderStatus IN (0, 1, 2)")
-    List<RoomRVOrder> findActiveOrdersOnDate(@Param("targetDate") LocalDate targetDate);
-    
-    //查詢特定日期範圍內有效的訂單
-    @Query("SELECT rro FROM RoomRVOrder rro WHERE " +
-           "NOT (rro.checkOutDate <= :startDate OR rro.checkInDate >= :endDate) " +
-           "AND rro.roomOrderStatus IN (0, 1, 2)")
-    List<RoomRVOrder> findActiveOrdersInDateRange(
-        @Param("startDate") LocalDate startDate, 
-        @Param("endDate") LocalDate endDate
-    );
-    
+//// ==================== 給 RoomTypeAvailability 庫存計算相關查詢 ====================
+//    
+//    /*
+//     * 查詢特定日期有效的訂單 (該日期在入住和退房日期之間)
+//     * 訂單狀態：0=已確認, 1=已入住, 2=已退房 (排除已取消等狀態)
+//     */
+//    @Query("SELECT rro FROM RoomRVOrder rro WHERE " +
+//           "rro.checkInDate <= :targetDate AND rro.checkOutDate > :targetDate " +
+//           "AND rro.roomOrderStatus IN (0, 1, 2)")
+//    List<RoomRVOrder> findActiveOrdersOnDate(@Param("targetDate") LocalDate targetDate);
+//    
+//    //查詢特定日期範圍內有效的訂單
+//    @Query("SELECT rro FROM RoomRVOrder rro WHERE " +
+//           "NOT (rro.checkOutDate <= :startDate OR rro.checkInDate >= :endDate) " +
+//           "AND rro.roomOrderStatus IN (0, 1, 2)")
+//    List<RoomRVOrder> findActiveOrdersInDateRange(
+//        @Param("startDate") LocalDate startDate, 
+//        @Param("endDate") LocalDate endDate
+//    );
+//    
     //查詢特定房型在特定日期的有效訂單數量
     @Query("SELECT COUNT(rrd) FROM RoomRVOrder rro " +
            "JOIN rro.roomRVDetails rrd " +
