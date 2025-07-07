@@ -35,10 +35,10 @@ public class ProductController {
     public String homeProduct(Model model) {
         // 只查詢上架商品
         List<Product> products = productService.getProductByStatus((byte)1);
-        // 創建一個用來封裝產品資料和圖片 URL 的 DTO 列表
+        // 僅顯示庫存大於0的商品
         List<ProductWithImageDTO> productWithImageDTOs = new ArrayList<>();
-        // 查詢每個產品的第一張圖片並設置給產品資料
         for (Product product : products) {
+            if (product.getProductQuantity() == null || product.getProductQuantity() <= 0) continue;
             // 根據 productId 查詢該產品的第一張圖片
             ProductPhoto mainProductPhoto = productPhotoService.getMainProductPhotoByProductId(product.getProductId());
             String productImageUrl = "https://dummyimage.com/300x200/";  // 預設圖片 URL
@@ -58,7 +58,6 @@ public class ProductController {
             // 加入到 DTO 列表中
             productWithImageDTOs.add(productWithImageDTO);
         }
-
         // 將產品和產品類別資料添加到模型中
         model.addAttribute("product", productWithImageDTOs);
         model.addAttribute("category", productCategoryService.getAllProductCategory());
@@ -87,8 +86,10 @@ public class ProductController {
         } else {
             productPage = productService.getProductByStatus((byte)1, pageable);
         }
+        // 僅顯示庫存大於0的商品
         List<ProductWithImageDTO> productWithImageDTOs = new ArrayList<>();
         for (Product product : productPage.getContent()) {
+            if (product.getProductQuantity() == null || product.getProductQuantity() <= 0) continue;
             ProductPhoto mainProductPhoto = productPhotoService.getMainProductPhotoByProductId(product.getProductId());
             String productImageUrl = "https://dummyimage.com/300x200/";
             if (mainProductPhoto != null) {
