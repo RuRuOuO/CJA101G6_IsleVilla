@@ -36,145 +36,135 @@ const chatStatus = /*[[${room.chatStatus}]]*/;
 </script>
 
 	<script>
-const input = document.getElementById("msg");
-const banner = document.getElementById("status-banner");
+		const input = document.getElementById("msg");
+		const banner = document.getElementById("status-banner");
 
-// 建立 WebSocket
-const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/chat?roomId=${roomId}`);
+		// 建立 WebSocket
+		const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/chat?roomId=${roomId}`);
+		
+		ws.onopen = () => {
+		    console.log(" WebSocket 已連線聊天室", roomId);
 
-ws.onopen = () => {
-    console.log(" WebSocket 已連線聊天室", roomId);
-//     if (chatStatus === 2) {
-//         disableInput(" 此聊天室已結束，無法傳送訊息");
-//     }
-if (chatStatus === 2) {
-    banner.textContent = "此聊天室已結案，請注意後續未讀訊息";
-    banner.style.color = "red";
-}
-};
+	    if (chatStatus === 2) {
+	    banner.textContent = "此聊天室已結案，請注意後續未讀訊息";
+	    banner.style.color = "red";
+		}
+		};
+	
+		ws.onclose = () => {
+		    console.log(" WebSocket 已關閉");
+		    disableInput(" 聯線已中斷");
+		};
+		
+		ws.onerror = (err) => {
+		    console.error(" WebSocket 錯誤", err);
+		    disableInput(" 發生錯誤，請重試");
+		};
+		
+		ws.onmessage = event => {
+		    const msg = JSON.parse(event.data);
+		    const isMe = (msg.senderId === senderId) && (msg.senderType === senderType);
+		    const displayName = msg.senderType === 1 ? 'IsleVilla 客服' : msg.senderName;
+		    renderMessage(isMe, displayName, msg.messageContent, msg.messageTime);
+		};
 
-ws.onclose = () => {
-    console.log(" WebSocket 已關閉");
-    disableInput(" 聯線已中斷");
-};
+		// 拉取歷史訊息
+		window.onload = () => {
+			fetch(`/api/chat/room/${roomId}/history`)
+		    .then(res => res.json())
+		    .then(history => {
+		        history.forEach(msg => {
+		            const isMe = (msg.senderId === senderId) && (msg.senderType === senderType);
+		            const displayName = msg.senderType === 1 ? 'IsleVilla 客服' : msg.senderName;
+		            renderMessage(isMe, displayName, msg.messageContent, msg.messageTime);
+		        });
+		    });
+		};
 
-ws.onerror = (err) => {
-    console.error(" WebSocket 錯誤", err);
-    disableInput(" 發生錯誤，請重試");
-};
+		// 發送訊息
+		function sendMessage() {
+		    if (chatStatus === 2) {
+		        alert(" 此聊天室已結案，請注意後續未讀訊息");
+		    }
+		
+		    const content = input.value.trim();
+		    if (!content) return;
+		
+		    const data = {
+		        chatRoomId: roomId,
+		        senderType: senderType,
+		        senderId: senderId,
+		        senderName: senderName,
+		        messageContent: content
+		    };
+		
+		    ws.send(JSON.stringify(data));
+		    input.value = "";
+		    console.log("發送訊息", data);
+		}
 
-ws.onmessage = event => {
-    const msg = JSON.parse(event.data);
-    const isMe = (msg.senderId === senderId) && (msg.senderType === senderType);
-    const displayName = msg.senderType === 1 ? 'IsleVilla 客服' : msg.senderName;
-    renderMessage(isMe, displayName, msg.messageContent, msg.messageTime);
-};
-
-// 拉取歷史訊息
-window.onload = () => {
-	fetch(`/api/chat/room/${roomId}/history`)
-    .then(res => res.json())
-    .then(history => {
-        history.forEach(msg => {
-            const isMe = (msg.senderId === senderId) && (msg.senderType === senderType);
-            const displayName = msg.senderType === 1 ? 'IsleVilla 客服' : msg.senderName;
-            renderMessage(isMe, displayName, msg.messageContent, msg.messageTime);
-        });
-    });
-};
-
-// 發送訊息
-function sendMessage() {
-    if (chatStatus === 2) {
-        alert(" 此聊天室已結案，請注意後續未讀訊息");
-    }
-
-    const content = input.value.trim();
-    if (!content) return;
-
-    const data = {
-        chatRoomId: roomId,
-        senderType: senderType,
-        senderId: senderId,
-        senderName: senderName,
-        messageContent: content
-    };
-
-    ws.send(JSON.stringify(data));
-    input.value = "";
-    console.log("發送訊息", data);
-}
-
-// 演繹訊息
-function renderMessage(isMe, sender, content, timeMillis) {
-  const div = document.createElement("div");
-  div.className = "msg " + (isMe ? "right" : "left");
-
-  const bubble = document.createElement("div");
-  bubble.className = "bubble";
-
-  const nameSpan = document.createElement("span");
-  nameSpan.className = "name";
-  nameSpan.textContent = sender;
-
-  const contentSpan = document.createElement("span");
-  contentSpan.className = "content";
-  contentSpan.textContent = content;
-
-  const timeSpan = document.createElement("span");
-  timeSpan.className = "time";
-  timeSpan.textContent = formatTime(timeMillis ?? Date.now());
-
-  bubble.append(nameSpan, contentSpan, timeSpan);
-  div.appendChild(bubble);
-
-  const chat = document.getElementById("chat");
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
-}
-
-// 格式化時間
-function formatTime(timestamp) {
-    const date = new Date(timestamp);
-    const hh = date.getHours().toString().padStart(2, '0');
-    const mm = date.getMinutes().toString().padStart(2, '0');
-    return `${hh}:${mm}`;
-}
-
-// 返回聊天室列表 並清除未讀紀錄
-function gochatlist() {
-    fetch(`/api/chat/room/${roomId}/unread/employee/clear`, {
-        method: 'POST'
-    })
-    .then(res => res.json())
-    .then(data => {
-        console.log("已清除客服未讀訊息", data);
-        // 清除完再導回聊天室列表
-        window.location.href = "/backend/chat/room/list";
-    })
-    .catch(err => {
-        console.error("清除未讀訊息失敗", err);
-        // 出錯也照樣導頁，不影響體驗
-        window.location.href = "/backend/chat/room/list";
-    });
-}
-
-// Enter發送
-function handleKey(event) {
-    if (event.key === "Enter") {
-        event.preventDefault();
-        sendMessage();
-    }
-}
-
-// 停用輸入框
-function disableInput(message) {
-    input.disabled = true;
-    document.querySelector("button").disabled = true;
-    banner.textContent = message;
-}
-
-
+		// 演繹訊息
+		function renderMessage(isMe, sender, content, timeMillis) {
+		  const div = document.createElement("div");
+		  div.className = "msg " + (isMe ? "right" : "left");
+		
+		  const bubble = document.createElement("div");
+		  bubble.className = "bubble";
+		
+		  const nameSpan = document.createElement("span");
+		  nameSpan.className = "name";
+		  nameSpan.textContent = sender;
+		
+		  const contentSpan = document.createElement("span");
+		  contentSpan.className = "content";
+		  contentSpan.textContent = content;
+		
+		  const timeSpan = document.createElement("span");
+		  timeSpan.className = "time";
+		  timeSpan.textContent = formatTime(timeMillis ?? Date.now());
+		
+		  bubble.append(nameSpan, contentSpan, timeSpan);
+		  div.appendChild(bubble);
+		
+		  const chat = document.getElementById("chat");
+		  chat.appendChild(div);
+		  chat.scrollTop = chat.scrollHeight;
+		}
+		
+		// 格式化時間
+		function formatTime(timestamp) {
+		    const date = new Date(timestamp);
+		    const hh = date.getHours().toString().padStart(2, '0');
+		    const mm = date.getMinutes().toString().padStart(2, '0');
+		    return `${hh}:${mm}`;
+		}
+		
+		// 返回聊天室列表 並清除未讀紀錄
+		function gochatlist() {
+		    fetch(`/api/chat/room/${roomId}/unread/employee/clear`, {
+		        method: 'POST'
+		    })
+		    .then(res => res.json())
+		    .then(data => {
+		        console.log("已清除客服未讀訊息", data);
+		        // 清除完再導回聊天室列表
+		        window.location.href = "/backend/chat/room/list";
+		    })
+		    .catch(err => {
+		        console.error("清除未讀訊息失敗", err);
+		        // 出錯也照樣導頁，不影響體驗
+		        window.location.href = "/backend/chat/room/list";
+		    });
+		}
+		
+		// 綁定Enter發送
+		function handleKey(event) {
+		    if (event.key === "Enter") {
+		        event.preventDefault();
+		        sendMessage();
+		    }
+		}
+		
 </script>
 
 </body>

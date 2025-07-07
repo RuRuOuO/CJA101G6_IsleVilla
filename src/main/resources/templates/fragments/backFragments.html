@@ -301,7 +301,8 @@
                             <li><a th:href="@{/backend/room/selectRoomPage}">房間管理</a></li>
                             <li><a th:href="@{/backend/roomType/listRoomType}">房型管理</a></li>
                             <li><a th:href="@{/backend/roomTypeAvailability/list}">房型庫存管理</a></li>
-
+                            <li><a th:href="@{backend/promotion/listAll}">優惠專案管理</a></li>
+                            <li><a th:href="@{roompromotionprice/listAll}">優惠專案價格管理</a></li>
                         </ul>
                     </div>
                 </li>
@@ -404,19 +405,20 @@
                     class="btn btn-toggle d-flex align-items-center w-100 rounded border-0 text-white"
                     data-bs-toggle="collapse"
                     data-bs-target="#dashboard-employee"
-                    th:aria-expanded="${sidebarActive == 'employee-list' or sidebarActive == 'department-list'}"
+                    th:aria-expanded="${sidebarActive == 'employee-list' or sidebarActive == 'department-list' or sidebarActive == 'log-list'}"
             >
                 <i class="bi bi-person-circle" style="color: #fff; font-size: 1.3rem;"></i>
                 <span class="ms-2">員工管理</span>
                 <i class="bi bi-chevron-down ms-auto" style="font-size: 0.9rem;"></i>
             </button>
             <div class="collapse" id="dashboard-employee"
-                 th:classappend="${sidebarActive == 'employee-list' or sidebarActive == 'department-list'} ? ' show'">
+                 th:classappend="${sidebarActive == 'employee-list' or sidebarActive == 'department-list' or sidebarActive == 'log-list'} ? ' show'">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-2 lh-lg">
                     <li>
                         <a th:href="@{/backend/employee/list}"
                            class="d-flex align-items-center link-body-emphasis text-white"
-                           th:classappend="${sidebarActive == 'employee-list'} ? ' sidebar-active'">
+                           th:classappend="${sidebarActive == 'employee-list'} ? ' sidebar-active'"
+                           th:attr="data-debug=${sidebarActive}">
 
                             <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
                                 <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
@@ -436,7 +438,8 @@
                     </li>
                     <li>
                         <a th:href="@{/backend/operation-log/list}"
-                           class="d-flex align-items-center link-body-emphasis text-white">
+                           class="d-flex align-items-center link-body-emphasis text-white"
+                           th:classappend="${sidebarActive == 'log-list'} ? ' sidebar-active'">
                             <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
                                 <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
                             </span>
@@ -453,17 +456,18 @@
                     class="btn btn-toggle d-flex align-items-center w-100 rounded border-0 text-white"
                     data-bs-toggle="collapse"
                     data-bs-target="#dashboard-room"
-                    aria-expanded="false"
-            >
+                    th:aria-expanded="${sidebarActive == 'check-in-out-list' or sidebarActive == 'selectRoomPage-list' or sidebarActive == 'listRoomType-list' or sidebarActive == 'roomTypeAvailability-list' or sidebarActive == 'promotion-list' or sidebarActive == 'roompromotionprice-list'}">
                 <i class="bi bi-house-fill" style="color: #fff; font-size: 1.3rem;"></i>
                 <span class="ms-2">住房管理</span>
                 <i class="bi bi-chevron-down ms-auto" style="font-size: 0.9rem;"></i>
             </button>
-            <div class="collapse" id="dashboard-room">
+            <div class="collapse" id="dashboard-room"
+                    th:classappend="${sidebarActive == 'check-in-out-list' or sidebarActive == 'selectRoomPage-list' or sidebarActive == 'listRoomType-list' or sidebarActive == 'roomTypeAvailability-list' or sidebarActive == 'promotion-list' or sidebarActive == 'roompromotionprice-list'} ? ' show'">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-2 lh-lg">
                     <li>
                         <a th:href="@{/backend/check-in-out/list}"
-                           class="d-flex align-items-center link-body-emphasis text-white">
+                           class="d-flex align-items-center link-body-emphasis text-white"
+                           th:classappend="${sidebarActive == 'check-in-out-list'} ? ' sidebar-active'">
                             <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
                                 <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
                             </span>
@@ -472,7 +476,8 @@
                     </li>
                     <li>
                         <a th:href="@{/backend/room/selectRoomPage}"
-                           class="d-flex align-items-center link-body-emphasis text-white">
+                           class="d-flex align-items-center link-body-emphasis text-white"
+                           th:classappend="${sidebarActive == 'selectRoomPage-list'} ? ' sidebar-active'">
                             <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
                                 <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
                             </span>
@@ -481,7 +486,8 @@
                     </li>
                     <li>
                         <a th:href="@{/backend/roomType/listRoomType}"
-                           class="d-flex align-items-center link-body-emphasis text-white">
+                           class="d-flex align-items-center link-body-emphasis text-white"
+                           th:classappend="${sidebarActive == 'listRoomType-list'} ? ' sidebar-active'">
                             <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
                                 <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
                             </span>
@@ -490,13 +496,37 @@
                     </li>
                     <li>
                         <a th:href="@{/backend/roomTypeAvailability/list}"
-                           class="d-flex align-items-center link-body-emphasis text-white">
+                           class="d-flex align-items-center link-body-emphasis text-white"
+                           th:classappend="${sidebarActive == 'roomTypeAvailability-list'} ? ' sidebar-active'">
                             <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
                                 <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
                             </span>
                             <span class="ms-2">房型庫存管理</span>
                         </a>
                     </li>
+
+                    <li>
+                        <a th:href="@{/backend/promotion/listAll}"
+                           class="d-flex align-items-center link-body-emphasis text-white"
+                           th:classappend="${sidebarActive == 'promotion-list'} ? ' sidebar-active'">
+                            <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
+                                <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
+                            </span>
+                            <span class="ms-2">優惠專案管理</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a th:href="@{/backend/roompromotionprice/listAll}"
+                           class="d-flex align-items-center link-body-emphasis text-white"
+                           th:classappend="${sidebarActive == 'roompromotionprice-list'} ? ' sidebar-active'">
+                            <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
+                                <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
+                            </span>
+                            <span class="ms-2">優惠專案價格管理</span>
+                        </a>
+                    </li>
+
                 </ul>
             </div>
         </li>
@@ -507,17 +537,20 @@
                     class="btn btn-toggle d-flex align-items-center w-100 rounded border-0 text-white"
                     data-bs-toggle="collapse"
                     data-bs-target="#dashboard-product"
-                    aria-expanded="false"
+                    th:aria-expanded="${sidebarActive == 'product-list' or sidebarActive == 'product-category-list' or sidebarActive == 'product-order-list' or sidebarActive == 'coupon_list'}"
             >
                 <i class="bi bi-bag-fill" style="color: #fff; font-size: 1.3rem;"></i>
                 <span class="ms-2">購物管理</span>
                 <i class="bi bi-chevron-down ms-auto" style="font-size: 0.9rem;"></i>
             </button>
-            <div class="collapse" id="dashboard-product">
+            <div class="collapse" id="dashboard-product"
+                th:block th:classappend="${sidebarActive == 'product-list' or sidebarActive == 'product-category-list' or sidebarActive == 'product-order-list' or sidebarActive == 'coupon_list'} ? ' show'">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 lh-lg">
                     <li>
                         <a th:href="@{/backend/product/list}"
-                           class="d-flex align-items-center link-body-emphasis text-white">
+                           class="d-flex align-items-center link-body-emphasis text-white"
+                           th:classappend="${sidebarActive == 'product-list'} ? ' sidebar-active'">
+
                             <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
                                 <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
                             </span>
@@ -526,7 +559,8 @@
                     </li>
                     <li>
                         <a th:href="@{/backend/product/category/list}"
-                           class="d-flex align-items-center link-body-emphasis text-white">
+                           class="d-flex align-items-center link-body-emphasis text-white"
+                           th:classappend="${sidebarActive == 'product-category-list'} ? ' sidebar-active'">
                             <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
                                 <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
                             </span>
@@ -535,7 +569,8 @@
                     </li>
                     <li>
                         <a th:href="@{/backend/product-order/listAllProductOrder}"
-                           class="d-flex align-items-center link-body-emphasis text-white">
+                           class="d-flex align-items-center link-body-emphasis text-white"
+                           th:classappend="${sidebarActive == 'product-order-list'} ? ' sidebar-active'">
                             <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
                                 <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
                             </span>
@@ -544,7 +579,8 @@
                     </li>
                     <li>
                         <a th:href="@{/backend/coupon/list}"
-                           class="d-flex align-items-center link-body-emphasis text-white">
+                           class="d-flex align-items-center link-body-emphasis text-white"
+                           th:classappend="${sidebarActive == 'coupon-list'} ? ' sidebar-active'">
                             <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
                                 <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
                             </span>
@@ -561,17 +597,19 @@
                     class="btn btn-toggle d-flex align-items-center w-100 rounded border-0 text-white"
                     data-bs-toggle="collapse"
                     data-bs-target="#dashboard-shuttle"
-                    aria-expanded="false"
+                    th:aria-expanded="${sidebarActive == 'reservation-list' or sidebarActive == 'backshuttlereservationseat-list' or sidebarActive == 'seatavailability-list' or sidebarActive == 'backseat-list' or sidebarActive == 'shuttle-list'}"
             >
                 <i class="bi bi-water" style="color: #fff; font-size: 1.3rem;"></i>
                 <span class="ms-2">接駁管理</span>
                 <i class="bi bi-chevron-down ms-auto" style="font-size: 0.9rem;"></i>
             </button>
-            <div class="collapse" id="dashboard-shuttle">
+            <div class="collapse" id="dashboard-shuttle"
+                    th:classappend="${sidebarActive == 'reservation-list' or sidebarActive == 'backshuttlereservationseat-list' or sidebarActive == 'seatavailability-list' or sidebarActive == 'backseat-list' or sidebarActive == 'shuttle-list'} ? ' show'">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-2 lh-lg">
                     <li>
                         <a th:href="@{/backend/reservation/list}"
-                           class="d-flex align-items-center link-body-emphasis text-white">
+                           class="d-flex align-items-center link-body-emphasis text-white"
+                           th:classappend="${sidebarActive == 'reservation-list'} ? ' sidebar-active'">
                             <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
                                 <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
                             </span>
@@ -580,7 +618,8 @@
                     </li>
                     <li>
                         <a th:href="@{/backend/backshuttlereservationseat/list}"
-                           class="d-flex align-items-center link-body-emphasis text-white">
+                           class="d-flex align-items-center link-body-emphasis text-white"
+                           th:classappend="${sidebarActive == 'backshuttlereservationseat-list'} ? ' sidebar-active'">
                             <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
                                 <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
                             </span>
@@ -589,7 +628,8 @@
                     </li>
                     <li>
                         <a th:href="@{/backend/seatavailability/list}"
-                           class="d-flex align-items-center link-body-emphasis text-white">
+                           class="d-flex align-items-center link-body-emphasis text-white"
+                           th:classappend="${sidebarActive == 'seatavailability-list'} ? ' sidebar-active'">
                             <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
                                 <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
                             </span>
@@ -598,7 +638,8 @@
                     </li>
                     <li>
                         <a th:href="@{/backend/backseat/list}"
-                           class="d-flex align-items-center link-body-emphasis text-white">
+                           class="d-flex align-items-center link-body-emphasis text-white"
+                           th:classappend="${sidebarActive == 'backseat-list'} ? ' sidebar-active'">
                             <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
                                 <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
                             </span>
@@ -607,7 +648,8 @@
                     </li>
                     <li>
                         <a th:href="@{/backend/shuttle/list}"
-                           class="d-flex align-items-center link-body-emphasis text-white">
+                           class="d-flex align-items-center link-body-emphasis text-white"
+                           th:classappend="${sidebarActive == 'shuttle-list'} ? ' sidebar-active'">
                             <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
                                 <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
                             </span>
@@ -624,17 +666,19 @@
                     class="btn btn-toggle d-flex align-items-center w-100 rounded border-0 text-white"
                     data-bs-toggle="collapse"
                     data-bs-target="#dashboard-home"
-                    aria-expanded="false"
+                    th:aria-expanded="${sidebarActive == 'news-list' or sidebarActive == 'feeback-list' or sidebarActive == 'member-list' or sidebarActive == 'chat-list'}"
             >
                 <i class="bi bi-gear" style="color: #fff; font-size: 1.3rem;"></i>
                 <span class="ms-2">其他管理</span>
                 <i class="bi bi-chevron-down ms-auto" style="font-size: 0.9rem;"></i>
             </button>
-            <div class="collapse" id="dashboard-home">
+            <div class="collapse" id="dashboard-home"
+                    th:classappend="${sidebarActive == 'news-list' or sidebarActive == 'feeback-list' or sidebarActive == 'member-list' or sidebarActive == 'chat-list'} ? ' show'">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-2 lh-lg">
                     <li>
                         <a th:href="@{/backend/news/list}"
-                           class="d-flex align-items-center link-body-emphasis text-white">
+                           class="d-flex align-items-center link-body-emphasis text-white"
+                           th:classappend="${sidebarActive == 'news-list'} ? ' sidebar-active'">
                             <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
                                 <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
                             </span>
@@ -643,7 +687,8 @@
                     </li>
                     <li>
                         <a th:href="@{/backend/feedback/list}"
-                           class="d-flex align-items-center link-body-emphasis text-white">
+                           class="d-flex align-items-center link-body-emphasis text-white"
+                           th:classappend="${sidebarActive == 'feeback-list'} ? ' sidebar-active'">
                             <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
                                 <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
                             </span>
@@ -652,7 +697,8 @@
                     </li>
                     <li>
                         <a th:href="@{/backend/member/list}"
-                           class="d-flex align-items-center link-body-emphasis text-white">
+                           class="d-flex align-items-center link-body-emphasis text-white"
+                           th:classappend="${sidebarActive == 'member-list'} ? ' sidebar-active'">
                             <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
                                 <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
                             </span>
@@ -661,7 +707,8 @@
                     </li>
                     <li>
                         <a th:href="@{/backend/chat/room/list}"
-                           class="d-flex align-items-center link-body-emphasis text-white">
+                           class="d-flex align-items-center link-body-emphasis text-white"
+                           th:classappend="${sidebarActive == 'chat-list'} ? ' sidebar-active'">
                             <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
                                 <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
                             </span>

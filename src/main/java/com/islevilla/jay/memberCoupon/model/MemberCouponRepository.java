@@ -33,6 +33,7 @@ public interface MemberCouponRepository extends JpaRepository<MemberCoupon, Memb
     @Query(value = "SELECT * FROM coupon c WHERE c.start_date <= CURDATE() " +
            "AND c.end_date >= CURDATE() " +
            "AND c.min_spend <= :orderAmount " +
+           "AND c.coupon_status = 1 " +
            "AND NOT EXISTS (SELECT 1 FROM member_coupon mc WHERE mc.member_id = :memberId " +
            "AND mc.coupon_id = c.coupon_id)", nativeQuery = true)
     List<Coupon> findValidCouponsByMemberId(@Param("memberId") Integer memberId, @Param("orderAmount") Integer orderAmount);
