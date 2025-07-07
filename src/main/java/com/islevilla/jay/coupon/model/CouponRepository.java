@@ -23,5 +23,8 @@ public interface CouponRepository extends JpaRepository<Coupon, Integer> {
 
     // 模糊查詢優惠券代碼
     List<Coupon> findByCouponCodeContaining(String keyword);
+
+    // 根據狀態查詢優惠券
+    List<Coupon> findByCouponStatus(Byte couponStatus);
 }
 

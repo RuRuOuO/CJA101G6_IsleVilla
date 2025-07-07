@@ -98,13 +98,13 @@
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <label for="keyword" class="form-label">關鍵字</label>
-                            <input type="text" class="form-control" id="keyword" name="keyword" 
-                                   th:value="${searchKeyword}" placeholder="搜尋操作描述">
+                            <label for="logDescription" class="form-label">關鍵字</label>
+                            <input type="text" class="form-control" id="logDescription" name="logDescription" 
+                                   th:value="${searchLogDescription}" placeholder="搜尋操作描述">
                         </div>
                         <div class="col-md-2">
-                            <label for="operationDate" class="form-label">操作日期</label>
-                            <input type="date" class="form-control" id="operationDate" name="operationDate" th:value="${searchOperationDate}">
+                            <label for="operationTime" class="form-label">操作日期</label>
+                            <input type="date" class="form-control" id="operationTime" name="operationTime" th:value="${searchOperationTime}">
                         </div>
                         <div class="col-md-3 d-flex align-items-end">
                             <button type="submit" class="btn btn-primary me-2">

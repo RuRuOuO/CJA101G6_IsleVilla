@@ -48,7 +48,7 @@ public class ChatRoomDbService {
 
 		chatRoomRepository.save(c);
 
-		// 再儲存所有訊息
+		// 再次儲存所有訊息
 		List<ChatMessage> messages = messageDtos.stream().map(dto -> {
 
 			ChatMessage m = new ChatMessage();

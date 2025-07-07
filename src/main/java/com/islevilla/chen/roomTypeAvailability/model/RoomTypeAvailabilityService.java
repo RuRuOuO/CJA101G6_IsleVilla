@@ -11,9 +11,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 
+import com.islevilla.chen.room.model.RoomTypeCount;
 import com.islevilla.chen.roomType.model.RoomType;
 import com.islevilla.chen.roomType.model.RoomTypeRepository;
+import com.islevilla.chen.roomType.model.RoomTypeService;
 import com.islevilla.chen.util.exception.BusinessException;
 import com.islevilla.wei.room.model.RoomRVOrderRepository;
 
@@ -24,199 +27,64 @@ public class RoomTypeAvailabilityService {
 	private RoomTypeAvailabilityRepository roomTypeAvailabilityRepository;
 	
 	@Autowired
+	private RoomTypeService roomTypeService;
+	
+	@Autowired
 	private RoomTypeRepository roomTypeRepository;
 	
 	@Autowired
 	private RoomRVOrderRepository roomRVOrderRepository;
 	
-	/**
-	 * 新增房型可用性記錄
-	 */
-	@Transactional
-	public RoomTypeAvailability addRoomTypeAvailability(RoomTypeAvailability roomTypeAvailability) {
-		// 檢查房型是否存在
-		Integer roomTypeId = roomTypeAvailability.getRoomTypeAvailabilityId().getRoomTypeId();
-		Optional<RoomType> roomType = roomTypeRepository.findById(roomTypeId);
-		if (!roomType.isPresent()) {
-			throw new BusinessException("房型不存在，ID: " + roomTypeId);
-		}
-		
-		// 檢查是否已存在相同的記錄
-		LocalDate availabilityDate = roomTypeAvailability.getRoomTypeAvailabilityId().getRoomTypeAvailabilityDate();
-		boolean exists = roomTypeAvailabilityRepository.existsByRoomTypeAvailabilityId_RoomTypeIdAndRoomTypeAvailabilityId_RoomTypeAvailabilityDate(
-			roomTypeId, availabilityDate);
-		if (exists) {
-			throw new BusinessException("該房型在指定日期已有可用性記錄: " + roomTypeId + ", " + availabilityDate);
-		}
-		
-		// 設置房型關聯
-		roomTypeAvailability.setRoomType(roomType.get());
-		
-		return roomTypeAvailabilityRepository.save(roomTypeAvailability);
-	}
 	
-	/**
-	 * 更新房型可用性記錄
-	 */
-	@Transactional
-	public RoomTypeAvailability updateRoomTypeAvailability(RoomTypeAvailability roomTypeAvailability) {
-		// 檢查記錄是否存在
-		RoomTypeAvailabilityId id = roomTypeAvailability.getRoomTypeAvailabilityId();
-		Optional<RoomTypeAvailability> existing = roomTypeAvailabilityRepository.findById(id);
-		if (!existing.isPresent()) {
-			throw new BusinessException("房型可用性記錄不存在: " + id.getRoomTypeId() + ", " + id.getRoomTypeAvailabilityDate());
-		}
-		
-		// 確保房型關聯正確設置
-		if (roomTypeAvailability.getRoomType() == null) {
-			roomTypeAvailability.setRoomType(existing.get().getRoomType());
-		}
-		
-		return roomTypeAvailabilityRepository.save(roomTypeAvailability);
-	}
-	
-	/**
-	 * 根據複合主鍵刪除房型可用性記錄
-	 */
-	@Transactional
-	public void deleteRoomTypeAvailability(Integer roomTypeId, LocalDate roomTypeAvailabilityDate) {
-		RoomTypeAvailabilityId id = new RoomTypeAvailabilityId(roomTypeId, roomTypeAvailabilityDate);
-		
-		if (!roomTypeAvailabilityRepository.existsById(id)) {
-			throw new BusinessException("房型可用性記錄不存在: " + roomTypeId + ", " + roomTypeAvailabilityDate);
-		}
-		
-		roomTypeAvailabilityRepository.deleteById(id);
-	}
-	
-	/**
-	 * 根據複合主鍵查詢房型可用性記錄
-	 */
+	// 全部房型和單月份查詢
 	@Transactional(readOnly = true)
-	public RoomTypeAvailability findById(Integer roomTypeId, LocalDate roomTypeAvailabilityDate) {
-		RoomTypeAvailabilityId id = new RoomTypeAvailabilityId(roomTypeId, roomTypeAvailabilityDate);
-		Optional<RoomTypeAvailability> optional = roomTypeAvailabilityRepository.findById(id);
-		return optional.orElse(null);
-	}
-	
-	/**
-	 * 查詢所有房型可用性記錄
-	 */
-	@Transactional(readOnly = true)
-	public List<RoomTypeAvailability> findAll() {
-		return roomTypeAvailabilityRepository.findAll();
-	}
-	
-	/**
-	 * 根據房型ID查詢所有可用性記錄
-	 */
-	@Transactional(readOnly = true)
-	public List<RoomTypeAvailability> findByRoomTypeId(Integer roomTypeId) {
-		List<RoomTypeAvailability> result = roomTypeAvailabilityRepository.findByRoomTypeAvailabilityId_RoomTypeId(roomTypeId);
+	public List<RoomTypeAvailability> findAllByYearMonth(int year,int month) {
+		List<RoomTypeAvailability> result = roomTypeAvailabilityRepository.findAllByYearMonth(year,month);
 		if (result.isEmpty()) {
-			throw new BusinessException("查無該房型的可用性記錄，房型ID: " + roomTypeId);
+			throw new BusinessException("查無當月記錄");
 		}
 		return result;
 	}
 	
-	/**
-	 * 根據日期查詢所有房型可用性
-	 */
+	
+	// 根據房型ID和單月份查詢
 	@Transactional(readOnly = true)
-	public List<RoomTypeAvailability> findByAvailabilityDate(LocalDate availabilityDate) {
-		List<RoomTypeAvailability> result = roomTypeAvailabilityRepository.findByRoomTypeAvailabilityId_RoomTypeAvailabilityDate(availabilityDate);
-		if (result.isEmpty()) {
-			throw new BusinessException("查無該日期的房型可用性記錄: " + availabilityDate);
-		}
-		return result;
+	public List<RoomTypeAvailability> findByRoomTypeIdAndYearMonth(Integer roomTypeId, int year, int month){
+		return roomTypeAvailabilityRepository.findByRoomTypeIdAndYearMonth(roomTypeId, year, month);
 	}
 	
-	/**
-	 * 根據房型ID和日期範圍查詢
-	 */
-	@Transactional(readOnly = true)
-	public List<RoomTypeAvailability> findByRoomTypeIdAndDateRange(Integer roomTypeId, LocalDate startDate, LocalDate endDate) {
-		if (startDate.isAfter(endDate)) {
-			throw new BusinessException("開始日期不能晚於結束日期");
-		}
-		
-		List<RoomTypeAvailability> result = roomTypeAvailabilityRepository.findByRoomTypeIdAndDateRange(roomTypeId, startDate, endDate);
-		if (result.isEmpty()) {
-			throw new BusinessException("查無符合條件的房型可用性記錄");
-		}
-		return result;
-	}
-	
-	/**
-	 * 查詢特定日期範圍內的所有可用性記錄
-	 */
-	@Transactional(readOnly = true)
-	public List<RoomTypeAvailability> findByDateRange(LocalDate startDate, LocalDate endDate) {
-		if (startDate.isAfter(endDate)) {
-			throw new BusinessException("開始日期不能晚於結束日期");
-		}
-		
-		return roomTypeAvailabilityRepository.findByDateRange(startDate, endDate);
-	}
-	
-	/**
-	 * 查詢可用數量大於指定值的記錄
-	 */
-	@Transactional(readOnly = true)
-	public List<RoomTypeAvailability> findByMinAvailability(Integer minCount) {
-		if (minCount < 0) {
-			throw new BusinessException("最小可用數量不能小於0");
-		}
-		
-		return roomTypeAvailabilityRepository.findByAvailabilityCountGreaterThan(minCount);
-	}
-	
-	/**
-	 * 檢查特定房型在特定日期是否有可用性記錄
-	 */
-	@Transactional(readOnly = true)
-	public boolean existsAvailability(Integer roomTypeId, LocalDate availabilityDate) {
-		return roomTypeAvailabilityRepository.existsByRoomTypeAvailabilityId_RoomTypeIdAndRoomTypeAvailabilityId_RoomTypeAvailabilityDate(
-			roomTypeId, availabilityDate);
-	}
-	
-	/**
-	 * 批量創建房型可用性記錄（用於初始化某個房型的可用性）
-	 */
+	//當Room資料庫表格更動時，重新計算特定房型的可用數量
 	@Transactional
-	public List<RoomTypeAvailability> batchCreateAvailability(Integer roomTypeId, LocalDate startDate, LocalDate endDate, Integer defaultCount) {
-		// 檢查房型是否存在
-		Optional<RoomType> roomType = roomTypeRepository.findById(roomTypeId);
-		if (!roomType.isPresent()) {
-			throw new BusinessException("房型不存在，ID: " + roomTypeId);
-		}
+	public void recalculateAvailability(RoomTypeCount roomTypeCount) {
+		// 重新計算該房型未來所有日期的可用數量
+		LocalDate startDate = LocalDate.now();
+		LocalDate endDate = startDate.plusMonths(3); // 未來三個月
 		
-		if (startDate.isAfter(endDate)) {
-			throw new BusinessException("開始日期不能晚於結束日期");
-		}
-		
-		List<RoomTypeAvailability> result = new java.util.ArrayList<>();
-		LocalDate currentDate = startDate;
-		
-		while (!currentDate.isAfter(endDate)) {
-			// 檢查是否已存在記錄
-			if (!existsAvailability(roomTypeId, currentDate)) {
-				RoomTypeAvailabilityId id = new RoomTypeAvailabilityId(roomTypeId, currentDate);
-				RoomTypeAvailability availability = new RoomTypeAvailability();
-				availability.setRoomTypeAvailabilityId(id);
-				availability.setRoomType(roomType.get());
-				availability.setRoomTypeAvailabilityCount(defaultCount);
+		LocalDate date = startDate;
+		while (!date.isAfter(endDate)) {
+			// 計算該日期的實際可用數量
+			RoomTypeAvailability daliyRoomTypeAvailability = new RoomTypeAvailability();
+			RoomTypeAvailabilityId roomTypeAvailabilityId = new RoomTypeAvailabilityId();
+            		
+			// 獲取 RoomType 實體
+			RoomType roomType = roomTypeService.findById(roomTypeCount.getRoomTypeIdDTO());
+			if (roomType != null) {
+				roomTypeAvailabilityId.setRoomTypeId(roomTypeCount.getRoomTypeIdDTO());
+				roomTypeAvailabilityId.setRoomTypeAvailabilityDate(date);
 				
-				result.add(roomTypeAvailabilityRepository.save(availability));
-			}
-			currentDate = currentDate.plusDays(1);
+				daliyRoomTypeAvailability.setRoomTypeAvailabilityId(roomTypeAvailabilityId);
+				daliyRoomTypeAvailability.setRoomType(roomType); // 設定 RoomType 實體
+				            daliyRoomTypeAvailability.setRoomTypeAvailabilityCount(roomTypeCount.getRoomAvailableDTO());
+
+				roomTypeAvailabilityRepository.save(daliyRoomTypeAvailability);
+			}			
+			date = date.plusDays(1);
 		}
-		
-		return result;
 	}
 	
-	// ==================== 庫存計算相關方法 ====================
 	
+
+	//=======給patty用的=======
 	/**
 	 * 計算特定房型在特定日期的實際可用數量
 	 * @param roomTypeId 房型ID
@@ -378,7 +246,7 @@ public class RoomTypeAvailabilityService {
 		return true;
 	}
 	
-	// ==================== 分頁查詢方法 ====================
+			// ==================== 分頁查詢方法 ====================
 	
 	/**
 	 * 分頁查詢所有房型可用性記錄
@@ -483,4 +351,49 @@ public class RoomTypeAvailabilityService {
 			throw new RuntimeException("查無庫存資料: 房型ID=" + roomTypeId + ", 日期=" + date);
 		}
 	}
+	/**
+	  * 根據房型ID和日期範圍查詢
+	  */
+	 @Transactional(readOnly = true)
+	 public List<RoomTypeAvailability> findByRoomTypeIdAndDateRange(Integer roomTypeId, LocalDate startDate, LocalDate endDate) {
+	  if (startDate.isAfter(endDate)) {
+	   throw new BusinessException("開始日期不能晚於結束日期");
+	  }
+	  
+	  List<RoomTypeAvailability> result = roomTypeAvailabilityRepository.findByRoomTypeIdAndDateRange(roomTypeId, startDate, endDate);
+	  if (result.isEmpty()) {
+	   throw new BusinessException("查無符合條件的房型可用性記錄");
+	  }
+	  return result;
+	 }
+	 /**
+	  * 查詢特定日期範圍內的所有可用性記錄
+	  */
+	 @Transactional(readOnly = true)
+	 public List<RoomTypeAvailability> findByDateRange(LocalDate startDate, LocalDate endDate) {
+	  if (startDate.isAfter(endDate)) {
+	   throw new BusinessException("開始日期不能晚於結束日期");
+	  }
+	  
+	  return roomTypeAvailabilityRepository.findByDateRange(startDate, endDate);
+	 }
+	 /**
+	  * 根據房型ID查詢所有可用性記錄
+	  */
+	 @Transactional(readOnly = true)
+	 public List<RoomTypeAvailability> findByRoomTypeId(Integer roomTypeId) {
+	  List<RoomTypeAvailability> result = roomTypeAvailabilityRepository.findByRoomTypeAvailabilityId_RoomTypeId(roomTypeId);
+	  if (result.isEmpty()) {
+	   throw new BusinessException("查無該房型的可用性記錄，房型ID: " + roomTypeId);
+	  }
+	  return result;
+	 }
+	 /**
+	  * 查詢所有房型可用性記錄
+	  */
+	 @Transactional(readOnly = true)
+	 public List<RoomTypeAvailability> findAll() {
+	  return roomTypeAvailabilityRepository.findAll();
+	 }
+	//==================================
 }

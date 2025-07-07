@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品訂單成立通知</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #007bff;
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .header p {
+            color: #666;
+            margin: 10px 0 0 0;
+        }
+        .highlight { 
+            background-color: #e3f2fd; 
+            padding: 15px; 
+            border-radius: 5px; 
+            margin: 20px 0; 
+            border-left: 4px solid #2196f3; 
+        }
+        .order-info { 
+            background-color: #f8f9fa; 
+            border-radius: 8px; 
+            padding: 20px; 
+            margin: 20px 0; 
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #495057;
+            min-width: 120px;
+        }
+
+        .info-value {
+            color: #007bff;
+            font-weight: 500;
+        }
+        .product-list { 
+            margin: 20px 0; 
+        }
+        .product-list table { 
+            width: 100%; 
+            border-collapse: collapse; 
+        }
+        .product-list th, .product-list td { 
+            border: 1px solid #e9ecef; 
+            padding: 8px; 
+            text-align: center; 
+        }
+        .product-list th { 
+            background-color: #f1f3f4; 
+            color: #333; 
+        }
+        .footer { 
+            text-align: center; 
+            margin-top: 30px; 
+            padding-top: 20px; 
+            border-top: 1px solid #e9ecef; 
+            color: #666; 
+            font-size: 14px; 
+        }
+
+        .contact-info {
+            background-color: #f1f3f4;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 480px) { 
+            .info-row { 
+                flex-direction: column; 
+            } 
+            .info-label { 
+                min-width: auto; 
+                margin-bottom: 5px; 
+            } 
+        }
+
+        
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🛒 商品訂單成立通知</h1>
+        <p>親愛的 <span th:text="${memberName}">會員</span>，您的訂單已成立！</p>
+    </div>
+    <div class="highlight">
+        <strong>訂單成立！</strong> 感謝您的訂購，以下是您的訂單詳細資訊：
+    </div>
+    <div class="order-info">
+        <div class="info-row">
+            <span class="info-label">訂單編號：</span>
+            <span class="info-value" th:text="${orderId}">發生錯誤</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">成立時間：</span>
+            <span class="info-value" th:text="${#temporals.format(orderTime, 'yyyy-MM-dd HH:mm:ss')}">發生錯誤</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">訂單金額：</span>
+            <span class="info-value" th:text="${orderAmount}">發生錯誤</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">折扣金額：</span>
+            <span class="info-value" th:text="${discountAmount}">發生錯誤</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">實付金額：</span>
+            <span class="info-value" th:text="${paidAmount}">發生錯誤</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">收件人：</span>
+            <span class="info-value" th:text="${contactName}">發生錯誤</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">收件人電話：</span>
+            <span class="info-value" th:text="${contactPhone}">發生錯誤</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">收件人地址：</span>
+            <span class="info-value" th:text="${contactAddress}">發生錯誤</span>
+        </div>
+    </div>
+    <div class="product-list">
+        <h3>商品明細</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>商品名稱</th>
+                    <th>數量</th>
+                    <th>單價</th>
+                    <th>小計</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="detail : ${orderDetails}">
+                    <td th:text="${detail.productOrderName}"></td>
+                    <td th:text="${detail.productOrderQuantity}"></td>
+                    <td th:text="${detail.productOrderPrice}"></td>
+                    <td th:text="${detail.productOrderQuantity * detail.productOrderPrice}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="contact-info">
+        <strong>📞 聯絡資訊</strong><br>
+        如有任何疑問，歡迎與我們聯絡：<br>
+        電話：(02) 1234-5678<br>
+        信箱：info@islevilla.com<br>
+        服務時間：09:00 - 18:00（週一至週日）
+    </div>
+
+    <div class="footer">
+        <p>此郵件由系統自動發送，請勿直接回覆。</p>
+        <p>感謝您的使用，祝您旅途愉快！</p>
+        <p style="margin-top: 15px; color: #999;">© 2025 微嶼IsleVilla 接駁服務系統</p>
+    </div>
+</div>
+</body>
+</html> 

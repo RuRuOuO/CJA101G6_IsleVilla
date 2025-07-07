@@ -30,8 +30,11 @@ public class DailyDataInsert {
     @Autowired
     private RoomService roomService;
 
-    /**
-     * 伺服器啟動後馬上執行一次
+    //伺服器啟動後馬上執行一次
+    /*
+     * 這個錯誤表示在建立 RoomTypeAvailability 實體時，roomType 屬性為 null，
+     * 但由於使用了 @MapsId 註解，Hibernate 期望這個屬性不能為空。
+     * 使用了 @MapsId("roomTypeId") 註解，必須設定對應的 RoomType 實體。
      */
     @PostConstruct
     public void init() {

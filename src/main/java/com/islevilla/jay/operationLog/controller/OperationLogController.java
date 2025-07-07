@@ -33,8 +33,13 @@ public class OperationLogController {
      * 顯示操作日誌列表（一次查詢所有資料，供DataTables前端分頁排序）
      */
     @GetMapping("/list")
-    public String listOperationLogs(Model model) {
-        List<OperationLog> operationLogs = operationLogService.getAllOperationLogs();
+    public String listOperationLogs(@RequestParam Map<String, String> params, Model model) {
+        // 將Map<String, String> 轉成 Map<String, String[]>
+        Map<String, String[]> paramMap = new HashMap<>();
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            paramMap.put(entry.getKey(), new String[]{entry.getValue()});
+        }
+        List<OperationLog> operationLogs = operationLogService.getAll(paramMap);
         List<Employee> employees = employeeService.getAllEmployees();
         long todayCount = operationLogService.getTodayOperationCount();
         long totalCount = operationLogService.getTotalOperationCount();
@@ -43,7 +48,11 @@ public class OperationLogController {
         model.addAttribute("employees", employees);
         model.addAttribute("todayCount", todayCount);
         model.addAttribute("totalCount", totalCount);
-
+        model.addAttribute("sidebarActive", "log-list");
+        // 回傳查詢條件，方便前端保留查詢值
+        model.addAttribute("searchEmployeeId", params.get("employeeId"));
+        model.addAttribute("searchLogDescription", params.get("logDescription"));
+        model.addAttribute("searchOperationTime", params.get("operationTime"));
         return "back-end/operation-log/list";
     }
 

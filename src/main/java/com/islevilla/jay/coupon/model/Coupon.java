@@ -31,6 +31,9 @@ public class Coupon {
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
+    @Column(name = "coupon_status", nullable = false)
+    private Byte couponStatus;
+
     public Coupon() {}
 
     public Integer getCouponId() {
@@ -79,6 +82,14 @@ public class Coupon {
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public Byte getCouponStatus() {
+        return couponStatus;
+    }
+
+    public void setCouponStatus(Byte couponStatus) {
+        this.couponStatus = couponStatus;
     }
 
 }

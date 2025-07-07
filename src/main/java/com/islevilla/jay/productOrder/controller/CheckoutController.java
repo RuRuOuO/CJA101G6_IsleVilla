@@ -13,6 +13,8 @@ import com.islevilla.lai.members.model.MembersService;
 import com.islevilla.jay.productOrderDetail.model.ProductOrderDetailService;
 import com.islevilla.jay.coupon.model.Coupon;
 import com.islevilla.jay.memberCoupon.model.MemberCouponService;
+import com.islevilla.lai.email.model.EmailService;
+import com.islevilla.jay.email.model.ProductEmailService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 public class CheckoutController {
@@ -43,6 +47,9 @@ public class CheckoutController {
 
     @Autowired
     private MemberCouponService memberCouponService;
+
+    @Autowired
+    private ProductEmailService productEmailService;
 
     @GetMapping("/checkout")
     public String checkout(@RequestParam(value = "redirect", required = false) String redirect, 
@@ -160,21 +167,30 @@ public class CheckoutController {
             
             // 創建訂單明細
             for (CartDTO cartItem : cartItems) {
-                Product product = productService.getProductById(cartItem.getProductId());
-                if (product != null) {
-                    ProductOrderDetail detail = new ProductOrderDetail();
-                    ProductOrderDetailId detailId = new ProductOrderDetailId();
-                    detailId.setProductOrderId(order.getProductOrderId());
-                    detailId.setProductId(cartItem.getProductId());
-                    detail.setId(detailId);
-                    detail.setProductOrder(order);
-                    detail.setProduct(product);
-                    detail.setProductOrderQuantity(cartItem.getQuantity());
-                    detail.setProductOrderPrice(cartItem.getProductPrice());
-                    detail.setProductOrderName(cartItem.getProductName());
-                    
-                    productOrderDetailService.addOrderDetail(detail);
+                // 使用悲觀鎖查詢商品，確保同時只有一個交易能修改庫存，防止超賣
+                Product product = productService.getProductByIdForUpdate(cartItem.getProductId());
+                if (product.getProductQuantity() < cartItem.getQuantity()) {
+                    // 設定錯誤訊息並回到結帳頁
+                    model.addAttribute("error", "商品庫存不足，請重新選購！");
+                    return "front-end/product/checkout";
                 }
+                // 扣減庫存
+                int newQuantity = product.getProductQuantity() - cartItem.getQuantity();
+                product.setProductQuantity(newQuantity);
+                productService.updateProduct(product);
+
+                ProductOrderDetail detail = new ProductOrderDetail();
+                ProductOrderDetailId detailId = new ProductOrderDetailId();
+                detailId.setProductOrderId(order.getProductOrderId());
+                detailId.setProductId(cartItem.getProductId());
+                detail.setId(detailId);
+                detail.setProductOrder(order);
+                detail.setProduct(product);
+                detail.setProductOrderQuantity(cartItem.getQuantity());
+                detail.setProductOrderPrice(cartItem.getProductPrice());
+                detail.setProductOrderName(cartItem.getProductName());
+                
+                productOrderDetailService.addOrderDetail(detail);
             }
             
             // 如果有使用優惠券，標記為已使用
@@ -184,6 +200,27 @@ public class CheckoutController {
             
             // 清空購物車
             cartService.clearCart(userId);
+
+            // 訂單成立後寄信通知會員（HTML模板）
+            try {
+                String email = member.getMemberEmail();
+                String subject = "您的訂單已成立 | 微嶼 Isle Villa";
+                Map<String, Object> variables = new HashMap<>();
+                variables.put("memberName", member.getMemberName());
+                variables.put("orderId", order.getProductOrderId());
+                variables.put("orderTime", order.getOrderTime());
+                variables.put("orderAmount", order.getProductOrderAmount());
+                variables.put("discountAmount", order.getDiscountAmount());
+                variables.put("paidAmount", order.getProductPaidAmount());
+                variables.put("contactName", order.getContactName());
+                variables.put("contactPhone", order.getContactPhone());
+                variables.put("contactAddress", order.getContactAddress());
+                List<ProductOrderDetail> orderDetails = productOrderDetailService.findByProductOrderId(order.getProductOrderId());
+                variables.put("orderDetails", orderDetails);
+                productEmailService.sendOrderConfirmation(email, subject, "email/email-productOrder-confirmation.html", variables);
+            } catch (Exception e) {
+                System.err.println("訂單成立通知信寄送失敗: " + e.getMessage());
+            }
             
             // 重定向到訂單成功頁面
             return "redirect:/order-success";

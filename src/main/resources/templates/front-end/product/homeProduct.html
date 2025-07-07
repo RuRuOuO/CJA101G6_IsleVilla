@@ -145,7 +145,8 @@
                 <!-- 商品卡片 1 -->
                 <!-- 迴圈渲染：products 為 Controller 傳入的 List<Product> -->
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3"
-                     th:each="prod : ${product}">
+                     th:each="prod, stat : ${product}"
+                     th:if="${stat.index} < 12">
                     <div class="card h-100 d-flex flex-column">
                         <img th:src="${prod.productImageUrl}"
                              class="card-img-top img-fluid"
@@ -165,7 +166,7 @@
                                    class="btn btn-secondary btn-sm text-center"
                                    style="flex: 1 1 0; min-width: 0; white-space: nowrap;">查看詳情</a>
                                 <!-- 加入購物車按鈕 -->
-                                <form id="addToCartForm" th:action="@{/addToCart}" method="post" style="display: none;">
+                                <form th:id="'addToCartForm-' + ${prod.productId}" th:action="@{/addToCart}" method="post" style="display: none;" class="add-to-cart-form">
                                     <input type="hidden" name="productId" th:value="${prod.productId}" />
                                     <input type="hidden" name="quantity" value="1" />
                                     <input type="hidden" name="stock" th:value="${prod.productQuantity}" />
@@ -175,7 +176,7 @@
                                 <button type="submit"
                                         class="btn btn-primary btn-sm text-center"
                                         style="flex: 1 1 0; min-width: 0; white-space: nowrap;"
-                                        form="addToCartForm">
+                                        th:form="'addToCartForm-' + ${prod.productId}">
                                     加入購物車
                                 </button>
                             </div>
@@ -191,8 +192,6 @@
 <!-- ========== 載入Footer ========== -->
 <div th:replace="~{fragments/fragments :: footer}"></div>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // 加入購物車AJAX
     document.querySelectorAll('.add-to-cart-form').forEach(function(form) {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -212,28 +211,27 @@ document.addEventListener('DOMContentLoaded', function() {
                         method: 'POST',
                         body: formData
                     })
-                    .then(response => {
-                        if (response.status === 401) {
-                            if (confirm('請先登入會員才能加入購物車，是否前往登入頁面？')) {
-                                window.location.href = '/member/login?redirect=' + encodeURIComponent(window.location.pathname);
+                        .then(response => {
+                            if (response.status === 401) {
+                                if (confirm('請先登入會員才能加入購物車，是否前往登入頁面？')) {
+                                    window.location.href = '/member/login?redirect=' + encodeURIComponent(window.location.pathname);
+                                }
+                                return;
                             }
-                            return;
-                        }
-                        if (!response.ok) throw new Error('加入購物車失敗');
-                        return response.text();
-                    })
-                    .then(msg => {
-                        if (msg) {
-                            alert(msg);
-                        }
-                    })
-                    .catch(() => {
-                        alert('加入購物車失敗，請稍後再試');
-                    });
+                            if (!response.ok) throw new Error('加入購物車失敗');
+                            return response.text();
+                        })
+                        .then(msg => {
+                            if (msg) {
+                                alert(msg);
+                            }
+                        })
+                        .catch(() => {
+                            alert('加入購物車失敗，請稍後再試');
+                        });
                 });
         });
     });
-});
 </script>
 </body>
 </html>
