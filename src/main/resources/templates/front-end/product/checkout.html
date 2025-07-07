@@ -133,14 +133,11 @@
 <div th:replace="~{fragments/fragments :: header}"></div>
 
 <!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
-<main>
+<main class="container py-5">
+    <!-- 錯誤訊息顯示區塊 -->
+    <div th:if="${error}" class="alert alert-danger text-center mb-3" th:text="${error}"></div>
     <div class="container mt-5 checkout-container">
         <h2 class="mb-4">結帳</h2>
-        
-        <!-- 錯誤訊息顯示 -->
-        <div th:if="${error}" class="alert alert-danger" role="alert">
-            <span th:text="${error}"></span>
-        </div>
         
         <div class="row">
             <!-- 左側：聯絡資訊表單 -->

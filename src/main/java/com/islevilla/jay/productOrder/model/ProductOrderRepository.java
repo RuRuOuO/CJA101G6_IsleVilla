@@ -27,8 +27,8 @@ public interface ProductOrderRepository extends JpaRepository<ProductOrder, Inte
     @Query("SELECT po FROM ProductOrder po LEFT JOIN FETCH po.coupon ORDER BY po.orderTime DESC")
     List<ProductOrder> findAllByOrderByOrderTimeDesc();
 
-    // 根據會員ID查詢訂單，按訂單時間降序排列，並加載優惠券關聯
-    @Query("SELECT po FROM ProductOrder po LEFT JOIN FETCH po.coupon WHERE po.member.memberId = :memberId ORDER BY po.orderTime DESC")
+    // 根據會員ID查詢訂單，按訂單時間降序排列，並加載優惠券與訂單明細關聯
+    @Query("SELECT DISTINCT po FROM ProductOrder po LEFT JOIN FETCH po.coupon LEFT JOIN FETCH po.orderDetails WHERE po.member.memberId = :memberId ORDER BY po.orderTime DESC")
     List<ProductOrder> findByMember_MemberIdOrderByOrderTimeDesc(@Param("memberId") Integer memberId);
 
     // 根據訂單狀態查詢，按訂單時間降序排列，並加載優惠券關聯

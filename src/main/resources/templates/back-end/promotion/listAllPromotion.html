@@ -1,65 +1,116 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>微嶼 | Isle Villa 後台首頁</title>
-  <!-- ===== 載入統一樣式 ===== -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>優惠專案管理</title>
   <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
 </head>
 <body>
-<!-- ===== 載入sidebar ===== -->
-<!-- 插入手機版側邊欄 -->
+
+<!-- 側邊欄 -->
 <div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
-<!-- 插入桌面版側邊欄 -->
 <div th:replace="~{fragments/backFragments :: sidebar}"></div>
 
 <main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
   <th:block th:fragment="myContent">
-    <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
-    <div class="container">
-      <h2 class="card-title">優惠專案管理</h2>
-      <a class="btn btn-primary" th:href="@{/backend/promotion/add}">新增專案</a>
 
-
-      <table class="table table-striped">
-        <thead>
-        <tr>
-        <th>#</th>
-		<th>優惠專案名稱</th>
-		<th>專案開始日期</th>
-		<th>專案結束日期</th>
-		<th>備註</th>
-		<th>操作</th>
-        </tr>
-        </thead>
-        <tbody>
-        <th:block th:each="promotion : ${promotionListData}">
-			<tr>
-				<td th:text="${promotion.roomPromotionId}"></td>
-				<td th:text="${promotion.roomPromotionTitle}"></td>
-				<td th:text="${promotion.promotionStartDate != null ? promotion.promotionStartDate.toLocalDate() : ''}"></td>
-				<td th:text="${promotion.promotionEndDate != null ? promotion.promotionEndDate.toLocalDate() : ''}"></td>
-				<td th:text="${promotion.promotionRemark}"></td>
-                <td>
-                    <form method="post" th:action="@{/backend/promotion/getOneForUpdate}" style="display: inline-block; margin-bottom: 0px;">
-                        <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-pencil-fill me-1"></i>修改</button>
-                        <input type="hidden" name="roomPromotionId" th:value="${promotion.roomPromotionId}">
-                    </form>
-                    <form method="post" th:action="@{/backend/promotion/delete}" style="display: inline-block; margin-bottom: 0px;" onsubmit="return confirm('您確定要刪除這筆優惠專案嗎？');">
-                        <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash-fill me-1"></i>刪除</button>
-                        <input type="hidden" name="roomPromotionId" th:value="${promotion.roomPromotionId}">
-                    </form>
-                </td>
-			</tr>
-		</th:block>
-        </tbody>
-      </table>
+    <!-- ===== 標題區 ===== -->
+    <div class="card-header bg-transparent border-0 pt-4">
+      <h4 class="card-title fw-bold">
+        <i class="bi bi-tags-fill me-2"></i>優惠專案管理
+      </h4>
     </div>
 
-    <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
-  </th:block>
+    <div class="card-body">
+      <!-- ===== 新增按鈕 ===== -->
+      <div class="mb-3">
+        <a class="btn btn-primary" th:href="@{/backend/promotion/add}">
+          <i class="bi bi-plus-circle me-2"></i>新增專案
+        </a>
+      </div>
 
+      <!-- ===== 即時搜尋欄（前端用） ===== -->
+      <div class="input-group input-group-sm mb-3" style="max-width: 180px;">
+        <span class="input-group-text bg-white border-end-0">
+          <i class="fas fa-search text-muted"></i>
+        </span>
+        <input type="text" id="searchInput" class="form-control border-start-0" placeholder="輸入關鍵字查詢..">
+      </div>
+
+      <!-- ===== 表格區 ===== -->
+      <div class="table-responsive">
+        <table class="table table-hover" id="promotionTable">
+          <thead>
+          <tr>
+            <th>編號</th>
+            <th>優惠專案名稱</th>
+            <th>專案開始日期</th>
+            <th>專案結束日期</th>
+            <th>備註</th>
+            <th>操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          <th:block th:each="promotion : ${promotionListData}">
+            <tr>
+              <td th:text="${promotion.roomPromotionId}">1</td>
+              <td th:text="${promotion.roomPromotionTitle}">標題</td>
+              <td th:text="${promotion.promotionStartDate != null ? promotion.promotionStartDate.toLocalDate() : ''}">開始</td>
+              <td th:text="${promotion.promotionEndDate != null ? promotion.promotionEndDate.toLocalDate() : ''}">結束</td>
+              <td th:text="${promotion.promotionRemark}">備註</td>
+              <td>
+                <div class="d-flex gap-2 flex-wrap">
+                  <form method="post" th:action="@{/backend/promotion/getOneForUpdate}" class="m-0">
+                    <input type="hidden" name="roomPromotionId" th:value="${promotion.roomPromotionId}">
+                    <button type="submit" class="btn btn-sm btn-primary">
+                      <i class="bi bi-pencil-fill"></i>
+                    </button>
+                  </form>
+                  <form method="post" th:action="@{/backend/promotion/delete}" class="m-0"
+                        onsubmit="return confirm('您確定要刪除這筆優惠專案嗎？');">
+                    <input type="hidden" name="roomPromotionId" th:value="${promotion.roomPromotionId}">
+                    <button type="submit" class="btn btn-sm btn-danger">
+                      <i class="bi bi-trash-fill"></i>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          </th:block>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </th:block>
 </main>
+
+<!-- 載入統一 JS -->
+<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
+
+<!-- DataTable 初始化 + 即時搜尋 -->
+<script>
+  $(document).ready(function () {
+    const table = $('#promotionTable').DataTable({
+      dom: "t<'d-flex justify-content-center my-3'p>",
+      pagingType: 'simple_numbers',
+      lengthChange: false,
+      info: false,
+      language: {
+        paginate: {
+          previous: '上一頁',
+          next: '下一頁'
+        }
+      },
+    });
+
+    //  即時搜尋綁定
+    document.getElementById('searchInput').addEventListener('input', function () {
+      table.search(this.value).draw();
+    });
+  });
+</script>
+
 </body>
 </html>

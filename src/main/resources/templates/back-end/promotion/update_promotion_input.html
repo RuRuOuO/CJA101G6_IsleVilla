@@ -17,45 +17,47 @@
 
 <main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
     <th:block th:fragment="myContent">
-		<h2 class="card-title">優惠專案修改</h2>
-		<h5 class="card-subtitle mb-4 text-muted">所有欄位皆為必填</h5>
-
-		<form th:action="@{/backend/promotion/update}" method="post" th:object="${promotion}" enctype="multipart/form-data">
-			
-			<div class="mb-3">
-				<label for="roomPromotionId" class="form-label">優惠專案編號:</label>
-				<input type="text" id="roomPromotionId" th:field="*{roomPromotionId}" class="form-control-plaintext" readonly/>
-			</div>
-			
-			<div class="mb-3">
-				<label for="roomPromotionTitle" class="form-label">優惠專案名稱:</label>
-				<input type="text" id="roomPromotionTitle" th:field="*{roomPromotionTitle}" class="form-control-plaintext" readonly />
-			</div>
-			
-			<div class="mb-3">
-				<label for="promotionStartDate" class="form-label">專案開始日期:</label>
-				<input type="date" id="promotionStartDate" th:field="*{promotionStartDate}" class="form-control" />
-				<div th:if="${#fields.hasErrors('promotionStartDate')}" th:errors="*{promotionStartDate}" class="text-danger"></div>
-			</div>
-			
-			<div class="mb-3">
-				<label for="promotionEndDate" class="form-label">專案結束日期:</label>
-				<input type="date" id="promotionEndDate" th:field="*{promotionEndDate}" class="form-control" />
-				<div th:if="${#fields.hasErrors('promotionEndDate')}" th:errors="*{promotionEndDate}" class="text-danger"></div>
-			</div>
-
-			<div class="mb-3">
-				<label for="promotionRemark" class="form-label">備註:</label>
-				<input type="text" id="promotionRemark" th:field="*{promotionRemark}" class="form-control" />
-				<div th:if="${#fields.hasErrors('promotionRemark')}" th:errors="*{promotionRemark}" class="text-danger"></div>
-			</div>
-			
-			
-			<div>
-				<button type="submit" id="submit" class="btn btn-primary">送出修改</button>
-				<a th:href="@{/backend/promotion/listAll}" class="btn btn-secondary">取消</a>
-			</div>		
-		</form>
+        <div class="card shadow">
+            <div class="card-header bg-transparent border-0 pt-4">
+                <h4 class="card-title fw-bold">
+                    <i class="bi bi-tags-fill me-2"></i>優惠專案修改
+                </h4>
+            </div>
+            <div class="card-body">
+                <h6 class="card-subtitle mb-4 text-muted">所有欄位皆為必填</h6>
+                <form th:action="@{/backend/promotion/update}" method="post" th:object="${promotion}" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="roomPromotionId" class="form-label">優惠專案編號:</label>
+                        <input type="text" id="roomPromotionId" th:field="*{roomPromotionId}" class="form-control-plaintext" readonly/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="roomPromotionTitle" class="form-label">優惠專案名稱:</label>
+                        <input type="text" id="roomPromotionTitle" th:field="*{roomPromotionTitle}" class="form-control-plaintext" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label for="promotionStartDate" class="form-label">專案開始日期:</label>
+                        <input type="date" id="promotionStartDate" th:field="*{promotionStartDate}" class="form-control" />
+                        <div th:if="${#fields.hasErrors('promotionStartDate')}" th:errors="*{promotionStartDate}" class="text-danger"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="promotionEndDate" class="form-label">專案結束日期:</label>
+                        <input type="date" id="promotionEndDate" th:field="*{promotionEndDate}" class="form-control" />
+                        <div th:if="${#fields.hasErrors('promotionEndDate')}" th:errors="*{promotionEndDate}" class="text-danger"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="promotionRemark" class="form-label">備註:</label>
+                        <input type="text" id="promotionRemark" th:field="*{promotionRemark}" class="form-control" />
+                        <div th:if="${#fields.hasErrors('promotionRemark')}" th:errors="*{promotionRemark}" class="text-danger"></div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" id="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-1"></i>送出修改
+                        </button>
+                        <a th:href="@{/backend/promotion/listAll}" class="btn btn-secondary">取消</a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </th:block>
 </main>
 

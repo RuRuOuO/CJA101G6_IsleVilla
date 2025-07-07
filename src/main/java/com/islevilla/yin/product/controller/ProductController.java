@@ -16,6 +16,9 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 //頁面渲染
 @Controller
@@ -72,20 +75,22 @@ public class ProductController {
 
     //前台-商品分頁
     @GetMapping("/product/list")
-    public String homeProduct(@RequestParam(value = "productCategoryId", required = false) Integer productCategoryId, Model model) {
-        List<Product> products;
+    public String homeProduct(
+            @RequestParam(value = "productCategoryId", required = false) Integer productCategoryId,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            Model model) {
+        int pageSize = 12;
+        Pageable pageable = PageRequest.of(page, pageSize);
+        Page<Product> productPage;
         if (productCategoryId != null) {
-            // 只查詢該分類且上架的商品
-            products = productService.getProductByCategoryIdAndStatus(productCategoryId, (byte)1);
+            productPage = productService.getProductByCategoryIdAndStatus(productCategoryId, (byte)1, pageable);
         } else {
-            // 只查詢上架商品
-            products = productService.getProductByStatus((byte)1);
+            productPage = productService.getProductByStatus((byte)1, pageable);
         }
-
         List<ProductWithImageDTO> productWithImageDTOs = new ArrayList<>();
-        for (Product product : products) {
+        for (Product product : productPage.getContent()) {
             ProductPhoto mainProductPhoto = productPhotoService.getMainProductPhotoByProductId(product.getProductId());
-            String productImageUrl = "https://dummyimage.com/300x200/";  // 預設圖片 URL
+            String productImageUrl = "https://dummyimage.com/300x200/";
             if (mainProductPhoto != null) {
                 productImageUrl = convertImageToBase64(mainProductPhoto.getProductImage());
             }
@@ -99,11 +104,14 @@ public class ProductController {
             );
             productWithImageDTOs.add(productWithImageDTO);
         }
-
         model.addAttribute("product", productWithImageDTOs);
         model.addAttribute("category", productCategoryService.getAllProductCategory());
-        model.addAttribute("selectedCategoryId", productCategoryId); // 新增這行
-
+        model.addAttribute("selectedCategoryId", productCategoryId);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", productPage.getTotalPages());
+        model.addAttribute("totalElements", productPage.getTotalElements());
+        String pageURL = "/product/list" + (productCategoryId != null ? "?productCategoryId=" + productCategoryId : "");
+        model.addAttribute("pageURL", pageURL);
         return "front-end/product/listProduct";
     }
 
@@ -170,7 +178,7 @@ public class ProductController {
                     categoryName = "未分類";
                 }
             }
-
+            System.out.println("商品ID=" + productId + "，庫存=" + product.getProductQuantity() + "，狀態=" + product.getProductStatus());
             // 將資料添加到模型中
             model.addAttribute("product", product);
             model.addAttribute("productImages", productImageUrls);
