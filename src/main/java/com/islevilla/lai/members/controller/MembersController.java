@@ -85,10 +85,6 @@ public class MembersController {
 					return "redirect:/member/login";
 				}
 
-				// 登入成功，將會員資訊存入session
-				session.setAttribute("member", member);
-				System.out.println("session.getAttribute: " + session.getAttribute("member"));
-
 				// 如果選擇記住我，設定較長的session timeout（可選）
 //		                if (rememberMe) {
 //              		      session.setMaxInactiveInterval(30 * 24 * 60 * 60); // 30天
@@ -98,6 +94,11 @@ public class MembersController {
 
 				// 更新最後登入時間
 				membersService.updateMemberLastLoginTime(member.getMemberId(), LocalDateTime.now());
+
+				// 登入成功，將會員資訊存入session
+				member.setMemberLastLoginTime(LocalDateTime.now());
+				session.setAttribute("member", member);
+				System.out.println("session.getAttribute: " + session.getAttribute("member"));
 
 				redirectAttributes.addFlashAttribute("success", "登入成功！歡迎回來");
 
@@ -391,12 +392,29 @@ public class MembersController {
 			HttpSession session, RedirectAttributes redirectAttributes) {
 
 		try {
+			// 從資料庫中獲取現有會員資料
+	        Members existingMember = membersService.getOneMember(member.getMemberId());
+	        if (existingMember == null) {
+	            redirectAttributes.addFlashAttribute("errorMessage", "找不到會員資料");
+	            return "redirect:/member/info";
+	        }
+	        
+	        // 更新可編輯的欄位
+	        existingMember.setMemberName(member.getMemberName());
+	        existingMember.setMemberPhone(member.getMemberPhone());
+	        existingMember.setMemberAddress(member.getMemberAddress());
+			
 			// 處理照片上傳
 			if (!photoFile.isEmpty()) {
 				member.setMemberPhoto(photoFile.getBytes());
 			}
 
-			membersService.updateMember(member);
+			// 儲存更新的會員資料
+	        Members updatedMember = membersService.updateMember(existingMember);
+			
+	        // 更新 session 中的會員資料
+	        session.setAttribute("member", updatedMember);
+	        
 			redirectAttributes.addFlashAttribute("successMessage", "資料更新成功！");
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("errorMessage", "資料更新失敗：" + e.getMessage());
@@ -404,6 +422,39 @@ public class MembersController {
 		// 更新邏輯
 		session.setAttribute("member", membersService.getOneMember(member.getMemberId())); // 更新 session 中的會員資料
 		return "redirect:/member/info";
+	}
+	
+	// 更新會員密碼
+	@PostMapping("/member/updatePassword")
+	public String updatePassword(@RequestParam("currentPassword") String currentPassword,
+	                           @RequestParam("newPassword") String newPassword,
+	                           @RequestParam("confirmPassword") String confirmPassword,
+	                           HttpSession session,
+	                           RedirectAttributes redirectAttributes) {
+	    try {
+	        Members member = (Members) session.getAttribute("member");
+	        if (member == null) {
+	            return "redirect:/member/login";
+	        }
+	        
+	        // 檢查新密碼與確認密碼是否一致
+	        if (!newPassword.equals(confirmPassword)) {
+	            redirectAttributes.addFlashAttribute("errorMessage", "新密碼與確認密碼不一致");
+	            return "redirect:/member/info";
+	        }
+	        
+	        // 更新密碼
+	        boolean result = membersService.updatePassword(member.getMemberId(), currentPassword, newPassword);
+	        if (result) {
+	            redirectAttributes.addFlashAttribute("successMessage", "密碼更新成功！");
+	        } else {
+	            redirectAttributes.addFlashAttribute("errorMessage", "原密碼錯誤或密碼更新失敗");
+	        }
+	    } catch (Exception e) {
+	        redirectAttributes.addFlashAttribute("errorMessage", "密碼更新失敗：" + e.getMessage());
+	    }
+	    
+	    return "redirect:/member/info";
 	}
 
 	@GetMapping("/member/photo/{memberId}")

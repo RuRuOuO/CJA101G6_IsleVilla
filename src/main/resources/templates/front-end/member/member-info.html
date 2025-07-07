@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>微嶼 | Isle Villa</title>
     <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/fragments :: styles}"></th:block>
@@ -21,304 +22,369 @@
         }
     </style>
 </head>
+
 <body>
-<!-- ===== 載入Header ===== -->
-<div th:replace="~{fragments/fragments :: header}"></div>
-<main>
-    <!-- Hero Section -->
-    <section class="hero-section pt-5">
-        <div class="container text-center">
-            <h1 class="mb-4">會員專區</h1>
-            <p class="mb-4">
-                <i class="fas fa-user-circle me-2"></i>
-                管理您的個人資訊與帳戶資料
-            </p>
-        </div>
-    </section>
+    <!-- ===== 載入Header ===== -->
+    <div th:replace="~{fragments/fragments :: header}"></div>
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section pt-5">
+            <div class="container text-center">
+                <h1 class="mb-4">會員專區</h1>
+                <p class="mb-4">
+                    <i class="fas fa-user-circle me-2"></i>
+                    管理您的個人資訊與帳戶資料
+                </p>
+            </div>
+        </section>
 
-    <!-- Content Section -->
-    <section class="py-4">
-        <div class="container">
-            <div class="row">
-                <!-- ===== 載入側邊欄 ===== -->
-                <div th:replace="~{fragments/fragments :: memberSidebar(activeTab='info')}"></div>
+        <!-- Content Section -->
+        <section class="py-4">
+            <div class="container">
+                <div class="row">
+                    <!-- ===== 載入側邊欄 ===== -->
+                    <div th:replace="~{fragments/fragments :: memberSidebar(activeTab='info')}"></div>
 
-                <!-- 右側內容區 -->
-                <div class="col-md-9">
-                    <!-- //////////////////// 會員頁面內容放這裡 //////////////////// -->
-                    <!-- 個人資訊展示區域 -->
-                    <div id="memberInfoDisplay" th:if="${member != null}">
-                        <div class="card p-4 shadow-sm">
-                            <!--                            <div class="d-flex justify-content-between align-items-center mb-4">-->
-                            <!--                                <h3 class="mb-0">個人資訊</h3>-->
-                            <!--                                <button type="button" class="btn btn-dark" onclick="toggleEditMode()">-->
-                            <!--                                    <i class="fas fa-edit me-2"></i>編輯資料-->
-                            <!--                                </button>-->
-                            <!--                            </div>-->
+                    <!-- 右側內容區 -->
+                    <div class="col-md-9">
+                        <!-- 成功/錯誤訊息 -->
+                        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show"
+                            role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <span th:text="${successMessage}"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show"
+                            role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <span th:text="${errorMessage}"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
 
-                            <div class="row">
-                                <!-- 左側：大頭照 -->
-                                <div class="col-md-4 text-center mb-4">
-                                    <div class="bg-light rounded-3 p-4 h-100">
-                                        <img th:if="${member.memberPhoto != null}"
-                                             th:src="@{/member/photo/{memberId}(memberId=${member.memberId})}"
-                                             alt="會員照片"
-                                             class="member-photo rounded-circle mb-3 shadow-sm">
-                                        <img th:unless="${member.memberPhoto != null}"
-                                             src="/img/home/member1.png"
-                                             alt="預設照片"
-                                             class="member-photo rounded-circle mb-3 shadow-sm">
-                                        <h5 th:text="${member.memberName}">會員姓名</h5>
-                                        <span class="badge rounded-pill mt-2"
-                                              th:classappend="${member.memberStatus == 0 ? 'bg-warning text-dark' : (member.memberStatus == 1 ? 'bg-success' : 'bg-danger')}"
-                                              th:text="${member.memberStatus == 0 ? '未驗證' : (member.memberStatus == 1 ? '已驗證' : '停用')}">
-                                        狀態
-                                        </span>
+                        <!-- //////////////////// 會員頁面內容放這裡 //////////////////// -->
+                        <!-- 個人資訊展示區域 -->
+                        <div id="memberInfoDisplay" th:if="${member != null}">
+                            <div class="card p-4 shadow-sm">
+                                <div class="row">
+                                    <!-- 左側：大頭照 -->
+                                    <div class="col-md-4 text-center mb-4">
+                                        <div class="bg-light rounded-3 p-4 h-100">
+                                            <img th:if="${member.memberPhoto != null}"
+                                                th:src="@{/member/photo/{memberId}(memberId=${member.memberId})}"
+                                                alt="會員照片" class="member-photo rounded-circle mb-3 shadow-sm">
+                                            <img th:unless="${member.memberPhoto != null}" src="/img/home/member1.png"
+                                                alt="預設照片" class="member-photo rounded-circle mb-3 shadow-sm">
+                                            <h5 th:text="${member.memberName}">會員姓名</h5>
+                                            <span class="badge rounded-pill mt-2"
+                                                th:classappend="${member.memberStatus == 0 ? 'bg-warning text-dark' : (member.memberStatus == 1 ? 'bg-success' : 'bg-danger')}"
+                                                th:text="${member.memberStatus == 0 ? '未驗證' : (member.memberStatus == 1 ? '已驗證' : '停用')}">
+                                                狀態
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <!-- 右側：詳細資訊 -->
-                                <div class="col-md-8">
-                                    <div class="bg-light rounded-3 p-4 mb-4">
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <h5 class="mb-0"><i class="fas fa-user me-2"></i>基本資料</h5>
-                                            <button type="button" class="btn btn-outline-dark btn-sm"
-                                                    onclick="toggleEditMode()">
-                                                <i class="fas fa-edit me-1"></i>編輯
-                                            </button>
-                                        </div>
-                                        <hr>
+                                    <!-- 右側：詳細資訊 -->
+                                    <div class="col-md-8">
+                                        <div class="bg-light rounded-3 p-4 mb-4">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h5 class="mb-0"><i class="fas fa-user me-2"></i>基本資料</h5>
+                                                <div>
+                                                    <button type="button" class="btn btn-outline-dark btn-sm me-2"
+                                                        onclick="toggleEditMode()">
+                                                        <i class="fas fa-edit me-1"></i>編輯
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-primary btn-sm"
+                                                        data-bs-toggle="modal" data-bs-target="#passwordModal">
+                                                        <i class="fas fa-key me-1"></i>更改密碼
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <hr>
 
-                                        <div class="row mb-3">
-                                            <div class="col-sm-4 fw-bold text-secondary">會員編號：</div>
-                                            <div class="col-sm-8 text-muted" th:text="${member.memberId}">編號</div>
-                                        </div>
+                                            <div class="row mb-3">
+                                                <div class="col-sm-4 fw-bold text-secondary">會員編號：</div>
+                                                <div class="col-sm-8 text-muted" th:text="${member.memberId}">編號</div>
+                                            </div>
 
-                                        <div class="row mb-3">
-                                            <div class="col-sm-4 fw-bold text-secondary">電子信箱：</div>
-                                            <div class="col-sm-8 text-muted" th:text="${member.memberEmail}">電子信箱
+                                            <div class="row mb-3">
+                                                <div class="col-sm-4 fw-bold text-secondary">電子信箱：</div>
+                                                <div class="col-sm-8 text-muted" th:text="${member.memberEmail}">電子信箱
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-sm-4 fw-bold text-secondary">姓名：</div>
+                                                <div class="col-sm-8 text-muted" th:text="${member.memberName}">姓名</div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-sm-4 fw-bold text-secondary">生日：</div>
+                                                <div class="col-sm-8 text-muted"
+                                                    th:text="${#temporals.format(member.memberBirthdate, 'yyyy年MM月dd日')}">
+                                                    生日
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-sm-4 fw-bold text-secondary">性別：</div>
+                                                <div class="col-sm-8 text-muted"
+                                                    th:text="${member.memberGender == 0 ? '男生' : (member.memberGender == 1 ? '女生' : '其他')}">
+                                                    性別
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-sm-4 fw-bold text-secondary">電話：</div>
+                                                <div class="col-sm-8 text-muted" th:text="${member.memberPhone}">電話
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-0">
+                                                <div class="col-sm-4 fw-bold text-secondary">地址：</div>
+                                                <div class="col-sm-8 text-muted" th:text="${member.memberAddress}">地址
+                                                </div>
                                             </div>
                                         </div>
 
-                                        <div class="row mb-3">
-                                            <div class="col-sm-4 fw-bold text-secondary">姓名：</div>
-                                            <div class="col-sm-8 text-muted" th:text="${member.memberName}">姓名</div>
+                                        <div class="bg-light rounded-3 p-4">
+                                            <h5 class="mb-3"><i class="fas fa-clock me-2"></i>帳戶資訊</h5>
+
+                                            <div class="row mb-3">
+                                                <div class="col-sm-4 fw-bold text-secondary">註冊時間：</div>
+                                                <div class="col-sm-8 text-muted"
+                                                    th:text="${#temporals.format(member.memberCreatedAt, 'yyyy年MM月dd日 HH:mm:ss')}">
+                                                    註冊時間
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-sm-4 fw-bold text-secondary">最後更新：</div>
+                                                <div class="col-sm-8 text-muted"
+                                                    th:text="${#temporals.format(member.memberUpdatedAt, 'yyyy年MM月dd日 HH:mm:ss')}">
+                                                    更新時間
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-0">
+                                                <div class="col-sm-4 fw-bold text-secondary">最後登入：</div>
+                                                <div class="col-sm-8 text-muted"
+                                                    th:text="${#temporals.format(member.memberLastLoginTime, 'yyyy年MM月dd日 HH:mm:ss')}">
+                                                    登入時間
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 個人資訊編輯區域 -->
+                        <div id="memberInfoEdit" style="display: none;" th:if="${member != null}">
+                            <div class="card p-4 shadow-sm">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h3 class="mb-0">編輯個人資訊</h3>
+                                    <button type="button" class="btn btn-secondary" onclick="toggleEditMode()">
+                                        <i class="fas fa-times me-2"></i>取消編輯
+                                    </button>
+                                </div>
+
+                                <form th:action="@{/member/update}" method="post" enctype="multipart/form-data"
+                                    th:object="${member}">
+                                    <input type="hidden" th:field="*{memberId}">
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="memberName" class="form-label">姓名 <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="memberName"
+                                                th:field="*{memberName}" required>
+                                            <div class="invalid-feedback">請輸入您的姓名</div>
                                         </div>
 
-                                        <div class="row mb-3">
-                                            <div class="col-sm-4 fw-bold text-secondary">生日：</div>
-                                            <div class="col-sm-8 text-muted"
-                                                 th:text="${#temporals.format(member.memberBirthdate, 'yyyy年MM月dd日')}">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">電子信箱</label>
+                                            <div class="form-control-plaintext bg-light p-2 rounded"
+                                                th:text="${member.memberEmail}">
+                                                電子信箱
+                                            </div>
+                                            <small class="form-text text-muted">電子信箱無法修改</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">生日</label>
+                                            <div class="form-control-plaintext bg-light p-2 rounded"
+                                                th:text="${#temporals.format(member.memberBirthdate, 'yyyy年MM月dd日')}">
                                                 生日
                                             </div>
+                                            <small class="form-text text-muted">生日無法修改</small>
                                         </div>
 
-                                        <div class="row mb-3">
-                                            <div class="col-sm-4 fw-bold text-secondary">性別：</div>
-                                            <div class="col-sm-8 text-muted"
-                                                 th:text="${member.memberGender == 0 ? '男生' : (member.memberGender == 1 ? '女生' : '其他')}">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">性別</label>
+                                            <div class="form-control-plaintext bg-light p-2 rounded"
+                                                th:text="${member.memberGender == 0 ? '男生' : (member.memberGender == 1 ? '女生' : '其他')}">
                                                 性別
                                             </div>
-                                        </div>
-
-                                        <div class="row mb-3">
-                                            <div class="col-sm-4 fw-bold text-secondary">電話：</div>
-                                            <div class="col-sm-8 text-muted" th:text="${member.memberPhone}">電話</div>
-                                        </div>
-
-                                        <div class="row mb-0">
-                                            <div class="col-sm-4 fw-bold text-secondary">地址：</div>
-                                            <div class="col-sm-8 text-muted" th:text="${member.memberAddress}">地址
-                                            </div>
+                                            <small class="form-text text-muted">性別無法修改</small>
                                         </div>
                                     </div>
 
-                                    <div class="bg-light rounded-3 p-4">
-                                        <h5 class="mb-3"><i class="fas fa-clock me-2"></i>帳戶資訊</h5>
-
-                                        <div class="row mb-3">
-                                            <div class="col-sm-4 fw-bold text-secondary">註冊時間：</div>
-                                            <div class="col-sm-8 text-muted"
-                                                 th:text="${#temporals.format(member.memberCreatedAt, 'yyyy年MM月dd日 HH:mm')}">
-                                                註冊時間
-                                            </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="memberPhone" class="form-label">電話 <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="tel" class="form-control" id="memberPhone"
+                                                th:field="*{memberPhone}" required>
                                         </div>
 
-                                        <div class="row mb-3">
-                                            <div class="col-sm-4 fw-bold text-secondary">最後更新：</div>
-                                            <div class="col-sm-8 text-muted"
-                                                 th:text="${#temporals.format(member.memberUpdatedAt, 'yyyy年MM月dd日 HH:mm')}">
-                                                更新時間
-                                            </div>
-                                        </div>
-
-                                        <div class="row mb-0">
-                                            <div class="col-sm-4 fw-bold text-secondary">最後登入：</div>
-                                            <div class="col-sm-8 text-muted"
-                                                 th:text="${#temporals.format(member.memberLastLoginTime, 'yyyy年MM月dd日 HH:mm')}">
-                                                登入時間
-                                            </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="memberPhoto" class="form-label">大頭照</label>
+                                            <input type="file" class="form-control" id="memberPhoto" name="photoFile"
+                                                accept="image/*">
+                                            <small class="form-text text-muted">支援 JPG、PNG 格式</small>
                                         </div>
                                     </div>
+
+                                    <div class="mb-4">
+                                        <label for="memberAddress" class="form-label">地址 <span
+                                                class="text-danger">*</span></label>
+                                        <textarea class="form-control" id="memberAddress" th:field="*{memberAddress}"
+                                            rows="3" required></textarea>
+                                    </div>
+
+                                    <div class="text-end">
+                                        <button type="button" class="btn btn-secondary me-2"
+                                            onclick="toggleEditMode()">取消
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-2"></i>儲存變更
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- 密碼更改 Modal -->
+                        <div class="modal fade" id="passwordModal" tabindex="-1" aria-labelledby="passwordModalLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="passwordModalLabel">
+                                            <i class="fas fa-key me-2"></i>更改密碼
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <form th:action="@{/member/updatePassword}" method="post">
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label for="currentPassword" class="form-label">目前密碼 <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="password" class="form-control" id="currentPassword"
+                                                    name="currentPassword" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="newPassword" class="form-label">新密碼 <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="password" class="form-control" id="newPassword"
+                                                    name="newPassword" required minlength="6">
+                                                <small class="form-text text-muted">密碼長度至少6個字元</small>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="confirmPassword" class="form-label">確認新密碼 <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="password" class="form-control" id="confirmPassword"
+                                                    name="confirmPassword" required>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">取消</button>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-save me-2"></i>更新密碼
+                                            </button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- 個人資訊編輯區域 -->
-                    <div id="memberInfoEdit" style="display: none;" th:if="${member != null}">
-                        <div class="card p-4 shadow-sm">
-                            <div class="d-flex justify-content-between align-items-center mb-4">
-                                <h3 class="mb-0">編輯個人資訊</h3>
-                                <button type="button" class="btn btn-secondary" onclick="toggleEditMode()">
-                                    <i class="fas fa-times me-2"></i>取消編輯
-                                </button>
+                        <!-- 如果沒有會員資料 -->
+                        <div th:if="${member == null}" class="card p-4 shadow-sm">
+                            <div class="text-center py-5">
+                                <i class="fas fa-user-times fa-3x text-muted mb-3"></i>
+                                <h4 class="text-muted">找不到會員資料</h4>
+                                <p class="text-muted">請重新登入或聯繫客服人員</p>
+                                <a href="/member/login" class="btn btn-primary">重新登入</a>
                             </div>
-
-                            <form th:action="@{/member/update}" method="post"
-                                  enctype="multipart/form-data" th:object="${member}">
-                                <input type="hidden" th:field="*{memberId}">
-                                <input type="hidden" th:field="*{memberCreatedAt}">
-                                <input type="hidden" th:field="*{memberLastLoginTime}">
-                                <input type="hidden" th:field="*{memberStatus}">
-
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="memberName" class="form-label">姓名 <span
-                                                class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="memberName" th:field="*{memberName}"
-                                               required>
-                                        <div class="invalid-feedback">請輸入您的姓名</div>
-                                    </div>
-
-                                    <div class="col-md-6 mb-3">
-                                        <label for="memberEmail" class="form-label">電子信箱 <span
-                                                class="text-danger">*</span></label>
-                                        <input type="email" class="form-control" id="memberEmail"
-                                               th:field="*{memberEmail}"
-                                               required readonly>
-                                        <small class="form-text text-muted">電子信箱無法修改</small>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="memberBirthdate" class="form-label">生日 <span
-                                                class="text-danger">*</span></label>
-                                        <input type="date" class="form-control" id="memberBirthdate"
-                                               th:field="*{memberBirthdate}"
-                                               required>
-                                    </div>
-
-                                    <div class="col-md-6 mb-3">
-                                        <label for="memberGender" class="form-label">性別 <span
-                                                class="text-danger">*</span></label>
-                                        <select class="form-select" id="memberGender" th:field="*{memberGender}"
-                                                required>
-                                            <option value="">請選擇性別</option>
-                                            <option value="0">男生</option>
-                                            <option value="1">女生</option>
-                                            <option value="2">其他</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="memberPhone" class="form-label">電話 <span
-                                                class="text-danger">*</span></label>
-                                        <input type="tel" class="form-control" id="memberPhone"
-                                               th:field="*{memberPhone}"
-                                               required>
-                                    </div>
-
-                                    <div class="col-md-6 mb-3">
-                                        <label for="memberPhoto" class="form-label">大頭照</label>
-                                        <input type="file" class="form-control" id="memberPhoto" name="photoFile"
-                                               accept="image/*">
-                                        <small class="form-text text-muted">支援 JPG、PNG 格式</small>
-                                    </div>
-                                </div>
-
-                                <div class="mb-4">
-                                    <label for="memberAddress" class="form-label">地址 <span
-                                            class="text-danger">*</span></label>
-                                    <textarea class="form-control" id="memberAddress" th:field="*{memberAddress}"
-                                              rows="3"
-                                              required></textarea>
-                                </div>
-
-                                <div class="text-end">
-                                    <button type="button" class="btn btn-secondary me-2" onclick="toggleEditMode()">取消
-                                    </button>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-save me-2"></i>儲存變更
-                                    </button>
-                                </div>
-                            </form>
                         </div>
+                        <!-- //////////////////// 會員頁面內容放這裡 //////////////////// -->
                     </div>
-
-                    <!-- 如果沒有會員資料 -->
-                    <div th:if="${member == null}" class="card p-4 shadow-sm">
-                        <div class="text-center py-5">
-                            <i class="fas fa-user-times fa-3x text-muted mb-3"></i>
-                            <h4 class="text-muted">找不到會員資料</h4>
-                            <p class="text-muted">請重新登入或聯繫客服人員</p>
-                            <a href="/member/login" class="btn btn-primary">重新登入</a>
-                        </div>
-                    </div>
-                    <!-- //////////////////// 會員頁面內容放這裡 //////////////////// -->
                 </div>
             </div>
-        </div>
-    </section>
-</main>
-<!-- ========== 載入Footer ========== -->
-<footer th:replace="~{fragments/fragments :: footer}"></footer>
-<script>
-    function toggleEditMode() {
-        const displayDiv = document.getElementById('memberInfoDisplay');
-        const editDiv = document.getElementById('memberInfoEdit');
+        </section>
+    </main>
+    <!-- ========== 載入Footer ========== -->
+    <footer th:replace="~{fragments/fragments :: footer}"></footer>
+    <script>
+        function toggleEditMode() {
+            const displayDiv = document.getElementById('memberInfoDisplay');
+            const editDiv = document.getElementById('memberInfoEdit');
 
-        if (displayDiv.style.display === 'none') {
-            displayDiv.style.display = 'block';
-            editDiv.style.display = 'none';
-        } else {
-            displayDiv.style.display = 'none';
-            editDiv.style.display = 'block';
+            if (displayDiv.style.display === 'none') {
+                displayDiv.style.display = 'block';
+                editDiv.style.display = 'none';
+            } else {
+                displayDiv.style.display = 'none';
+                editDiv.style.display = 'block';
+            }
         }
-    }
 
-    // 表單驗證 (使用Bootstrap 5的驗證)
-    (function () {
-        'use strict';
-        window.addEventListener('load', function () {
-            const forms = document.getElementsByTagName('form');
-            Array.prototype.filter.call(forms, function (form) {
-                form.addEventListener('submit', function (event) {
-                    if (form.checkValidity() === false) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                }, false);
-            });
-        }, false);
-    })();
+        // 表單驗證 (使用Bootstrap 5的驗證)
+        (function () {
+            'use strict';
+            window.addEventListener('load', function () {
+                const forms = document.getElementsByTagName('form');
+                Array.prototype.filter.call(forms, function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
 
-    // 照片預覽功能
-    document.getElementById('memberPhoto').addEventListener('change', function (event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                // 可以在這裡添加照片預覽功能
-                console.log('照片已選擇:', file.name);
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-</script>
+        // 密碼確認驗證
+        document.getElementById('confirmPassword').addEventListener('input', function () {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = this.value;
+
+            if (newPassword !== confirmPassword) {
+                this.setCustomValidity('密碼不一致');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+
+        // 照片預覽功能
+        document.getElementById('memberPhoto').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    // 可以在這裡添加照片預覽功能
+                    console.log('照片已選擇:', file.name);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
 </body>
+
 </html>

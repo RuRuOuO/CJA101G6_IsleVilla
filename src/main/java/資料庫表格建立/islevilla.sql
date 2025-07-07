@@ -410,7 +410,7 @@ VALUES (1, 'A01', '標準雙人房', 10, 2, '
         舒適設備｜Morning call、空調、室內拖鞋
         餐飲服務｜冰箱、即溶咖啡、茶包、快煮壺
         衣物與洗衣設備｜衣櫃衣架、洗衣乾洗服務
-        安全特色｜晶片式安全感應門鎖', 25200, 0),
+        安全特色｜晶片式安全感應門鎖', 25200, 1),
        (6, 'F06', '行政豪華月牙套房', 3, 2, '
         床型：雙人床
         坪數：18坪
@@ -419,16 +419,16 @@ VALUES (1, 'A01', '標準雙人房', 10, 2, '
         舒適設備｜Morning call、空調、室內拖鞋
         餐飲服務｜冰箱、即溶咖啡、茶包、快煮壺
         衣物與洗衣設備｜衣櫃衣架、洗衣乾洗服務
-        安全特色｜晶片式安全感應門鎖', 28800, 0);
+        安全特色｜晶片式安全感應門鎖', 28800, 1);
 
 -- DROP TABLE IF EXISTS room_type;
 
 
 -- 房間 room （詹力臻）
 CREATE TABLE room (
-    room_id			INT		NOT NULL,																-- 房號 (PK)
-    room_type_id	INT		NOT NULL,																-- 房型編號 (FK)
-    room_status		TINYINT	NOT NULL	DEFAULT 0	COMMENT '0:空房 1:入住中 2:待維修 3:待清潔 4:停用',	-- 房間狀態
+    room_id            INT        NOT NULL,                                                                -- 房號 (PK)
+    room_type_id    INT        NOT NULL,                                                                -- 房型編號 (FK)
+    room_status        TINYINT    NOT NULL    DEFAULT 0    COMMENT '0:空房 1:入住中 2:待維修 3:待清潔 4:停用',    -- 房間狀態
     CONSTRAINT pk_room_id PRIMARY KEY (room_id),
     CONSTRAINT fk_room_room_type_id FOREIGN KEY (room_type_id) REFERENCES room_type(room_type_id)
 );
@@ -443,9 +443,9 @@ VALUES (101,  1, 0),
        (509,  1, 0),
        (602,  1, 0),
        (603,  1, 0),
-       (607,  1, 2),
+       (607,  1, 0),
        (703,  1, 0),
-       -- 房型1 共11間（空房10間，待維修1間）
+       -- 房型1 共11間（空房10間，待維修0間）
        (301,  2, 0),
        (503,  2, 0),
        (505,  2, 0),
@@ -453,16 +453,16 @@ VALUES (101,  1, 0),
        (609,  2, 0),
        -- 房型2 共5間（空房5間，待維修0間）
        (401,  3, 0),
-	   (506,  3, 0),
+       (506,  3, 0),
        (601,  3, 0),
        (605,  3, 0),
        (606,  3, 0),
        (702,  3, 0),
        (705,  3, 0),
        (706,  3, 0),
-       (707,  3, 2),
+       (707,  3, 0),
        (708,  3, 0),
-       -- 房型3 共10間（空房9間，待維修1間）
+       -- 房型3 共10間（空房9間，待維修0間）
        (701,  4, 0),
        (802,  4, 0),
        (803,  4, 0),
@@ -480,7 +480,7 @@ VALUES (101,  1, 0),
        (1002, 6, 0),
        (1003, 6, 0);
        -- 房型6 共3間（空房3間，待維修0間）
-       
+
 -- DROP TABLE IF EXISTS room;
 
 
@@ -716,54 +716,51 @@ INSERT INTO room_reservation_detail (
 
 -- 房型優惠價格 room_promotion_price （曾宸瑩）
 CREATE TABLE room_promotion_price (
-	room_promotion_id		INT				NOT NULL,		-- 優惠專案編號 (PK, FK)
-	room_type_id			INT				NOT NULL,		-- 房型編號 (PK, FK)
-	promotion_start_date	DATE			NOT NULL,		-- 專案開始日期
-	promotion_end_date		DATE			NOT NULL,		-- 專案結束日期
-	room_discount_rate		DECIMAL(3,2)	DEFAULT 1.0,	-- 房間折扣率
-	promotion_remark		VARCHAR(50),					-- 專案備註
-	CONSTRAINT pk_room_promotion_id_room_type_id PRIMARY KEY (room_promotion_id, room_type_id),
-	FOREIGN KEY (room_promotion_id) REFERENCES promotion (room_promotion_id) ,
-	FOREIGN KEY (room_type_id) REFERENCES room_type (room_type_id)
+    room_promotion_id  INT           NOT NULL,    -- 優惠專案編號 (PK, FK)
+    room_type_id       INT           NOT NULL,    -- 房型編號 (PK, FK)
+    room_discount_rate DECIMAL(3,2)  DEFAULT 1.0, -- 房間折扣率
+    CONSTRAINT pk_room_promotion_id_room_type_id PRIMARY KEY (room_promotion_id, room_type_id),
+    FOREIGN KEY (room_promotion_id) REFERENCES promotion (room_promotion_id) ,
+    FOREIGN KEY (room_type_id) REFERENCES room_type (room_type_id)
 );
 
-INSERT INTO room_promotion_price (room_promotion_id, room_type_id, promotion_start_date, promotion_end_date, room_discount_rate, promotion_remark)
+INSERT INTO room_promotion_price (room_promotion_id, room_type_id, room_discount_rate)
 VALUES 
        -- 1. 春假專案：針對雙人房 6 折吸引學生族群
-       (1, 1, '2025-03-10', '2025-03-20', 0.60, '針對雙人房 6 折吸引學生族群'),  -- 標準雙人房 6 折
-       (1, 2,'2025-03-10', '2025-03-20', 0.60, '針對雙人房 6 折吸引學生族群'),  -- 豪華海景雙人房 6 折
+       (1, 1, 0.60),  -- 標準雙人房 6 折
+       (1, 2, 0.60),  -- 豪華海景雙人房 6 折
        -- 2. 暑期優惠：指定房型 85 折
-       (2, 1, '2025-07-01', '2025-08-31', 0.85, '指定房型 85 折'),  -- 標準雙人房 85 折
-       (2, 2, '2025-07-01', '2025-08-31', 0.85, '指定房型 85 折'),  -- 豪華海景雙人房 85 折
-       (2, 3, '2025-07-01', '2025-08-31', 0.85, '指定房型 85 折'),  -- 豪華家庭房 85 折
-       (2, 4, '2025-07-01', '2025-08-31', 0.85, '指定房型 85 折'),  -- 豪華海景家庭房 85 折
+       (2, 1, 0.85),  -- 標準雙人房 85 折
+       (2, 2, 0.85),  -- 豪華海景雙人房 85 折
+       (2, 3, 0.85),  -- 豪華家庭房 85 折
+       (2, 4, 0.85),  -- 豪華海景家庭房 85 折
        -- 3. 週末快閃特惠：僅雙人房（含海景）享 9 折
-       (3, 1, '2025-09-06', '2025-09-08', 0.9, '雙人房（含海景）享 9 折'),  -- 標準雙人房 9 折
-       (3, 2, '2025-09-06', '2025-09-08', 0.9, '雙人房（含海景）享 9 折'),  -- 豪華海景雙人房 9 折
+       (3, 1, 0.9),  -- 標準雙人房 9 折
+       (3, 2, 0.9),  -- 豪華海景雙人房 9 折
        -- 4. 限時快閃：便宜房型超低 7 折
-       (4, 1, '2025-09-15', '2025-09-17', 0.7, '便宜房型超低 7 折'),  -- 標準雙人房 7 折
+       (4, 1, 0.7),  -- 標準雙人房 7 折
        -- 5. 早鳥優惠：雙人房 75 折
-       (5, 1, '2025-10-01', '2025-10-15', 0.75, '雙人房 75 折'),  -- 標準雙人房 75 折
-       (5, 2, '2025-10-01', '2025-10-15', 0.75, '雙人房 75 折'),  -- 豪華海景雙人房 75 折
+       (5, 1, 0.75),  -- 標準雙人房 75 折
+       (5, 2, 0.75),  -- 豪華海景雙人房 75 折
        -- 6. 中秋促銷：海景房型中秋優惠
-       (6, 2, '2025-10-03', '2025-10-06', 0.85, '海景房型中秋優惠'),  -- 豪華海景雙人房 85 折
-       (6, 4, '2025-10-03', '2025-10-06', 0.85, '海景房型中秋優惠'),  -- 豪華海景家庭房 85 折
-       (6, 5, '2025-10-03', '2025-10-06', 0.85, '海景房型中秋優惠'),  -- 海景樓中樓家庭房 85 折
+       (6, 2, 0.85),  -- 豪華海景雙人房 85 折
+       (6, 4, 0.85),  -- 豪華海景家庭房 85 折
+       (6, 5, 0.85),  -- 海景樓中樓家庭房 85 折
        -- 7. 秋季放鬆：中價房型舒壓優惠
-       (7, 2, '2025-10-20', '2025-10-31', 0.85, '中價房型舒壓優惠'),  -- 豪華海景雙人房 85 折
-       (7, 3, '2025-10-20', '2025-10-31', 0.85, '中價房型舒壓優惠'),  -- 豪華家庭房 85 折
+       (7, 2,  0.85),  -- 豪華海景雙人房 85 折
+       (7, 3,  0.85),  -- 豪華家庭房 85 折
        -- 8. 週年活動：超大優惠回饋
-       (8, 1, '2025-11-01', '2025-11-10', 0.75, '週年超大優惠回饋'),  -- 標準雙人房 75 折
-       (8, 2, '2025-11-01', '2025-11-10', 0.75, '週年超大優惠回饋'),  -- 豪華海景雙人房 75 折
-       (8, 3, '2025-11-01', '2025-11-10', 0.75, '週年超大優惠回饋'),  -- 豪華家庭房 75 折
+       (8, 1, 0.75),  -- 標準雙人房 75 折
+       (8, 2, 0.75),  -- 豪華海景雙人房 75 折
+       (8, 3, 0.75),  -- 豪華家庭房 75 折
        -- 9. 聖誕禮物：最高價房型專屬折扣
-       (9, 5, '2025-12-24', '2025-12-26', 0.8, '最高價房型專屬折扣'),  -- 海景樓中樓家庭房 8 折
-       (9, 6, '2025-12-24', '2025-12-26', 0.8, '最高價房型專屬折扣'),  -- 行政豪華月牙套房 8 折
+       (9, 5, 0.8),  -- 海景樓中樓家庭房 8 折
+       (9, 6, 0.8),  -- 行政豪華月牙套房 8 折
        -- 10. 元旦開年優惠：全館限量 8 折
-       (10, 1, '2026-01-01', '2026-01-07', 0.8, '全館限量 8 折'),  -- 標準雙人房 8 折
-       (10, 2, '2026-01-01', '2026-01-07', 0.8, '全館限量 8 折'),  -- 豪華海景雙人房 8 折
-       (10, 3, '2026-01-01', '2026-01-07', 0.8, '全館限量 8 折'),  -- 豪華家庭房 8 折
-       (10, 4, '2026-01-01', '2026-01-07', 0.8, '全館限量 8 折');  -- 豪華海景家庭房 8 折
+       (10, 1, 0.8),  -- 標準雙人房 8 折
+       (10, 2, 0.8),  -- 豪華海景雙人房 8 折
+       (10, 3, 0.8),  -- 豪華家庭房 8 折
+       (10, 4, 0.8);  -- 豪華海景家庭房 8 折
 
 -- DROP TABLE IF EXISTS room_promotion_price;
 
@@ -1120,19 +1117,20 @@ VALUES
 
 -- 優惠券 coupon （楊捷）
 CREATE TABLE coupon (
-	coupon_id       INT          AUTO_INCREMENT  PRIMARY KEY,  -- 優惠券編號 (PK)
+    coupon_id       INT          AUTO_INCREMENT  PRIMARY KEY,  -- 優惠券編號 (PK)
     coupon_code     VARCHAR(10)  NOT NULL,                     -- 優惠代碼
     discount_value  INT          NOT NULL,                     -- 折扣金額
     min_spend       INT          NOT NULL,                     -- 最低消費金額限制
     start_date      DATE         NOT NULL,                     -- 啟用日期
-    end_date        DATE         NOT NULL                      -- 結束日期
+    end_date        DATE         NOT NULL,                     -- 結束日期
+    coupon_status   TINYINT      NOT NULL                      -- 優惠券狀態
 );
 
-INSERT INTO coupon (coupon_code, discount_value, min_spend, start_date, end_date)
-VALUES ('Tibame', 50, 500, '2025-01-01', '2025-12-31'),
-	   ('David', 100, 1000, '2025-05-01', '2025-08-31'),
-       ('Summer123', 66, 200, '2025-07-01', '2025-08-31'),
-       ('MOM520', 520, 4000, '2025-05-01', '2025-05-31');
+INSERT INTO coupon (coupon_code, discount_value, min_spend, start_date, end_date, coupon_status)
+VALUES ('Tibame', 50, 500, '2025-01-01', '2025-12-31', 1),
+       ('David', 100, 1000, '2025-05-01', '2025-08-31', 1),
+       ('Summer123', 66, 200, '2025-07-01', '2025-08-31', 1),
+       ('MOM520', 520, 4000, '2025-05-01', '2025-05-31', 1);
 
 -- DROP TABLE IF EXISTS coupon;
 
