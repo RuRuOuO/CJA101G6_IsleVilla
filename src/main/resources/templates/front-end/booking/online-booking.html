@@ -75,17 +75,17 @@
                         <!-- 人數選擇 -->
                         <div class="mb-3 d-flex gap-2">
                             <select class="form-select" id="main-adults" name="mainAdults" style="max-width: 120px;">
-                                <option value="1" selected="selected">1 位成人</option>
-                                <option value="2">2 位成人</option>
-                                <option value="3">3 位成人</option>
-                                <option value="4">4 位成人</option>
-                                <option value="5">5 位成人</option>
-                                <option value="6">6 位成人</option>
+                                <option value="1" th:selected="${roomAdults != null and #lists.size(roomAdults) > 0 and roomAdults[0] == 1}">1 位成人</option>
+                                <option value="2" th:selected="${roomAdults != null and #lists.size(roomAdults) > 0 and roomAdults[0] == 2}">2 位成人</option>
+                                <option value="3" th:selected="${roomAdults != null and #lists.size(roomAdults) > 0 and roomAdults[0] == 3}">3 位成人</option>
+                                <option value="4" th:selected="${roomAdults != null and #lists.size(roomAdults) > 0 and roomAdults[0] == 4}">4 位成人</option>
+                                <option value="5" th:selected="${roomAdults != null and #lists.size(roomAdults) > 0 and roomAdults[0] == 5}">5 位成人</option>
+                                <option value="6" th:selected="${roomAdults != null and #lists.size(roomAdults) > 0 and roomAdults[0] == 6}">6 位成人</option>
                             </select>
                             <select class="form-select" id="main-children" name="children" style="max-width: 120px;">
-                                <option value="0" selected="selected">0 位孩童</option>
-                                <option value="1">1 位孩童</option>
-                                <option value="2">2 位孩童</option>
+                                <option value="0" th:selected="${children == null or children == 0}">0 位孩童</option>
+                                <option value="1" th:selected="${children != null and children == 1}">1 位孩童</option>
+                                <option value="2" th:selected="${children != null and children == 2}">2 位孩童</option>
                             </select>
                         </div>
                     </form>
@@ -126,12 +126,20 @@
                                     <div>
                                         <div class="fw-bold">原價</div>
                                         <div class="text-primary">
-                                        <span class="room-type-price"
-                                                th:attr="data-price=${roomTypeWithPromotions.roomType.roomTypePrice ?: 0}"
-                                                th:text="|${roomTypeWithPromotions.roomType.roomTypePrice ?: 0} 元/晚 × ${nights ?: 1} 晚 = ${(roomTypeWithPromotions.roomType.roomTypePrice ?: 0) * (nights ?: 1)} 元|">
-                                        </span>
-                                                                              </div>
+                                            <span class="room-type-price"
+                                                  th:attr="data-price=${roomTypeWithPromotions.roomType.roomTypePrice ?: 0}"
+                                                  th:text="|${roomTypeWithPromotions.roomType.roomTypePrice ?: 0} 元/晚 × ${nights ?: 1} 晚 = ${(roomTypeWithPromotions.roomType.roomTypePrice ?: 0) * (nights ?: 1)} 元|">
+                                            </span>
+                                        </div>
                                     </div>
+                                    <button type="button" class="btn btn-dark btn-select-room ms-2"
+                                            th:attr="data-room-name=${roomTypeWithPromotions.roomType.roomTypeName},
+                                                     data-room-price=${roomTypeWithPromotions.roomType.roomTypePrice ?: 0},
+                                                     data-room-id=${roomTypeWithPromotions.roomType.roomTypeId},
+                                                     data-room-type-id=${roomTypeWithPromotions.roomType.roomTypeId},
+                                                     data-promotion-title=''">
+                                        選擇
+                                    </button>
                                 </div>
                             </div>
                             <!-- 優惠專案詳細資訊 -->
@@ -158,7 +166,9 @@
                                        th:attr="data-room-name=${roomTypeWithPromotions.roomType.roomTypeName},
                                                 data-room-price=${roomTypeWithPromotions.getDiscountedPrice(promotion)},
                                                 data-room-id=${roomTypeWithPromotions.roomType.roomTypeId},
-                                                data-room-type-id=${roomTypeWithPromotions.roomType.roomTypeId}">
+                                                data-room-type-id=${roomTypeWithPromotions.roomType.roomTypeId},
+                                                data-promotion-title=${promotion.promotion.roomPromotionTitle != null ? promotion.promotion.roomPromotionTitle : ''},
+                                                data-promotion-id=${promotion.promotion.roomPromotionId != null ? promotion.promotion.roomPromotionId : ''}">
                                         選擇
                                     </a>
                                 </div>
@@ -259,10 +269,11 @@
         console.log('頁面載入完成');
         
         // 取得 Thymeleaf 傳來的查詢條件
-        var checkin = /*2025-07-21*/ '';
-        var checkout = /*2025-07-22*/ '';
+        var checkin =  '';
+        var checkout = '';
         if (checkin) document.getElementById('checkin').value = checkin;
         if (checkout) document.getElementById('checkout').value = checkout;
+        
         
         flatpickr("#main-date-range", {
             mode: "range",
@@ -279,6 +290,11 @@
                     document.getElementById('toyear').value = selectedDates[1].getFullYear();
                     document.getElementById('tomonth').value = String(selectedDates[1].getMonth() + 1).padStart(2, '0');
                     document.getElementById('today').value = String(selectedDates[1].getDate()).padStart(2, '0');
+                    // 將人數參數加入 URL，避免頁面重新載入後重置
+                    const currentUrl = new URL(window.location);
+                    currentUrl.searchParams.set('mainAdults', adults);
+                    currentUrl.searchParams.set('children', children);
+                    window.history.replaceState({}, '', currentUrl);
                     setTimeout(function() {
                         document.getElementById('idForm').requestSubmit();
                     }, 200);
@@ -300,10 +316,18 @@
             document.getElementById('adulteresa').value = this.value;
             // 只支援一間房，roomAdults 為單一成人數陣列
             document.getElementById('roomAdults').value = JSON.stringify([parseInt(this.value)]);
+            // 將人數參數加入 URL，避免頁面重新載入後重置
+            const currentUrl = new URL(window.location);
+            currentUrl.searchParams.set('mainAdults', this.value);
+            window.history.replaceState({}, '', currentUrl);
             tryAutoSubmit();
         });
         document.getElementById('main-children').addEventListener('change', function() {
             document.getElementById('enfantresa').value = this.value;
+            // 將人數參數加入 URL，避免頁面重新載入後重置
+            const currentUrl = new URL(window.location);
+            currentUrl.searchParams.set('children', this.value);
+            window.history.replaceState({}, '', currentUrl);
             tryAutoSubmit();
         });
         
@@ -351,6 +375,8 @@
         // 頁面載入時自動更新右側資訊
         if (typeof updateCartInfo === 'function') updateCartInfo();
         updateRoomTypePrices();
+        // 頁面載入時呼叫 renderCart 確保右側內容正確顯示
+        if (typeof renderCart === 'function') renderCart();
     });
 </script>
 
@@ -431,10 +457,11 @@ function renderCart() {
         selectedRoomsContainer.innerHTML = cartRoomsArr.map(function(room, index) {
             const price = parseInt(room.price || 0);
             const subtotal = price * nights;
+            if(room.promotionTitle) console.log('badge:', room.promotionTitle);
             return '<div class="border rounded p-2 mb-2">' +
                    '<div class="d-flex justify-content-between align-items-start">' +
                    '<div class="flex-grow-1">' +
-                   '<div class="fw-bold small">' + room.name + '</div>' +
+                   '<div class="fw-bold small">' + room.name + (room.promotionTitle ? ' <span class="badge bg-success ms-1">' + room.promotionTitle + '</span>' : '') + '</div>' +
                    '<div class="text-primary">' + price + ' 元/晚 × ' + nights + ' 晚 = ' + subtotal + ' 元</div>' +
                    '</div>' +
                    '<button type="button" class="btn btn-sm btn-outline-danger" onclick="removeRoom(' + index + ')">' +
@@ -492,16 +519,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 100);
 });
 
-document.querySelectorAll('.btn-select-room').forEach(btn => {
-    btn.addEventListener('click', function(e) {
+// 事件委派 - 處理選擇房型按鈕
+document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.btn-select-room');
+    if (btn) {
         e.preventDefault();
-        const roomName = this.getAttribute('data-room-name');
-        const price = this.getAttribute('data-room-price');
-        const roomId = this.getAttribute('data-room-id');
-        const roomTypeId = this.getAttribute('data-room-type-id');
-        cartRoomsArr.push({ name: roomName, price, roomId, roomTypeId });
+        const roomName = btn.getAttribute('data-room-name');
+        const price = btn.getAttribute('data-room-price');
+        const roomId = btn.getAttribute('data-room-id');
+        const roomTypeId = btn.getAttribute('data-room-type-id');
+        const promotionTitle = btn.getAttribute('data-promotion-title') || '';
+        const promotionId = btn.getAttribute('data-promotion-id') || '';
+        cartRoomsArr.push({ name: roomName, price, roomId, roomTypeId, promotionTitle, promotionId });
+        console.log('加入房型:', { name: roomName, price, roomId, roomTypeId, promotionTitle, promotionId });
         renderCart();
-    });
+    }
 });
 
 // 當查詢條件變動時自動更新右側資訊
