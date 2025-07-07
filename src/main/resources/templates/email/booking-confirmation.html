@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>訂房成功通知</title>
+</head>
+<body>
+    <h2>親愛的 [[${member.memberName}]] 您好：</h2>
+    <p>感謝您在IsleVilla完成訂房！以下是您的訂房資訊：</p>
+    <ul>
+        <li>訂單編號：[[${booking.id}]]</li>
+        <li>入住日期：[[${booking.checkInDate}]]</li>
+        <li>退房日期：[[${booking.checkOutDate}]]</li>
+        <li>房型：[[${booking.roomType}]]</li>
+        <li>房間數量：[[${booking.roomCount}]]</li>
+        <li>總金額：[[${booking.totalAmount}]] 元</li>
+    </ul>
+    <p>如有任何問題，歡迎隨時聯絡我們。</p>
+    <p>祝您有美好的一天！<br/>IsleVilla 團隊敬上</p>
+</body>
+</html>

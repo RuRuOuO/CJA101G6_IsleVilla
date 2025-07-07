@@ -372,7 +372,7 @@ public class BookingService {
         return ids.isEmpty() ? null : ids.get(0);
     }
 
-    public void createOrder(String guestName, String guestPhone, String guestEmail, String guestAddress, String specialRequests, String paymentMethod, java.util.Map bookingData, com.islevilla.lai.members.model.Members member) {
+    public Booking createOrderAndReturnBooking(String guestName, String guestPhone, String guestEmail, String guestAddress, String specialRequests, String paymentMethod, java.util.Map bookingData, com.islevilla.lai.members.model.Members member) {
         // 解析 bookingData 取得必要資訊
         java.time.LocalDate checkin = java.time.LocalDate.parse((String)bookingData.get("checkin"));
         java.time.LocalDate checkout = java.time.LocalDate.parse((String)bookingData.get("checkout"));
@@ -392,39 +392,30 @@ public class BookingService {
         order.setRoomTotalAmount(totalPrice);
         order.setRvDiscountAmount(0); // 先預設 0
         order.setRvPaidAmount(totalPrice);
-        
         // 處理優惠專案
         com.islevilla.patty.promotion.model.Promotion selectedPromotion = null;
         int totalDiscountAmount = 0;
-        
         // 明細
         java.util.List<com.islevilla.wei.room.model.RoomRVDetail> details = new java.util.ArrayList<>();
         for (java.util.Map room : selectedRooms) {
             com.islevilla.wei.room.model.RoomRVDetail detail = new com.islevilla.wei.room.model.RoomRVDetail();
-            // 取得 roomId 與 roomTypeId
             Integer roomId = room.get("roomId") != null ? Integer.parseInt(room.get("roomId").toString()) : null;
             Integer roomTypeId = room.get("roomTypeId") != null ? Integer.parseInt(room.get("roomTypeId").toString()) : null;
             Integer promotionId = room.get("promotionId") != null ? Integer.parseInt(room.get("promotionId").toString()) : null;
-            
             if (roomId != null) {
                 detail.setRoom(roomRepository.findById(roomId).orElse(null));
             }
             if (roomTypeId != null) {
                 detail.setRoomType(roomTypeRepository.findById(roomTypeId).orElse(null));
             }
-            
-            detail.setGuestCount(adults); // 先用總人數
+            detail.setGuestCount(adults);
             int roomPrice = Integer.parseInt(room.getOrDefault("price", "0").toString());
             detail.setRoomPrice(roomPrice);
-            
-            // 處理優惠專案折扣
             if (promotionId != null) {
-                // 查詢優惠專案
                 com.islevilla.patty.promotion.model.Promotion promotion = 
                     entityManager.find(com.islevilla.patty.promotion.model.Promotion.class, promotionId);
                 if (promotion != null) {
                     selectedPromotion = promotion;
-                    // 計算折扣金額（原價 - 優惠價）
                     if (detail.getRoomType() != null) {
                         int originalPrice = detail.getRoomType().getRoomTypePrice();
                         int discountAmount = originalPrice - roomPrice;
@@ -435,35 +426,36 @@ public class BookingService {
             } else {
                 detail.setRvDiscountAmount(0);
             }
-            
             detail.setRvPaidAmount(roomPrice);
             detail.setRoomRVOrder(order);
             details.add(detail);
         }
-        
-        // 設定訂單的優惠專案和折扣金額
         if (selectedPromotion != null) {
             order.setPromotion(selectedPromotion);
             order.setRvDiscountAmount(totalDiscountAmount);
         }
-        
         order.setRoomRVDetails(details);
-        // 儲存
         bookingRepository.save(order);
-
-        // === 新增：同步扣減 room_type_availability ===
-        // 依據每個明細，扣減對應日期的庫存
         for (com.islevilla.wei.room.model.RoomRVDetail detail : details) {
             Integer roomTypeId = detail.getRoomType().getRoomTypeId();
             java.time.LocalDate checkinDate = order.getCheckInDate();
             java.time.LocalDate checkoutDate = order.getCheckOutDate();
             java.time.LocalDate current = checkinDate;
             while (current.isBefore(checkoutDate)) {
-                // 調用 service 扣減庫存
                 roomTypeAvailabilityService.decreaseAvailability(roomTypeId, current, 1);
                 current = current.plusDays(1);
             }
         }
+        // 封裝Booking物件回傳
+        Booking booking = new Booking();
+        booking.setId(order.getRoomReservationId() != null ? order.getRoomReservationId().longValue() : null);
+        booking.setCheckInDate(checkin);
+        booking.setCheckOutDate(checkout);
+        booking.setRoomType(selectedRooms.size() > 0 && selectedRooms.get(0).get("roomTypeName") != null ? selectedRooms.get(0).get("roomTypeName").toString() : "");
+        booking.setRoomCount(selectedRooms.size());
+        booking.setTotalAmount(totalPrice);
+        booking.setEmail(guestEmail);
+        return booking;
     }
 
     public static class RoomTypeWithPromotions {
