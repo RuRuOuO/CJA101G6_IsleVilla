@@ -32,6 +32,7 @@ public class CheckInOutController {
         if (!orderListToday.isEmpty()) {
             model.addAttribute("orderListToday", orderListToday);
         }
+        model.addAttribute("sidebarActive", "check-in-out-list");
         return "back-end/check-in-out/check-in-out-list";
     }
 

@@ -10,9 +10,9 @@
 <body>
 <!-- ===== 載入sidebar ===== -->
 <!-- 插入手機版側邊欄 -->
-<th:block th:replace="~{fragments/backFragments :: mobileSidebar}"></th:block>
+<th:block th:replace="~{fragments/backFragments :: mobileSidebar(activeTab='feedback-list')}"></th:block>
 <!-- 插入桌面版側邊欄 -->
-<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+<div th:replace="~{fragments/backFragments :: sidebar(activeTab='feedback-list')}"></div>
 
 <main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
     <th:block th:fragment="myContent">
