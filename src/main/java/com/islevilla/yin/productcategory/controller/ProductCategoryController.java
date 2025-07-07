@@ -21,6 +21,7 @@ public class ProductCategoryController {
     public String listProductCategory(Model model) {
         List<ProductCategory> categories = productCategoryService.getAllProductCategory();
         model.addAttribute("categories", categories);
+        model.addAttribute("sidebarActive", "product-category-list");
         return "back-end/product/listProductCategory";
     }
 
