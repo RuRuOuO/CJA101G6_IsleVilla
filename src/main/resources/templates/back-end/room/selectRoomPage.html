@@ -76,8 +76,7 @@
 							</label> <select name="roomStatus" id="roomStatus" class="form-select">
 								<option value="">請選擇房間狀態</option>
 								<option th:each="roomStatus : ${roomStatusMap}"
-									th:value="${roomStatus.key}" th:text="${roomStatus.value}">
-								</option>
+									th:value="${roomStatus.key}" th:text="${roomStatus.value}"></option>
 							</select>
 						</div>
 					</div>
@@ -92,40 +91,43 @@
 						</button>
 					</div>
 				</form>
-				
-				<div class="table-responsive">
-                  <table class="table table-striped table-hover">
-	                  <thead class="table-dark">
-		                  <tr>
-			                  <th>房間ID</th>
-			                  <th>房型ID</th>
-			                  <th>房型名稱</th>
-			                  <th>房間狀態</th>
-			                  <th>修改</th>
-			                  <th>刪除</th>
-		                  </tr>
-	                  </thead>
-	              	  <tbody> 
-	                    <tr th:each="room : ${roomList}">
-						      <td th:text="${room.roomId}">房間ID</td>
-						      <td th:text="${room.roomTypeId}">房型ID</td>
-						      <td th:text="${roomTypeNameMap[room.roomTypeId]}">房型名稱</td>
-						      <td th:text="${roomStatusMap[room.roomStatus]}">房間狀態</td>
-	                      <td>
-                      		<a th:href="@{/backend/room/updateRoom/{roomId}(roomId=${room.roomId})}" class="btn btn-primary btn-sm">
-								    <i class="bi bi-pencil"></i> 修改
-								</a>
-	                      </td>
-	                      <td>
-	                      	<a href="javascript:void(0);"
-								class="btn btn-danger btn-sm"
-								th:onclick="deleteRoom([[${room.roomId}]])"> 
-								<i class="bi bi-trash"></i> 刪除
-							</a></td>
-						    </tr>
-				    </tbody>
-				  </table>
-              	</div>
+
+				<div class="table-responsive mt-4">
+					<table class="table table-hover align-middle">
+						<thead class="table-light">
+							<tr>
+								<th>房間ID</th>
+								<th>房型ID</th>
+								<th>房型名稱</th>
+								<th>房間狀態</th>
+								<th>修改</th>
+								<th>刪除</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="room : ${roomList}">
+								<td th:text="${room.roomId}">房間ID</td>
+								<td th:text="${room.roomTypeId}">房型ID</td>
+								<td th:text="${roomTypeNameMap[room.roomTypeId]}">房型名稱</td>
+								<td th:text="${roomStatusMap[room.roomStatus]}">房間狀態</td>
+								<td><a
+									th:href="@{/backend/room/updateRoom/{roomId}(roomId=${room.roomId})}"
+									class="btn btn-primary btn-sm"> <i class="bi bi-pencil"></i>
+										修改
+								</a></td>
+								<td><a
+									th:href="@{/backend/room/deleteRoom/{roomId}(roomId=${room.roomId})}"
+									class="btn btn-danger btn-sm"
+									onclick="return confirm('確定要刪除這個房間嗎？')"> <i
+										class="bi bi-trash"></i> 刪除
+								</a></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<th:block
+					th:replace="~{fragments/fragments :: paginationFragment(currentPage=${currentPage}, totalPages=${totalPages}, pageURL=${pageURL})}" />
 			</div>
 		</th:block>
 	</main>
@@ -133,39 +135,5 @@
 	<!-- ===== 載入統一的 JavaScript ===== -->
 	<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
 	<script src="/js/room.js"></script>
-    <script>
-	//JavaScript 發送 fetch 刪除請求並接收後端訊息
-	function deleteRoom(roomId) {
-	    if (!confirm('確定要刪除這個房間嗎？')) {
-	        return;
-	    }
-	
-	    fetch('/backend/room/deleteRoom/' + roomId, {
-	        method: 'GET',
-	    }).then(response => {
-	        if (response.ok) {
-	            // 從定向的URL中取得成功或失敗的訊息
-	            const redirectUrl = response.url;
-	            const urlParams = new URLSearchParams(new URL(redirectUrl).search);
-	            const successMessage = urlParams.get('successMessage');
-	            const errorMessage = urlParams.get('errorMessage');
-
-	            if (successMessage) {
-	                alert('刪除成功');
-	            } else if (errorMessage) {
-	                alert('刪除失敗：' + decodeURIComponent(errorMessage));
-	            }
-	            window.location.reload();
-	        } else {
-	            response.text().then(text => {
-	                alert('刪除失敗：' + text);
-	            });
-	        }
-	    }).catch(error => {
-	        console.error('刪除時發生錯誤:', error);
-	        alert('刪除時發生錯誤');
-	    });
-	}
-	</script>
 </body>
 </html>

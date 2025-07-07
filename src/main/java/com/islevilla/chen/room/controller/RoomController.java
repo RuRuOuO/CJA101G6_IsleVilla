@@ -9,6 +9,11 @@ import java.util.stream.Collectors;
 import javax.naming.directory.SearchResult;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -24,7 +29,9 @@ import com.islevilla.chen.roomType.model.RoomTypeService;
 import com.islevilla.chen.roomTypeAvailability.model.RoomTypeAvailabilityService;
 import com.islevilla.chen.util.exception.BusinessException;
 import com.islevilla.chen.util.map.RoomTypeName;
+import com.islevilla.wei.PageUtil;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
@@ -113,16 +120,23 @@ public String showAddRoom(Model model) {
 	
 // 顯示SelectPage網頁
 @GetMapping("/selectRoomPage")
-public String showSelectPage(Model model) {
+public String showSelectPage(@RequestParam(defaultValue = "0") int page,
+                             @RequestParam(defaultValue = "10") int size,
+                             Model model,
+                             HttpServletRequest request) {
 	Room room = new Room();
 	
 	// 房型下拉選單選項
     List<RoomType> roomTypeList=roomTypeName.getRoomTypeNameList();
     
-    // 新增：查詢所有房間資料
-    List<Room> roomList = roomService.findAll();
+    // 分頁查詢
+    Pageable pageable = PageRequest.of(page, size, Sort.by("roomId").ascending());
+    Page<Room> roomPage = roomService.findAll(pageable);
     
-    // 新增：創建房型名稱對應表
+    // 使用 PageUtil 將分頁資料加入 model
+    PageUtil.ModelWithPage(roomPage, model, page, "roomList", request);
+    
+    // 創建房型名稱對應表
     Map<Integer, String> roomTypeNameMap=roomTypeName.getRoomTypeNameMap();
     
 	System.out.println("進入頁面");
@@ -130,8 +144,7 @@ public String showSelectPage(Model model) {
     model.addAttribute("roomTypeList", roomTypeList);
     model.addAttribute("roomStatusMap", roomStatusMap);
     
-    // 新增：將房間列表和房型名稱對應表加到 model
-    model.addAttribute("roomList", roomList);
+    // 將房型名稱對應表加到 model
     model.addAttribute("roomTypeNameMap", roomTypeNameMap);
     
 	return "/back-end/room/selectRoomPage";
@@ -141,31 +154,44 @@ public String showSelectPage(Model model) {
 	public String selectRoomPage(@RequestParam(required = false) Integer roomId,
 	                        @RequestParam(required = false) Integer roomTypeId,
 	                        @RequestParam(required = false) Byte roomStatus,
-	                        Model model) {
+	                        @RequestParam(defaultValue = "0") int page,
+	                        @RequestParam(defaultValue = "10") int size,
+	                        Model model,
+	                        HttpServletRequest request) {
 	    List<String> errorMessage = new ArrayList<>();
-	    System.out.println(roomId);
-	    	List<Room> searchResult = roomService.compoundQuery(roomId, roomTypeId, roomStatus);
-	        if (searchResult.isEmpty()) {
-	            errorMessage.add("查無符合條件的房間資料");
-	        }
 	    
-		// 房型下拉選單選項
+	    // 取得所有符合條件的資料
+	    List<Room> fullResult = roomService.compoundQuery(roomId, roomTypeId, roomStatus);
+
+	    if (fullResult.isEmpty()) {
+	        errorMessage.add("查無符合條件的房間資料");
+	    }
+
+	    // 手動進行分頁
+	    Pageable pageable = PageRequest.of(page, size);
+	    int start = (int) pageable.getOffset();
+	    int end = Math.min((start + pageable.getPageSize()), fullResult.size());
+	    List<Room> pageContent = fullResult.subList(start, end);
+	    Page<Room> roomPage = new PageImpl<>(pageContent, pageable, fullResult.size());
+
+	    // 使用 PageUtil 將分頁資料加入 model
+	    PageUtil.ModelWithPage(roomPage, model, page, "searchResult", request);
+
+	    // 房型下拉選單選項
 	    List<RoomType> roomTypeList=roomTypeName.getRoomTypeNameList();
 	    // 創建房型名稱對應表（查詢結果需要顯示房型名稱）
 	    Map<Integer, String> roomTypeNameMap=roomTypeName.getRoomTypeNameMap();
 	    
 	    // 將結果傳遞給頁面
-	    model.addAttribute("searchResult", searchResult);
 	    model.addAttribute("roomTypeList", roomTypeList);
 	    model.addAttribute("roomTypeNameMap", roomTypeNameMap); 
 	    model.addAttribute("roomStatusMap", roomStatusMap);
 	    
 	    if (!errorMessage.isEmpty()) {
 	        model.addAttribute("errorMessage", errorMessage);
-	        return "/back-end/room/selectRoomPage";
 	    }
 	    
-	    System.out.println("查詢完成，找到 " + searchResult.size() + " 筆資料");
+	    System.out.println("查詢完成，找到 " + fullResult.size() + " 筆資料");
 	    return "back-end/room/searchRoom";
 	}
 
@@ -188,22 +214,6 @@ public String showSearchRoom(@RequestParam(required = false) Integer roomId,
 	return "/back-end/room/searchRoom";
 	
 	}
-
-// 顯示ListAllRoom網頁
-@GetMapping("/listAllRoom")
-public String showListAllRoom(Model model) {
-	
-	List<Room> roomList = roomService.findAll();
-	
-    // 創建房型名稱對應表（查詢結果需要顯示房型名稱）
-    Map<Integer, String> roomTypeNameMap=roomTypeName.getRoomTypeNameMap();
-
-	System.out.println("進入頁面");
-	model.addAttribute("roomList", roomList);  
-	model.addAttribute("roomStatusMap", roomStatusMap);  
-	model.addAttribute("roomTypeNameMap", roomTypeNameMap);  
-	return "back-end/room/listAllRoom";
-}	
 
 //顯示UpdateRoom網頁
 @GetMapping("/updateRoom/{roomId}")

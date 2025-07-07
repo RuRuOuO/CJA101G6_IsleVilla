@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +44,11 @@ public class RoomService {
 	@Transactional(readOnly = true)
 	public List<Room> findAll() {
 		return roomRepository.findAll();
+	}
+
+	@Transactional(readOnly = true)
+	public Page<Room> findAll(Pageable pageable) {
+		return roomRepository.findAll(pageable);
 	}
 	@Transactional(readOnly = true)
 	public List<Room> compoundQuery(Integer roomId, Integer roomTypeId, Byte roomStatus){
