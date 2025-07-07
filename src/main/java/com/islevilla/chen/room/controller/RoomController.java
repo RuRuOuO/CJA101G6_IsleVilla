@@ -9,6 +9,11 @@ import java.util.stream.Collectors;
 import javax.naming.directory.SearchResult;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -21,9 +26,12 @@ import com.islevilla.chen.room.model.Room;
 import com.islevilla.chen.room.model.RoomService;
 import com.islevilla.chen.roomType.model.RoomType;
 import com.islevilla.chen.roomType.model.RoomTypeService;
+import com.islevilla.chen.roomTypeAvailability.model.RoomTypeAvailabilityService;
 import com.islevilla.chen.util.exception.BusinessException;
 import com.islevilla.chen.util.map.RoomTypeName;
+import com.islevilla.wei.PageUtil;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
@@ -36,6 +44,9 @@ public class RoomController {
 	
 	@Autowired
 	private RoomTypeService roomTypeService;
+	
+	@Autowired
+	private RoomTypeAvailabilityService roomTypeAvailabilityService;
 	
 	@Autowired
 	private RoomTypeName roomTypeName;
@@ -87,6 +98,11 @@ public String showAddRoom(Model model) {
 		
 		try {
 	        roomService.addRoom(room);
+			//增加新房間後，更新該房型的統計資料
+	        roomService.updateRoomTypeBasicStatistics(room.getRoomTypeId());
+	        // 更新該房型的統計資料後改寫roomTypeAvailability資料庫
+	        roomTypeAvailabilityService.recalculateAvailability(roomService.updateRoomTypeBasicStatistics(room.getRoomTypeId()));
+	        
 			System.out.println("資料送出成功");
 			model.addAttribute("successMessage", "房間新增成功！");
 			model.addAttribute("room", room); 
@@ -104,16 +120,33 @@ public String showAddRoom(Model model) {
 	
 // 顯示SelectPage網頁
 @GetMapping("/selectRoomPage")
-public String showSelectPage(Model model) {
+public String showSelectPage(@RequestParam(defaultValue = "0") int page,
+                             @RequestParam(defaultValue = "10") int size,
+                             Model model,
+                             HttpServletRequest request) {
 	Room room = new Room();
 	
 	// 房型下拉選單選項
     List<RoomType> roomTypeList=roomTypeName.getRoomTypeNameList();
     
+    // 分頁查詢
+    Pageable pageable = PageRequest.of(page, size, Sort.by("roomId").ascending());
+    Page<Room> roomPage = roomService.findAll(pageable);
+    
+    // 使用 PageUtil 將分頁資料加入 model
+    PageUtil.ModelWithPage(roomPage, model, page, "roomList", request);
+    
+    // 創建房型名稱對應表
+    Map<Integer, String> roomTypeNameMap=roomTypeName.getRoomTypeNameMap();
+    
 	System.out.println("進入頁面");
     model.addAttribute("room", room);
     model.addAttribute("roomTypeList", roomTypeList);
     model.addAttribute("roomStatusMap", roomStatusMap);
+    
+    // 將房型名稱對應表加到 model
+    model.addAttribute("roomTypeNameMap", roomTypeNameMap);
+    
 	return "/back-end/room/selectRoomPage";
 }	
 	
@@ -123,29 +156,32 @@ public String showSelectPage(Model model) {
 	                        @RequestParam(required = false) Byte roomStatus,
 	                        Model model) {
 	    List<String> errorMessage = new ArrayList<>();
-	    System.out.println(roomId);
-	    	List<Room> searchResult = roomService.compoundQuery(roomId, roomTypeId, roomStatus);
-	        if (searchResult.isEmpty()) {
-	            errorMessage.add("查無符合條件的房間資料");
-	        }
 	    
-		// 房型下拉選單選項
+	    // 取得所有符合條件的資料（不分頁）
+	    List<Room> fullResult = roomService.compoundQuery(roomId, roomTypeId, roomStatus);
+
+	    if (fullResult.isEmpty()) {
+	        errorMessage.add("查無符合條件的房間資料");
+	    }
+
+	    // 直接傳遞所有查詢結果，不進行分頁
+	    model.addAttribute("searchResult", fullResult);
+
+	    // 房型下拉選單選項
 	    List<RoomType> roomTypeList=roomTypeName.getRoomTypeNameList();
 	    // 創建房型名稱對應表（查詢結果需要顯示房型名稱）
 	    Map<Integer, String> roomTypeNameMap=roomTypeName.getRoomTypeNameMap();
 	    
 	    // 將結果傳遞給頁面
-	    model.addAttribute("searchResult", searchResult);
 	    model.addAttribute("roomTypeList", roomTypeList);
 	    model.addAttribute("roomTypeNameMap", roomTypeNameMap); 
 	    model.addAttribute("roomStatusMap", roomStatusMap);
 	    
 	    if (!errorMessage.isEmpty()) {
 	        model.addAttribute("errorMessage", errorMessage);
-	        return "/back-end/room/selectRoomPage";
 	    }
 	    
-	    System.out.println("查詢完成，找到 " + searchResult.size() + " 筆資料");
+	    System.out.println("查詢完成，找到 " + fullResult.size() + " 筆資料");
 	    return "back-end/room/searchRoom";
 	}
 
@@ -168,22 +204,6 @@ public String showSearchRoom(@RequestParam(required = false) Integer roomId,
 	return "/back-end/room/searchRoom";
 	
 	}
-
-// 顯示ListAllRoom網頁
-@GetMapping("/listAllRoom")
-public String showListAllRoom(Model model) {
-	
-	List<Room> roomList = roomService.findAll();
-	
-    // 創建房型名稱對應表（查詢結果需要顯示房型名稱）
-    Map<Integer, String> roomTypeNameMap=roomTypeName.getRoomTypeNameMap();
-
-	System.out.println("進入頁面");
-	model.addAttribute("roomList", roomList);  
-	model.addAttribute("roomStatusMap", roomStatusMap);  
-	model.addAttribute("roomTypeNameMap", roomTypeNameMap);  
-	return "back-end/room/listAllRoom";
-}	
 
 //顯示UpdateRoom網頁
 @GetMapping("/updateRoom/{roomId}")
@@ -233,14 +253,29 @@ public String showUpdateRoom(@PathVariable Integer roomId, Model model) {
 			model.addAttribute("room", room);
 			return "/back-end/room/updateRoom";
 		}else{
+			// 取得原始房間資料以比較房型是否改變
+			Room originalRoom = roomService.findById(room.getRoomId());
+			Integer originalRoomTypeId = originalRoom.getRoomTypeId();
+			
 			roomService.updateRoom(room);
-
-			System.out.println("資料送出成功");
-			model.addAttribute("successMessage", "房間資料更新成功！");
-			model.addAttribute("room", room);
-			return "back-end/room/updateRoom";
+			
+			//增加新房間後，更新"新"房型的統計資料
+	        roomService.updateRoomTypeBasicStatistics(room.getRoomTypeId());
+	        // 更新"新"房型的統計資料後改寫roomTypeAvailability資料庫
+	        roomTypeAvailabilityService.recalculateAvailability(roomService.updateRoomTypeBasicStatistics(room.getRoomTypeId()));
+			
+			//增加新房間後，更新舊房型的統計資料
+	        roomService.updateRoomTypeBasicStatistics(originalRoomTypeId);
+	        // 更新舊房型的統計資料後改寫roomTypeAvailability資料庫
+	        roomTypeAvailabilityService.recalculateAvailability(roomService.updateRoomTypeBasicStatistics(originalRoomTypeId));;
 		}
+
+		System.out.println("資料送出成功");
+		model.addAttribute("successMessage", "房間資料更新成功！");
+		model.addAttribute("room", room);
+		return "back-end/room/updateRoom";
 	}
+
 	
 	//刪除
 	@GetMapping("/deleteRoom/{roomId}")
@@ -248,7 +283,15 @@ public String showUpdateRoom(@PathVariable Integer roomId, Model model) {
 						   @RequestHeader(value = "Referer", required = false) String referer,
 						   RedirectAttributes redirectAttr) {
 		 try {
+		        // 在刪除前取得房間資料以獲取房型ID
+		        Room roomToDelete = roomService.findById(roomId);
+		        Integer roomTypeId = roomToDelete.getRoomTypeId();
+		        
 		        roomService.deleteRoom(roomId);
+		        
+		        // 刪除房間後，重新計算該房型的統計資料
+		        roomTypeAvailabilityService.recalculateAvailability(roomService.updateRoomTypeBasicStatistics(roomTypeId));
+		        
 		        redirectAttr.addFlashAttribute("successMessage", "房間刪除成功！");
 		    } catch (Exception e) { //外鍵約束錯誤會發生在控制器，service不用寫
 		        redirectAttr.addFlashAttribute("errorMessage", "此房間尚有訂單資料，無法刪除");

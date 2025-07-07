@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
+import java.util.ArrayList;
 
 @Controller
 public class CartController {
@@ -115,5 +116,31 @@ public class CartController {
         }
         String userId = String.valueOf(member.getMemberId());
         return cartService.getProductQuantityInCart(userId, productId);
+    }
+
+    // 結帳前庫存檢查
+    @PostMapping("/cart/checkout")
+    public String preCheckout(HttpSession session, Model model) {
+        Members member = (Members) session.getAttribute("member");
+        if (member == null) {
+            return "redirect:/member/login?redirect=/cart";
+        }
+        String userId = String.valueOf(member.getMemberId());
+        List<CartDTO> cartItems = cartService.getCartItems(userId);
+
+        List<String> errorList = new ArrayList<>();
+        for (CartDTO item : cartItems) {
+            Integer stock = productService.getProductById(item.getProductId()).getProductQuantity();
+            if (item.getQuantity() > stock) {
+                errorList.add(item.getProductName() + "庫存不足，請重新調整數量（剩餘" + stock + "件）");
+            }
+        }
+        if (!errorList.isEmpty()) {
+            model.addAttribute("cartItems", cartItems);
+            model.addAttribute("totalAmount", cartItems.stream().mapToInt(CartDTO::getSubtotal).sum());
+            model.addAttribute("error", String.join("<br>", errorList));
+            return "front-end/product/cart";
+        }
+        return "redirect:/checkout";
     }
 }

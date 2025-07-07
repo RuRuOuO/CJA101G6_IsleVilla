@@ -62,7 +62,7 @@
 
 				<!-- 房型表格 -->
 				<div class="table-responsive">
-					<table id="roomTypeTable" class="table table-hover">
+					<table id="roomTypeTable" class="table table-hover table-light align-middle">
 						<thead>
 							<tr>
 								<th>房型編號</th>
@@ -303,6 +303,24 @@
 
 
 	<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
+<script>
+$(document).ready(function(){
+	// 只添加 DataTables 排序功能
+	if ($('#roomTypeTable').length > 0) {
+		$('#roomTypeTable').DataTable({
+			paging: false,  // 關閉分頁
+			info: false,    // 關閉資訊顯示
+			searching: false, // 關閉搜尋
+			columnDefs: [
+				{ orderable: false, targets: [6] } // 操作欄不排序
+			],
+			language: {
+				emptyTable: "沒有資料可顯示"
+			}
+		});
+	}
+});
+</script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 <script src="/js/roomType.js"></script>
 

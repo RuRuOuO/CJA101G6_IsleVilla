@@ -17,37 +17,385 @@
 
 <main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
     <th:block th:fragment="myContent">
-		<h2 class="card-title">優惠專案價格修改</h2>
-		<h5 class="card-subtitle mb-4 text-muted">所有欄位皆為必填</h5>
+        <h2 class="card-title">優惠專案價格修改</h2>
+        <h5 class="card-subtitle mb-4 text-muted">所有欄位皆為必填</h5>
 
-		<form th:action="@{/backend/roompromotionprice/update}" method="post" th:object="${roompromotionprice}" enctype="multipart/form-data">
-			
-			<div class="mb-3">
-				<label for="roomPromotionTitle" class="form-label">優惠專案名稱:</label>
-				<input type="text" id="roomPromotionTitle" th:field="*{roomPromotionTitle}" class="form-control-plaintext" readonly />
-			</div>
+        <!-- 基本資訊 -->
+        <div class="mb-3">
+            <label class="form-label">優惠專案編號:</label>
+            <span th:text="${roomPromotionPrice.promotion != null ? roomPromotionPrice.promotion.roomPromotionId : ''}"></span>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">優惠專案名稱:</label>
+            <span th:text="${roomPromotionPrice.promotion != null ? roomPromotionPrice.promotion.roomPromotionTitle : ''}"></span>
+        </div>
 
-			<div>
-			<label>房型:</label>
-			<select th:field="*{roomType.roomTypeId}">
-				<option th:each="roomType : ${roomTypeListData}" th:value="${roomType.roomTypeId}" th:text="${roomType.roomTypeName}" />
-			</select>
-       <!-- <span th:if="${#fields.hasErrors('deptVO.deptno')}" th:errors="*{deptVO.deptno}" class="error" id="deptVO.deptno.errors"></span> -->
-			</div>
-			
-			<div>
-			<label>價格:</label>
-			<input type="text" th:field="*{roomDiscountRate}" onclick="hideContent('roomDiscountRate.errors');" /><br/>
-			<span  th:if="${#fields.hasErrors('roomDiscountRate')}" th:errors="*{roomDiscountRate}" class="error" id="roomDiscountRate.errors"></span>
-			</div>
-			
-			<div>
-				<button type="submit" id="submit" class="btn btn-primary">送出修改</button>
-				<a th:href="@{/backend/roompromotionprice/listAll}" class="btn btn-secondary">取消</a>
-			</div>		
-		</form>
+        <!-- 已設定價格的房型 -->
+        <div class="mb-4">
+            <h6 class="fw-bold mb-3">已設定價格</h6>
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm align-middle bg-white">
+                    <thead class="table-light">
+                        <tr class="text-center align-middle">
+                            <th style="width:50%">房型</th>
+                            <th style="width:30%">折扣率</th>
+                            <th style="width:20%">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="ps : ${existingPriceSettings}">
+                            <td>
+                                <span th:text="${ps.roomType.roomTypeName}"></span>
+                            </td>
+                            <td>
+                                <select class="form-select discount-rate-select" 
+                                        th:data-promotion-id="${ps.promotion.roomPromotionId}"
+                                        th:data-room-type-id="${ps.roomType.roomTypeId}">
+                                    <option th:each="i : ${discountOptions}"
+                                            th:value="${i}"
+                                            th:text="${i}"
+                                            th:selected="${ps.roomDiscountRate == i}"></option>
+                                </select>
+                            </td>
+                            <td class="text-center">
+                                <button type="button" class="btn btn-danger btn-sm delete-btn" 
+                                        th:data-promotion-id="${ps.promotion.roomPromotionId}"
+                                        th:data-room-type-id="${ps.roomType.roomTypeId}">
+                                    <i class="bi bi-trash"></i> 刪除
+                                </button>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(existingPriceSettings)}">
+                            <td colspan="3" class="text-center text-muted">尚無設定</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 新增價格設定 -->
+        <div class="mb-4">
+            <h6 class="fw-bold mb-3">新增價格設定</h6>
+            <div class="row mb-3 align-items-end">
+                <div class="col-md-6">
+                    <label for="newRoomTypeId" class="form-label">房型:<span class="text-danger">*</span></label>
+                    <select id="newRoomTypeId" class="form-select" required>
+                        <option value="">請選擇房型</option>
+                        <option th:each="roomType : ${unassignedRoomTypeList}" th:value="${roomType.roomTypeId}" th:text="${roomType.roomTypeName}"></option>
+                    </select>
+                    <div class="invalid-feedback">請選擇房型</div>
+                </div>
+                <div class="col-md-4">
+                    <label for="newRoomDiscountRate" class="form-label">折扣率:<span class="text-danger">*</span></label>
+                    <input type="number" id="newRoomDiscountRate" class="form-control" step="0.05" min="0" max="1" placeholder="0.00" required />
+                    <div class="invalid-feedback">請輸入有效的折扣率</div>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" id="addPriceBtn" class="btn btn-primary w-100">
+                        <i class="bi bi-plus-circle me-1"></i>新增
+                    </button>
+                </div>
+            </div>
+            <!-- 錯誤訊息顯示區域 -->
+            <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
+            <!-- 成功訊息顯示區域 -->
+            <div id="successMessage" class="alert alert-success" style="display: none;"></div>
+            <div class="d-flex gap-2">
+                <!-- <button type="button" id="saveAllBtn" class="btn btn-success">
+                    <i class="bi bi-save me-1"></i>儲存全部
+                </button> -->
+                <a th:href="@{/backend/roompromotionprice/listAll}" class="btn btn-secondary">返回列表</a>
+            </div>
+        </div>
     </th:block>
 </main>
+
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+
+        // 新增價格設定的 AJAX 處理
+        const addPriceBtn = document.getElementById('addPriceBtn');
+        const newRoomTypeId = document.getElementById('newRoomTypeId');
+        const newRoomDiscountRate = document.getElementById('newRoomDiscountRate');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        
+        // 獲取優惠專案ID
+        const promotionId = /*[[${roomPromotionPrice.promotion.roomPromotionId}]]*/ 0;
+
+        // 儲存全部資料的處理
+        // const saveAllBtn = document.getElementById('saveAllBtn');
+        // saveAllBtn.addEventListener('click', function() {
+        //     // 清除之前的訊息
+        //     errorMessage.style.display = 'none';
+        //     successMessage.style.display = 'none';
+            
+        //     // 檢查所有折扣率是否為 0.05 的倍數
+        //     const discountInputs = document.querySelectorAll('.discount-rate-input');
+        //     let hasInvalidDiscount = false;
+        //     let invalidInput = null;
+            
+        //     discountInputs.forEach(input => {
+        //         const discountRate = parseFloat(input.value);
+        //         if (!isNaN(discountRate) && Math.round(discountRate * 20) / 20 !== discountRate) {
+        //             hasInvalidDiscount = true;
+        //             invalidInput = input;
+        //         }
+        //     });
+            
+        //     if (hasInvalidDiscount) {
+        //         showError('所有折扣率必須是 0.05 的倍數（如：0.05, 0.10, 0.15, ..., 0.95, 1.00）');
+        //         if (invalidInput) {
+        //             invalidInput.focus();
+        //         }
+        //         return;
+        //     }
+            
+        //     // 發送 AJAX 請求
+        //     fetch('/backend/roompromotionprice/saveAll', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/x-www-form-urlencoded',
+        //         },
+        //         body: new URLSearchParams({
+        //             roomPromotionId: promotionId
+        //         })
+        //     })
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         if (data.success) {
+        //             showSuccess(data.message);
+        //             // 延遲跳轉到列表頁面
+        //             setTimeout(() => {
+        //                 window.location.href = data.redirectUrl;
+        //             }, 1500);
+        //         } else {
+        //             showError(data.message);
+        //         }
+        //     })
+        //     .catch(error => {
+        //         showError('儲存失敗：' + error.message);
+        //     });
+        // });
+
+        addPriceBtn.addEventListener('click', function() {
+            // 清除之前的訊息
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+            
+            // 驗證欄位
+            if (!newRoomTypeId.value || !newRoomDiscountRate.value) {
+                showError('請填寫所有必填欄位');
+                return;
+            }
+            
+            const roomTypeId = parseInt(newRoomTypeId.value);
+            const roomDiscountRate = parseFloat(newRoomDiscountRate.value);
+            
+            if (roomDiscountRate <= 0 || roomDiscountRate > 1) {
+                showError('折扣率必須在 0 到 1 之間');
+                return;
+            }
+            // 檢查是否為 0.05 的倍數
+            if (Math.round(roomDiscountRate * 20) / 20 !== roomDiscountRate) {
+                showError('折扣率必須是 0.05 的倍數（如：0.05, 0.10, 0.15, ..., 0.95, 1.00）');
+                return;
+            }
+            
+            // 發送 AJAX 請求
+            fetch('/backend/roompromotionprice/addPriceSetting', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    roomPromotionId: promotionId,
+                    roomTypeId: roomTypeId,
+                    roomDiscountRate: roomDiscountRate
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccess(data.message);
+                    // 清空欄位
+                    newRoomTypeId.value = '';
+                    newRoomDiscountRate.value = '';
+                    // 重新載入頁面以顯示新資料
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    showError(data.message);
+                }
+            })
+            .catch(error => {
+                showError('發生錯誤：' + error.message);
+            });
+        });
+        
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+        }
+        
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+        }
+
+        // 刪除價格設定的 AJAX 處理
+        document.addEventListener('click', function(e) {
+            const deleteBtn = e.target.closest('.delete-btn');
+            if (deleteBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const promotionId = deleteBtn.getAttribute('data-promotion-id');
+                const roomTypeId = deleteBtn.getAttribute('data-room-type-id');
+                
+                console.log('Delete button clicked:', promotionId, roomTypeId); // 除錯用
+                
+                if (confirm('確定要刪除這筆設定嗎？')) {
+                    console.log('User confirmed deletion'); // 除錯用
+                    
+                    // 發送 AJAX 請求
+                    fetch('/backend/roompromotionprice/deleteOne', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            roomPromotionId: promotionId,
+                            roomTypeId: roomTypeId
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showSuccess(data.message);
+                            // 重新載入頁面以更新資料
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1500);
+                        } else {
+                            showError(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        showError('刪除失敗：' + error.message);
+                    });
+                }
+            }
+        });
+
+        // 折扣率輸入框變更處理
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('discount-rate-input')) {
+                const input = e.target;
+                const promotionId = input.getAttribute('data-promotion-id');
+                const roomTypeId = input.getAttribute('data-room-type-id');
+                const newDiscountRate = parseFloat(input.value);
+                
+                // 驗證折扣率
+                if (isNaN(newDiscountRate) || newDiscountRate <= 0 || newDiscountRate > 1) {
+                    showError('折扣率必須在 0 到 1 之間');
+                    return;
+                }
+                
+                // 發送 AJAX 請求更新折扣率
+                fetch('/backend/roompromotionprice/updateDiscountRate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        roomPromotionId: promotionId,
+                        roomTypeId: roomTypeId,
+                        roomDiscountRate: newDiscountRate
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showSuccess(data.message);
+                    } else {
+                        showError(data.message);
+                    }
+                })
+                .catch(error => {
+                    showError('更新失敗：' + error.message);
+                });
+            }
+        });
+
+        // 攔截返回列表按鈕，先儲存所有折扣率再跳轉
+        const backBtn = document.querySelector('a.btn.btn-secondary');
+        if (backBtn) {
+            backBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                errorMessage.style.display = 'none';
+                successMessage.style.display = 'none';
+
+                // 收集所有下拉選單的資料
+                const selects = document.querySelectorAll('.discount-rate-select');
+                const requests = [];
+                let hasError = false;
+
+                selects.forEach(select => {
+                    const promotionId = select.getAttribute('data-promotion-id');
+                    const roomTypeId = select.getAttribute('data-room-type-id');
+                    const newDiscountRate = parseFloat(select.value);
+                    // 只要有一個無效就不送出
+                    if (isNaN(newDiscountRate) || newDiscountRate <= 0 || newDiscountRate > 1) {
+                        showError('折扣率必須在 0 到 1 之間');
+                        hasError = true;
+                        select.focus();
+                        return;
+                    }
+                    requests.push(
+                        fetch('/backend/roompromotionprice/updateDiscountRate', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: new URLSearchParams({
+                                roomPromotionId: promotionId,
+                                roomTypeId: roomTypeId,
+                                roomDiscountRate: newDiscountRate
+                            })
+                        }).then(res => res.json())
+                    );
+                });
+
+                if (hasError) return;
+
+                Promise.all(requests).then(results => {
+                    // 檢查有沒有失敗
+                    const fail = results.find(r => !r.success);
+                    if (fail) {
+                        showError(fail.message || '有資料儲存失敗');
+                    } else {
+                        // 全部成功才跳轉
+                        window.location.href = backBtn.href;
+                    }
+                }).catch(err => {
+                    showError('儲存過程發生錯誤：' + err.message);
+                });
+            });
+        }
+    });
+</script>
 
 </body>
 </html>

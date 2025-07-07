@@ -267,14 +267,15 @@
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="agreeTerms" required>
                                     <label class="form-check-label" for="agreeTerms">
-                                        我已閱讀並同意 <a href="#" target="_blank">訂房條款</a> 和 <a href="#" target="_blank">隱私政策</a>
+                                        我已閱讀並同意 
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">訂房條款</a> 和 
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">隱私政策</a>
                                     </label>
                                 </div>
                             </div>
-
-                            <!-- 按鈕 -->
+                            <!-- 表單底部按鈕 -->
                             <div class="d-flex justify-content-between">
-                                <button type="button" class="btn btn-secondary" onclick="history.back()">
+                                <button type="button" class="btn btn-secondary" onclick="goBackToBooking()">
                                     <i class="bi bi-arrow-left"></i> 返回修改
                                 </button>
                                 <button type="submit" class="btn btn-primary">
@@ -289,8 +290,97 @@
     </div>
 </main>
 
+<!-- 訂房條款 Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="termsModalLabel">訂房條款</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+        <p>歡迎您預訂微嶼 Isle Villa，我們致力於提供舒適與安心的住宿體驗。請詳閱以下訂房條款：</p>
+            
+        <ol>
+          <li><strong>入住與退房時間：</strong> <br>
+            入住時間為當日下午 15:00 以後，退房時間為翌日上午 11:00 前。提前入住或延遲退房請提前聯繫，我們將視房況提供協助。</li>
+    
+          <li><strong>付款方式：</strong> <br>
+            預訂時將以信用卡預收全額房價。線上付款尚未支援美國運通信用卡，不便之處，敬請見諒!</li>
+        
+          <li><strong>取消與更改：</strong> <br>
+            本渡假村採預收 100% 房價之訂房方式，若需取消，將依照交通部觀光署公告之定型化契約規定計算取消費用（如下表），其餘金額將全額退還。<br>
+            - 依照觀光署「旅客直接訂房定型化契約」取消訂房之規定如下；相關事宜請與微嶼客服聯繫:<br>
+            - 於預訂住宿日14日前接獲解約通知者，房費全額退還； <br>
+            - 於預訂住宿日10~13日前接獲解約通知者，退還訂金之70%； <br>
+            - 於預訂住宿日7~9日前接獲解約通知者，退還訂金之50%； <br>
+            - 於預訂住宿日前4~6日接獲解約通知者，退還訂金之40%； <br>
+            - 於預訂住宿日前2~3日接獲解約通知者，退還訂金之30%； <br>
+            - 於預訂住宿日前1日接獲解約通知者，退還訂金之20%； <br>
+            - 於預訂住宿日接獲解約通知或未為解約通知者，訂金不予退還。<br>
+            - 如需更改日期，請於入住日前至少 14 日聯繫我們。</li>
+        
+          <li><strong>房客責任：</strong> <br>
+            請妥善使用房間設備與公共設施，如有損壞需照價賠償。禁止吸菸與攜帶寵物。</li>
+        
+          <li><strong>不可抗力因素：</strong> <br>
+            如遇颱風、地震等不可抗力因素導致無法入住，我們將協助取消訂單並提供退費或延期服務。</li>
+        </ol>
+        
+        <p>預訂即表示您已閱讀並同意上述條款。如有任何疑問，歡迎與我們聯繫。</p></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 隱私政策 Modal -->
+<div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="privacyModalLabel">隱私政策</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+        <p>微嶼 Isle Villa 尊重並重視您的隱私權，以下為我們的資料收集與使用政策：</p>
+
+        <ol>
+        <li><strong>資料收集：</strong> <br>
+            為提供訂房與客服服務，我們會收集以下資訊：姓名、電話、電子信箱、入住資料與付款資訊。</li>
+
+        <li><strong>資料用途：</strong> <br>
+            您的個人資料僅用於訂房確認、聯繫通知、客服處理與服務改進，不會用於其他未經您同意之用途。</li>
+
+        <li><strong>資料保護：</strong> <br>
+            我們保護您的個人資料，並限制內部人員之存取權限。</li>
+
+        <li><strong>資料分享：</strong> <br>
+            除非經法律要求或取得您的同意，我們不會將您的個資提供給第三方。</li>
+
+        <li><strong>資料查詢與刪除：</strong> <br>
+            您有權查詢、修改或要求刪除您的個人資料。請透過客服信箱與我們聯繫。</li>
+        </ol>
+
+        <p>若您使用本網站服務，即視為同意本隱私政策內容。政策如有修訂，將公告於本網站上。</p>
+
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ========== 載入Footer ========== -->
 <div th:replace="~{fragments/fragments :: footer}"></div>
+
+<!-- Bootstrap 5 JS (bundle) for modal support -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -345,7 +435,7 @@
                 roomDiv.innerHTML = `
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <strong>${room.name}</strong>
+                            <strong>${room.name}${room.promotionTitle ? ' <span class="badge bg-success ms-1">' + room.promotionTitle + '</span>' : ''}</strong>
                             <div class="text-muted">${price} 元/晚 × ${nights} 晚 = <span class="text-primary">${subtotal} 元</span></div>
                         </div>
                     </div>
@@ -388,6 +478,10 @@
             sessionStorage.setItem('isMemberLoggedIn', 'true');
         }
     });
+
+    function goBackToBooking() {
+        window.location.href = '/booking';
+    }
 </script>
 </body>
 </html>

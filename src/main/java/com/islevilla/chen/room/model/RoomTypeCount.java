@@ -10,4 +10,7 @@ import lombok.NoArgsConstructor;
 public class RoomTypeCount {
     private Integer roomTypeIdDTO;
     private Integer roomCountDTO;
+    private Integer roomUnableDTO;
+    private Integer roomAvailableDTO;
+
 }

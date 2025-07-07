@@ -207,7 +207,7 @@
                     <div class="row mb-3">
                         <div class="col-12">
                             <small class="text-muted">
-                                找到 <span id="searchResultCount" th:text="${#lists.size(product)}">0</span> 個商品
+                                找到 <span id="searchResultCount" th:text="${totalElements}">0</span> 個商品
                             </small>
                         </div>
                     </div>
@@ -219,32 +219,32 @@
                                 <img th:src="${prod.productImageUrl}" class="card-img-top" alt="商品圖片"/>
                                 <div class="card-body">
                                     <h5 class="card-title product-name" th:text="${prod.productName}"></h5>
+                                    <p class="product-description" th:text="${prod.productDescription}"></p>
                                     <p class="price mt-auto" th:text="'NT$ ' + ${prod.productPrice}"></p>
                                 </div>
                                 <div class="card-footer bg-transparent border-0">
                                     <div class="d-flex gap-2">
-                                        <!-- 查看詳情按鈕 -->
-                                        <a th:href="@{/product/detail/{productId}(productId=${prod.productId})}" 
+                                        <a th:href="@{/product/detail/{productId}(productId=${prod.productId})}"
                                            class="btn btn-secondary btn-sm text-center"
                                            style="flex: 1 1 0; min-width: 0; white-space: nowrap;">查看詳情</a>
-
-                                        <!-- 加入購物車按鈕 -->
                                         <form id="addToCartForm" th:action="@{/addToCart}" method="post" class="add-to-cart-form" style="display: none;">
                                             <input type="hidden" name="productId" th:value="${prod.productId}" />
                                             <input type="hidden" name="quantity" value="1" />
                                             <input type="hidden" name="stock" th:value="${prod.productQuantity}" />
                                         </form>
-
                                         <button type="submit"
                                                 class="btn btn-primary btn-sm text-center w-100"
                                                 style="white-space: nowrap;"
                                                 form="addToCartForm">加入購物車</button>
-
-
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    
+                    <!-- 分頁區域 -->
+                    <div class="d-flex justify-content-center">
+                        <th:block th:replace="~{fragments/fragments :: paginationFragment(currentPage=${currentPage}, totalPages=${totalPages}, pageURL=${pageURL})}"/>
                     </div>
                     
                     <!-- 無搜尋結果提示 -->
