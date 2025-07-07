@@ -192,7 +192,7 @@
                                             <i class="bi bi-search"></i>
                                         </span>
                                         <input type="text" id="productSearchInput" class="form-control" 
-                                               placeholder="搜尋商品名稱或描述..." 
+                                               placeholder="搜尋商品名稱"
                                                aria-label="搜尋商品">
                                         <button type="button" id="clearSearchBtn" class="btn btn-outline-secondary">
                                             <i class="bi bi-x-circle me-1"></i>清除搜尋
@@ -219,7 +219,6 @@
                                 <img th:src="${prod.productImageUrl}" class="card-img-top" alt="商品圖片"/>
                                 <div class="card-body">
                                     <h5 class="card-title product-name" th:text="${prod.productName}"></h5>
-                                    <p class="product-description" th:text="${prod.productDescription}"></p>
                                     <p class="price mt-auto" th:text="'NT$ ' + ${prod.productPrice}"></p>
                                 </div>
                                 <div class="card-footer bg-transparent border-0">
