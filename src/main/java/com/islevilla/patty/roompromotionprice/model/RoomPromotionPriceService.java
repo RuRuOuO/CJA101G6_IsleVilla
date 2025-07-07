@@ -39,14 +39,6 @@ public class RoomPromotionPriceService {
 	public void updateRoomPromotionPrice(RoomPromotionPrice roomPromotionPrice) {
 		repository.save(roomPromotionPrice);
 	}
-//	
-//	public void deleteRoomPromotionPrice(Integer id) {
-//	    if (repository.existsById(id)) {
-//	        repository.deleteById(id);
-//	    } else {
-//	        throw new RuntimeException("找不到指定的優惠專案 ID：" + id);
-//	    }
-//	}
 
 	/**
 	 * 取得單一價格設定

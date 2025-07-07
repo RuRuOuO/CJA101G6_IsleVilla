@@ -451,7 +451,7 @@ public class BookingService {
         booking.setId(order.getRoomReservationId() != null ? order.getRoomReservationId().longValue() : null);
         booking.setCheckInDate(checkin);
         booking.setCheckOutDate(checkout);
-        booking.setRoomType(selectedRooms.size() > 0 && selectedRooms.get(0).get("roomTypeName") != null ? selectedRooms.get(0).get("roomTypeName").toString() : "");
+        booking.setRoomType(selectedRooms.size() > 0 && selectedRooms.get(0).get("name") != null ? selectedRooms.get(0).get("name").toString() : "");
         booking.setRoomCount(selectedRooms.size());
         booking.setTotalAmount(totalPrice);
         booking.setEmail(guestEmail);

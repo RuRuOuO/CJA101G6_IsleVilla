@@ -30,8 +30,8 @@ public class BookingEmailServiceImpl implements BookingEmailService {
         context.setVariable("member", member);
         context.setVariable("booking", booking);
 
-        String subject = "訂房成功通知";
-        String content = templateEngine.process("email/booking-confirmation.html", context);
+        String subject = "您的預訂已成立 | 微嶼 Isle Villa";
+        String content = templateEngine.process("email/email-booking-confirmation.html", context);
 
         sendHtmlMail(booking.getEmail(), subject, content); // 寄到訂房填寫的信箱
     }
