@@ -429,6 +429,10 @@
                         $('<span/>').addClass('page-link').text(txt)
                     );
                 });
+            },
+            initComplete: function () {
+                // 初始化完成後立即應用排序
+                this.api().order([0, 'desc']).draw();
             }
         });
 
@@ -465,6 +469,10 @@
                         $('<span/>').addClass('page-link').text(txt)
                     );
                 });
+            },
+            initComplete: function () {
+                // 初始化完成後立即應用排序
+                this.api().order([0, 'desc']).draw();
             }
         });
 

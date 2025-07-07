@@ -235,18 +235,18 @@
                         .then(() => {
                             // 更新狀態欄位文字
                             const statusCell = tr.querySelector('.fbStatusCell');
-                            statusCell.innerHTML = `<span class="badge ${newStatus === 1 ? 'bg-success' : 'bg-danger'}">${newStatus === 1 ? '上架' : '下架'}</span>`;
+                            statusCell.innerHTML = `<span class="badge ${newStatus === 1 ? 'bg-info' : 'bg-secondary'}">${newStatus === 1 ? '上架' : '下架'}</span>`;
 
                             // 更新按鈕文字與 data-status
                             if (newStatus === 1) {
                                 toggleBtn.textContent = '下架';
-                                toggleBtn.classList.remove('btn-success');
+                                toggleBtn.classList.remove('btn-warning');
                                 toggleBtn.classList.add('btn-secondary');
                                 toggleBtn.setAttribute('data-status', '0');
                             } else {
                                 toggleBtn.textContent = '上架';
-                                toggleBtn.classList.remove('btn-warning');
-                                toggleBtn.classList.add('btn-success');
+                                toggleBtn.classList.remove('btn-secondary');
+                                toggleBtn.classList.add('btn-warning');
                                 toggleBtn.setAttribute('data-status', '1');
                             }
 
@@ -281,6 +281,10 @@
                     const txt = $(this).text();
                     $(this).replaceWith($('<span/>').addClass('page-link').text(txt));
                 });
+            },
+            initComplete: function () {
+                // 初始化完成後立即應用排序
+                this.api().order([0, 'desc']).draw();
             }
         });
     }

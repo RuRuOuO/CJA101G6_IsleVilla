@@ -41,8 +41,8 @@ public class FeedbackService implements FeedbackService_interface {
 
     @Override
     public List<Feedback> findAll() {
-        return feedbackRepository.findAll();
-    }
+    return feedbackRepository.findAllByOrderByFbIdDesc();
+}
 
     @Override
     public void deleteById(Integer id) {
@@ -88,8 +88,8 @@ public class FeedbackService implements FeedbackService_interface {
 
     @Override
     public List<Feedback> findPublicAndActiveFeedbacks() {
-        return feedbackRepository.findByFbPublicAndFbStatus(1, 1);
-    }
+    return feedbackRepository.findByFbPublicAndFbStatusOrderByFbIdDesc(1, 1);
+}
 
     @Override
     public boolean saveFeedback(FeedbackFormDTO dto, Members member) {
