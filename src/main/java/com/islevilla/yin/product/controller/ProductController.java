@@ -222,6 +222,7 @@ public class ProductController {
         model.addAttribute("category", productCategoryService.getAllProductCategory());
         model.addAttribute("selectedCategoryId", categoryId);
         model.addAttribute("selectedStatus", status);
+        model.addAttribute("sidebarActive", "product-list");
         return "back-end/product/listProduct";
     }
 
