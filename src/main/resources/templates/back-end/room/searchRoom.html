@@ -30,8 +30,8 @@
 
         <div class="card-body">
             <div class="table-responsive">
-                 <table class="table table-hover align-middle">
-                    <thead class="table-light">
+                 <table id="searchResultTable" class="table table-hover table-light align-middle">
+                    <thead>
                         <tr>
                             <th>房間ID</th>
                             <th>房型ID</th>
@@ -61,15 +61,30 @@
                     </tbody>
                 </table>
             </div>
-            <!-- 新增分頁控制項 -->
-            <th:block
-                th:replace="~{fragments/fragments :: paginationFragment(currentPage=${currentPage}, totalPages=${totalPages}, pageURL=${pageURL})}"/>
         </div>
     </th:block>
 </main>
 
 <!-- ===== 載入統一的 JavaScript ===== -->
 <th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
+<script>
+$(document).ready(function(){
+    // 只添加 DataTables 排序功能
+    if ($('#searchResultTable').length > 0) {
+        $('#searchResultTable').DataTable({
+            paging: false,  // 關閉分頁
+            info: false,    // 關閉資訊顯示
+            searching: false, // 關閉搜尋
+            columnDefs: [
+                { orderable: false, targets: [4, 5] } // 修改和刪除欄不排序
+            ],
+            language: {
+                emptyTable: "沒有資料可顯示"
+            }
+        });
+    }
+});
+</script>
 <script src="/js/room.js"></script>
 </body>
 </html>

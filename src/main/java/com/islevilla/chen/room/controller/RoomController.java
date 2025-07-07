@@ -154,28 +154,18 @@ public String showSelectPage(@RequestParam(defaultValue = "0") int page,
 	public String selectRoomPage(@RequestParam(required = false) Integer roomId,
 	                        @RequestParam(required = false) Integer roomTypeId,
 	                        @RequestParam(required = false) Byte roomStatus,
-	                        @RequestParam(defaultValue = "0") int page,
-	                        @RequestParam(defaultValue = "10") int size,
-	                        Model model,
-	                        HttpServletRequest request) {
+	                        Model model) {
 	    List<String> errorMessage = new ArrayList<>();
 	    
-	    // 取得所有符合條件的資料
+	    // 取得所有符合條件的資料（不分頁）
 	    List<Room> fullResult = roomService.compoundQuery(roomId, roomTypeId, roomStatus);
 
 	    if (fullResult.isEmpty()) {
 	        errorMessage.add("查無符合條件的房間資料");
 	    }
 
-	    // 手動進行分頁
-	    Pageable pageable = PageRequest.of(page, size);
-	    int start = (int) pageable.getOffset();
-	    int end = Math.min((start + pageable.getPageSize()), fullResult.size());
-	    List<Room> pageContent = fullResult.subList(start, end);
-	    Page<Room> roomPage = new PageImpl<>(pageContent, pageable, fullResult.size());
-
-	    // 使用 PageUtil 將分頁資料加入 model
-	    PageUtil.ModelWithPage(roomPage, model, page, "searchResult", request);
+	    // 直接傳遞所有查詢結果，不進行分頁
+	    model.addAttribute("searchResult", fullResult);
 
 	    // 房型下拉選單選項
 	    List<RoomType> roomTypeList=roomTypeName.getRoomTypeNameList();

@@ -93,8 +93,8 @@
 				</form>
 
 				<div class="table-responsive mt-4">
-					<table class="table table-hover align-middle">
-						<thead class="table-light">
+					<table id="roomTable" class="table table-hover table-light align-middle">
+						<thead>
 							<tr>
 								<th>房間ID</th>
 								<th>房型ID</th>
@@ -134,6 +134,28 @@
 
 	<!-- ===== 載入統一的 JavaScript ===== -->
 	<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
+	<script>
+	$(document).ready(function(){
+		// 只添加 DataTables 排序功能
+		if ($('#roomTable').length > 0) {
+			$('#roomTable').DataTable({
+				paging: false,  // 關閉分頁
+				info: false,    // 關閉資訊顯示
+				searching: false, // 關閉搜尋
+				columnDefs: [
+					{ orderable: false, targets: [4, 5] } // 修改和刪除欄不排序
+				],
+				language: {
+					emptyTable: "沒有資料可顯示"
+				}
+			});
+		}
+	});
+	
+	function resetForm() {
+		document.getElementById('roomForm').reset();
+	}
+	</script>
 	<script src="/js/room.js"></script>
 </body>
 </html>
