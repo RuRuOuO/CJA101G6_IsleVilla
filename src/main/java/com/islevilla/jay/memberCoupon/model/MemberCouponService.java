@@ -99,13 +99,12 @@ public class MemberCouponService {
     }
 
     // 檢查優惠券是否可用（未過期且符合使用條件）
+    // 若需判斷 couponStatus == 1，請在此加上 coupon.getCouponStatus() == 1
     public boolean isCouponValid(Coupon coupon, Integer orderAmount) {
         if (coupon == null) {
             return false;
         }
-
         java.time.LocalDate today = java.time.LocalDate.now();
-        
         return orderAmount >= coupon.getMinSpend()
                 && (coupon.getStartDate() == null || !coupon.getStartDate().isAfter(today))
                 && (coupon.getEndDate() == null || !coupon.getEndDate().isBefore(today));

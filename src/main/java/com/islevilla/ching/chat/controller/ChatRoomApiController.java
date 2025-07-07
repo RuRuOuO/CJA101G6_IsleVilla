@@ -121,6 +121,7 @@ public class ChatRoomApiController {
 		return chatRedisService.getMessageHistory(roomId, afterEnd);
 	}
 
+	// 查詢某個聊天室的客服端的未讀訊息數量
 	@GetMapping("/room/{roomId}/unread/employee")
 	public Map<String, Object> getEmployeeUnread(@PathVariable Integer roomId) {
 		Integer unread = chatRedisService.getUnreadCountForEmployee(roomId);
@@ -140,6 +141,20 @@ public class ChatRoomApiController {
 		chatRoomUpdateService.clearUnreadForEmployee(roomId);
 		return success("客服未讀已清除");
 	}
+	
+	// 最後訊息時間
+	@GetMapping("/room/{roomId}/lastMessageTime")
+	public Map<String, String> getLastMessageTime(@PathVariable Integer roomId) {
+		ChatRoomDTO room = chatRedisService.getChatRoom(roomId);
+		if (room == null || room.getLastMessageTime() == null) {
+			return Map.of("lastMessageTime", "-");
+		}
+		// 將 epoch 毫秒轉換成 LocalDateTime
+		LocalDateTime dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(room.getLastMessageTime()),
+				ZoneId.systemDefault());
+		String formatted = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+		return Map.of("lastMessageTime", formatted);
+	}
 
 	// 刪除聊天室
 	@DeleteMapping("/room/{roomId}/delete")
@@ -148,10 +163,9 @@ public class ChatRoomApiController {
 		return success("聊天室已刪除");
 	}
 
-	
-	
-	
 	/* =================== 存入SQL =================== */
+	
+	// 把聊天室的訊息存進MySQL
 	@PostMapping("/room/{roomId}/import")
 	public Map<String, Object> importRoomToSql(@PathVariable Integer roomId, HttpSession session) {
 		Employee employee = (Employee) session.getAttribute("employee");
@@ -174,20 +188,6 @@ public class ChatRoomApiController {
 		return success("匯入成功" + roomId);
 	}
 
-	@GetMapping("/room/{roomId}/lastMessageTime")
-	public Map<String, String> getLastMessageTime(@PathVariable Integer roomId) {
-		ChatRoomDTO room = chatRedisService.getChatRoom(roomId);
-		if (room == null || room.getLastMessageTime() == null) {
-			return Map.of("lastMessageTime", "-");
-		}
-		// 將 epoch 毫秒轉換成 LocalDateTime
-		LocalDateTime dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(room.getLastMessageTime()),
-				ZoneId.systemDefault());
-		String formatted = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-		return Map.of("lastMessageTime", formatted);
-	}
-	
-	
 	/* =================== 共用回傳 =================== */
 
 	private Map<String, Object> success(String msg) {

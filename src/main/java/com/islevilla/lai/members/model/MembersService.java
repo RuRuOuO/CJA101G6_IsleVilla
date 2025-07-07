@@ -24,9 +24,6 @@ public class MembersService {
 	@Autowired
 	private PasswordConvert pc;
 
-//	@Autowired
-//	private SessionFactory sessionFactory;
-
 	// 新增會員
 	public void addMember(Members member) {
 		membersRepository.save(member);
@@ -95,6 +92,24 @@ public class MembersService {
 	public void updateMemberLastLoginTime(Integer memberId, LocalDateTime memberLastLoginTime) {
 		membersRepository.updateMemberLastLoginTime(memberId, memberLastLoginTime);
 		System.out.println("已更新會員最後登入時間: " + memberLastLoginTime);
+	}
+	
+	// 更新會員密碼
+	public boolean updatePassword(Integer memberId, String currentPassword, String newPassword) {
+	    Optional<Members> optional = membersRepository.findById(memberId);
+	    if (optional.isPresent()) {
+	        Members member = optional.get();
+	        
+	        // 檢查原密碼是否正確
+	        if (pc.passwordVerify(member.getMemberPasswordHash(), currentPassword)) {
+	            // 更新密碼
+	            member.setMemberPasswordHash(pc.hashing(newPassword));
+	            member.setMemberUpdatedAt(LocalDateTime.now());
+	            membersRepository.save(member);
+	            return true;
+	        }
+	    }
+	    return false;
 	}
 
 	// 檢查電子信箱是否已存在

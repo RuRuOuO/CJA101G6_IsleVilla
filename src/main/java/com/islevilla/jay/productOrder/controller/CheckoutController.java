@@ -49,9 +49,6 @@ public class CheckoutController {
     private MemberCouponService memberCouponService;
 
     @Autowired
-    private EmailService emailService;
-
-    @Autowired
     private ProductEmailService productEmailService;
 
     @GetMapping("/checkout")

@@ -56,6 +56,7 @@
                             <th>最低消費金額</th>
                             <th>啟用日期</th>
                             <th>結束日期</th>
+                            <th>狀態</th>
                             <th>操作</th>
                         </tr>
                     </thead>
@@ -95,6 +96,13 @@
                                            th:attr="id='input-endDate-' + ${iterStat.index}" required />
                                 </td>
                                 <td>
+                                    <select name="couponStatus" class="form-select d-none" th:attr="id='input-couponStatus-' + ${iterStat.index}">
+                                        <option th:value="1" th:selected="${coupon.couponStatus == 1}">可使用</option>
+                                        <option th:value="0" th:selected="${coupon.couponStatus == 0}">已停用</option>
+                                    </select>
+                                    <span th:text="${coupon.couponStatus == 1 ? '可使用' : '已停用'}" th:attr="id='text-couponStatus-' + ${iterStat.index}"></span>
+                                </td>
+                                <td>
                                     <a type="button" class="btn btn-sm btn-primary"
                                        th:attr="id='editBtn-' + ${iterStat.index},data-id=${coupon.couponId},data-code=${coupon.couponCode},data-name=${coupon.couponCode},data-value=${coupon.discountValue},data-min=${coupon.minSpend},data-start=${#temporals.format(coupon.startDate, 'yyyy-MM-dd')},data-end=${#temporals.format(coupon.endDate, 'yyyy-MM-dd')}"
                                        th:onclick="|enableEditRow(${iterStat.index})|">
@@ -108,9 +116,9 @@
                                             th:attr="id='cancelBtn-' + ${iterStat.index}"
                                             th:onclick="|cancelEditRow(${iterStat.index})|"
                                     >取消</button>
-                                    <a th:href="@{/backend/coupon/delete(couponId=${coupon.couponId})}" class="btn btn-danger btn-sm" onclick="return confirm('確定要刪除此優惠券嗎？')">
+                                    <!-- <a th:href="@{/backend/coupon/delete(couponId=${coupon.couponId})}" class="btn btn-danger btn-sm" onclick="return confirm('確定要刪除此優惠券嗎？')">
                                         <i class="bi bi-trash"></i>
-                                    </a>
+                                    </a> -->
                                     <div th:if="${rowErrorMap != null and rowErrorMap[coupon.couponId] != null}" class="text-danger">
                                         <ul>
                                             <li th:each="msg : ${rowErrorMap[coupon.couponId]}" th:text="${msg}"></li>
@@ -165,11 +173,11 @@ $(function(){
     <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
     <script>
         function enableEditRow(idx) {
-            ["discountValue", "minSpend", "startDate", "endDate"].forEach(function(field) {
+            ["discountValue", "minSpend", "startDate", "endDate", "couponStatus"].forEach(function(field) {
                 document.getElementById('text-' + field + '-' + idx).classList.add('d-none');
                 var input = document.getElementById('input-' + field + '-' + idx);
                 input.classList.remove('d-none');
-                input.removeAttribute('readonly');
+                if(field !== 'couponStatus') input.removeAttribute('readonly');
             });
             document.getElementById('text-couponCode-' + idx).classList.remove('d-none');
             document.getElementById('input-couponCode-' + idx).classList.add('d-none');
@@ -178,11 +186,11 @@ $(function(){
             document.getElementById('cancelBtn-' + idx).classList.remove('d-none');
         }
         function cancelEditRow(idx) {
-            ["discountValue", "minSpend", "startDate", "endDate"].forEach(function(field) {
+            ["discountValue", "minSpend", "startDate", "endDate", "couponStatus"].forEach(function(field) {
                 document.getElementById('text-' + field + '-' + idx).classList.remove('d-none');
                 var input = document.getElementById('input-' + field + '-' + idx);
                 input.classList.add('d-none');
-                input.setAttribute('readonly', true);
+                if(field !== 'couponStatus') input.setAttribute('readonly', true);
             });
             document.getElementById('text-couponCode-' + idx).classList.remove('d-none');
             document.getElementById('input-couponCode-' + idx).classList.add('d-none');

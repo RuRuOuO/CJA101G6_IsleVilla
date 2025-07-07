@@ -25,6 +25,7 @@ public class BackSeatController {
 	public String BackSeatList(Model model) {
 		List<BackSeat> list = backSeatService.getAllSeat();
 		model.addAttribute("backSeatList", list);
+		model.addAttribute("sidebarActive", "backseat-list");
 		return "back-end/backseat/backseat_list";
 	}
 

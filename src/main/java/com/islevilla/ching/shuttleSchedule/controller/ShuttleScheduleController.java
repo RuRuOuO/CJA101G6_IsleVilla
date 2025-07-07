@@ -27,6 +27,7 @@ public class ShuttleScheduleController {
 	public String listShuttles(Model model) {
 		List<ShuttleSchedule> list = shuttleService.getAllShuttle();
 		model.addAttribute("shuttleList", list);
+		model.addAttribute("sidebarActive", "shuttle-list");
 		return "back-end/shuttle/shuttle_list";
 	}
 

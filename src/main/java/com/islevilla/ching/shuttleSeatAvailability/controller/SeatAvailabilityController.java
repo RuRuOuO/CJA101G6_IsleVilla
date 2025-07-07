@@ -47,6 +47,7 @@ public class SeatAvailabilityController {
 
 	    // 時段選單資料（接駁船時段表）
 	    model.addAttribute("availableSchedules", shuttleService.getAllShuttle());
+	    model.addAttribute("sidebarActive", "seatavailability-list");
 
 	    return "back-end/seatavailability/seatavailability_list";
 	}

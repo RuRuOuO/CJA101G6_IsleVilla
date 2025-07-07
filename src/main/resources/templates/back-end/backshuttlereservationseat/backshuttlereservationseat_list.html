@@ -1,218 +1,155 @@
+<!-- ✅ 接駁預約座位列表 | 統一模板 -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>接駁預約座位列表 | 後台管理</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>接駁預約座位列表 | Isle Villa 後台</title>
 
-<th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+  <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<link rel="stylesheet"
-	href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    thead th {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(4px);
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      text-align: center;
+      vertical-align: middle;
+      padding: 12px;
+      font-size: 1rem;
+    }
 
-<style>
-thead th {
-	background: rgba(255, 255, 255, 0.95);
-	backdrop-filter: blur(4px);
-	border: none;
-	border-radius: 6px;
-	font-weight: bold;
-	text-align: center;
-	vertical-align: middle;
-	padding: 14px 12px;
-	font-size: 1rem;
-}
+    table.dataTable td {
+      text-align: center;
+      vertical-align: middle;
+      padding: 12px;
+      font-size: 0.95rem;
+    }
 
-table.dataTable {
-	border-radius: 10px;
-	overflow: hidden;
-	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
+    .search-wrapper {
+      display: flex;
+      align-items: center;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      background-color: #fff;
+      width: 210px;
+      overflow: hidden;
+    }
 
-table.dataTable thead>tr>th {
-	border-bottom: none;
-}
+    .search-wrapper .search-icon {
+      padding: 0.6rem 0.75rem;
+      color: #6c757d;
+      font-size: 1.1rem;
+      background-color: #f8f9fa;
+      border-right: 1px solid #ced4da;
+    }
 
-table.dataTable td {
-	text-align: center;
-	vertical-align: middle;
-	padding: 14px 10px;
-	font-size: 0.95rem;
-	line-height: 1.6;
-}
+    .search-wrapper .search-input {
+      border: none;
+      outline: none;
+      box-shadow: none;
+      flex-grow: 1;
+      padding: 0.6rem 0.75rem;
+      font-size: 0.95rem;
+    }
 
-table.dataTable tbody tr:nth-child(even) {
-	background-color: #f8f9fa;
-}
-
-table.dataTable tbody tr:hover {
-	background-color: #eef6ff;
-}
-
-.search-wrapper {
-	display: flex;
-	align-items: center;
-	border: 1px solid #ced4da;
-	border-radius: 6px;
-	background-color: #fff;
-	width: 210px;
-	overflow: hidden;
-	margin: 1.5rem 0;
-}
-
-.search-wrapper .search-icon {
-	padding: 0.6rem 0.75rem;
-	color: #6c757d;
-	font-size: 1.1rem;
-	background-color: #f8f9fa;
-	border-right: 1px solid #ced4da;
-}
-
-.search-wrapper .search-input {
-	border: none;
-	outline: none;
-	box-shadow: none;
-	flex-grow: 1;
-	padding: 0.6rem 0.75rem;
-	font-size: 0.95rem;
-}
-
-.search-wrapper .search-input::placeholder {
-	color: #6c757d;
-}
-
-th.col-id {
-	width: 13%;
-	text-align: center;
-}
-
-th.col-date {
-	width: 20%;
-	text-align: center;
-}
-
-th.col-seat {
-	width: 40%;
-	text-align: center;
-}
-
-td.text-start {
-	text-align: left !important;
-}
-</style>
-
+    td.text-start {
+      text-align: left !important;
+    }
+  </style>
 </head>
-
 <body>
-	<th:block th:replace="~{fragments/backFragments :: mobileSidebar}"></th:block>
-	<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+  <th:block th:replace="~{fragments/backFragments :: mobileSidebar}"></th:block>
+  <div th:replace="~{fragments/backFragments :: sidebar}"></div>
 
-	<main
-		th:replace="~{fragments/backFragments :: mainContent(~{::content})}">
-		<th:block th:fragment="content">
+  <main th:replace="~{fragments/backFragments :: mainContent(~{::content})}">
+    <th:block th:fragment="content">
+      <div class="card-header bg-transparent border-0 pt-4 pb-2">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+          <h4 class="card-title fw-bold mb-0">
+            <i class="bi bi-list-ul me-2"></i>接駁預約座位列表
+          </h4>
+        </div>
+      </div>
 
-			<div class="card-header bg-transparent border-0 pt-4">
-				<h4 class="card-title mb-0 fw-bold">
-					<i class="bi bi-list-ul me-2"></i>接駁預約座位列表
-				</h4>
-			</div>
+      <div class="card-body">
+        <div class="d-flex flex-wrap gap-3 mb-3">
+          <div class="search-wrapper">
+            <i class="fas fa-hashtag search-icon"></i>
+            <input type="text" id="idSearch" class="form-control search-input" placeholder="請輸入預約編號查詢" />
+          </div>
 
-			<div class="card-body">
-				<div class="search-container"
-					style="display: flex; gap: 1rem; flex-wrap: wrap;">
-					<!-- 預約編號搜尋 -->
-					<div class="search-wrapper" style="width: 210px;">
-						<i class="fas fa-hashtag search-icon"></i> <input type="text"
-							id="idSearch" class="form-control search-input"
-							placeholder="請輸入預約編號查詢" />
-					</div>
+          <div class="search-wrapper">
+            <i class="fas fa-chair search-icon"></i>
+            <input type="text" id="seatSearch" class="form-control search-input" placeholder="座位查詢 例：C01" />
+          </div>
+        </div>
 
-					<!-- 關鍵字模糊搜尋 -->
-					<div class="search-wrapper">
-						<i class="fas fa-search search-icon"></i> <input type="text"
-							id="seatSearch" class="form-control search-input"
-							placeholder="請輸入關鍵字查詢" />
-					</div>
-				</div>
-				<div class="table-responsive">
-					<table id="seatTable"
-						class="table table-hover align-middle text-center">
-						<thead>
-							<tr>
-								<th class="text-center col-id">預約編號</th>
-								<th class="text-center col-date">接駁日期</th>
-								<th class="text-center col-seat">座位編號</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr th:each="entry : ${groupedSeatMap}">
-								<td th:text="${entry.key}">1001</td>
-								<td
-									th:text="${seatNameMap != null and seatNameMap[entry.key] != null ? seatNameMap[entry.key] : '無資料'}">2025/07/04</td>
-								<td class="text-start"
-									th:text="${entry.value != null ? T(java.lang.String).join(', ', entry.value) : ''}">A1,
-									A2</td>
-							</tr>
-							<tr th:if="${#lists.isEmpty(groupedSeatMap)}">
-								<td colspan="3" class="text-center">目前沒有任何資料</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-			</div>
+        <div class="table-responsive">
+          <table id="seatTable" class="table table-hover align-middle text-center">
+            <thead>
+              <tr>
+                <th class="text-center" style="width: 20%;">預約編號</th>
+                <th class="text-center" style="width: 30%;">接駁日期</th>
+                <th class="text-center" style="width: 50%;">座位編號</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="entry : ${groupedSeatMap}">
+                <td th:text="${entry.key}">1001</td>
+                <td th:text="${seatNameMap != null and seatNameMap[entry.key] != null ? seatNameMap[entry.key] : '無資料'}">2025/07/04</td>
+                <td class="text-start" th:text="${entry.value != null ? T(java.lang.String).join(', ', entry.value) : ''}">A1, A2</td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(groupedSeatMap)}">
+                <td colspan="3" class="text-center">目前沒有任何資料</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </th:block>
+  </main>
 
-		</th:block>
-	</main>
+  <th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      const table = $('#seatTable').DataTable({
+        dom: 'lrtip',
+        language: {
+          sProcessing: "處理中...",
+          sLengthMenu: "顯示 _MENU_ 項結果",
+          sZeroRecords: "沒有符合的結果",
+          sInfo: "顯示第 _START_ 至 _END_ 項結果，共 _TOTAL_ 項",
+          sInfoEmpty: "顯示第 0 至 0 項結果，共 0 項",
+          sInfoFiltered: "(從 _MAX_ 項結果中過濾)",
+          sSearch: "搜尋：",
+          oPaginate: {
+            sFirst: "第一頁",
+            sPrevious: "上一頁",
+            sNext: "下一頁",
+            sLast: "最後一頁"
+          }
+        },
+        ordering: true,
+        paging: true,
+        lengthChange: false
+      });
 
-	<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
+      $('#idSearch').on('keyup', function () {
+        const value = this.value.trim();
+        table.column(0).search(value === '' ? '' : '^' + value + '$', true, false).draw();
+      });
 
-	<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-	<script
-		src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-	<script
-		src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-
-	<script>
-		$(document).ready(function() {
-			const table = $('#seatTable').DataTable({
-				dom : 'lrtip',
-				language : {
-					"sProcessing" : "處理中...",
-					"sLengthMenu" : "顯示 _MENU_ 項結果",
-					"sZeroRecords" : "沒有符合的結果",
-					"sInfo" : "顯示第 _START_ 至 _END_ 項結果，共 _TOTAL_ 項",
-					"sInfoEmpty" : "顯示第 0 至 0 項結果，共 0 項",
-					"sInfoFiltered" : "(從 _MAX_ 項結果中過濾)",
-					"sSearch" : "搜尋：",
-					"oPaginate" : {
-						"sFirst" : "第一頁",
-						"sPrevious" : "上一頁",
-						"sNext" : "下一頁",
-						"sLast" : "最後一頁"
-					}
-				},
-				ordering : true,
-				paging : true,
-				lengthChange : false
-			});
-
-			// ✅ 預約編號精準查詢（只查第0欄，完整比對）
-			$('#idSearch').on('keyup', function () {
-				const value = this.value.trim();
-				if (value === '') {
-					table.column(0).search('').draw();
-				} else {
-					table.column(0).search('^' + value + '$', true, false).draw();
-				}
-			});
-
-			// ✅ 關鍵字模糊查詢（全欄位）
-			$('#seatSearch').on('keyup', function () {
-				table.search(this.value).draw();
-			});
-		});
-	</script>
+      $('#seatSearch').on('keyup', function () {
+        table.column(2).search(this.value).draw();
+      });
+    });
+  </script>
 </body>
 </html>
