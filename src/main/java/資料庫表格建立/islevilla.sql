@@ -1117,19 +1117,20 @@ VALUES
 
 -- 優惠券 coupon （楊捷）
 CREATE TABLE coupon (
-	coupon_id       INT          AUTO_INCREMENT  PRIMARY KEY,  -- 優惠券編號 (PK)
+    coupon_id       INT          AUTO_INCREMENT  PRIMARY KEY,  -- 優惠券編號 (PK)
     coupon_code     VARCHAR(10)  NOT NULL,                     -- 優惠代碼
     discount_value  INT          NOT NULL,                     -- 折扣金額
     min_spend       INT          NOT NULL,                     -- 最低消費金額限制
     start_date      DATE         NOT NULL,                     -- 啟用日期
-    end_date        DATE         NOT NULL                      -- 結束日期
+    end_date        DATE         NOT NULL,                     -- 結束日期
+    coupon_status   TINYINT      NOT NULL                      -- 優惠券狀態
 );
 
-INSERT INTO coupon (coupon_code, discount_value, min_spend, start_date, end_date)
-VALUES ('Tibame', 50, 500, '2025-01-01', '2025-12-31'),
-	   ('David', 100, 1000, '2025-05-01', '2025-08-31'),
-       ('Summer123', 66, 200, '2025-07-01', '2025-08-31'),
-       ('MOM520', 520, 4000, '2025-05-01', '2025-05-31');
+INSERT INTO coupon (coupon_code, discount_value, min_spend, start_date, end_date, coupon_status)
+VALUES ('Tibame', 50, 500, '2025-01-01', '2025-12-31', 1),
+       ('David', 100, 1000, '2025-05-01', '2025-08-31', 1),
+       ('Summer123', 66, 200, '2025-07-01', '2025-08-31', 1),
+       ('MOM520', 520, 4000, '2025-05-01', '2025-05-31', 1);
 
 -- DROP TABLE IF EXISTS coupon;
 
