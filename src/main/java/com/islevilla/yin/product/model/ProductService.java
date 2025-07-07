@@ -3,6 +3,8 @@ package com.islevilla.yin.product.model;
 import com.islevilla.yin.productphoto.ProductPhoto;
 import com.islevilla.yin.productphoto.ProductPhotoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -42,6 +44,17 @@ public class ProductService {
     public List<Product> getProductByCategoryIdAndStatus(Integer categoryId, Byte status) {
         return productRepository.findByProductCategoryProductCategoryIdAndProductStatus(categoryId, status);
     }
+
+    public Page<Product> getProductByStatus(Byte status, Pageable pageable) {
+        return productRepository.findByProductStatus(status, pageable);
+    }
+    public Page<Product> getProductByCategoryIdAndStatus(Integer categoryId, Byte status, Pageable pageable) {
+        return productRepository.findByProductCategoryProductCategoryIdAndProductStatus(categoryId, status, pageable);
+    }
+    public Page<Product> getProductByProductCategoryId(Integer productCategoryId, Pageable pageable) {
+        return productRepository.findByProductCategoryProductCategoryId(productCategoryId, pageable);
+    }
+  
     /**
      * 以悲觀鎖查詢商品，確保同時只有一個交易能修改庫存。
      * 用於下單流程防止超賣。
