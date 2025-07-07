@@ -17,94 +17,101 @@
 
 <main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
     <th:block th:fragment="myContent">
-        <h2 class="card-title">優惠專案價格修改</h2>
-        <h5 class="card-subtitle mb-4 text-muted">所有欄位皆為必填</h5>
+        <div class="card shadow">
+            <div class="card-header bg-transparent border-0 pt-4">
+                <h4 class="card-title fw-bold">
+                    <i class="bi bi-tags-fill me-2"></i>優惠專案價格修改
+                </h4>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/backend/roompromotionprice/update}" method="post" th:object="${roomPromotionPrice}">
+                    <!-- 基本資訊 -->
+                    <div class="mb-3">
+                        <label for="promotionId" class="form-label">優惠專案編號:</label>
+                        <input type="text" id="promotionId" th:field="*{promotion.roomPromotionId}" class="form-control-plaintext" readonly/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="promotionTitle" class="form-label">優惠專案名稱:</label>
+                        <input type="text" id="promotionTitle" th:field="*{promotion.roomPromotionTitle}" class="form-control-plaintext" readonly />
+                    </div>
 
-        <!-- 基本資訊 -->
-        <div class="mb-3">
-            <label class="form-label">優惠專案編號:</label>
-            <span th:text="${roomPromotionPrice.promotion != null ? roomPromotionPrice.promotion.roomPromotionId : ''}"></span>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">優惠專案名稱:</label>
-            <span th:text="${roomPromotionPrice.promotion != null ? roomPromotionPrice.promotion.roomPromotionTitle : ''}"></span>
-        </div>
+                    <!-- 已設定價格的房型 -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold mb-3">已設定價格</h6>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm align-middle bg-white">
+                                <thead class="table-light">
+                                    <tr class="text-center align-middle">
+                                        <th style="width:50%">房型</th>
+                                        <th style="width:30%">折扣率</th>
+                                        <th style="width:20%">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="ps : ${existingPriceSettings}">
+                                        <td>
+                                            <span th:text="${ps.roomType.roomTypeName}"></span>
+                                        </td>
+                                        <td>
+                                            <select class="form-select discount-rate-select" 
+                                                    th:data-promotion-id="${ps.promotion.roomPromotionId}"
+                                                    th:data-room-type-id="${ps.roomType.roomTypeId}">
+                                                <option th:each="i : ${discountOptions}"
+                                                        th:value="${i}"
+                                                        th:text="${i}"
+                                                        th:selected="${ps.roomDiscountRate == i}"></option>
+                                            </select>
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-danger btn-sm delete-btn" 
+                                                    th:data-promotion-id="${ps.promotion.roomPromotionId}"
+                                                    th:data-room-type-id="${ps.roomType.roomTypeId}">
+                                                <i class="bi bi-trash"></i> 刪除
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(existingPriceSettings)}">
+                                        <td colspan="3" class="text-center text-muted">尚無設定</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
 
-        <!-- 已設定價格的房型 -->
-        <div class="mb-4">
-            <h6 class="fw-bold mb-3">已設定價格</h6>
-            <div class="table-responsive">
-                <table class="table table-bordered table-sm align-middle bg-white">
-                    <thead class="table-light">
-                        <tr class="text-center align-middle">
-                            <th style="width:50%">房型</th>
-                            <th style="width:30%">折扣率</th>
-                            <th style="width:20%">操作</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="ps : ${existingPriceSettings}">
-                            <td>
-                                <span th:text="${ps.roomType.roomTypeName}"></span>
-                            </td>
-                            <td>
-                                <select class="form-select discount-rate-select" 
-                                        th:data-promotion-id="${ps.promotion.roomPromotionId}"
-                                        th:data-room-type-id="${ps.roomType.roomTypeId}">
-                                    <option th:each="i : ${discountOptions}"
-                                            th:value="${i}"
-                                            th:text="${i}"
-                                            th:selected="${ps.roomDiscountRate == i}"></option>
+                    <!-- 新增價格設定 -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold mb-3">新增價格設定</h6>
+                        <div class="row mb-3 align-items-end">
+                            <div class="col-md-6">
+                                <label for="newRoomTypeId" class="form-label">房型:<span class="text-danger">*</span></label>
+                                <select id="newRoomTypeId" class="form-select" required>
+                                    <option value="">請選擇房型</option>
+                                    <option th:each="roomType : ${unassignedRoomTypeList}" th:value="${roomType.roomTypeId}" th:text="${roomType.roomTypeName}"></option>
                                 </select>
-                            </td>
-                            <td class="text-center">
-                                <button type="button" class="btn btn-danger btn-sm delete-btn" 
-                                        th:data-promotion-id="${ps.promotion.roomPromotionId}"
-                                        th:data-room-type-id="${ps.roomType.roomTypeId}">
-                                    <i class="bi bi-trash"></i> 刪除
+                                <div class="invalid-feedback">請選擇房型</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="newRoomDiscountRate" class="form-label">折扣率:<span class="text-danger">*</span></label>
+                                <input type="number" id="newRoomDiscountRate" class="form-control" step="0.05" min="0" max="1" placeholder="0.00" required />
+                                <div class="invalid-feedback">請輸入有效的折扣率</div>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" id="addPriceBtn" class="btn btn-primary w-100">
+                                    <i class="bi bi-plus-circle me-1"></i>新增
                                 </button>
-                            </td>
-                        </tr>
-                        <tr th:if="${#lists.isEmpty(existingPriceSettings)}">
-                            <td colspan="3" class="text-center text-muted">尚無設定</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                            </div>
+                        </div>
+                        <!-- 錯誤訊息顯示區域 -->
+                        <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
+                        <!-- 成功訊息顯示區域 -->
+                        <div id="successMessage" class="alert alert-success" style="display: none;"></div>
+                    </div>
 
-        <!-- 新增價格設定 -->
-        <div class="mb-4">
-            <h6 class="fw-bold mb-3">新增價格設定</h6>
-            <div class="row mb-3 align-items-end">
-                <div class="col-md-6">
-                    <label for="newRoomTypeId" class="form-label">房型:<span class="text-danger">*</span></label>
-                    <select id="newRoomTypeId" class="form-select" required>
-                        <option value="">請選擇房型</option>
-                        <option th:each="roomType : ${unassignedRoomTypeList}" th:value="${roomType.roomTypeId}" th:text="${roomType.roomTypeName}"></option>
-                    </select>
-                    <div class="invalid-feedback">請選擇房型</div>
-                </div>
-                <div class="col-md-4">
-                    <label for="newRoomDiscountRate" class="form-label">折扣率:<span class="text-danger">*</span></label>
-                    <input type="number" id="newRoomDiscountRate" class="form-control" step="0.05" min="0" max="1" placeholder="0.00" required />
-                    <div class="invalid-feedback">請輸入有效的折扣率</div>
-                </div>
-                <div class="col-md-2">
-                    <button type="button" id="addPriceBtn" class="btn btn-primary w-100">
-                        <i class="bi bi-plus-circle me-1"></i>新增
-                    </button>
-                </div>
-            </div>
-            <!-- 錯誤訊息顯示區域 -->
-            <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
-            <!-- 成功訊息顯示區域 -->
-            <div id="successMessage" class="alert alert-success" style="display: none;"></div>
-            <div class="d-flex gap-2">
-                <!-- <button type="button" id="saveAllBtn" class="btn btn-success">
-                    <i class="bi bi-save me-1"></i>儲存全部
-                </button> -->
-                <a th:href="@{/backend/roompromotionprice/listAll}" class="btn btn-secondary">返回列表</a>
+                    <!-- 按鈕區域 -->
+                    <div class="d-flex gap-2">
+                        <a th:href="@{/backend/roompromotionprice/listAll}" class="btn btn-secondary">返回</a>
+                    </div>
+                </form>
             </div>
         </div>
     </th:block>

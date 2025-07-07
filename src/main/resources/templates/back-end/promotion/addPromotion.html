@@ -22,12 +22,12 @@
                 </h4>
             </div>
             <div class="card-body">
-                <h6 class="card-subtitle mb-4 text-muted">所有欄位皆為必填</h6>
                 <form th:action="@{/backend/promotion/insert}" method="post" th:object="${promotion}" novalidate>
                     <div class="mb-3">
-                        <label for="roomPromotionTitle" class="form-label">優惠專案名稱:</label>
-                        <input type="text" id="roomPromotionTitle" th:field="*{roomPromotionTitle}" class="form-control" required />
-                        <div th:if="${#fields.hasErrors('roomPromotionTitle')}" th:errors="*{roomPromotionTitle}" class="text-danger"></div>
+                        <label for="roomPromotionTitle" class="form-label">優惠專案名稱:<span class="text-danger">*</span></label>
+                        <input type="text" id="roomPromotionTitle" th:field="*{roomPromotionTitle}" class="form-control" required minlength="2" maxlength="10" />
+                        <div class="invalid-feedback">優惠專案名稱不可為空，長度限制2-10個字元</div>
+                        <div th:if="${#fields.hasErrors('roomPromotionTitle')}" class="text-danger">優惠專案名稱不可為空，長度限制2-10個字元</div>
                     </div>
                     <div class="mb-3">
                         <label for="promotionStartDate" class="form-label">專案開始日期:<span class="text-danger">*</span></label>

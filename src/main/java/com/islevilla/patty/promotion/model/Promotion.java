@@ -18,8 +18,7 @@ public class Promotion implements Serializable {
     @Column(name = "room_promotion_id")
     private Integer roomPromotionId;
 
-    @NotEmpty(message = "優惠專案名稱: 請勿空白")
-    @Pattern(regexp = "^[(\u4e00-\u9fa5)(a-zA-Z0-9)]{2,10}$", message = "優惠專案名稱: 只能是中、英文字母、數字 , 且長度必需在2到10之間")
+    @Pattern(regexp = "^[(\u4e00-\u9fa5)(a-zA-Z0-9)]{2,10}$", message = "優惠專案名稱只能是中、英文或數字，長度2~10")
     @Column(name = "room_promotion_title")
     private String roomPromotionTitle;
 
