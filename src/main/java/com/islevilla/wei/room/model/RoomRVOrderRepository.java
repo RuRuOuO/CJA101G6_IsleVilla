@@ -88,24 +88,24 @@ public interface RoomRVOrderRepository extends JpaRepository<RoomRVOrder, Intege
 //        @Param("endDate") LocalDate endDate
 //    );
 //    
-//    //查詢特定房型在特定日期的有效訂單數量
-//    @Query("SELECT COUNT(rrd) FROM RoomRVOrder rro " +
-//           "JOIN rro.roomRVDetails rrd " +
-//           "WHERE rro.checkInDate <= :targetDate AND rro.checkOutDate > :targetDate " +
-//           "AND rro.roomOrderStatus IN (0, 1, 2) " +
-//           "AND rrd.roomType.roomTypeId = :roomTypeId")
-//    Long countReservedRoomsOnDate(
-//        @Param("roomTypeId") Integer roomTypeId, 
-//        @Param("targetDate") LocalDate targetDate
-//    );
-//    
-//
-//    //批量查詢多個房型在特定日期的預訂數量
-//    @Query("SELECT rrd.roomType.roomTypeId, COUNT(rrd) FROM RoomRVOrder rro " +
-//           "JOIN rro.roomRVDetails rrd " +
-//           "WHERE rro.checkInDate <= :targetDate AND rro.checkOutDate > :targetDate " +
-//           "AND rro.roomOrderStatus IN (0, 1, 2) " +
-//           "GROUP BY rrd.roomType.roomTypeId")
-//    List<Object[]> countReservedRoomsByTypeOnDate(@Param("targetDate") LocalDate targetDate);
-// // ==================== 給 RoomTypeAvailability 庫存計算相關查詢 ====================
+    //查詢特定房型在特定日期的有效訂單數量
+    @Query("SELECT COUNT(rrd) FROM RoomRVOrder rro " +
+           "JOIN rro.roomRVDetails rrd " +
+           "WHERE rro.checkInDate <= :targetDate AND rro.checkOutDate > :targetDate " +
+           "AND rro.roomOrderStatus IN (0, 1, 2) " +
+           "AND rrd.roomType.roomTypeId = :roomTypeId")
+    Long countReservedRoomsOnDate(
+        @Param("roomTypeId") Integer roomTypeId, 
+        @Param("targetDate") LocalDate targetDate
+    );
+    
+
+    //批量查詢多個房型在特定日期的預訂數量
+    @Query("SELECT rrd.roomType.roomTypeId, COUNT(rrd) FROM RoomRVOrder rro " +
+           "JOIN rro.roomRVDetails rrd " +
+           "WHERE rro.checkInDate <= :targetDate AND rro.checkOutDate > :targetDate " +
+           "AND rro.roomOrderStatus IN (0, 1, 2) " +
+           "GROUP BY rrd.roomType.roomTypeId")
+    List<Object[]> countReservedRoomsByTypeOnDate(@Param("targetDate") LocalDate targetDate);
+ // ==================== 給 RoomTypeAvailability 庫存計算相關查詢 ====================
 }
