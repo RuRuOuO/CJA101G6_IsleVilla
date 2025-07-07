@@ -178,7 +178,7 @@ public class ProductController {
                     categoryName = "未分類";
                 }
             }
-
+            System.out.println("商品ID=" + productId + "，庫存=" + product.getProductQuantity() + "，狀態=" + product.getProductStatus());
             // 將資料添加到模型中
             model.addAttribute("product", product);
             model.addAttribute("productImages", productImageUrls);

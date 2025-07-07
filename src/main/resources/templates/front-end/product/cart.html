@@ -127,6 +127,8 @@
 <main>
     <div class="container mt-5 mb-5">
         <h2 class="mb-4">購物車</h2>
+        <!-- 錯誤訊息顯示區塊 -->
+        <div th:if="${error}" class="alert alert-danger text-center mb-3" th:text="${error}"></div>
         <!-- 空購物車提示 -->
         <div th:if="${#lists.isEmpty(cartItems)}" class="empty-cart-box">
             <i class="bi bi-cart-x"></i>
@@ -172,7 +174,9 @@
             </div>
             <!-- 行動按鈕 -->
             <div class="cart-action-btns mb-3">
-                <a th:href="@{/checkout(redirect='/cart')}" class="btn btn-success btn-lg"><i class="bi bi-credit-card me-1"></i>結帳</a>
+                <form th:action="@{/cart/checkout}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-success btn-lg"><i class="bi bi-credit-card me-1"></i>結帳</button>
+                </form>
                 <a th:href="@{/product}" class="btn btn-outline-primary btn-lg"><i class="bi bi-arrow-left me-1"></i>繼續購物</a>
                 <form th:action="@{/clearCart}" method="post" style="display:inline;">
                     <button type="submit" class="btn btn-outline-danger btn-lg"><i class="bi bi-trash me-1"></i>清空購物車</button>

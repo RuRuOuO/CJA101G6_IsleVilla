@@ -21,6 +21,7 @@ import com.islevilla.chen.roomTypePhoto.model.RoomTypePhotoRepository;
 import com.islevilla.chen.roomTypePhoto.model.RoomTypePhoto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import com.islevilla.chen.roomTypeAvailability.model.RoomTypeAvailabilityService;
 
 @Service
 public class BookingService {
@@ -40,6 +41,9 @@ public class BookingService {
 
     @Autowired
     private RoomTypePhotoRepository roomTypePhotoRepository;
+
+    @Autowired
+    private RoomTypeAvailabilityService roomTypeAvailabilityService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -446,6 +450,20 @@ public class BookingService {
         order.setRoomRVDetails(details);
         // 儲存
         bookingRepository.save(order);
+
+        // === 新增：同步扣減 room_type_availability ===
+        // 依據每個明細，扣減對應日期的庫存
+        for (com.islevilla.wei.room.model.RoomRVDetail detail : details) {
+            Integer roomTypeId = detail.getRoomType().getRoomTypeId();
+            java.time.LocalDate checkinDate = order.getCheckInDate();
+            java.time.LocalDate checkoutDate = order.getCheckOutDate();
+            java.time.LocalDate current = checkinDate;
+            while (current.isBefore(checkoutDate)) {
+                // 調用 service 扣減庫存
+                roomTypeAvailabilityService.decreaseAvailability(roomTypeId, current, 1);
+                current = current.plusDays(1);
+            }
+        }
     }
 
     public static class RoomTypeWithPromotions {

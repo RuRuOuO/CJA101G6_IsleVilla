@@ -136,6 +136,8 @@ public class OperationLogAspect {
         if (className.contains("Promotion")) return "促銷";
         if (className.contains("ProductApi")) return "商品";
         if (className.contains("ProductCategory")) return "商品分類";
+        if (className.contains("SeatAvailability")) return "接駁船座位狀態";
+        if (className.contains("ShuttleSchedule")) return "接駁船時段";
         // 你可以依需求繼續擴充
         // 預設去掉 Controller 結尾
         if (className.endsWith("Controller")) {
