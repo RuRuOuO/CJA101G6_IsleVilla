@@ -5,6 +5,7 @@ import com.islevilla.patty.promotion.model.PromotionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -60,5 +61,12 @@ public class PromotionController {
     public String delete(@RequestParam("roomPromotionId") Integer id, ModelMap model) {
         promotionSvc.deletePromotion(id);
         return "redirect:/backend/promotion/listAll";
+    }
+    
+    @GetMapping("/search")
+    public String searchPromotion(@RequestParam("id") Integer roomPromotionId, Model model) {
+        Promotion promotion = promotionSvc.getOnePromotion(roomPromotionId);
+        model.addAttribute("searchResult", promotion);
+        return "back-end/promotion/lisstAllpromotion"; 
     }
 }
