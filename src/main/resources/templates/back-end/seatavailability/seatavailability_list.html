@@ -1,229 +1,181 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>座位狀況列表 | Isle Villa 後台</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>座位狀況列表 | Isle Villa 後台</title>
 
-  <!-- 共用樣式 -->
-  <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+<link rel="stylesheet"
+	href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
-  <style>
-    thead th {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(4px);
-      border: none;
-      border-radius: 8px;
-      font-weight: bold;
-      text-align: center;
-      vertical-align: middle;
-      padding: 12px;
-    }
+<style>
+/* 統一高度容器 */
+.unified-height {
+	height: 32px;
+}
 
-    table.dataTable thead>tr>th {
-      border-bottom: none;
-    }
+/* 搜尋欄外層容器（含 icon） */
+.search-wrapper {
+	display: flex;
+	align-items: center;
+	border: 1px solid #ced4da;
+	border-radius: 6px;
+	background-color: #fff;
+	width: 180px;
+	overflow: hidden;
+}
 
-    table.dataTable td {
-      text-align: center;
-      vertical-align: middle;
-    }
+/* 放大鏡 icon */
+.search-wrapper .search-icon {
+	padding: 0.6rem 0.75rem;
+	color: #6c757d;
+	font-size: 1.1rem;
+	background-color: #f8f9fa;
+	border-right: 1px solid #ced4da;
+}
 
-    div.dataTables_wrapper div.dataTables_paginate {
-      display: flex;
-      justify-content: flex-end;
-      padding-right: 1rem;
-    }
-
-    .page-header {
-      padding-top: 2rem;
-      padding-bottom: 1rem;
-    }
-
-    .filter-section {
-      margin-top: 1rem;
-      margin-bottom: 1rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1.5rem 2rem; /* ✅ 增加行間距與欄距 */
-    }
-
-    .filter-section .form-select {
-      min-width: 160px;
-      padding: 0.25rem 0.75rem;
-    }
-    
-    table.dataTable td,
-    table.dataTable th {
-      padding: 10px 8px;
-    }
-
-    .btn-group-wrap {
-      margin-bottom: 1.5rem;
-    }
-  </style>
+/* 輸入框 */
+.search-wrapper .search-input {
+	border: none;
+	outline: none;
+	box-shadow: none;
+	padding: 0.55rem 0.75rem;
+	font-size: 0.9rem;
+	flex-grow: 1;
+}
+</style>
 </head>
-
 <body>
-  <th:block th:replace="~{fragments/backFragments :: mobileSidebar}"></th:block>
-  <div th:replace="~{fragments/backFragments :: sidebar}"></div>
+	<th:block th:replace="~{fragments/backFragments :: mobileSidebar}"></th:block>
+	<div th:replace="~{fragments/backFragments :: sidebar}"></div>
 
-  <main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
-    <th:block th:fragment="myContent">
+	<main
+		th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+		<th:block th:fragment="myContent">
+			<div class="card-header bg-transparent border-0 pt-4 pb-2">
+				<div
+					class="d-flex justify-content-between align-items-center flex-wrap">
+					<h4 class="card-title fw-bold mb-0">
+						<i class="bi bi-grid-fill me-2"></i>座位狀況列表
+					</h4>
+					<a class="btn btn-success"
+						th:href="@{/backend/seatavailability/add}"> <i
+						class="bi bi-plus-circle me-1"></i>新增座位
+					</a>
+				</div>
+			</div>
 
-      <!-- 頁首 -->
-      <div class="d-flex justify-content-between align-items-center flex-wrap page-header">
-  <h4 class="fw-bold mb-0">
-    <i class="bi bi-grid-fill me-2"></i>座位狀況列表
-  </h4>
+			<div class="card-body">
+				<div class="filter-section row gx-3 gy-2 align-items-center">
 
-  <div class="text-end">
-    <a class="btn btn-success" th:href="@{/backend/seatavailability/add}">
-      <i class="bi bi-plus-circle me-1"></i>新增座位
-    </a>
-  </div>
-</div>
+					<!-- 日期選單 -->
+					<div class="col-auto d-flex align-items-center gap-2">
+						<select id="dateFilter" class="form-select custom-filter-lg">
+							<option value="">全部日期</option>
+							<option th:each="date : ${availableDates}" th:value="${date}"
+								th:text="${date}"></option>
+						</select>
+					</div>
 
+					<!-- 時段搜尋 -->
+					<div class="col-auto d-flex align-items-center gap-2">
+						<div class="search-wrapper custom-filter-lg">
+							<i class="fa-solid fa-magnifying-glass search-icon"></i> <input
+								type="text" id="scheduleInput" class="form-control search-input"
+								placeholder="請輸入時段編號" />
+						</div>
+					</div>
 
-        <!-- 查詢篩選 -->
-        <div class="filter-section d-flex flex-wrap align-items-end gap-4">
-          <div class="d-flex flex-column">
-            <label for="dateFilter" class="form-label mb-1 fw-semibold text-secondary small">依照日期查詢</label>
-            <select class="form-select" id="dateFilter">
-              <option value="">全部日期</option>
-              <option th:each="date : ${availableDates}" th:value="${date}" th:text="${date}"></option>
-            </select>
-          </div>
+				</div>
+			</div>
+			<div class="table-responsive">
+				<table class="table table-hover text-center align-middle"
+					id="seatTable">
+					<thead>
+						<tr>
+							<th class="text-center">日期</th>
+							<th class="text-center">時段資訊</th>
+							<th class="text-center">可用座位</th>
+							<th class="text-center">最後更新時間</th>
+							<th class="text-center">操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="seat : ${seatavailability}">
+							<td
+								th:text="${#temporals.format(seat.shuttleDate, 'yyyy-MM-dd')}"></td>
+							<td
+								th:text="'#' + ${seat.shuttleSchedule.shuttleScheduleId} + '｜' + (${seat.shuttleSchedule.shuttleDirection == 0 ? '去程' : '回程'}) + ' ' + ${#temporals.format(seat.shuttleSchedule.shuttleDepartureTime, 'HH:mm')} + ' ~ ' + ${#temporals.format(seat.shuttleSchedule.shuttleArrivalTime, 'HH:mm')}"></td>
+							<td th:text="${seat.seatQuantity}"></td>
+							<td
+								th:text="${#temporals.format(seat.seatUpdatedAt, 'yyyy-MM-dd HH:mm')}"></td>
+							<td>
+								<div class="d-flex justify-content-center gap-1 flex-wrap">
+									<a class="btn btn-sm btn-primary"
+										th:href="@{'/backend/seatavailability/edit/' + ${seat.shuttleScheduleId} + '/' + ${#temporals.format(seat.shuttleDate, 'yyyy-MM-dd')} }">
+										<i class="bi bi-pencil me-1"></i>編輯
+									</a> <a class="btn btn-sm btn-danger"
+										th:href="@{'/backend/seatavailability/delete/' + ${seat.shuttleScheduleId} + '/' + ${#temporals.format(seat.shuttleDate, 'yyyy-MM-dd')} }"
+										onclick="return confirm('確定要刪除嗎？');"> <i
+										class="bi bi-trash me-1"></i>刪除
+									</a>
+								</div>
+							</td>
+						</tr>
+						<tr th:if="${#lists.isEmpty(seatavailability)}">
+							<td colspan="5" class="text-center">尚無座位狀況資料</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</th:block>
+	</main>
 
-          <div class="d-flex flex-column">
-            <label for="scheduleFilter" class="form-label mb-1 fw-semibold text-secondary small">依照時段查詢</label>
-            <select class="form-select" id="scheduleFilter">
-  <option value="">全部時段</option>
-  <option th:each="s : ${availableSchedules}" 
-          th:value="${s.shuttleScheduleId}" 
-          th:text="'#' + ${s.shuttleScheduleId} + '｜' + (${s.shuttleDirection == 0 ? '去程' : '回程'}) + ' ' + ${#temporals.format(s.shuttleDepartureTime, 'HH:mm')} + '~' + ${#temporals.format(s.shuttleArrivalTime, 'HH:mm')}">
-  </option>
-</select>
-          </div>
-        </div>
-      </div>
+	<th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
+	<script
+		src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+	<script
+		src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+	<script>
+		$(document).ready(
+				function() {
+					const table = $('#seatTable').DataTable({
+						dom : "t<'my-3'p>",
+						pagingType : 'simple_numbers',
+						lengthChange : false,
+						info : false,
+						autoWidth : false,
+						language : {
+							paginate : {
+								previous : '上一頁',
+								next : '下一頁'
+							}
+						}
+					});
 
-      <!-- 表格 -->
-      <div class="table-responsive">
-        <table class="table table-hover text-center align-middle" id="seatTable">
-          <thead>
-            <tr>
-              <th class="text-center">日期</th>
-              <th class="text-center">時段資訊</th>
-              <th class="text-center">可用座位</th>
-              <th class="text-center">最後更新時間</th>
-              <th class="text-center">操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr th:each="seat : ${seatavailability}">
-              <td th:text="${#temporals.format(seat.shuttleDate, 'yyyy-MM-dd')}"></td>
-              <td th:text="'#' + ${seat.shuttleSchedule.shuttleScheduleId} + '｜' + (${seat.shuttleSchedule.shuttleDirection == 0 ? '去程' : '回程'}) + ' ' + ${#temporals.format(seat.shuttleSchedule.shuttleDepartureTime, 'HH:mm')} + ' ~ ' + ${#temporals.format(seat.shuttleSchedule.shuttleArrivalTime, 'HH:mm')}"></td>
-              <td th:text="${seat.seatQuantity}"></td>
-              <td th:text="${#temporals.format(seat.seatUpdatedAt, 'yyyy-MM-dd HH:mm')}"></td>
-              <td>
-                <div class="d-flex justify-content-center gap-1 flex-wrap">
-                  <a class="btn btn-sm btn-primary"
-                    th:href="@{'/backend/seatavailability/edit/' + ${seat.shuttleScheduleId} + '/' + ${#temporals.format(seat.shuttleDate, 'yyyy-MM-dd')} }">
-                    <i class="bi bi-pencil me-1"></i>編輯
-                  </a>
-                  <a class="btn btn-sm btn-danger"
-                    th:href="@{'/backend/seatavailability/delete/' + ${seat.shuttleScheduleId} + '/' + ${#temporals.format(seat.shuttleDate, 'yyyy-MM-dd')} }"
-                    onclick="return confirm('確定要刪除嗎？');">
-                    <i class="bi bi-trash me-1"></i>刪除
-                  </a>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </th:block>
-  </main>
-
-  <!-- 共用腳本 -->
-  <th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
-  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-
-  <script th:inline="javascript">
-    /*<![CDATA[*/
-    const seatMap = /*[[${seatavailability}]]*/ [];
-    const scheduleMap = {};
-    const allSchedules = {};
-    const scheduleList = /*[[${availableSchedules}]]*/ [];
-
-    scheduleList.forEach(s => {
-      allSchedules[s.shuttleScheduleId] = '#' + s.shuttleScheduleId + '｜' +
-        (s.shuttleDirection === 0 ? '去程' : '回程') + ' ' +
-        s.shuttleDepartureTime.substring(0, 5) + '~' + s.shuttleArrivalTime.substring(0, 5);
-    });
-
-    seatMap.forEach(seat => {
-      const date = seat.shuttleDate;
-      const id = seat.shuttleSchedule.shuttleScheduleId;
-      if (!scheduleMap[date]) {
-        scheduleMap[date] = [];
-      }
-      if (!scheduleMap[date].includes(id)) {
-        scheduleMap[date].push(id);
-      }
-    });
-    /*]]>*/
-  </script>
-
-  <script>
-    $(document).ready(function () {
-      const table = $('#seatTable').DataTable({
-        dom: "t<'my-3'p>",
-        pagingType: 'simple_numbers',
-        lengthChange: false,
-        info: false,
-        autoWidth: false,
-        language: {
-          paginate: {
-            previous: '上一頁',
-            next: '下一頁'
-          }
-        }
-      });
-
-      function filterTable() {
-        const selectedDate = $('#dateFilter').val();
-        const selectedScheduleId = $('#scheduleFilter').val();
-
-        $.fn.dataTable.ext.search.push((settings, data) => {
-          const rowDate = data[0];
-          const rowSchedule = data[1];
-
-          const matchDate = !selectedDate || rowDate.includes(selectedDate);
-          const matchSchedule = !selectedScheduleId || rowSchedule.includes('#' + selectedScheduleId + '｜');
-          return matchDate && matchSchedule;
-        });
-
-        table.draw();
-        $.fn.dataTable.ext.search.pop();
-      }
-
-   	  // 初始化 scheduleFilter 的選項
-      $('#scheduleFilter').empty().append(`<option value="">全部時段</option>`);
-      Object.entries(allSchedules).forEach(([id, label]) => {
-        $('#scheduleFilter').append(`<option value="${id}">${label}</option>`);
-      });
-
-      // 綁定變更事件（兩者皆可獨立查詢）
-      $('#dateFilter, #scheduleFilter').on('change', function () {
-        filterTable();
-      });
-    });
-  </script>
+					// 🔍 根據「日期 + 時段輸入」聯合過濾
+					$('#dateFilter, #scheduleInput').on('input change', function () {
+					  const selectedDate = $('#dateFilter').val();
+					  const keyword = $('#scheduleInput').val().trim();
+					
+					  $.fn.dataTable.ext.search.push(function (settings, data) {
+					    const rowDate = data[0];      // 第 0 欄：日期
+					    const rowSchedule = data[1];  // 第 1 欄：#12｜去程 08:00 ~ 09:00
+					
+					    // 擷取 # 後的編號（去掉 "#" 和 "｜" 後面的文字）
+					    const scheduleId = rowSchedule.split('｜')[0].replace('#', '').trim(); // 例如 "12"
+					
+					    const matchDate = !selectedDate || rowDate === selectedDate;
+					    const matchSchedule = !keyword || scheduleId === keyword;
+					
+					    return matchDate && matchSchedule;
+					  });
+					
+					  table.draw();
+					  $.fn.dataTable.ext.search.pop();
+					});
+				});
+	</script>
 </body>
-
 </html>

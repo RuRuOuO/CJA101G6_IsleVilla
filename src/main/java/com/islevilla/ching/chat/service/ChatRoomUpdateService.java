@@ -81,15 +81,15 @@ public class ChatRoomUpdateService {
 		return (value != null) ? Long.parseLong(value) : null;
 	}
 
-	// 更新最後訊息時間
-	public void updateLastMessageTime(Integer roomId, Long timestamp) {
-		redisStr.opsForValue().set(ChatRedisKey.chatLastMessageTime(roomId), String.valueOf(timestamp));
-	}
-
 	// 查詢最後訊息時間
 	public Long getLastMessageTime(Integer roomId) {
 		String value = redisStr.opsForValue().get(ChatRedisKey.chatLastMessageTime(roomId));
 		return (value != null) ? Long.parseLong(value) : null;
+	}
+
+	// 更新最後訊息時間
+	public void updateLastMessageTime(Integer roomId, Long timestamp) {
+		redisStr.opsForValue().set(ChatRedisKey.chatLastMessageTime(roomId), String.valueOf(timestamp));
 	}
 
 	// 查詢聊天室狀態
@@ -97,14 +97,14 @@ public class ChatRoomUpdateService {
 		ChatRoomDTO room = chatRedisService.getChatRoom(roomId);
 		return room != null ? room.getChatStatus() : 0;
 	}
-	
-	// 聊天室等待中（狀態=3）
-	public void markRoomPending(Integer roomId) {
-	    ChatRoomDTO room = chatRedisService.getChatRoom(roomId);
-	    if (room != null && room.getChatStatus() == 2) {
-	        room.setChatStatus(3); // 等待回覆
-	        saveChatRoom(room);
-	    }
+
+	// 聊天室重新開啟（狀態=1）
+	public void reopenRoom(Integer roomId) {
+		ChatRoomDTO room = chatRedisService.getChatRoom(roomId);
+		if (room != null) {
+			room.setChatStatus(1);
+			saveChatRoom(room);
+		}
 	}
 
 	// 聊天室結案（狀態=2）
@@ -117,11 +117,11 @@ public class ChatRoomUpdateService {
 		}
 	}
 
-	// 聊天室重新開啟（狀態=1）
-	public void reopenRoom(Integer roomId) {
+	// 聊天室等待中（狀態=3）
+	public void markRoomPending(Integer roomId) {
 		ChatRoomDTO room = chatRedisService.getChatRoom(roomId);
-		if (room != null) {
-			room.setChatStatus(1);
+		if (room != null && room.getChatStatus() == 2) {
+			room.setChatStatus(3); // 等待回覆
 			saveChatRoom(room);
 		}
 	}
