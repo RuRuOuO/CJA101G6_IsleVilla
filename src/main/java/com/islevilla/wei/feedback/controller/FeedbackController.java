@@ -116,7 +116,8 @@ public class FeedbackController {
 
     // 後台顯示全部feedback
     @GetMapping("/backend/feedback/list")
-    public String backFeedbackList() {
+    public String backFeedbackList(Model model) {
+        model.addAttribute("sidebarActive", "feeback-list");
         return "back-end/feedback/listAllFeedback";
     }
 

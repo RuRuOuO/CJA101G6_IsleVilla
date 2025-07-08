@@ -10,7 +10,7 @@
 }
 pre {
     font-family: "Noto Sans TC", sans-serif;
-    font-size: 1rem;  /* 可視需求調整大小 */
+    font-size: 15px;  /* 可視需求調整大小 */
     white-space: pre-wrap; /* 保留換行但讓內容可換行避免過寬 */
     word-break: break-word;
 }

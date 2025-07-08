@@ -13,28 +13,31 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.islevilla.lai.members.model.Members;
+import com.islevilla.lai.members.model.MembersPasswordResetTokensService;
 import com.islevilla.lai.members.model.MembersService;
 import com.islevilla.lai.util.PasswordConvert;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 
 @Controller
+@Slf4j
 public class MembersController {
 	@Autowired
 	private MembersService membersService;
+
+	@Autowired
+	private MembersPasswordResetTokensService membersPasswordResetTokensService;
 
 	@Autowired
 	private PasswordConvert pc;
@@ -294,6 +297,124 @@ public class MembersController {
 		return "front-end/member/member-forgot-password";
 	}
 
+	/**
+	 * 處理忘記密碼請求
+	 */
+	@PostMapping("/member/forgot-password")
+	public String processForgotPassword(@RequestParam String memberEmail, HttpSession session,
+			RedirectAttributes redirectAttributes) {
+		// 如果用戶已經登入，重定向到首頁
+		if (session.getAttribute("member") != null) {
+			System.out.println("目前已經登入！\n目前登入中的會員：" + ((Members) session.getAttribute("member")).getMemberName());
+			return "redirect:/";
+		}
+		try {
+			// 驗證email格式
+			if (memberEmail == null || memberEmail.trim().isEmpty()) {
+				redirectAttributes.addFlashAttribute("error", "請輸入電子信箱");
+				return "redirect:/member/forgot-password";
+			}
+
+			// 簡單的email格式驗證
+			if (!memberEmail.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
+				redirectAttributes.addFlashAttribute("error", "請輸入有效的電子信箱格式");
+				return "redirect:/member/forgot-password";
+			}
+
+			// 處理忘記密碼請求
+			boolean success = membersPasswordResetTokensService.processForgotPassword(memberEmail.trim());
+
+			if (success) {
+				redirectAttributes.addFlashAttribute("success", "如果該電子信箱已註冊，您將收到密碼重設的郵件。請檢查您的收件匣（包括垃圾郵件夾）。");
+			} else {
+				// 為了安全考量，不透露會員是否存在
+				redirectAttributes.addFlashAttribute("success", "如果該電子信箱已註冊，您將收到密碼重設的郵件。請檢查您的收件匣（包括垃圾郵件夾）。");
+			}
+
+			return "redirect:/member/forgot-password";
+
+		} catch (Exception e) {
+			log.error("處理忘記密碼請求時發生錯誤: {}", e.getMessage(), e);
+			redirectAttributes.addFlashAttribute("error", "系統暫時無法處理您的請求，請稍後再試");
+			return "redirect:/member/forgot-password";
+		}
+	}
+
+	/**
+	 * 顯示重設密碼頁面
+	 */
+	@GetMapping("/member/reset-password")
+	public String showResetPasswordPage(@RequestParam String token, Model model) {
+		// 驗證token
+		if (!membersPasswordResetTokensService.validateResetToken(token)) {
+			model.addAttribute("error", "重設連結已失效或不存在，請重新申請密碼重設");
+			return "front-end/member/member-reset-password";
+		}
+
+		// 獲取對應的email
+		String email = membersPasswordResetTokensService.getEmailByToken(token);
+		if (email == null) {
+			model.addAttribute("error", "重設連結已失效或不存在，請重新申請密碼重設");
+			return "front-end/member/member-reset-password";
+		}
+		model.addAttribute("token", token);
+		model.addAttribute("email", email);
+		model.addAttribute("error", false);
+		return "front-end/member/member-reset-password";
+	}
+
+	/**
+	 * 處理重設密碼請求
+	 */
+	@PostMapping("/member/reset-password")
+	public String processResetPassword(@RequestParam String token, @RequestParam String newPassword,
+			@RequestParam String confirmPassword, RedirectAttributes redirectAttributes) {
+		try {
+			// 驗證輸入
+			if (newPassword == null || newPassword.trim().isEmpty()) {
+				redirectAttributes.addFlashAttribute("error", "請輸入新密碼");
+				redirectAttributes.addFlashAttribute("token", token);
+				return "redirect:/member/reset-password?token=" + token;
+			}
+
+			if (!newPassword.equals(confirmPassword)) {
+				redirectAttributes.addFlashAttribute("error", "密碼確認不一致");
+				redirectAttributes.addFlashAttribute("token", token);
+				return "redirect:/member/reset-password?token=" + token;
+			}
+
+			// 密碼強度驗證
+			if (newPassword.length() < 8) {
+				redirectAttributes.addFlashAttribute("error", "密碼至少需要8個字元");
+				redirectAttributes.addFlashAttribute("token", token);
+				return "redirect:/member/reset-password?token=" + token;
+			}
+
+			if (!newPassword.matches(".*[a-zA-Z].*") || !newPassword.matches(".*\\d.*")) {
+				redirectAttributes.addFlashAttribute("error", "密碼必須包含英文字母和數字");
+				redirectAttributes.addFlashAttribute("token", token);
+				return "redirect:/member/reset-password?token=" + token;
+			}
+
+			// 重設密碼
+			boolean success = membersPasswordResetTokensService.resetPassword(token, newPassword);
+
+			if (success) {
+				redirectAttributes.addFlashAttribute("success", "密碼重設成功！您可以使用新密碼登入。");
+				return "redirect:/member/login";
+			} else {
+				redirectAttributes.addFlashAttribute("error", "重設連結已失效或不存在，請重新申請密碼重設");
+				return "redirect:/member/forgot-password";
+			}
+
+		} catch (Exception e) {
+			log.error("處理重設密碼請求時發生錯誤: {}", e.getMessage(), e);
+			redirectAttributes.addFlashAttribute("error", "系統暫時無法處理您的請求，請稍後再試");
+			redirectAttributes.addFlashAttribute("token", token);
+			return "redirect:/member/reset-password?token=" + token;
+		}
+	}
+
 	// -------------------------------登出----------------------------------- //
 	// 顯示登出確認頁面
 	@GetMapping("/member/logout")
@@ -393,28 +514,28 @@ public class MembersController {
 
 		try {
 			// 從資料庫中獲取現有會員資料
-	        Members existingMember = membersService.getOneMember(member.getMemberId());
-	        if (existingMember == null) {
-	            redirectAttributes.addFlashAttribute("errorMessage", "找不到會員資料");
-	            return "redirect:/member/info";
-	        }
-	        
-	        // 更新可編輯的欄位
-	        existingMember.setMemberName(member.getMemberName());
-	        existingMember.setMemberPhone(member.getMemberPhone());
-	        existingMember.setMemberAddress(member.getMemberAddress());
-			
+			Members existingMember = membersService.getOneMember(member.getMemberId());
+			if (existingMember == null) {
+				redirectAttributes.addFlashAttribute("errorMessage", "找不到會員資料");
+				return "redirect:/member/info";
+			}
+
+			// 更新可編輯的欄位
+			existingMember.setMemberName(member.getMemberName());
+			existingMember.setMemberPhone(member.getMemberPhone());
+			existingMember.setMemberAddress(member.getMemberAddress());
+
 			// 處理照片上傳
 			if (!photoFile.isEmpty()) {
-				member.setMemberPhoto(photoFile.getBytes());
+				existingMember.setMemberPhoto(photoFile.getBytes());
 			}
 
 			// 儲存更新的會員資料
-	        Members updatedMember = membersService.updateMember(existingMember);
-			
-	        // 更新 session 中的會員資料
-	        session.setAttribute("member", updatedMember);
-	        
+			Members updatedMember = membersService.updateMember(existingMember);
+
+			// 更新 session 中的會員資料
+			session.setAttribute("member", updatedMember);
+
 			redirectAttributes.addFlashAttribute("successMessage", "資料更新成功！");
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("errorMessage", "資料更新失敗：" + e.getMessage());
@@ -423,38 +544,42 @@ public class MembersController {
 		session.setAttribute("member", membersService.getOneMember(member.getMemberId())); // 更新 session 中的會員資料
 		return "redirect:/member/info";
 	}
-	
+
 	// 更新會員密碼
 	@PostMapping("/member/updatePassword")
 	public String updatePassword(@RequestParam("currentPassword") String currentPassword,
-	                           @RequestParam("newPassword") String newPassword,
-	                           @RequestParam("confirmPassword") String confirmPassword,
-	                           HttpSession session,
-	                           RedirectAttributes redirectAttributes) {
-	    try {
-	        Members member = (Members) session.getAttribute("member");
-	        if (member == null) {
-	            return "redirect:/member/login";
-	        }
-	        
-	        // 檢查新密碼與確認密碼是否一致
-	        if (!newPassword.equals(confirmPassword)) {
-	            redirectAttributes.addFlashAttribute("errorMessage", "新密碼與確認密碼不一致");
-	            return "redirect:/member/info";
-	        }
-	        
-	        // 更新密碼
-	        boolean result = membersService.updatePassword(member.getMemberId(), currentPassword, newPassword);
-	        if (result) {
-	            redirectAttributes.addFlashAttribute("successMessage", "密碼更新成功！");
-	        } else {
-	            redirectAttributes.addFlashAttribute("errorMessage", "原密碼錯誤或密碼更新失敗");
-	        }
-	    } catch (Exception e) {
-	        redirectAttributes.addFlashAttribute("errorMessage", "密碼更新失敗：" + e.getMessage());
-	    }
-	    
-	    return "redirect:/member/info";
+			@RequestParam("newPassword") String newPassword, @RequestParam("confirmPassword") String confirmPassword,
+			HttpSession session, RedirectAttributes redirectAttributes) {
+		try {
+			Members member = (Members) session.getAttribute("member");
+			if (member == null) {
+				return "redirect:/member/login";
+			}
+
+			// 檢查新密碼與確認密碼是否一致
+			if (!newPassword.equals(confirmPassword)) {
+				redirectAttributes.addFlashAttribute("errorMessage", "新密碼與確認密碼不一致");
+				return "redirect:/member/info";
+			}
+
+			// 更新密碼
+			boolean result = membersService.updatePassword(member.getMemberId(), currentPassword, newPassword);
+			if (result) {
+				redirectAttributes.addFlashAttribute("successMessage", "密碼更新成功！");
+			} else {
+				redirectAttributes.addFlashAttribute("errorMessage", "原密碼錯誤或密碼更新失敗");
+			}
+
+			// 儲存更新的會員資料
+			Members updatedMember = membersService.updateMember(member);
+
+			// 更新 session 中的會員資料
+			session.setAttribute("member", updatedMember);
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("errorMessage", "密碼更新失敗：" + e.getMessage());
+		}
+
+		return "redirect:/member/info";
 	}
 
 	@GetMapping("/member/photo/{memberId}")
@@ -572,16 +697,16 @@ public class MembersController {
 			// 根據會員性別和會員狀態過濾會員
 			memberList = membersService.getMemberByMemberGenderAndMemberStatus(gender, status);
 		} else if (gender != null) {
-		    // 根據會員性別過濾會員
+			// 根據會員性別過濾會員
 			memberList = membersService.getMemberByMemberGender(gender);
 		} else if (status != null) {
-		    // 根據會員狀態過濾會員
+			// 根據會員狀態過濾會員
 			memberList = membersService.getMemberByMemberStatus(status);
 		} else {
-		    // 沒有選擇篩選條件時顯示所有會員
+			// 沒有選擇篩選條件時顯示所有會員
 			memberList = membersService.getAll();
 		}
-		
+
 		model.addAttribute("memberList", memberList);
 		model.addAttribute("member", new Members()); // 用於表單綁定
 		model.addAttribute("selectedStatus", status);
@@ -590,10 +715,10 @@ public class MembersController {
 
 		return "back-end/member/listMember";
 	}
-	
+
 	/**
-     * 新增會員
-     */
+	 * 新增會員
+	 */
 //    @PostMapping("/add")
 //    public String addMember(@Valid Members member,
 //                          BindingResult bindingResult,
@@ -617,7 +742,6 @@ public class MembersController {
 //        
 //        return "redirect:/admin/members";
 //    }
-	
 
 	// ----------------------------工具方法---------------------------- //
 

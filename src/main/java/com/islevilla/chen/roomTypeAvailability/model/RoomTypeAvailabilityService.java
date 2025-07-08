@@ -249,6 +249,21 @@ public class RoomTypeAvailabilityService {
 			// ==================== 分頁查詢方法 ====================
 	
 	/**
+	  * 計算整個住宿期間的最小可用庫存
+	  */
+	 @Transactional(readOnly = true)
+	 public int calculateAvailableRoomsInRange(Integer roomTypeId, LocalDate start, LocalDate end) {
+	     int min = Integer.MAX_VALUE;
+	     LocalDate d = start;
+	     while (d.isBefore(end)) {
+	         int available = calculateAvailableRooms(roomTypeId, d);
+	         if (available < min) min = available;
+	         d = d.plusDays(1);
+	     }
+	     return min == Integer.MAX_VALUE ? 0 : min;
+	 }
+	
+	/**
 	 * 分頁查詢所有房型可用性記錄
 	 */
 	@Transactional(readOnly = true)

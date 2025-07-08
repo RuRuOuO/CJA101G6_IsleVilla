@@ -75,8 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		       modal.querySelector('input[name="roomTypeId"]').value = id;
 		       modal.querySelector('#updateRoomTypeName').value = name;
 		       modal.querySelector('#updateRoomTypeCode').value = code;
-		       modal.querySelector('#updateRoomTypeQuantity').value = quantity;
-		       modal.querySelector('#updateRoomTypeCapacity').value = capacity;
+		       		       modal.querySelector('#updateRoomTypeCapacity').value = capacity;
 		       modal.querySelector('#updateRoomTypeContent').value = content;
 		       modal.querySelector('#updateRoomTypePrice').value = price;
 	
@@ -204,17 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				}
 				break;
 				
-			case 'addRoomTypeQuantity':
-			case 'updateRoomTypeQuantity':
-				const quantity = parseInt(value);
-				if (!value) {
-					isValid = false;
-					errorMessage = '請輸入房型數量';
-				} else if (isNaN(quantity) || quantity < 0) {
-					isValid = false;
-					errorMessage = '房型數量必須大於等於0';
-				}
-				break;
+							break;
 				
 			case 'addRoomTypeCapacity':
 			case 'updateRoomTypeCapacity':
