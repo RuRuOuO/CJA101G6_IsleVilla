@@ -4,14 +4,14 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>微嶼 | 房型庫存總覽</title>
-    
+
     <!-- ===== CSRF META ===== -->
     <meta name="_csrf" th:content="${_csrf?.token}" th:if="${_csrf}"/>
     <meta name="_csrf_header" th:content="${_csrf?.headerName}" th:if="${_csrf}"/>
-    
+
     <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
-    </head>
+</head>
 <body>
 <!-- ===== 載入sidebar ===== -->
 <!-- 插入手機版側邊欄 -->
@@ -21,90 +21,137 @@
 
 <main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
     <th:block th:fragment="myContent">
-        <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
+
         <div class="container mt-4">
-
-    <!-- 查詢條件區塊 --> 
-    <form method="get" action="/backend/roomTypeAvailability/list" class="mb-4">
-
-        <div class="row align-items-end">
-            <!-- 房型下拉選單 -->
-            <div class="col-md-4">
-                <label for="roomTypeId" class="form-label">房型</label>
-                <select id="roomTypeId" name="roomTypeId" class="form-select">
-                    <option value="0" th:selected="${selectedRoomTypeId == 0}">全部房型</option>
-                    <option th:each="roomType : ${roomTypeNameList}" 
-					        th:value="${roomType.roomTypeId}" 
-					        th:text="${roomType.roomTypeName}" 
-                            th:selected="${roomType.roomTypeId == selectedRoomTypeId}">
-                    </option>
-                </select>
+            <!-- ================= 標題列 ================= -->
+            <div class="card-header bg-transparent border-0 pt-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0 fw-bold">
+                        <i class="bi bi-calendar-check me-2"></i>房型庫存總覽
+                    </h4>
+                </div>
             </div>
 
-            <!-- 年月選擇器 -->
-            <div class="col-md-4">
-                <label for="yearMonth" class="form-label">月份</label>
-                <input type="month" id="yearMonth" name="yearMonth" 
-                       th:value="${selectedYear} + '-' + ${selectedMonth < 10 ? '0' + selectedMonth : selectedMonth}" 
-                       class="form-control">
-            </div>
+            <!-- ================= 查詢條件區塊 ================= -->
+            <form method="get" action="/backend/roomTypeAvailability/list" class="mb-4">
+                <div class="row g-3 align-items-end">
+                    <!-- 房型下拉選單 -->
+                    <div class="col-md-4">
+                        <label for="roomTypeId" class="form-label">
+                            <i class="bi bi-house-door me-1"></i>房型
+                        </label>
+                        <select id="roomTypeId" name="roomTypeId" class="form-select">
+                            <option value="0" th:selected="${selectedRoomTypeId == 0}">全部房型</option>
+                            <option th:each="roomType : ${roomTypeNameList}" 
+                                    th:value="${roomType.roomTypeId}" 
+                                    th:text="${roomType.roomTypeName}" 
+                                    th:selected="${roomType.roomTypeId == selectedRoomTypeId}">
+                            </option>
+                        </select>
+                    </div>
 
-            <!-- 查詢按鈕 -->
-            <div class="col-md-4">
-                <button type="submit" class="btn btn-primary w-100">查詢</button>
+                    <!-- 年月選擇器 -->
+                    <div class="col-md-4">
+                        <label for="yearMonth" class="form-label">
+                            <i class="bi bi-calendar3 me-1"></i>月份
+                        </label>
+                        <input type="month" id="yearMonth" name="yearMonth" 
+                               th:value="${selectedYear} + '-' + ${selectedMonth < 10 ? '0' + selectedMonth : selectedMonth}" 
+                               class="form-control">
+                    </div>
+
+                    <!-- 查詢按鈕 -->
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="bi bi-search me-1"></i>查詢
+                        </button>
+                    </div>
+                    
+                </div>
+            </form>
+
+            <!-- ================= 每日明細表格 ================= -->
+				<div class="mb-3 text-end">
+					<button class="btn btn-outline-primary"
+						onclick="exportAvailabilityToCSV('房型庫存總覽.csv')">
+						<i class="bi bi-download me-1"></i> 匯出 CSV
+					</button>
+				</div>
+				<div class="table-responsive">
+                <table class="table table-hover table-light align-middle text-center">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="min-width: 120px;">房型</th>
+                            <!-- 動態生成當月所有日期的表頭 -->
+                            <th th:each="day : ${daysInMonth}" th:text="${selectedMonth} + '/' + ${day}"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 遍歷所有房型來生成每一列 -->
+                        <tr th:each="roomType : ${roomTypes}">
+                            <!-- 第一格顯示房型名稱 -->
+                            <td th:text="${roomType.roomTypeName}"></td>
+                            <!-- 再次遍歷當月所有日期，以找到對應的庫存 -->
+                            <td th:each="day : ${daysInMonth}">
+                                <!-- 
+                                    從 availabilityMatrix 中根據 房型ID 和 日期 查找庫存量。
+                                    如果 availabilityMatrix 中有這個房型，並且這個房型中有這一天的庫存，則顯示庫存。
+                                    否則顯示 "-"
+                                -->
+                                <span th:text="${availabilityMatrix[roomType.roomTypeId][T(java.lang.Integer).parseInt(day)] != null 
+                                                ? availabilityMatrix[roomType.roomTypeId][T(java.lang.Integer).parseInt(day)] 
+                                                : '-'}"></span>
+                            </td>
+                        </tr>
+
+                        <!-- 若無任何房型資料，顯示提示行 -->
+                        <tr th:if="${#lists.isEmpty(roomTypes)}">
+                            <td th:colspan="${#lists.size(daysInMonth)}" class="text-center text-muted">
+                                查無資料，或請選擇一個房型進行查詢
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
-    </form>
+    </th:block>
+</main>
 
-    <!-- 每日明細表格 -->
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover text-center">
-            <thead class="table-light">
-                <tr>
-                    <th style="min-width: 120px;">房型</th>
-                    <!-- 動態生成當月所有日期的表頭 -->
-                    <th th:each="day : ${daysInMonth}" th:text="${selectedMonth} + '/' + ${day}"></th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- 遍歷所有房型來生成每一列 -->
-                <tr th:each="roomType : ${roomTypes}">
-                    <!-- 第一格顯示房型名稱 -->
-                    <td th:text="${roomType.roomTypeName}"></td>
-                    <!-- 再次遍歷當月所有日期，以找到對應的庫存 -->
-                    <td th:each="day : ${daysInMonth}">
-                        <!-- Debugging: Print roomTypeId, quantityMap, and day -->
-<!--                         <span th:text="'RoomType ID: ' + ${roomType.roomTypeId}"></span><br/> -->
-<!--                         <span th:text="'Quantity Map: ' + ${availabilityMatrix[roomType.roomTypeId]}"></span><br/> -->
-<!--                         <span th:text="'Current Day: ' + ${day}"></span><br/> -->
-                        <!-- 
-                            從 availabilityMatrix 中根據 房型ID 和 日期 查找庫存量。
-                            如果 availabilityMatrix 中有這個房型，並且這個房型中有這一天的庫存，則顯示庫存。
-                            否則顯示 0。
-                        -->
-                        <span  
-                              th:text="${availabilityMatrix[roomType.roomTypeId][T(java.lang.Integer).parseInt(day)]!=null ? availabilityMatrix[roomType.roomTypeId][T(java.lang.Integer).parseInt(day)] : '-'}"></span><br/>
-<!--                               <span th:text="'Quantity Map: ' + ${availabilityMatrix[4][4]}"></span> -->
-<!--                               <span th:text="${availabilityMatrix[roomType.roomTypeId][T(java.lang.Integer).parseInt(day)]}"></span> -->
-<!--                               <span class="test" th:text="${day=='4'}"></span> -->
-                    </td>
-                </tr>
-                <!-- 檢查判斷清單是否為空，如果沒有任何房型資料，則顯示提示 -->
-                <tr th:if="${#lists.isEmpty(roomTypes)}">
-                    <td th:colspan="${#lists.size(daysInMonth)}" class="text-center text-muted">查無資料，或請選擇一個房型進行查詢</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-</div>
 <!-- ===== 載入統一 JavaScript ===== -->
 <th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
 
-<!-- 房型庫存管理 JavaScript -->
+<!-- ================= 自訂腳本 ================= -->
 <script th:src="@{/js/roomTypeAvailability.js}"></script>
 
+	<!-- 匯出CSV檔案報表 -->
+	<script>
+function exportAvailabilityToCSV(filename) {
+    const table = document.querySelector("table");
+    const rows = table.querySelectorAll("tr");
+    let csv = [];
 
+    for (let row of rows) {
+        let cols = row.querySelectorAll("th, td");
+        let rowData = [];
+        for (let col of cols) {
+            // 處理雙引號與換行
+            let text = col.innerText.replace(/"/g, '""').replace(/\n/g, ' ').trim();
+            rowData.push('"' + text + '"');
+        }
+        csv.push(rowData.join(","));
+    }
+
+    // 產生 Blob 並下載
+    const csvBlob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(csvBlob);
+    link.download = filename;
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+</script>
 </body>
-</html> 
+</html>

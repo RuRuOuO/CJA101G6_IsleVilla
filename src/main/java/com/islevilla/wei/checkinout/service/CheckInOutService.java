@@ -46,10 +46,8 @@ public class CheckInOutService {
                     throw new IllegalArgumentException("請為所有訂房明細選擇房間");
                 }
                 // 驗證房間是否可用
-                Room selectedRoom = roomService.findById(selectedRoomId);
-                if (selectedRoom == null) {
-                    throw new IllegalArgumentException("選擇的房間不存在");
-                }
+                Room selectedRoom = roomService.findById(selectedRoomId)
+                    .orElseThrow(() -> new IllegalArgumentException("選擇的房間不存在"));
                 if (selectedRoom.getRoomStatus() != 0) {
                     throw new IllegalArgumentException("房間 " + selectedRoomId + " 狀態非空房，無法入住");
                 }
