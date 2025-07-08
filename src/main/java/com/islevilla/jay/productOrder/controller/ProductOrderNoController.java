@@ -142,6 +142,14 @@ public class ProductOrderNoController {
         Integer loginMemNo = loggedInMember.getMemberId();
         
         List<ProductOrder> memOrderList = productOrderSvc.getMemAllOrder(loginMemNo);
+        
+        System.out.println("會員ID: " + loginMemNo);
+        for (ProductOrder order : memOrderList) {
+            System.out.println("訂單編號: " + order.getProductOrderId()
+                + "，付款方式: " + order.getPaymentMethod()
+                + "，配送方式: " + order.getShippingMethod());
+        }
+        
         model.addAttribute("loginMemNo", loginMemNo);
         model.addAttribute("memOrderList", memOrderList);
         return "front-end/product-order/memberOrderList";
