@@ -59,7 +59,7 @@ public class NewsController {
         Page<News> newsPage = newsService.getAll(pageable);
 
         PageUtil.ModelWithPage(newsPage, model, page, "newsList", request);
-
+        model.addAttribute("sidebarActive", "news-list");
         // 返回模板路徑，對應到 src/main/resources/templates/front-end/news/newsList.html
         return "back-end/news/listAllNews";
     }

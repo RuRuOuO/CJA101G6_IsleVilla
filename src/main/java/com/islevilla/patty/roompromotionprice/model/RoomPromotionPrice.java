@@ -38,17 +38,8 @@ public class RoomPromotionPrice {
     @JoinColumn(name = "room_type_id", insertable = false, updatable = false)
     private RoomType roomType;
 
-    @Column(name = "promotion_start_date")
-    private LocalDate promotionStartDate;
-
-    @Column(name = "promotion_end_date")
-    private LocalDate promotionEndDate;
-
     @Column(name = "room_discount_rate", columnDefinition = "DECIMAL(3,2) DEFAULT 1.0")
     private Double roomDiscountRate;
-
-    @Column(name = "promotion_remark" , length = 50)
-    private String promotionRemark;
     
     @Transient
     public Double getDiscountedPrice() {
