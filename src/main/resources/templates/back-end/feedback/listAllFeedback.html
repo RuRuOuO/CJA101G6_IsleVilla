@@ -71,6 +71,7 @@
                         <th>再訪</th>
                         <th>公開</th>
                         <th>狀態</th>
+                        <th>圖片</th>
                         <th>操作</th>
                     </tr>
                     </thead>
@@ -173,6 +174,11 @@
                 <td>
                     <span class="badge ${fb.fbPublic === 1 ? 'bg-info' : 'bg-secondary'}">${fb.fbPublic === 1 ? '公開' : '不公開'}</span>
                 </td>
+                <td>
+        ${fb.fbImageBase64
+            ? `<img src="${fb.fbImageBase64}" alt="評價圖片" style="max-height:40px; width: 40px; object-fit: cover;">`
+            : '無'}
+    </td>
                 <td class="fbStatusCell">
                     <span class="badge ${fb.fbStatus === 1 ? 'bg-info' : 'bg-secondary'}">${fb.fbStatus === 1 ? '上架' : '下架'}</span>
                 </td>

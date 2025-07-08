@@ -74,9 +74,8 @@
                                     <i class="bi bi-house-check"></i> 辦理入住
                                 </div>
                                 <div class="card-body">
-                                    <form id="checkinForm" method="post"
-                                          th:action="@{/backend/room-reservation/{orderId}/checkin(orderId=${checkinOrderId})}"
-                                          onsubmit="return confirmCheckin();">
+                                    <form id="checkinForm" method="get"
+                                          onsubmit="return goToRoomSelection();">
                                         <div class="mb-3">
                                             <label for="checkinOrderId" class="form-label">訂房編號</label>
                                             <input type="number" class="form-control" id="checkinOrderId"
@@ -210,7 +209,7 @@
                     <div class="row mb-3 mt-4">
                         <div class="col-md-4">
                             <input type="text" id="orderSearchInput" class="form-control"
-                                   placeholder="搜尋 訂房編號 或 會員編號">
+                                   placeholder="搜尋 訂房編號">
                         </div>
                         <div class="col-md-3">
                             <select id="orderStatusFilter" class="form-select">
@@ -478,8 +477,8 @@
 
         // 搜尋功能
         $('#orderSearchInput').on('keyup', function () {
-            allOrdersTableInstance.columns([0, 1]).search(this.value).draw();
-        });
+            allOrdersTableInstance.column(0).search(this.value).draw();
+        })
 
         // 狀態篩選功能
         $('#orderStatusFilter').on('change', function () {
@@ -488,14 +487,24 @@
         });
     }
 
-    // 確認入住
-    function confirmCheckin() {
-        const id = document.getElementById('checkinOrderId').value;
-        if (!id || id <= 0) {
+    // // 確認入住
+    // function confirmCheckin() {
+    //     const id = document.getElementById('checkinOrderId').value;
+    //     if (!id || id <= 0) {
+    //         alert('請輸入有效的訂房編號');
+    //         return false;
+    //     }
+    //     return confirm(`確定要為訂單 #${id} 辦理入住嗎？`);
+    // }
+
+    function goToRoomSelection() {
+        const orderId = document.getElementById('checkinOrderId').value;
+        if (!orderId || orderId <= 0) {
             alert('請輸入有效的訂房編號');
             return false;
         }
-        return confirm(`確定要為訂單 #${id} 辦理入住嗎？`);
+        window.location.href = `/backend/room-reservation/${orderId}/select-rooms`;
+        return false; // 阻止表單預設送出
     }
 
     // 確認退房

@@ -64,7 +64,7 @@ public class RoomRVController {
     }
 
     // 前台取消訂單
-    @PostMapping("/member/room/{id}/c// 用會員id查詢該會員所有訂單ancel")
+    @PostMapping("/member/room/{id}/cancel")
     public String cancelOrderFront(@PathVariable Integer id) {
         roomRVOrderService.cancelOrderFront(id);
         return "redirect:/member/room/list";
@@ -74,7 +74,7 @@ public class RoomRVController {
     @PostMapping("/backend/room-reservation/{id}/cancel")
     public String cancelOrderBack(@PathVariable Integer id) {
         roomRVOrderService.cancelOrderBack(id);
-        return "redirect:/backend/room-reservation/list";
+        return "redirect:/backend/check-in-out/list";
     }
 
 //    // 後台顯示全部訂單 // pagable
@@ -105,9 +105,7 @@ public class RoomRVController {
 
     @GetMapping("/backend/order-detail/{id}")
     public String getOrderDetail(@PathVariable Integer id, Model model) {
-        System.out.println("收到查詢訂單 id: " + id);
         RoomRVOrder order = roomRVOrderService.getById(id);
-        System.out.println("查詢結果: " + order);
         if (order == null) {
             model.addAttribute("error", "查無此訂單");
             return "fragments/roomRV :: emptyOrder";
@@ -115,6 +113,13 @@ public class RoomRVController {
         List<RoomRVDetail> detailList = roomRVDetailService.getDetailsByRoomRVOrderId(id);
         model.addAttribute("order", order);
         model.addAttribute("detailList", detailList);
+
+        // 顯示退款相關資訊
+        Map<Integer, Integer> refundRateMap = new HashMap<>();
+        double rate = roomRVOrderService.calculateRefundRate(order.getCheckInDate());
+        refundRateMap.put(order.getRoomReservationId(), (int) Math.round(rate * 100));
+        model.addAttribute("refundRateMap", refundRateMap);
+
         return "fragments/roomRV :: roomRVOrder";
     }
 }
