@@ -16,115 +16,314 @@
 </head>
 
 <body class="bg-light">
-<!-- ===== 載入Header ===== -->
-<div th:replace="~{fragments/fragments :: header}"></div>
+    <!-- ===== 載入Header ===== -->
+    <div th:replace="~{fragments/fragments :: header}"></div>
 
-<div class="container-fluid py-4">
-    <div class="row w-100">
-        <div class="col-12 col-md-6 col-lg-4 mx-auto">
-            <div class="card shadow-lg border-0 rounded-4">
-                <div class="card-body p-5 text-center">
-                    <!-- 標題 -->
-                    <h2 class="fw-bold">登出成功</h2>
+    <div class="container-fluid py-4">
+        <div class="row w-100">
+            <div class="col-12 col-md-6 col-lg-4 mx-auto">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-body p-5 text-center">
+                        <!-- 標題 -->
+                        <h2 class="fw-bold">登出成功</h2>
 
-                    <!-- 主要訊息 -->
-                    <p class="text-muted mb-4 lh-base">
-                        您已安全登出，感謝您的使用！
-                    </p>
+                        <!-- 主要訊息 -->
+                        <p class="text-muted mb-4 lh-base">
+                            您已安全登出，感謝您的使用！
+                        </p>
 
-                    <!-- 感謝區塊 -->
-                    <div class="bg-light rounded-3 p-4 mb-4">
-                        <div class="mb-3">
-                            <strong class="fs-5">謝謝您選擇我們的服務</strong>
+                        <!-- 感謝區塊 -->
+                        <div class="bg-light rounded-3 p-4 mb-4">
+                            <div class="mb-3">
+                                <strong class="fs-5">謝謝您選擇我們的服務</strong>
+                            </div>
+                            <p class="text-muted mb-4 lh-base">您的帳戶資料已安全保存<br>隨時歡迎您再次登入享受以下服務：</p>
+
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <div class="d-flex align-items-center text-start">
+                                        <i class="fas fa-user-check me-2"></i>
+                                        <small>個人資料管理</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="d-flex align-items-center text-start">
+                                        <i class="fas fa-shopping-cart me-2"></i>
+                                        <small>購物車同步</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="d-flex align-items-center text-start">
+                                        <i class="fas fa-heart me-2"></i>
+                                        <small>收藏清單</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="d-flex align-items-center text-start">
+                                        <i class="fas fa-gift me-2"></i>
+                                        <small>專屬優惠通知</small>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <p class="text-muted mb-4 lh-base">您的帳戶資料已安全保存<br>隨時歡迎您再次登入享受以下服務：</p>
 
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <div class="d-flex align-items-center text-start">
-                                    <i class="fas fa-user-check me-2"></i>
-                                    <small>個人資料管理</small>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="d-flex align-items-center text-start">
-                                    <i class="fas fa-shopping-cart me-2"></i>
-                                    <small>購物車同步</small>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="d-flex align-items-center text-start">
-                                    <i class="fas fa-heart me-2"></i>
-                                    <small>收藏清單</small>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="d-flex align-items-center text-start">
-                                    <i class="fas fa-gift me-2"></i>
-                                    <small>專屬優惠通知</small>
-                                </div>
+                        <!-- 操作按鈕 -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-center mb-4">
+                            <a href="/member/login" class="btn btn-dark btn-lg px-4">
+                                <i class="fas fa-sign-in-alt me-2"></i>
+                                重新登入
+                            </a>
+                            <a href="/" class="btn btn-outline-dark btn-lg px-4">
+                                <i class="fas fa-home me-2"></i>
+                                回到首頁
+                            </a>
+                        </div>
+
+                        <!-- 自動跳轉倒數 -->
+                        <div class="alert bg-light border-0 rounded-3 mb-4">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <i class="fas fa-clock me-2"></i>
+                                <span>將在 <span class="fw-bold text-info" id="countdown">10</span> 秒後自動跳轉到首頁</span>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- 操作按鈕 -->
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-center mb-4">
-                        <a href="/member/login" class="btn btn-dark btn-lg px-4">
-                            <i class="fas fa-sign-in-alt me-2"></i>
-                            重新登入
-                        </a>
-                        <a href="/" class="btn btn-outline-dark btn-lg px-4">
-                            <i class="fas fa-home me-2"></i>
-                            回到首頁
-                        </a>
-                    </div>
-
-                    <!-- 自動跳轉倒數 -->
-                    <div class="alert bg-light border-0 rounded-3 mb-4">
-                        <div class="d-flex align-items-center justify-content-center">
-                            <i class="fas fa-clock me-2"></i>
-                            <span>將在 <span class="fw-bold text-info"
-                                             id="countdown">10</span> 秒後自動跳轉到首頁</span>
-                        </div>
-                    </div>
-
-                    <!-- 底部連結 -->
-                    <div class="border-top pt-3">
-                        <div class="d-flex justify-content-center gap-3 flex-wrap">
-                            <a href="/privacy" class="text-muted text-decoration-none small">隱私政策</a>
-                            <span class="text-muted">•</span>
-                            <a href="/terms" class="text-muted text-decoration-none small">服務條款</a>
-                            <span class="text-muted">•</span>
-                            <a href="/contact" class="text-muted text-decoration-none small">聯絡我們</a>
+                        <!-- 底部連結 -->
+                        <div class="border-top pt-3">
+                            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal"
+                                    class="text-muted text-decoration-none small">隱私政策</a>
+                                <span class="text-muted">•</span>
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal"
+                                    class="text-muted text-decoration-none small">服務條款</a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <!-- 服務條款 Modal -->
+    <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="termsModalLabel">服務條款</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>歡迎您使用「微嶼IsleVilla」（以下簡稱「本渡假村」、「本站」或「我們」）所提供的線上服務。為保障您的權益，請您詳細閱讀以下條款。當您使用本網站，即表示您已閱讀、理解並同意遵守本條款。
+                    </p>
 
-<!-- 倒數計時 JavaScript -->
-<script>
-    // 倒數計時功能
-    let countdown = 10;
-    const countdownElement = document.getElementById('countdown');
+                    <ol>
+                        <li><strong>服務範圍</strong> <br>
+                            本網站提供下列主要服務功能：
+                            <ol>
+                                <li><strong>線上訂房</strong>：提供客房查詢、預約、修改與取消等功能。</li>
+                                <li><strong>接駁服務預約</strong>：提供臺灣本島往返本渡假村接駁之預約功能。</li>
+                                <li><strong>線上購物</strong>：提供伴手禮、紀念品及度假村自有品牌商品的購買與配送服務。</li>
+                                <li><strong>線上客服</strong>：提供即時或非即時的客服對話，協助您解決使用上的問題或提供建議。</li>
+                            </ol>
 
-    const timer = setInterval(() => {
-        countdown--;
-        countdownElement.textContent = countdown;
+                        </li>
 
-        if (countdown <= 0) {
-            clearInterval(timer);
-            window.location.href = '/';
-        }
-    }, 1000);
-</script>
+                        <li><strong>會員註冊與帳戶管理</strong> <br>
+                            <ol>
+                                <li>使用部分功能前，您需註冊成為本站會員並提供正確、完整的個人資料。</li>
+                                <li>您應妥善保管帳號與密碼，不得轉讓或出借他人使用。若發現帳號有異常使用情形，請立即通知本渡假村。</li>
+                                <li>若您提供之資料有誤、虛假或違反法令，本渡假村有權暫停或終止您的帳號使用權限。</li>
+                            </ol>
+                        </li>
 
-<!-- ========== 載入Footer及Bootstrap JS ========== -->
-<div th:replace="~{fragments/fragments :: footer}"></div>
+                        <li><strong>訂房服務條款</strong> <br>
+                            <ol>
+                                <li>訂房成功後，系統將寄發電子郵件確認通知，請確認內容無誤。</li>
+                                <li>若需取消或變更訂房，請依據網站所公告之取消政策進行操作，否則可能產生手續費或無法退費。</li>
+                                <li>訂房內容包含房型、入住人數、入住與退房時間，請務必確認符合實際需求。</li>
+                                <li>為維護入住品質，本渡假村保留是否接受訂單之最終權利。</li>
+                            </ol>
+                        </li>
+
+                        <li><strong>接駁服務條款</strong> <br>
+                            <ol>
+                                <li>接駁服務需於網站上事先預約，並準時依指定時間與地點等候。</li>
+                                <li>若因天候、交通或其他不可抗力因素導致服務延誤或取消，本渡假村將協助提供替代方案，但不負任何賠償責任。</li>
+                                <li>接駁預約需提供正確航班資訊與聯絡方式，若資料錯誤導致接駁失誤，須自行負擔相關責任。</li>
+                            </ol>
+                        </li>
+
+                        <li><strong>購物服務條款</strong> <br>
+                            <ol>
+                                <li>商品圖片僅供參考，實際商品可能略有差異，請以實品為準。</li>
+                                <li>商品下單後，如無庫存或其他無法供應之情況，我們有權取消訂單並退還已付款項。</li>
+                                <li>若商品有瑕疵或配送錯誤，請於收貨後七日內與客服聯繫並提供相關證明，本渡假村將協助辦理退換貨。</li>
+                                <li>客製化商品或經使用過之商品恕不接受退貨，除非另有約定或依法規定。</li>
+                            </ol>
+                        </li>
+
+                        <li><strong>付款與退款</strong> <br>
+                            <ol>
+                                <li>本站支援多種線上付款方式，詳細支付流程依網站實際介面為準。</li>
+                                <li>所有退款均依原付款方式退回，處理時間約為7～14個工作日，視各付款平台作業時間而定。</li>
+                                <li>因使用者自身操作失誤導致之付款錯誤、重複下單等情形，請主動聯繫客服，本渡假村將視情況酌情協助處理。</li>
+                            </ol>
+                        </li>
+
+                        <li><strong>使用者義務</strong> <br>
+                            <ol>
+                                <li>不得以任何方式干擾或破壞本站正常運作。</li>
+                                <li>不得上傳或散布任何違反法令、猥褻、不實或侵害他人權益之內容。</li>
+                                <li>不得未經授權使用本網站之任何資料、圖像或商標。</li>
+                            </ol>
+                        </li>
+
+                        <li><strong>智慧財產權</strong> <br>
+                            <ol>
+                                <li>本網站所呈現之所有內容，包括文字、圖片、商標、標誌、介面設計等，皆為微嶼IsleVilla或其授權人所有。</li>
+                                <li>未經授權，不得擅自使用、重製、轉載或改作本站內容，否則將依法追究。</li>
+                            </ol>
+                        </li>
+
+                        <li><strong>免責聲明</strong> <br>
+                            <ol>
+                                <li>本渡假村不保證網站服務無中斷或錯誤發生，對於因系統維護、第三方入侵、不可抗力等所造成的損失不負賠償責任。</li>
+                                <li>對於使用者因依賴本站資料所做出之任何決策行為所造成之損失，本渡假村亦不負責任。</li>
+                            </ol>
+                        </li>
+
+                        <li><strong>條款變更</strong> <br>
+                            本渡假村有權隨時修訂本條款，修改後之內容將公布於網站上，不另行個別通知。建議您定期查閱，若您在條款變更後仍繼續使用本網站，即視為您已同意該等變更。
+                        </li>
+
+                        <li><strong>準據法與管轄權</strong> <br>
+                            本服務條款之解釋與適用，以及與本條款有關之爭議，均依中華民國法律處理，並以臺灣臺中地方法院為第一審管轄法院。
+                        </li>
+
+                        <li><strong>線上客服服務條款</strong> <br>
+                            <ol>
+                                <li>本網站提供之線上客服服務，可能包括即時聊天、留言表單、電子郵件回覆等形式，客服內容僅供參考，實際交易依訂單與官方公告為準。</li>
+                                <li>客服回應時間依本渡假村公告之服務時段為主。若遇假日、尖峰時段或特殊狀況，回覆時間可能有所延遲，敬請見諒。</li>
+                                <li>為提升服務品質，本渡假村有權記錄客服對話內容，僅供內部訓練與查詢使用，並依法保護您的個人資料。</li>
+                                <li>禁止於客服對話中發送不實訊息、廣告、謾罵、人身攻擊或任何違法內容，違者本渡假村得中止對話並視情節採取法律行動。</li>
+                                <li>線上客服不具法律效力之承諾性質，若有涉及退費、合約條件等重大問題，仍以官方電子郵件或正式文件為主。</li>
+                            </ol>
+                        </li>
+
+
+                    </ol>
+
+                    <p>註冊即表示您已閱讀並同意上述條款。如有任何疑問，歡迎與我們聯繫。</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 隱私政策 Modal -->
+    <div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="privacyModalLabel">隱私政策</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>非常歡迎您光臨「微嶼IsleVille海島渡假村官方網站」（以下簡稱本網站），為了讓您能夠安心使用本網站的各項服務與資訊，特此向您說明本網站的隱私權保護政策，以保障您的權益，請您詳閱下列內容：
+                    </p>
+
+                    <ol>
+                        <li><strong>隱私權保護政策的適用範圍</strong> <br>
+                            隱私權保護政策內容，包括本網站如何處理在您使用網站服務時收集到的個人識別資料。隱私權保護政策不適用於本網站以外的相關連結網站，也不適用於非本網站所委託或參與管理的人員。</li>
+
+                        <li><strong>個人資料的蒐集、處理及利用方式</strong> <br>
+                            <ul>
+                                <li>當您造訪本網站或使用本網站所提供之功能服務時，我們將視該服務功能性質，請您提供必要的個人資料，並在該特定目的範圍內處理及利用您的個人資料；非經您書面同意，本網站不會將個人資料用於其他用途。
+                                </li>
+                                <li>本網站在您使用服務信箱、問卷調查等互動性功能時，會保留您所提供的姓名、電子郵件地址、聯絡方式及使用時間等。</li>
+                                <li>於一般瀏覽時，伺服器會自行記錄相關行徑，包括您使用連線設備的IP位址、使用時間、使用的瀏覽器、瀏覽及點選資料記錄等，做為我們增進網站服務的參考依據，此記錄為內部應用，決不對外公佈。
+                                </li>
+                                <li>為提供精確的服務，我們會將收集的問卷調查內容進行統計與分析，分析結果之統計數據或說明文字呈現，除供內部研究外，我們會視需要公佈統計數據及說明文字，但不涉及特定個人之資料。
+                                </li>
+                                <li>您可以隨時向我們提出請求，以更正或刪除您的帳戶或本網站所蒐集的個人資料等隱私資訊。聯繫方式請見最下方聯繫管道。</li>
+                            </ul>
+                        </li>
+
+                        <li><strong>資料之保護</strong> <br>
+                            <ul>
+                                <li>本網站主機均設有防火牆、防毒系統等相關的各項資訊安全設備及必要的安全防護措施，加以保護網站及您的個人資料採用嚴格的保護措施，只由經過授權的人員才能接觸您的個人資料，相關處理人員皆簽有保密合約，如有違反保密義務者，將會受到相關的法律處分。
+                                </li>
+                                <li>如因業務需要有必要委託其他單位提供服務時，本網站亦會嚴格要求其遵守保密義務，並且採取必要檢查程序以確定其將確實遵守。</li>
+                            </ul>
+                        </li>
+
+                        <li><strong>網站對外的相關連結</strong> <br>
+                            本網站的網頁提供其他網站的網路連結，您也可經由本網站所提供的連結，點選進入其他網站。但該連結網站不適用本網站的隱私權保護政策，您必須參考該連結網站中的隱私權保護政策。</li>
+
+                        <li><strong>與第三人共用個人資料之政策</strong> <br>
+                            本網站絕不會提供、交換、出租或出售任何您的個人資料給其他個人、團體、私人企業或公務機關，但有法律依據或合約義務者，不在此限。 <br>
+                            前項但書之情形包括不限於：
+                            <ul>
+                                <li>經由您書面同意。</li>
+                                <li>法律明文規定。</li>
+                                <li>為免除您生命、身體、自由或財產上之危險。</li>
+                                <li>與公務機關或學術研究機構合作，基於公共利益為統計或學術研究而有必要，且資料經過提供者處理或蒐集著依其揭露方式無從識別特定之當事人。</li>
+                                <li>當您在網站的行為，違反服務條款或可能損害或妨礙網站與其他使用者權益或導致任何人遭受損害時，經網站管理單位研析揭露您的個人資料是為了辨識、聯絡或採取法律行動所必要者。
+                                </li>
+                                <li>有利於您的權益。</li>
+                            </ul>
+                            本網站委託廠商協助蒐集、處理或利用您的個人資料時，將對委外廠商或個人善盡監督管理之責。
+                        </li>
+
+                        <li><strong>Cookie之使用</strong> <br>
+                            為了提供您最佳的服務，本網站會在您的電腦中放置並取用我們的Cookie，若您不願接受Cookie的寫入，您可在您使用的瀏覽器功能項中設定隱私權等級為高，即可拒絕Cookie的寫入，但可能會導至網站某些功能無法正常執行。
+                        </li>
+
+                        <li><strong>隱私權保護政策之修正</strong> <br>
+                            本網站隱私權保護政策將因應需求隨時進行修正，修正後的條款將刊登於網站上。</li>
+
+                        <li><strong>聯繫管道</strong> <br>
+                            本網站隱私權保護政策將因應需求隨時進行修正，修正後的條款將刊登於網站上。
+                            <ul>
+                                <li>公司名稱：微嶼IsleVilla海島渡假村</li>
+                                <li>地　　址：951台東縣綠島鄉公館66號</li>
+                                <li>電子信箱：info@islevilla.com</li>
+                                <li>電　　話：02-1234-5678</li>
+                            </ul>
+                        </li>
+                    </ol>
+
+                    <p>若您使用本網站服務，即視為同意本隱私政策內容。政策如有修訂，將公告於本網站上。</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <!-- 倒數計時 JavaScript -->
+    <script>
+        // 倒數計時功能
+        let countdown = 10;
+        const countdownElement = document.getElementById('countdown');
+
+        const timer = setInterval(() => {
+            countdown--;
+            countdownElement.textContent = countdown;
+
+            if (countdown <= 0) {
+                clearInterval(timer);
+                window.location.href = '/';
+            }
+        }, 1000);
+    </script>
+
+    <!-- ========== 載入Footer及Bootstrap JS ========== -->
+    <div th:replace="~{fragments/fragments :: footer}"></div>
 </body>
+
 </html>
