@@ -14,78 +14,68 @@
 <div th:replace="~{fragments/fragments :: header}"></div>
 
 <!-- //////////////////// 頁面內容放<main>裡 //////////////////// -->
-<main>
-    <!--    <div class="container">-->
-    <!--        &lt;!&ndash; 頁面標題 &ndash;&gt;-->
-    <!--        <h1 class="page-title mb-5">客房介紹</h1>-->
-    <!-- Hero Section -->
+<main class="roomtype-container">
+    <!--      <div class="container">-->
+    <!-- 頁面標題 -->
+    <!--        <h1 class="page-title">客房介紹</h1>-->
     <section class="hero-section pt-5">
         <div class="container text-center">
-            <h1 class="mb-4">客房介紹</h1>
+            <h1 class="mb-4">房型介紹</h1>
             <p class="mb-4">
-                <!--            <i class="fas fa-newspaper me-2"></i>-->
-                <i class="fa-solid fa-bed me-2"></i>
-                從獨旅到家族旅遊，微嶼提供最好的住宿環境供您選擇
+                <i class="fas fa-bed me-2"></i>
+                從獨旅到家族旅遊，微嶼提供最好的住宿環境
             </p>
         </div>
     </section>
 
+    <!-- 房型卡片容器 -->
     <section class="py-4">
-        <div class="container">
-            <!-- 如果有房型資料 -->
-            <div th:if="${roomTypeList != null and !roomTypeList.isEmpty()}">
-                <div th:each="roomType, iterStat : ${roomTypeList}"
-                     class="row align-items-center mb-5"
-                     th:classappend="${iterStat.index % 2 == 1} ? 'flex-md-row-reverse'">
+        <div class="roomtype-cards-container container">
+            <!-- 如果有房型資料，使用 Thymeleaf th:each 渲染房型卡片 -->
+            <div th:each="roomType : ${roomTypeList}" th:if="${roomTypeList != null and !roomTypeList.isEmpty()}"
+                 class="roomtype-card">
+                <!-- 房型圖片區域 -->
+                <div class="roomtype-image-container">
+                    <!-- 如果有圖片 -->
+                    <img th:if="${roomTypeFirstPhoto.get(roomType.roomTypeId) != null}"
+                         th:src="@{/roomtype/image/{photoId}(photoId=${roomTypeFirstPhoto.get(roomType.roomTypeId)})}"
+                         th:alt="${roomType.roomTypeName}"
+                         class="roomtype-image"
+                         loading="lazy">
 
-                    <!-- 圖片區塊 -->
-                    <div class="col-md-6">
-                        <div class="square-img-wrapper shadow-sm">
-                            <img th:if="${roomTypeFirstPhoto.get(roomType.roomTypeId) != null}"
-                                 th:src="@{/roomtype/image/{photoId}(photoId=${roomTypeFirstPhoto.get(roomType.roomTypeId)})}"
-                                 th:alt="${roomType.roomTypeName}"
-                                 class="square-img shadow-sm"
-                                 loading="lazy"/>
-                            <!-- 沒有圖片時的佔位 -->
-                            <div th:unless="${roomTypeFirstPhoto.get(roomType.roomTypeId) != null}"
-                                 class="square-img-wrapper d-flex align-items-center justify-content-center bg-light text-muted"
-                                 style="aspect-ratio: 1;">
-                                <div class="text-center">
-                                    <i class="bi bi-image" style="font-size: 2rem;"></i>
-                                    <p class="mt-2">暫無圖片</p>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- 如果沒有圖片，顯示佔位符 -->
+                    <div th:unless="${roomTypeFirstPhoto.get(roomType.roomTypeId) != null}" class="roomtype-no-image">
+                        <i class="bi bi-image"></i>
+                        <span>暫無圖片</span>
+                    </div>
+                </div>
+
+                <!-- 房型卡片內容 -->
+                <div class="roomtype-card-body">
+                    <h3 class="roomtype-name" th:text="${roomType.roomTypeName}">房型名稱</h3>
+                    <div class="roomtype-price"
+                         th:text="|NT$ ${#numbers.formatInteger(roomType.roomTypePrice, 0, 'COMMA')}|">NT$ 0
                     </div>
 
-                    <!-- 文字內容區塊 -->
-                    <div class="col-md-6 px-md-5">
-                        <h2 th:text="${roomType.roomTypeName}" class="mb-4 mt-3">房型名稱</h2>
-                        <pre th:text="${roomType.roomTypeContent}" class="mb-5 text-muted">房型說明內容</pre>
-                        <div class="mb-3 fw-bold fs-5"
-                             th:text="|NT$ ${#numbers.formatInteger(roomType.roomTypePrice, 0, 'COMMA')}|">
-                            NT$ 0
-                        </div>
-                        <button class="btn btn-primary"
-                                th:data-roomtype-id="${roomType.roomTypeId}"
-                                th:data-roomtype-name="${roomType.roomTypeName}"
-                                th:data-roomtype-capacity="${roomType.roomTypeCapacity}"
-                                th:data-roomtype-content="${roomType.roomTypeContent}"
-                                th:data-roomtype-price="${roomType.roomTypePrice}">
-                            查看更多 <i class="fa-solid fa-arrow-right ms-2"></i>
-                        </button>
-                    </div>
+                    <button class="btn roomtype-btn"
+                            th:data-roomtype-id="${roomType.roomTypeId}"
+                            th:data-roomtype-name="${roomType.roomTypeName}"
+                            th:data-roomtype-capacity="${roomType.roomTypeCapacity}"
+                            th:data-roomtype-content="${roomType.roomTypeContent}"
+                            th:data-roomtype-price="${roomType.roomTypePrice}">
+                        查看更多
+                    </button>
                 </div>
             </div>
 
-            <!-- 沒有房型資料時 -->
-            <div th:if="${roomTypeList == null or roomTypeList.isEmpty()}" class="text-center my-5">
-                <i class="bi bi-house fs-1 mb-3"></i>
+            <!-- 如果沒有房型資料 -->
+            <div th:if="${roomTypeList == null or roomTypeList.isEmpty()}" class="empty-state">
+                <i class="bi bi-house"></i>
                 <h5>暫無房型資料</h5>
-                <p class="text-muted">目前沒有可預訂的房型，請稍後再試</p>
+                <p>目前沒有可預訂的房型，請稍後再試</p>
             </div>
-            <!--    </div>-->
         </div>
+        <!--      </div>-->
     </section>
 </main>
 
