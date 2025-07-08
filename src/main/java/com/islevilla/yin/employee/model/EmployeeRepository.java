@@ -34,4 +34,9 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
     // 新增：根據部門和狀態查詢員工時一併載入權限
     @Query("SELECT DISTINCT e FROM Employee e LEFT JOIN FETCH e.permissions WHERE e.department.departmentId = :departmentId AND e.employeeStatus = :status")
     List<Employee> findByDepartmentDepartmentIdAndEmployeeStatusWithPermissions(@Param("departmentId") Integer departmentId, @Param("status") Byte status);
+
+    List<Employee> findByDepartment_DepartmentIdAndEmployeeStatusAndEmployeeNameContainingIgnoreCase(Integer departmentId, Byte status, String keyword);
+    List<Employee> findByDepartment_DepartmentIdAndEmployeeNameContainingIgnoreCase(Integer departmentId, String keyword);
+    List<Employee> findByEmployeeStatusAndEmployeeNameContainingIgnoreCase(Byte status, String keyword);
+    List<Employee> findByEmployeeNameContainingIgnoreCase(String keyword);
 }

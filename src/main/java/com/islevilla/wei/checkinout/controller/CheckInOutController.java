@@ -30,13 +30,44 @@ public class CheckInOutController {
     @GetMapping("/backend/check-in-out/list")
     public String checkInOutDashboard(Model model) {
         List<RoomRVOrder> orderList = roomRVOrderService.getAllOrders();
-        if (!orderList.isEmpty()) {
-            model.addAttribute("orderList", orderList);
-        }
         List<RoomRVOrder> orderListToday = roomRVOrderService.getTodayCheckInOrOutOrders();
-        if (!orderListToday.isEmpty()) {
-            model.addAttribute("orderListToday", orderListToday);
+
+        // 保證即使沒有資料也要傳空list，避免前端判斷null
+        model.addAttribute("orderList", orderList != null ? orderList : List.of());
+        model.addAttribute("orderListToday", orderListToday != null ? orderListToday : List.of());
+
+        // === 新增：退款金額、比例、距離入住日的 map ===
+        Map<Integer, Integer> refundAmountMap = new HashMap<>();
+        Map<Integer, Integer> refundRateMap = new HashMap<>();
+        Map<Integer, Long> daysToCheckInMap = new HashMap<>();
+
+        // 合併兩個list，避免有訂單只在其中一個list
+        List<RoomRVOrder> allOrders = new java.util.ArrayList<>();
+        if (orderList != null) allOrders.addAll(orderList);
+        if (orderListToday != null) {
+            for (RoomRVOrder o : orderListToday) {
+                if (allOrders.stream().noneMatch(x -> x.getRoomReservationId().equals(o.getRoomReservationId()))) {
+                    allOrders.add(o);
+                }
+            }
         }
+
+        for (RoomRVOrder order : allOrders) {
+            Integer orderId = order.getRoomReservationId();
+            Integer refundAmount = order.getRvRefundAmount() != null ? order.getRvRefundAmount() : 0;
+            Integer paidAmount = order.getRvPaidAmount() != null ? order.getRvPaidAmount() : 1; // 避免除以0
+            int refundRate = paidAmount > 0 ? (int) Math.round(refundAmount * 100.0 / paidAmount) : 0;
+            refundAmountMap.put(orderId, refundAmount);
+            refundRateMap.put(orderId, refundRate);
+
+            long days = java.time.temporal.ChronoUnit.DAYS.between(java.time.LocalDate.now(), order.getCheckInDate());
+            daysToCheckInMap.put(orderId, days);
+        }
+
+        model.addAttribute("refundAmountMap", refundAmountMap);
+        model.addAttribute("refundRateMap", refundRateMap);
+        model.addAttribute("daysToCheckInMap", daysToCheckInMap);
+
         model.addAttribute("sidebarActive", "check-in-out-list");
         return "back-end/check-in-out/check-in-out-list";
     }

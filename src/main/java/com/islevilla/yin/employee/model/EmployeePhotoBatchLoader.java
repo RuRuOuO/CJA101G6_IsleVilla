@@ -45,8 +45,8 @@ public class EmployeePhotoBatchLoader {
                             }
                         } else {
                             System.out.println("找不到圖片: " + fileName);
-                        }
-                    }
+                }
+            }
                 }
             }
         } catch (Exception e) {

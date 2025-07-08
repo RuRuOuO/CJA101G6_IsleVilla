@@ -100,6 +100,28 @@ public class RoomRVController {
     public String roomRVOrderList(Model model) {
         List<RoomRVOrder> orderList = roomRVOrderService.getAllOrders();
         model.addAttribute("orderList", orderList);
+
+        // 新增退款金額、比例、距離入住日的 map
+        Map<Integer, Integer> refundAmountMap = new HashMap<>();
+        Map<Integer, Integer> refundRateMap = new HashMap<>();
+        Map<Integer, Long> daysToCheckInMap = new HashMap<>();
+
+        for (RoomRVOrder order : orderList) {
+            Integer orderId = order.getRoomReservationId();
+            Integer refundAmount = order.getRvRefundAmount() != null ? order.getRvRefundAmount() : 0;
+            Integer paidAmount = order.getRvPaidAmount() != null ? order.getRvPaidAmount() : 1; // 避免除以0
+            int refundRate = paidAmount > 0 ? (int) Math.round(refundAmount * 100.0 / paidAmount) : 0;
+            refundAmountMap.put(orderId, refundAmount);
+            refundRateMap.put(orderId, refundRate);
+
+            long days = java.time.temporal.ChronoUnit.DAYS.between(java.time.LocalDate.now(), order.getCheckInDate());
+            daysToCheckInMap.put(orderId, days);
+        }
+
+        model.addAttribute("refundAmountMap", refundAmountMap);
+        model.addAttribute("refundRateMap", refundRateMap);
+        model.addAttribute("daysToCheckInMap", daysToCheckInMap);
+
         return "back-end/roomRVOrder/listAllRoomRVOrder";
     }
 
