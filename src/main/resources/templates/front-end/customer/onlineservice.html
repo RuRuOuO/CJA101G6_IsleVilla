@@ -1,177 +1,186 @@
-
 <!DOCTYPE html>
-<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<link rel="stylesheet" href="/css/onlineservice.css">
-<title>會員線上客服</title>
+	<meta charset="UTF-8"/>
+	<meta content="width=device-width, initial-scale=1" name="viewport"/>
+	<title>微嶼 | Isle Villa</title>
+	<link rel="stylesheet" href="/css/onlineservice.css">
+	<!-- ===== 載入統一樣式 ===== -->
+	<th:block th:replace="~{fragments/fragments :: styles}"></th:block>
 </head>
 
 <body>
+<!-- ===== 載入Header ===== -->
+<div th:replace="~{fragments/fragments :: header}"></div>
+<main class="mb-5">
 	<div id="chatStatusDisplay"
-		style="text-align: center; margin-bottom: 10px;">
+		 style="text-align: center; margin-bottom: 10px;">
 		<span id="statusIndicator"
-			style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: gray; margin-right: 8px;"></span>
+			  style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: gray; margin-right: 8px;"></span>
 		<span id="statusText">聊天室狀態讀取中...</span>
 	</div>
 	<h2>
 		線上客服 | 聊天室編號 <span th:text="${roomId}">0</span>
 	</h2>
 
-	<div class="container">
-		<button class="back-btn" onclick="goHome()">返回 IsleVilla 首頁</button>
+	<div class="container" style="max-width: 600px">
+		<!--    <button class="back-btn" onclick="goHome()">返回 IsleVilla 首頁</button>-->
 
 		<div id="chat"></div>
 
 		<div id="inputArea" class="input-area">
 			<input id="msg" type="text" placeholder="輸入訊息..."
-				onkeydown="handleKey(event)" autocomplete="off" />
-			<button onclick="sendMessage()">送出</button>
+				   onkeydown="handleKey(event)" autocomplete="off"/>
+			<button class="btn btn-dark" onclick="sendMessage()">送出</button>
 		</div>
 	</div>
+</main>
 
-	<script th:inline="javascript">
-/*<![CDATA[*/
-const roomId = [[${roomId}]];
-const senderId = [[${senderId}]];
-const senderType = [[${senderType}]];
-const senderName = [[${senderName}]];  // 加上單引號包住字串
-/*]]>*/
+<!-- ========== 載入Footer ========== -->
+<div th:replace="~{fragments/fragments :: footer}"></div>
+
+<script th:inline="javascript">
+	/*<![CDATA[*/
+	const roomId = [[${roomId}]];
+	const senderId = [[${senderId}]];
+	const senderType = [[${senderType}]];
+	const senderName = [[${senderName}]];  // 加上單引號包住字串
+	/*]]>*/
 </script>
 
-	<script>
-console.log("會員聊天室 | roomId=", roomId, "senderId=", senderId, "senderName=", senderName);
+<script>
+	console.log("會員聊天室 | roomId=", roomId, "senderId=", senderId, "senderName=", senderName);
 
-const input = document.getElementById("msg");
-const chat = document.getElementById("chat");
+	const input = document.getElementById("msg");
+	const chat = document.getElementById("chat");
 
-let chatStatus = 0; // 全域狀態變數：1 進行中，2 已結案，3 等待處理
+	let chatStatus = 0; // 全域狀態變數：1 進行中，2 已結案，3 等待處理
 
-// WebSocket 建立
-const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/chat?roomId=${roomId}`);
+	// WebSocket 建立
+	const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/chat?roomId=${roomId}`);
 
-ws.onopen = () => console.log("WebSocket 已連線聊天室", roomId);
-ws.onclose = () => console.log("WebSocket 已關閉");
-ws.onerror = (err) => console.error("WebSocket 錯誤", err);
+	ws.onopen = () => console.log("WebSocket 已連線聊天室", roomId);
+	ws.onclose = () => console.log("WebSocket 已關閉");
+	ws.onerror = (err) => console.error("WebSocket 錯誤", err);
 
-ws.onmessage = event => {
-    const msg = JSON.parse(event.data);
-    console.log("收到訊息", msg); // ← 這要有
-    
-    if (msg.type === 'system') {
-        if (msg.action === 'roomComplete') {
-            renderSystemMessage('----- 已結案 -----<br><br> 有任何相關問題請再與我們聯絡 ! <br><br>IsleVilla 微嶼 ');
-            updateStatusIndicator(2);
-            chatStatus = 2;
-        } else if (msg.action === 'roomReopen') {
-            renderSystemMessage('~~~ 很高興為您服務 ~~~<br><br>IsleVilla 微嶼');
-            updateStatusIndicator(1);
-            chatStatus = 1;
-        }
-        return;
-    }
+	ws.onmessage = event => {
+		const msg = JSON.parse(event.data);
+		console.log("收到訊息", msg); // ← 這要有
 
-    const isMe = (msg.senderId === senderId) && (msg.senderType === senderType);
-    
-    const displayName = msg.senderType === 1 ? 'IsleVilla 客服' : msg.senderName;
+		if (msg.type === 'system') {
+			if (msg.action === 'roomComplete') {
+				renderSystemMessage('----- 已結案 -----<br><br> 有任何相關問題請再與我們聯絡 ! <br><br>IsleVilla 微嶼 ');
+				updateStatusIndicator(2);
+				chatStatus = 2;
+			} else if (msg.action === 'roomReopen') {
+				renderSystemMessage('~~~ 很高興為您服務 ~~~<br><br>IsleVilla 微嶼');
+				updateStatusIndicator(1);
+				chatStatus = 1;
+			}
+			return;
+		}
 
-    // 等待處理中 + 客服回覆 = 狀態切回進行中
-    if (chatStatus === 3 && msg.senderType === 1) {
-        renderSystemMessage(' 很高興為您服務 <br><br> IsleVilla 微嶼');
-        updateStatusIndicator(1);
-        chatStatus = 1;
-    }
+		const isMe = (msg.senderId === senderId) && (msg.senderType === senderType);
 
-    renderMessage(isMe, displayName, msg.messageContent, msg.messageTime);
-};
+		const displayName = msg.senderType === 1 ? 'IsleVilla 客服' : msg.senderName;
 
-// 拉取歷史訊息 & 狀態燈設定
-window.onload = () => {
-    fetch(`/api/chat/room/${roomId}/status`)
-        .then(res => res.json())
-        .then(statusRes => {
-            const status = statusRes.chatStatus;
-            chatStatus = status; 			// 同步全域狀態
-            updateStatusIndicator(status);  // 狀態燈更新
+		// 等待處理中 + 客服回覆 = 狀態切回進行中
+		if (chatStatus === 3 && msg.senderType === 1) {
+			renderSystemMessage(' 很高興為您服務 <br><br> IsleVilla 微嶼');
+			updateStatusIndicator(1);
+			chatStatus = 1;
+		}
 
-            let afterEnd = false;
+		renderMessage(isMe, displayName, msg.messageContent, msg.messageTime);
+	};
 
-            if (status === 3) {
-                renderSystemMessage('在結案後傳送訊息，目前聊天室已轉為" 等待處理 "');
-                afterEnd = true;
-            }
+	// 拉取歷史訊息 & 狀態燈設定
+	window.onload = () => {
+		fetch(`/api/chat/room/${roomId}/status`)
+				.then(res => res.json())
+				.then(statusRes => {
+					const status = statusRes.chatStatus;
+					chatStatus = status; 			// 同步全域狀態
+					updateStatusIndicator(status);  // 狀態燈更新
 
-            if (status === 2) {
-                renderSystemMessage('-----已結案 -----<br><br> 有任何相關問題請再與我們聯絡 ! <br><br> IsleVilla 微嶼 ');
-            	 // 不轉成等待處理，讓使用者發送時再變更
-                afterEnd = false;
-            }
+					let afterEnd = false;
 
-            fetch(`/api/chat/room/${roomId}/history?afterEnd=${afterEnd}`)
-            .then(res => res.json())
-            .then(history => {
-                history.forEach(msg => {
-                    const isMe = (msg.senderId === senderId) && (msg.senderType === senderType);
-                    const displayName = msg.senderType === 1 ? 'IsleVilla 客服' : msg.senderName;
-                    renderMessage(isMe, displayName, msg.messageContent, msg.messageTime);
-                });
-              });
-   		    });
-	      };
+					if (status === 3) {
+						renderSystemMessage('在結案後傳送訊息，目前聊天室已轉為" 等待處理 "');
+						afterEnd = true;
+					}
 
-// 發送訊息
-function sendMessage() {
-    const content = input.value.trim();
-    if (!content) return;
-    
-    // 使用者在已結案狀態下再次輸入訊息
-    if (chatStatus === 2) {
-        renderSystemMessage(' 請稍等，即將為您服務 ! <br><br>IsleVilla 微嶼 ');
-        updateStatusIndicator(3);
-        chatStatus = 3;
-        
-     // 通知後端更新聊天室狀態為等待處理
-        fetch(`/api/chat/room/${roomId}/mark-pending`, { method: 'POST' });
-    }
+					if (status === 2) {
+						renderSystemMessage('-----已結案 -----<br><br> 有任何相關問題請再與我們聯絡 ! <br><br> IsleVilla 微嶼 ');
+						// 不轉成等待處理，讓使用者發送時再變更
+						afterEnd = false;
+					}
 
-    const data = {
-        chatRoomId: roomId,
-        senderType: senderType,
-        senderId: senderId,
-        senderName: senderName,
-        messageContent: content
-    };
+					fetch(`/api/chat/room/${roomId}/history?afterEnd=${afterEnd}`)
+							.then(res => res.json())
+							.then(history => {
+								history.forEach(msg => {
+									const isMe = (msg.senderId === senderId) && (msg.senderType === senderType);
+									const displayName = msg.senderType === 1 ? 'IsleVilla 客服' : msg.senderName;
+									renderMessage(isMe, displayName, msg.messageContent, msg.messageTime);
+								});
+							});
+				});
+	};
 
-    ws.send(JSON.stringify(data));
-    input.value = "";
-    console.log("發送訊息", data);
-}
+	// 發送訊息
+	function sendMessage() {
+		const content = input.value.trim();
+		if (!content) return;
 
-// 渲染訊息
-function renderMessage(isMe, sender, content, timeMillis) {
-    const div = document.createElement("div");
-    div.className = "msg " + (isMe ? "right" : "left");
+		// 使用者在已結案狀態下再次輸入訊息
+		if (chatStatus === 2) {
+			renderSystemMessage(' 請稍等，即將為您服務 ! <br><br>IsleVilla 微嶼 ');
+			updateStatusIndicator(3);
+			chatStatus = 3;
 
-    const timeStr = timeMillis ? formatTime(timeMillis) : formatTime(Date.now());
+			// 通知後端更新聊天室狀態為等待處理
+			fetch(`/api/chat/room/${roomId}/mark-pending`, {method: 'POST'});
+		}
 
-    div.innerHTML = `
+		const data = {
+			chatRoomId: roomId,
+			senderType: senderType,
+			senderId: senderId,
+			senderName: senderName,
+			messageContent: content
+		};
+
+		ws.send(JSON.stringify(data));
+		input.value = "";
+		console.log("發送訊息", data);
+	}
+
+	// 渲染訊息
+	function renderMessage(isMe, sender, content, timeMillis) {
+		const div = document.createElement("div");
+		div.className = "msg " + (isMe ? "right" : "left");
+
+		const timeStr = timeMillis ? formatTime(timeMillis) : formatTime(Date.now());
+
+		div.innerHTML = `
         <div class="bubble">
             <span class="name">${sender}</span>
             <span class="content">${content}</span>
             <span class="time">${timeStr}</span>
         </div>
     `;
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
-}
+		chat.appendChild(div);
+		chat.scrollTop = chat.scrollHeight;
+	}
 
-// 渲染系統提示
-function renderSystemMessage(text) {
-    const div = document.createElement("div");
-    div.className = "msg";
-    div.style.justifyContent = "center";
+	// 渲染系統提示
+	function renderSystemMessage(text) {
+		const div = document.createElement("div");
+		div.className = "msg";
+		div.style.justifyContent = "center";
 
-    div.innerHTML = `
+		div.innerHTML = `
         <div class="bubble" style="
             background-color: #f8f9fa;
             color: #333;
@@ -182,48 +191,49 @@ function renderSystemMessage(text) {
             ${text.replace(/\n/g, '<br>')}
         </div>
     `;
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
-}
-
-// 時間格式
-function formatTime(timestamp) {
-    const date = new Date(timestamp);
-    const hh = date.getHours().toString().padStart(2, '0');
-    const mm = date.getMinutes().toString().padStart(2, '0');
-    return `${hh}:${mm}`;
-}
-function updateStatusIndicator(status) {
-	const indicator = document.getElementById("statusIndicator");
-	const text = document.getElementById("statusText");
-
-	if (status === 1) {
-		indicator.style.backgroundColor = "#2ecc71"; // 綠色
-		text.textContent = "進行中";
-	} else if (status === 2) {
-		indicator.style.backgroundColor = "#e74c3c"; // 紅色
-		text.textContent = "已結案";
-	} else if (status === 3) {
-		indicator.style.backgroundColor = "#f39c12"; // 橘色
-		text.textContent = "等待處理";
-	} else {
-		indicator.style.backgroundColor = "gray";
-		text.textContent = "未知狀態";
+		chat.appendChild(div);
+		chat.scrollTop = chat.scrollHeight;
 	}
-}
 
-// 返回首頁
-function goHome() {
-    window.location.href = "/";
-}
+	// 時間格式
+	function formatTime(timestamp) {
+		const date = new Date(timestamp);
+		const hh = date.getHours().toString().padStart(2, '0');
+		const mm = date.getMinutes().toString().padStart(2, '0');
+		return `${hh}:${mm}`;
+	}
 
-// Enter鍵發送
-function handleKey(event) {
-    if (event.key === "Enter") {
-        event.preventDefault();
-        sendMessage();
-    }
-}
+	function updateStatusIndicator(status) {
+		const indicator = document.getElementById("statusIndicator");
+		const text = document.getElementById("statusText");
+
+		if (status === 1) {
+			indicator.style.backgroundColor = "#2ecc71"; // 綠色
+			text.textContent = "進行中";
+		} else if (status === 2) {
+			indicator.style.backgroundColor = "#e74c3c"; // 紅色
+			text.textContent = "已結案";
+		} else if (status === 3) {
+			indicator.style.backgroundColor = "#f39c12"; // 橘色
+			text.textContent = "等待處理";
+		} else {
+			indicator.style.backgroundColor = "gray";
+			text.textContent = "未知狀態";
+		}
+	}
+
+	// 返回首頁
+	function goHome() {
+		window.location.href = "/";
+	}
+
+	// Enter鍵發送
+	function handleKey(event) {
+		if (event.key === "Enter") {
+			event.preventDefault();
+			sendMessage();
+		}
+	}
 </script>
 
 </body>
