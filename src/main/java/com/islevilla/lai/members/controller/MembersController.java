@@ -406,7 +406,7 @@ public class MembersController {
 			
 			// 處理照片上傳
 			if (!photoFile.isEmpty()) {
-				member.setMemberPhoto(photoFile.getBytes());
+				existingMember.setMemberPhoto(photoFile.getBytes());
 			}
 
 			// 儲存更新的會員資料
@@ -450,6 +450,12 @@ public class MembersController {
 	        } else {
 	            redirectAttributes.addFlashAttribute("errorMessage", "原密碼錯誤或密碼更新失敗");
 	        }
+	        
+	        // 儲存更新的會員資料
+	        Members updatedMember = membersService.updateMember(member);
+			
+	        // 更新 session 中的會員資料
+	        session.setAttribute("member", updatedMember);
 	    } catch (Exception e) {
 	        redirectAttributes.addFlashAttribute("errorMessage", "密碼更新失敗：" + e.getMessage());
 	    }
