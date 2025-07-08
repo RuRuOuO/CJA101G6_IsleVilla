@@ -18,25 +18,8 @@ public class EmployeePermissionController {
 
     @Autowired
     private EmployeeService employeeService;
-    
-    @Autowired
-    private PermissionService permissionService;
 
-    /**
-     * 顯示員工權限管理頁面
-     */
-    @GetMapping("/manage/{employeeId}")
-    public String manageEmployeePermissions(@PathVariable Integer employeeId, Model model) {
-        Employee employee = employeeService.getEmployeeById(employeeId);
-        List<Permission> allPermissions = permissionService.getAllPermissions();
-        Set<Permission> employeePermissions = employeeService.getEmployeePermissions(employeeId);
-        
-        model.addAttribute("employee", employee);
-        model.addAttribute("allPermissions", allPermissions);
-        model.addAttribute("employeePermissions", employeePermissions);
-        
-        return "back-end/employee/managePermissions";
-    }
+
 
     /**
      * 新增權限給員工

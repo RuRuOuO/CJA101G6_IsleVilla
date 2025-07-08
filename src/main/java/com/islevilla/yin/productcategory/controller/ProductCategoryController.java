@@ -3,6 +3,7 @@ package com.islevilla.yin.productcategory.controller;
 import com.islevilla.yin.productcategory.model.ProductCategory;
 import com.islevilla.yin.productcategory.model.ProductCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/backend/product/category")
+@PreAuthorize("hasAuthority('product')")
 public class ProductCategoryController {
 
     @Autowired

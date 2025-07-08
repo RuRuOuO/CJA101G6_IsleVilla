@@ -264,7 +264,7 @@
         </button>
         <div class="collapse navbar-collapse" id="mobileNavbarCollapse">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <!-- 員工管理 -->
+                <!-- 組織管理 -->
                 <li class="nav-item" sec:authorize="hasAuthority('operation')">
                     <button
                             class="btn btn-toggle"
@@ -272,19 +272,19 @@
                             data-bs-target="#mobile-employee"
                             aria-expanded="false"
                     >
-                        員工管理
+                        組織管理
                         <i class="bi bi-chevron-down"></i>
                     </button>
                     <div class="collapse" id="mobile-employee">
                         <ul class="btn-toggle-nav list-unstyled">
-                            <li><a th:href="@{/backend/employee/list}">員工列表</a></li>
+                            <li><a th:href="@{/backend/employee/list}">員工管理</a></li>
                             <li><a th:href="@{/backend/department/list}">部門管理</a></li>
                             <li><a th:href="@{/backend/operation-log/list}">log檢視</a></li>
                         </ul>
                     </div>
                 </li>
 
-                <!-- 住房管理 -->
+                <!-- 訂房管理 -->
                 <li class="nav-item" sec:authorize="hasAuthority('room')">
                     <button
                             class="btn btn-toggle"
@@ -297,7 +297,7 @@
                     </button>
                     <div class="collapse" id="mobile-room">
                         <ul class="btn-toggle-nav list-unstyled">
-                            <li><a th:href="@{/backend/check-in-out/list}">住房管理</a></li>-->
+                            <li><a th:href="@{/backend/check-in-out/list}">訂房管理</a></li>-->
                             <li><a th:href="@{/backend/room/selectRoomPage}">房間管理</a></li>
                             <li><a th:href="@{/backend/roomType/listRoomType}">房型管理</a></li>
                             <li><a th:href="@{/backend/roomTypeAvailability/list}">房型庫存管理</a></li>
@@ -322,7 +322,7 @@
                         <ul class="btn-toggle-nav list-unstyled">
                             <li><a th:href="@{/backend/product/list}">商品管理</a></li>
                             <li><a th:href="@{/backend/product/category/list}">商品分類管理</a></li>
-                            <li><a th:href="@{/backend/product-order/listAllProductOrder}">訂單管理</a></li>
+                            <li><a th:href="@{/backend/product-order/listAllProductOrder}">商品訂單管理</a></li>
                             <li><a th:href="@{/backend/coupon/list}">優惠券管理</a></li>
                         </ul>
                     </div>
@@ -364,9 +364,9 @@
                     <div class="collapse" id="mobile-home">
                         <ul class="btn-toggle-nav list-unstyled">
                             <li><a th:href="@{/backend/news/list}">最近消息</a></li>
-                            <li><a th:href="@{/backend/feedback/list}">顧客回饋</a></li>
-                            <li><a th:href="@{/backend/member/list}">會員管理</a></li>
-                            <li><a th:href="@{/backend/chat/room/list}">客服管理</a></li>
+                            <li><a th:href="@{/backend/feedback/list}">顧客評價管理</a></li>
+                            <li><a th:href="@{/backend/member/list}">會員帳號管理</a></li>
+                            <li><a th:href="@{/backend/chat/room/list}">客服訊息管理</a></li>
                         </ul>
                     </div>
                 </li>
@@ -399,7 +399,7 @@
         </a>
     </div>
     <ul class="sidebar-menu list-unstyled ps-0" style="max-height: calc(100vh - 160px); overflow-y: auto;">
-        <!-- 員工管理 -->
+        <!-- 組織管理 -->
         <li class="mb-1"  sec:authorize="hasAuthority('operation')">
             <button
                     class="btn btn-toggle d-flex align-items-center w-100 rounded border-0 text-white"
@@ -408,7 +408,7 @@
                     th:aria-expanded="${sidebarActive == 'employee-list' or sidebarActive == 'department-list' or sidebarActive == 'log-list'}"
             >
                 <i class="bi bi-person-circle" style="color: #fff; font-size: 1.3rem;"></i>
-                <span class="ms-2">員工管理</span>
+                <span class="ms-2">組織管理</span>
                 <i class="bi bi-chevron-down ms-auto" style="font-size: 0.9rem;"></i>
             </button>
             <div class="collapse" id="dashboard-employee"
@@ -423,7 +423,7 @@
                             <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
                                 <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
                             </span>
-                            <span class="ms-2">員工列表</span>
+                            <span class="ms-2">員工管理</span>
                         </a>
                     </li>
                     <li>
@@ -450,7 +450,7 @@
             </div>
         </li>
 
-        <!-- 住房管理 -->
+        <!-- 訂房管理 -->
         <li class="mb-1"  sec:authorize="hasAuthority('room')">
             <button
                     class="btn btn-toggle d-flex align-items-center w-100 rounded border-0 text-white"
@@ -458,7 +458,7 @@
                     data-bs-target="#dashboard-room"
                     th:aria-expanded="${sidebarActive == 'check-in-out-list' or sidebarActive == 'selectRoomPage-list' or sidebarActive == 'listRoomType-list' or sidebarActive == 'roomTypeAvailability-list' or sidebarActive == 'promotion-list' or sidebarActive == 'roompromotionprice-list'}">
                 <i class="bi bi-house-fill" style="color: #fff; font-size: 1.3rem;"></i>
-                <span class="ms-2">住房管理</span>
+                <span class="ms-2">訂房管理</span>
                 <i class="bi bi-chevron-down ms-auto" style="font-size: 0.9rem;"></i>
             </button>
             <div class="collapse" id="dashboard-room"
@@ -574,7 +574,7 @@
                             <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
                                 <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
                             </span>
-                            <span class="ms-2">訂單管理</span>
+                            <span class="ms-2">商品訂單管理</span>
                         </a>
                     </li>
                     <li>
@@ -692,7 +692,7 @@
                             <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
                                 <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
                             </span>
-                            <span class="ms-2">顧客回饋</span>
+                            <span class="ms-2">顧客評價管理</span>
                         </a>
                     </li>
                     <li>
@@ -702,7 +702,7 @@
                             <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
                                 <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
                             </span>
-                            <span class="ms-2">會員管理</span>
+                            <span class="ms-2">會員帳號管理</span>
                         </a>
                     </li>
                     <li>
@@ -712,7 +712,7 @@
                             <span style="display: inline-flex; justify-content: center; align-items: center; width: 1.3rem; height: 1.3rem; align-self: center;">
                                 <span style="display: block; width: 4px; height: 4px; background: #fff; border-radius: 50%; margin: auto;"></span>
                             </span>
-                            <span class="ms-2">客服管理</span>
+                            <span class="ms-2">客服訊息管理</span>
                         </a>
                     </li>
 

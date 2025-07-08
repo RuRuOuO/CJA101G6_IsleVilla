@@ -128,6 +128,7 @@ public class RoomController {
 		model.addAttribute("roomStatusMap", roomStatusMap);
 	    // 將房型名稱對應表加到 model
 		model.addAttribute("roomTypeNameMap", roomTypeNameMap);
+		model.addAttribute("sidebarActive", "selectRoomPage-list");
 		return "/back-end/room/selectRoomPage";
 	}
 
