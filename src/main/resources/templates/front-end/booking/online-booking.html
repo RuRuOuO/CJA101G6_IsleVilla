@@ -122,28 +122,35 @@
                             <p th:text="${roomTypeWithPromotions.roomType.roomTypeContent}">房型說明</p>
                             <!-- 原價區塊 -->
                             <div class="mt-2">
-                                <div class="p-2 bg-light rounded mb-1 d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <div class="fw-bold">原價</div>
-                                        <div class="text-primary">
-                                            <span class="room-type-price"
-                                                  th:attr="data-price=${roomTypeWithPromotions.roomType.roomTypePrice ?: 0}"
-                                                  th:text="|${roomTypeWithPromotions.roomType.roomTypePrice ?: 0} 元/晚 × ${nights ?: 1} 晚 = ${(roomTypeWithPromotions.roomType.roomTypePrice ?: 0) * (nights ?: 1)} 元|">
-                                            </span>
-                                        </div>
+                                <div th:if="${!roomTypeWithPromotions.hasAvailableRooms()}">
+                                    <div style="background: #fff; color: #888; border-radius: .5rem; border: 1px solid #eee; padding: 1rem; text-align: center; font-weight: bold;">
+                                        <i class="bi bi-x-circle"></i> 您選擇的日期已無空房
                                     </div>
-                                    <button type="button" class="btn btn-dark btn-select-room ms-2"
-                                            th:attr="data-room-name=${roomTypeWithPromotions.roomType.roomTypeName},
-                                                     data-room-price=${roomTypeWithPromotions.roomType.roomTypePrice ?: 0},
-                                                     data-room-id=${roomTypeWithPromotions.roomType.roomTypeId},
-                                                     data-room-type-id=${roomTypeWithPromotions.roomType.roomTypeId},
-                                                     data-promotion-title=''">
-                                        選擇
-                                    </button>
+                                </div>
+                                <div th:if="${roomTypeWithPromotions.hasAvailableRooms()}">
+                                    <div class="p-2 bg-light rounded mb-1 d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="fw-bold">原價</div>
+                                            <div class="text-primary">
+                                                <span class="room-type-price"
+                                                      th:attr="data-price=${roomTypeWithPromotions.roomType.roomTypePrice ?: 0}"
+                                                      th:text="|${roomTypeWithPromotions.roomType.roomTypePrice ?: 0} 元/晚 × ${nights ?: 1} 晚 = ${(roomTypeWithPromotions.roomType.roomTypePrice ?: 0) * (nights ?: 1)} 元|">
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-dark btn-select-room ms-2"
+                                                th:attr="data-room-name=${roomTypeWithPromotions.roomType.roomTypeName},
+                                                         data-room-price=${roomTypeWithPromotions.roomType.roomTypePrice ?: 0},
+                                                         data-room-id=${roomTypeWithPromotions.roomType.roomTypeId},
+                                                         data-room-type-id=${roomTypeWithPromotions.roomType.roomTypeId},
+                                                         data-promotion-title=''">
+                                            選擇
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <!-- 優惠專案詳細資訊 -->
-                            <div class="mt-2" th:if="${!roomTypeWithPromotions.promotions.isEmpty()}">
+                            <div class="mt-2" th:if="${roomTypeWithPromotions.hasAvailableRooms() && !roomTypeWithPromotions.promotions.isEmpty()}">
                                 <div th:each="promotion : ${roomTypeWithPromotions.promotions}" class="p-2 bg-light rounded mb-1 d-flex justify-content-between align-items-center">
                                     <div>
                                         <div class="fw-bold" th:text="${promotion.promotion.roomPromotionTitle}">優惠名稱</div>
@@ -163,12 +170,12 @@
                                         </div>
                                     </div>
                                     <a href="#" class="btn btn-dark btn-select-room ms-2"
-                                       th:attr="data-room-name=${roomTypeWithPromotions.roomType.roomTypeName},
-                                                data-room-price=${roomTypeWithPromotions.getDiscountedPrice(promotion)},
-                                                data-room-id=${roomTypeWithPromotions.roomType.roomTypeId},
-                                                data-room-type-id=${roomTypeWithPromotions.roomType.roomTypeId},
-                                                data-promotion-title=${promotion.promotion.roomPromotionTitle != null ? promotion.promotion.roomPromotionTitle : ''},
-                                                data-promotion-id=${promotion.promotion.roomPromotionId != null ? promotion.promotion.roomPromotionId : ''}">
+                                           th:attr="data-room-name=${roomTypeWithPromotions.roomType.roomTypeName},
+                                                    data-room-price=${roomTypeWithPromotions.getDiscountedPrice(promotion)},
+                                                    data-room-id=${roomTypeWithPromotions.roomType.roomTypeId},
+                                                    data-room-type-id=${roomTypeWithPromotions.roomType.roomTypeId},
+                                                    data-promotion-title=${promotion.promotion.roomPromotionTitle != null ? promotion.promotion.roomPromotionTitle : ''},
+                                                    data-promotion-id=${promotion.promotion.roomPromotionId != null ? promotion.promotion.roomPromotionId : ''}">
                                         選擇
                                     </a>
                                 </div>
@@ -268,17 +275,18 @@
     document.addEventListener('DOMContentLoaded', function() {
         console.log('頁面載入完成');
         
-        // 取得 Thymeleaf 傳來的查詢條件
-        var checkin =  '';
-        var checkout = '';
-        if (checkin) document.getElementById('checkin').value = checkin;
-        if (checkout) document.getElementById('checkout').value = checkout;
-        
+        // 取得明天日期字串 yyyy-mm-dd
+        var tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        var yyyy = tomorrow.getFullYear();
+        var mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
+        var dd = String(tomorrow.getDate()).padStart(2, '0');
+        var tomorrowStr = yyyy + '-' + mm + '-' + dd;
         
         flatpickr("#main-date-range", {
             mode: "range",
             dateFormat: "Y-m-d",
-            minDate: "today",
+            minDate: tomorrowStr, // 只能選明天以後
             locale: "zh_tw",
             onChange: function(selectedDates) {
                 const adults = document.getElementById('main-adults').value;
