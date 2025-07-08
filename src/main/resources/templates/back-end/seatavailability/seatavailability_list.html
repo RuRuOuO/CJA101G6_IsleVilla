@@ -138,44 +138,61 @@
 	<script
 		src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 	<script>
-		$(document).ready(
-				function() {
-					const table = $('#seatTable').DataTable({
-						dom : "t<'my-3'p>",
-						pagingType : 'simple_numbers',
-						lengthChange : false,
-						info : false,
-						autoWidth : false,
-						language : {
-							paginate : {
-								previous : '上一頁',
-								next : '下一頁'
-							}
-						}
-					});
+		$(document)
+				.ready(
+						function() {
+							const table = $('#seatTable').DataTable({
+								dom : "t<'my-3'p>",
+								pagingType : 'simple_numbers',
+								lengthChange : false,
+								info : false,
+								autoWidth : false,
+								language : {
+									paginate : {
+										previous : '上一頁',
+										next : '下一頁'
+									}
+								}
+							});
 
-					// 🔍 根據「日期 + 時段輸入」聯合過濾
-					$('#dateFilter, #scheduleInput').on('input change', function () {
-					  const selectedDate = $('#dateFilter').val();
-					  const keyword = $('#scheduleInput').val().trim();
-					
-					  $.fn.dataTable.ext.search.push(function (settings, data) {
-					    const rowDate = data[0];      // 第 0 欄：日期
-					    const rowSchedule = data[1];  // 第 1 欄：#12｜去程 08:00 ~ 09:00
-					
-					    // 擷取 # 後的編號（去掉 "#" 和 "｜" 後面的文字）
-					    const scheduleId = rowSchedule.split('｜')[0].replace('#', '').trim(); // 例如 "12"
-					
-					    const matchDate = !selectedDate || rowDate === selectedDate;
-					    const matchSchedule = !keyword || scheduleId === keyword;
-					
-					    return matchDate && matchSchedule;
-					  });
-					
-					  table.draw();
-					  $.fn.dataTable.ext.search.pop();
-					});
-				});
+							// 日期 + 時段輸入查詢
+							$('#dateFilter, #scheduleInput')
+									.on(
+											'input change',
+											function() {
+												const selectedDate = $(
+														'#dateFilter').val();
+												const keyword = $(
+														'#scheduleInput').val()
+														.trim();
+
+												$.fn.dataTable.ext.search
+														.push(function(
+																settings, data) {
+															const rowDate = data[0];
+															const rowSchedule = data[1];
+
+															// 擷取 # 後的編號
+															const scheduleId = rowSchedule
+																	.split('｜')[0]
+																	.replace(
+																			'#',
+																			'')
+																	.trim(); // 例如 "12"
+
+															const matchDate = !selectedDate
+																	|| rowDate === selectedDate;
+															const matchSchedule = !keyword
+																	|| scheduleId === keyword;
+
+															return matchDate
+																	&& matchSchedule;
+														});
+
+												table.draw();
+												$.fn.dataTable.ext.search.pop();
+											});
+						});
 	</script>
 </body>
 </html>
