@@ -66,11 +66,18 @@
                             <i class="bi bi-search me-1"></i>查詢
                         </button>
                     </div>
+                    
                 </div>
             </form>
 
             <!-- ================= 每日明細表格 ================= -->
-            <div class="table-responsive">
+				<div class="mb-3 text-end">
+					<button class="btn btn-outline-primary"
+						onclick="exportAvailabilityToCSV('房型庫存總覽.csv')">
+						<i class="bi bi-download me-1"></i> 匯出 CSV
+					</button>
+				</div>
+				<div class="table-responsive">
                 <table class="table table-hover table-light align-middle text-center">
                     <thead class="table-light">
                         <tr>
@@ -116,5 +123,35 @@
 
 <!-- ================= 自訂腳本 ================= -->
 <script th:src="@{/js/roomTypeAvailability.js}"></script>
+
+	<!-- 匯出CSV檔案報表 -->
+	<script>
+function exportAvailabilityToCSV(filename) {
+    const table = document.querySelector("table");
+    const rows = table.querySelectorAll("tr");
+    let csv = [];
+
+    for (let row of rows) {
+        let cols = row.querySelectorAll("th, td");
+        let rowData = [];
+        for (let col of cols) {
+            // 處理雙引號與換行
+            let text = col.innerText.replace(/"/g, '""').replace(/\n/g, ' ').trim();
+            rowData.push('"' + text + '"');
+        }
+        csv.push(rowData.join(","));
+    }
+
+    // 產生 Blob 並下載
+    const csvBlob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(csvBlob);
+    link.download = filename;
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+</script>
 </body>
 </html>
