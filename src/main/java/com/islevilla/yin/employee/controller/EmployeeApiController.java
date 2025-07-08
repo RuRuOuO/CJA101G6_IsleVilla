@@ -4,6 +4,7 @@ import com.islevilla.yin.employee.model.Employee;
 import com.islevilla.yin.employee.model.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping
+@PreAuthorize("hasAuthority('operation')")
 public class EmployeeApiController {
     @Autowired
     private EmployeeService employeeService;

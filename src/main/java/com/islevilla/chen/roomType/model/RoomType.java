@@ -43,8 +43,6 @@ public class RoomType implements java.io.Serializable {
 	private String roomTypeName;
 	
 	@Column(name="room_type_quantity")
-	@NotNull(message = "房型數量:請輸入數字")
-	@Min(value=0, message = "房型數量:格式錯誤，請輸入數字")
 	private Integer roomTypeQuantity;
 	
 	@Column(name="room_type_capacity")

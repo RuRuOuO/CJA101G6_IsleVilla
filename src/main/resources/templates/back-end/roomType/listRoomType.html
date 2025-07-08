@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>微嶼 | Isle Villa 後台首頁</title>
+    <title>房型管理 | 微嶼 IsleVilla</title>
     <!-- ===== 載入統一樣式 ===== -->
 	<th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
 </head>
@@ -91,7 +91,6 @@
                                      data-id=${rt.roomTypeId},
                                      data-name=${rt.roomTypeName},
                                      data-code=${rt.roomTypeCode},
-                                     data-quantity=${rt.roomTypeQuantity},
                                      data-capacity=${rt.roomTypeCapacity},
                                      data-content=${rt.roomTypeContent},
                                      data-price=${rt.roomTypePrice},
@@ -154,11 +153,6 @@
                     <div class="invalid-feedback">請輸入房型說明，長度不超過1000字!</div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="updateRoomTypeQuantity" class="form-label">房型數量 <span class="text-danger">*</span></label>
-                        <input type="number" class="form-control" id="updateRoomTypeQuantity" th:field="*{roomTypeQuantity}" required min="0">
-                        <div class="invalid-feedback">請輸入房型數量，請輸入數字（必須大於等於0）</div>
-                    </div>
                     <div class="col-md-6 mb-3">
                         <label for="updateRoomTypeCapacity" class="form-label">房型容納人數 <span class="text-danger">*</span></label>
                         <input type="number" class="form-control" id="updateRoomTypeCapacity" th:field="*{roomTypeCapacity}" required min="1">
@@ -247,12 +241,7 @@
                     <div class="invalid-feedback">請輸入房型說明，長度不超過1000字!</div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="addRoomTypeQuantity" class="form-label">房型數量 <span class="text-danger">*</span></label>
-                        <input type="number" class="form-control" id="addRoomTypeQuantity" th:field="*{roomTypeQuantity}" required min="0">
-                        <div class="invalid-feedback">請輸入房型數量，請輸入數字（必須大於等於0）</div>
-                    </div>
-                    <div class="col-md-6 mb-3">
+                <div class="col-md-6 mb-3">
                         <label for="addRoomTypeCapacity" class="form-label">房型容納人數 <span class="text-danger">*</span></label>
                         <input type="number" class="form-control" id="addRoomTypeCapacity" th:field="*{roomTypeCapacity}" required min="1">
                         <div class="invalid-feedback">請輸入房型容納人數，請輸入數字（必須大於等於1）</div>

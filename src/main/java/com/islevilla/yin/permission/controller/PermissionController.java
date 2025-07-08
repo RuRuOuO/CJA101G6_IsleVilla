@@ -16,14 +16,6 @@ public class PermissionController {
     @Autowired
     private PermissionService permissionService;
 
-    //後台-權限列表
-    @GetMapping("/backend/permission/list")
-    public String listPermission(Model model) {
-        List<Permission> permissionList = permissionService.getAllPermissions();
-        model.addAttribute("permissionList", permissionList); // 權限列表
-        model.addAttribute("permission", new Permission());   // 空的 Permission 給 modal 表單用
-        return "back-end/employee/permission";
-    }
     
     // 取得權限資料 API
     @GetMapping("/backend/permission/get/{permissionId}")
