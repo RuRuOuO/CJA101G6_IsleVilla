@@ -106,6 +106,7 @@ public class RoomTypeAvailabilityController {
         model.addAttribute("daysInMonth", daysInMonth); // 當月天數
         model.addAttribute("roomTypeNameList", roomTypeName.getRoomTypeNameList());
         model.addAttribute("roomTypeName", roomTypeName.getRoomTypeNameMap());
+        model.addAttribute("sidebarActive", "roomTypeAvailability-list");
         return "back-end/roomTypeAvailability/listRoomTypeAvailability";
     }
 

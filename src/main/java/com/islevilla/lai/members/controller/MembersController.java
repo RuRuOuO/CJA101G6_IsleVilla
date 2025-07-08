@@ -712,6 +712,8 @@ public class MembersController {
 		model.addAttribute("selectedStatus", status);
 		model.addAttribute("selectedGender", gender);
 		model.addAttribute("searchKeyword", search);
+		model.addAttribute("sidebarActive", "member-list");
+
 
 		return "back-end/member/listMember";
 	}
