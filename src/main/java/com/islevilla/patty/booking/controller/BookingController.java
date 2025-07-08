@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.islevilla.patty.booking.model.BookingService;
+import com.islevilla.patty.booking.model.Booking;
+import com.islevilla.patty.booking.model.BookingEmailService;
 import com.islevilla.chen.roomTypePhoto.model.RoomTypePhotoService;
 import com.islevilla.chen.roomTypePhoto.model.RoomTypePhoto;
 import com.islevilla.chen.roomType.model.RoomTypeService;
@@ -35,6 +37,9 @@ public class BookingController {
 
     @Autowired
     private BookingService bookingService;
+
+    @Autowired
+    private BookingEmailService bookingEmailService;
 
     @Autowired
     private RoomTypePhotoService roomTypePhotoService;
@@ -156,7 +161,12 @@ public class BookingController {
                     hasAvailableRooms = false; // 預設為無空房
                 }
                 
-                System.out.println("房型 " + roomType.getRoomTypeName() + " 有 " + promotions.size() + " 個有效優惠專案，空房狀態: " + (hasAvailableRooms ? "有空房" : "無空房"));
+                System.out.println("房型 " + roomType.getRoomTypeName() + " 有 " + promotions.size() + " 個有效優惠專案");
+                if (!promotions.isEmpty()) {
+                    for (RoomPromotionPrice p : promotions) {
+                        System.out.println("  promotionId=" + p.getPromotion().getRoomPromotionId() + " title=" + p.getPromotion().getRoomPromotionTitle());
+                    }
+                }
                 
                 RoomTypeWithPromotions rtp = new RoomTypeWithPromotions(roomType, promotions, hasAvailableRooms, firstPhotoId);
                 rtp.setPhotoIds(photoIds); // 設定所有圖片ID
@@ -365,7 +375,9 @@ public class BookingController {
                 return "front-end/booking/booking-success";
             }
             // 建立訂單
-            bookingService.createOrder(guestName, guestPhone, guestEmail, guestAddress, specialRequests, paymentMethod, bookingData, (com.islevilla.lai.members.model.Members)member);
+            Booking booking = bookingService.createOrderAndReturnBooking(guestName, guestPhone, guestEmail, guestAddress, specialRequests, paymentMethod, bookingData, (com.islevilla.lai.members.model.Members)member);
+            // 新增：寄送訂房成功通知信
+            bookingEmailService.sendBookingConfirmationEmail((com.islevilla.lai.members.model.Members)member, booking);
             model.addAttribute("message", "訂房成功！我們會盡快與您聯繫確認。");
             return "front-end/booking/booking-success";
         } catch (Exception e) {

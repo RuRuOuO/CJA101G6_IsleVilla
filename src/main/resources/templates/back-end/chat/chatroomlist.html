@@ -6,6 +6,41 @@
   <title>客服訊息管理</title>
   <link rel="stylesheet" href="/css/chatroomlist.css">
   <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+  
+  <style>
+  /* 整體 main 區塊內距 */
+  main {
+    padding: 2rem;
+  }
+
+  /* 調整 h2 標題與上方距離 */
+  h2 {
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+    font-weight: bold;
+  }
+
+  /* 調整表格容器的上下左右間距 */
+  .table-responsive {
+    padding: 1.5rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  }
+
+  /* 表格的文字對齊與欄位內距 */
+  table th, table td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 12px 8px;
+  }
+
+  /* 頁面背景色統一淺灰 */
+  body {
+    background-color: #f8f9fa;
+  }
+</style>
+  
 </head>
 <body>
 	<th:block th:replace="~{fragments/backFragments :: mobileSidebar}"></th:block>
@@ -13,6 +48,7 @@
 	<main
 		th:replace="~{fragments/backFragments :: mainContent(~{::content})}">
 		<th:block th:fragment="content">
+		  <div class="container">	
 			<h2>客服訊息管理</h2>
 			<div class="table-responsive px-4 pb-4">
 				<table class="table table-bordered table-hover align-middle"

@@ -78,18 +78,18 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 		// 儲存訊息
 		chatRedisService.saveMessage(roomId, chatMessage);
 
-		// 廣播給聊天室內所有人
+		// 發送給聊天室內所有人
 		List<WebSocketSession> sessions = chatRoomSessions.getOrDefault(roomId, Collections.emptyList());
 		for (WebSocketSession s : sessions) {
 			if (s.isOpen()) {
 				s.sendMessage(new TextMessage(mapper.writeValueAsString(chatMessage)));
 			}
 		}
-		// 廣播聊天室列表頁面（未讀數更新）
+		// 發送聊天室列表頁面（未讀數更新）
 		broadcastToRoomList("newMessage", roomId, null);
 	}
 
-	// 廣播聊天室狀態（完成/重新開啟）
+	// 發送聊天室狀態（完成/重新開啟）
 	public void broadcastRoomStatus(Integer roomId, String action) {
 		Map<String, Object> payload = Map.of("type", "system", "action", action, "roomId", roomId); // roomComplete 或
 																									// roomReopen
@@ -106,7 +106,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 		}
 	}
 
-	// 廣播至聊天室列表頁（更新列表顯示）
+	// 發送至聊天室列表頁（更新列表顯示）
 	private void broadcastToRoomList(String type, Integer roomId, ChatRoomDTO roomData) {
 		try {
 			Map<String, Object> data = new HashMap<>();
@@ -147,7 +147,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 		return null;
 	}
 
-	// 新增聊天室時廣播
+	// 新增聊天室時推播
 	public void notifyNewRoom(ChatRoomDTO newRoom) {
 		broadcastToRoomList("newRoom", null, newRoom);
 	}

@@ -161,6 +161,7 @@ public class RoomPromotionPriceController {
        
         model.addAttribute("roomPromotionPriceListData", roomPromotionPriceSvc.getDistinctPromotions());
         model.addAttribute("promotionRoomTypeCounts", roomPromotionPriceSvc.getPromotionRoomTypeCounts());
+        model.addAttribute("sidebarActive", "roompromotionprice-list");
         return "back-end/roompromotionprice/listAllRoomPromotionPrice";
     }
 
@@ -209,8 +210,8 @@ public class RoomPromotionPriceController {
             newPriceSetting.setRoomType(roomType);
             
             // 設定日期（使用優惠專案的日期）
-            newPriceSetting.setPromotionStartDate(promotion.getPromotionStartDate().toLocalDate());
-            newPriceSetting.setPromotionEndDate(promotion.getPromotionEndDate().toLocalDate());
+//            newPriceSetting.setPromotionStartDate(promotion.getPromotionStartDate().toLocalDate());
+//            newPriceSetting.setPromotionEndDate(promotion.getPromotionEndDate().toLocalDate());
             
             // 儲存到資料庫
             roomPromotionPriceSvc.addRoomPromotionPrice(newPriceSetting);

@@ -27,6 +27,7 @@ public class BackShuttleReservationController {
 	public String listReservation(Model model) {
 		List<BackShuttleReservation> list = backShuttleReservationService.getAllShuttleReservation();
 		model.addAttribute("shuttleReservationList", list);
+		model.addAttribute("sidebarActive", "reservation-list");
 		return "back-end/shuttlereservation/backreservation_list";
 	}
 	

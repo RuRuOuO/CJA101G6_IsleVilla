@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class ChatRoomDTO {
+	private Integer memberId;
     private Integer chatRoomId;
-    private Integer memberId;
     private String memberName;
     private Integer employeeId;
     private String employeeName;
