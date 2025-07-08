@@ -122,6 +122,16 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <!-- 配送中才顯示確認完成訂單按鈕 -->
+                                    <div th:if="${order.orderStatus == 1}" class="mt-2">
+                                        <form th:action="@{/product-order/confirmOrder}" method="post" style="display:inline;" th:id="'confirmForm' + ${order.productOrderId}">
+                                            <input type="hidden" name="orderId" th:value="${order.productOrderId}" />
+                                            <button type="button" class="btn btn-warning btn-sm"
+                                                th:attr="onclick=|showConfirmDialog(${order.productOrderId})|">
+                                                確認完成訂單
+                                            </button>
+                                        </form>
+                                    </div>
                                     <div class="card-footer bg-transparent">
                                         <button type="button" class="btn btn-outline-primary btn-sm w-100"
                                                 data-bs-toggle="modal"
@@ -296,5 +306,21 @@
         </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function showConfirmDialog(orderId) {
+    Swal.fire({
+        title: '確定要將此訂單標記為已完成嗎？',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: '確定',
+        cancelButtonText: '取消'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('confirmForm' + orderId).submit();
+        }
+    });
+}
+</script>
 </body>
 </html>
