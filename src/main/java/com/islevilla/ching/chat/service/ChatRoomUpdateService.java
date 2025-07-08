@@ -33,11 +33,11 @@ public class ChatRoomUpdateService {
 		String roomIdStr = String.valueOf(room.getChatRoomId());
 		redisStr.opsForValue().set(ChatRedisKey.chatRoom(room.getChatRoomId()), gson.toJson(room));
 
-		// 自動補進聊天室清單集合（防止漏掉）
+		// 自動補進聊天室清單集合
 		redisStr.opsForSet().add(ChatRedisKey.CHAT_ROOMS_SET, roomIdStr);
 	}
 
-	// 刪除聊天室（含訊息與未讀）
+	// 刪除聊天室
 	public void deleteChatRoom(Integer roomId) {
 		ChatRoomDTO room = chatRoomQueryService.getChatRoom(roomId, null); // 若只查資料，不用 userId 補未讀
 

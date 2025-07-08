@@ -91,7 +91,7 @@
 									class="btn-action btn-complete"
 									th:onclick="|completeRoom(${room.chatRoomId})|">結案</button>
 								<button class="btn-action btn-import"
-									th:onclick="|importRoom(${room.chatRoomId})|">匯入SQL</button>
+									th:onclick="|importRoom(${room.chatRoomId})|">儲存至SQL</button>
 								<button th:if="${room.chatStatus == 2}"
 									class="btn-action btn-reopen"
 									th:onclick="|reopenRoom(${room.chatRoomId})|">重新開啟</button></td>
@@ -99,6 +99,7 @@
 					</tbody>
 				</table>
 			</div>
+		   </div>
 		</th:block>
 	</main>
 	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -268,22 +269,22 @@
 	        	  <a href="/backend/chat/history/${roomId}" class="btn-action btn-history">歷史</a>
 		          <a href="/backend/chat/room/${roomId}" class="btn-action btn-enter">進入</a>
 		          <button class="btn-action btn-complete" onclick="completeRoom(${roomId})">結案</button>
-		          <button class="btn-action btn-import" onclick="importRoom(${roomId})">匯入SQL</button>
+		          <button class="btn-action btn-import" onclick="importRoom(${roomId})">儲存至SQL</button>
 	        `;
 	    } else if (status === 2) {
 	        statusCell.innerHTML = '<span class="status-complete">已結案</span>';
 	        actionsCell.innerHTML = `
 	          <a href="/backend/chat/history/${roomId}" class="btn-action btn-history">歷史</a>
 	          <a href="/backend/chat/room/${roomId}" class="btn-action btn-enter">進入</a>
+	          <button class="btn-action btn-import" onclick="importRoom(${roomId})">儲存至SQL</button>
 	          <button class="btn-action btn-reopen" onclick="reopenRoom(${roomId})">重新開啟</button>
-	          <button class="btn-action btn-import" onclick="importRoom(${roomId})">匯入SQL</button>
 	        `;
 	    } else if (status === 3) {
 	        statusCell.innerHTML = '<span class="status-pending">等待處理</span>';
 	        actionsCell.innerHTML = `
 	        	<a href="/backend/chat/history/${roomId}" class="btn-action btn-history">歷史</a>
 	        	  <a href="/backend/chat/room/${roomId}" class="btn-action btn-enter">進入</a>
-	        	  <button class="btn-action btn-import" onclick="importRoom(${roomId})">匯入SQL</button>
+	        	  <button class="btn-action btn-import" onclick="importRoom(${roomId})">儲存至SQL</button>
 	        	`;
 	    }
 	}
