@@ -49,6 +49,7 @@ DROP TABLE IF EXISTS room_type_photo;            -- 房型圖片
 DROP TABLE IF EXISTS room_type_availability;     -- 各房型空房庫存量
 DROP TABLE IF EXISTS room_type;                  -- 房型
 -- 會員
+DROP TABLE IF EXISTS members_password_reset_tokens;  -- 會員密碼重設token
 DROP TABLE IF EXISTS members;                    -- 會員
 
 
@@ -101,6 +102,19 @@ VALUES ('cja101groupsix+01@gmail.com', '$argon2i$v=19$m=65536,t=3,p=1$Zi9GtJ8A1k
         '測試用', '1912-01-01', 0, '0900000011', '台北市信義路100號3樓之二', NULL, '2023-07-01 10:15:30', '2025-04-20 14:30:00', '2025-05-19 18:46:10', 1);
 
 -- DROP TABLE IF EXISTS members;
+
+
+-- 會員重設密碼token members_password_reset_tokens （賴彥儒）
+CREATE TABLE members_password_reset_tokens (
+	token_id      INT           AUTO_INCREMENT  PRIMARY KEY,    -- token編號
+    token         VARCHAR(255)  NOT NULL        UNIQUE,         -- token
+    member_email  VARCHAR(100)  NOT NULL,                       -- 會員信箱
+    expiry_time   DATETIME      NOT NULL,                       -- 過期時間
+    used          BOOLEAN       NOT NULL        DEFAULT FALSE,  -- 使用狀態
+    created_at    DATETIME      NOT NULL
+);
+
+-- DROP TABLE IF EXISTS members_password_reset_tokens;
 
 
 /***************************************************************************************************
