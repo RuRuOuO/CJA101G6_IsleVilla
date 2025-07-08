@@ -2,9 +2,11 @@ package com.islevilla.wei.news.controller;
 
 import com.islevilla.patty.promotion.model.Promotion;
 import com.islevilla.patty.promotion.model.PromotionService;
+import com.islevilla.patty.roompromotionprice.model.RoomPromotionPrice;
 import com.islevilla.wei.PageUtil;
 import com.islevilla.wei.news.model.News;
 import com.islevilla.wei.news.model.NewsService;
+import com.islevilla.wei.room.model.WeiRoomPromotionPriceService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @Controller // 標記為 Spring MVC 控制器，可以處理 HTTP 請求並返回視圖
 public class NewsController {
@@ -30,6 +33,9 @@ public class NewsController {
 
     @Autowired
     private PromotionService promotionService;
+
+    @Autowired
+    private WeiRoomPromotionPriceService weiRoomPromotionPriceService;
 
     // 前台顯示全部消息
     @GetMapping("/news/list")
@@ -150,6 +156,12 @@ public class NewsController {
 
         // 將消息資料加入到 Model 中，供前端模板使用
         model.addAttribute("news", news);
+
+        // 取得對應優惠專案資訊
+        if (news.getPromotion() != null) {
+            List<RoomPromotionPrice> promotionPrices = weiRoomPromotionPriceService.getByPromotionId(news.getPromotion().getRoomPromotionId());
+            model.addAttribute("promotionPrices", promotionPrices);
+        }
 
         // 返回消息詳情模板路徑
         return "front-end/news/listOneNews";

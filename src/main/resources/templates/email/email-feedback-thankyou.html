@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>感謝您的回饋</title>
+</head>
+<body>
+<h2>親愛的 <span th:text="${memberName}">會員</span>，感謝您填寫問卷！</h2>
+<p>我們已收到您的寶貴意見，期待您再次光臨。</p>
+<div th:if="${coupons != null and #lists.size(coupons) > 0}">
+    <h3>專屬優惠券</h3>
+    <ul>
+        <li th:each="coupon : ${coupons}">
+            優惠券代碼：<span th:text="${coupon.couponCode}"></span>，
+            折扣：<span th:text="${coupon.discountValue}"></span>元，
+            最低消費：<span th:text="${coupon.minSpend}"></span>元，
+            有效期限：<span th:text="${#temporals.format(coupon.startDate, 'yyyy-MM-dd')}"></span> ~
+            <span th:text="${#temporals.format(coupon.endDate, 'yyyy-MM-dd')}"></span>
+        </li>
+    </ul>
+</div>
+<div th:if="${coupons == null or #lists.size(coupons) == 0}">
+    <p>目前沒有可用的優惠券，敬請期待下次活動！</p>
+</div>
+<p>祝您有美好的一天！</p>
+</body>
+</html>

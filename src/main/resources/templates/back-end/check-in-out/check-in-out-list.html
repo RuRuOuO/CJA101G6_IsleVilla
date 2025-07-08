@@ -276,6 +276,9 @@
                                                 type="button"
                                                 class="btn btn-sm btn-danger cancel-btn"
                                                 th:data-order-id="${order.roomReservationId}"
+                                                th:data-refund-amount="${refundAmountMap[order.roomReservationId]}"
+                                                th:data-refund-rate="${refundRateMap[order.roomReservationId]}"
+                                                th:data-days-to-checkin="${daysToCheckInMap[order.roomReservationId]}"
                                                 title="確認取消">
                                             <i class="fas fa-times"></i>
                                         </button>
@@ -386,7 +389,11 @@
         document.querySelectorAll('.cancel-btn').forEach(button => {
             button.addEventListener('click', function () {
                 const orderId = this.getAttribute('data-order-id');
-                showConfirmModal('取消訂單', `確定取消訂單 #${orderId} 嗎？`, function () {
+                const refundAmount = this.getAttribute('data-refund-amount');
+                const refundRate = this.getAttribute('data-refund-rate');
+                const daysToCheckIn = this.getAttribute('data-days-to-checkin');
+                let msg = `距離入住日還有 ${daysToCheckIn} 天。\n依規定可退還 ${refundRate}% ，預計退款金額 NT$${refundAmount}。\n確定要取消訂單嗎？`;
+                showConfirmModal('取消訂單', msg, function () {
                     submitAction(`/backend/room-reservation/${orderId}/cancel`, orderId);
                 });
             });
