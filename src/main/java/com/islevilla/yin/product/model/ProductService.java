@@ -62,4 +62,8 @@ public class ProductService {
     public Product getProductByIdForUpdate(Integer productId) {
         return productRepository.findByIdForUpdate(productId);
     }
+
+    public Page<Product> getProductByStatusAndStock(Byte status, Pageable pageable) {
+        return productRepository.findByProductStatusAndProductQuantityGreaterThan(status, 0, pageable);
+    }
 }

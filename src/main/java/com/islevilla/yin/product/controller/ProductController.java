@@ -84,12 +84,10 @@ public class ProductController {
         if (productCategoryId != null) {
             productPage = productService.getProductByCategoryIdAndStatus(productCategoryId, (byte)1, pageable);
         } else {
-            productPage = productService.getProductByStatus((byte)1, pageable);
+            productPage = productService.getProductByStatusAndStock((byte)1, pageable);
         }
-        // 僅顯示庫存大於0的商品
         List<ProductWithImageDTO> productWithImageDTOs = new ArrayList<>();
         for (Product product : productPage.getContent()) {
-            if (product.getProductQuantity() == null || product.getProductQuantity() <= 0) continue;
             ProductPhoto mainProductPhoto = productPhotoService.getMainProductPhotoByProductId(product.getProductId());
             String productImageUrl = "https://dummyimage.com/300x200/";
             if (mainProductPhoto != null) {
@@ -110,7 +108,7 @@ public class ProductController {
         model.addAttribute("selectedCategoryId", productCategoryId);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", productPage.getTotalPages());
-        model.addAttribute("totalElements", productPage.getTotalElements());
+        model.addAttribute("totalElements", productWithImageDTOs.size());
         String pageURL = "/product/list" + (productCategoryId != null ? "?productCategoryId=" + productCategoryId : "");
         model.addAttribute("pageURL", pageURL);
         return "front-end/product/listProduct";

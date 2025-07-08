@@ -32,4 +32,6 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     @Query("SELECT p FROM Product p WHERE p.productId = :productId")
     Product findByIdForUpdate(@Param("productId") Integer productId);
 
+    Page<Product> findByProductStatusAndProductQuantityGreaterThan(Byte status, int quantity, Pageable pageable);
+
 }
