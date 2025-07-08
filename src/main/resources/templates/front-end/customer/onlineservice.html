@@ -56,7 +56,7 @@ ws.onerror = (err) => console.error("WebSocket 錯誤", err);
 
 ws.onmessage = event => {
     const msg = JSON.parse(event.data);
-    console.log("📩 收到訊息", msg); // ← 這要有
+    console.log("收到訊息", msg); // ← 這要有
     
     if (msg.type === 'system') {
         if (msg.action === 'roomComplete') {

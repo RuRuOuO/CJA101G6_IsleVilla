@@ -175,5 +175,19 @@ public class ProductOrderNoController {
         return "front-end/product-order/memberOrderDetail";
     }
 
+    @PostMapping("/confirmOrder")
+    public String confirmOrder(@RequestParam("orderId") Integer orderId, HttpSession session) {
+        Members loggedInMember = (Members) session.getAttribute("member");
+        if (loggedInMember == null) {
+            return "redirect:/member/login";
+        }
+        ProductOrder order = productOrderSvc.getOneProductOrder(orderId);
+        // 防呆：只能改自己的訂單
+        if (order != null && order.getMember().getMemberId().equals(loggedInMember.getMemberId()) && order.getOrderStatus() == 1) {
+            order.setOrderStatus((byte)2); // 2=已完成
+            productOrderSvc.updateProductOrder(order);
+        }
+        return "redirect:/product-order/memOrders";
+    }
     
 } 

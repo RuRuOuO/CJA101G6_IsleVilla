@@ -62,21 +62,19 @@
                                             <div class="col-6">
                                                 <small class="text-muted">付款方式</small>
                                                 <div>
-                                                <span th:switch="${order.paymentMethod}" class="badge">
-                                                    <span th:case="'0'">信用卡</span>
-                                                    <span th:case="'1'">現金付款</span>
-                                                    <span th:case="'*'">未知</span>
-                                                </span>
+                                                    <span th:if="${order.paymentMethod == 0}">信用卡</span>
+                                                    <span th:if="${order.paymentMethod == 1}">現金付款</span>
+                                                    <span th:if="${order.paymentMethod != 0 and order.paymentMethod != 1}">未知</span>
+                                                    <!-- <span style="color:red;">debug: <span th:text="${order.paymentMethod}"></span></span> -->
                                                 </div>
                                             </div>
                                             <div class="col-6">
                                                 <small class="text-muted">配送方式</small>
                                                 <div>
-                                                <span th:switch="${order.shippingMethod}" class="badge">
-                                                    <span th:case="'0'">宅配</span>
-                                                    <span th:case="'1'">飯店自取</span>
-                                                    <span th:case="'*'">未知</span>
-                                                </span>
+                                                    <span th:if="${order.shippingMethod == 0}">宅配</span>
+                                                    <span th:if="${order.shippingMethod == 1}">飯店自取</span>
+                                                    <span th:if="${order.shippingMethod != 0 and order.shippingMethod != 1}">未知</span>
+                                                    <!-- <span style="color:red;">debug: <span th:text="${order.shippingMethod}"></span></span> -->
                                                 </div>
                                             </div>
                                         </div>
@@ -123,6 +121,16 @@
                                                         th:text="${order.productPaidAmount}"></span></h5>
                                             </div>
                                         </div>
+                                    </div>
+                                    <!-- 配送中才顯示確認完成訂單按鈕 -->
+                                    <div th:if="${order.orderStatus == 1}" class="mt-2">
+                                        <form th:action="@{/product-order/confirmOrder}" method="post" style="display:inline;" th:id="'confirmForm' + ${order.productOrderId}">
+                                            <input type="hidden" name="orderId" th:value="${order.productOrderId}" />
+                                            <button type="button" class="btn btn-warning btn-sm"
+                                                th:attr="onclick=|showConfirmDialog(${order.productOrderId})|">
+                                                確認完成訂單
+                                            </button>
+                                        </form>
                                     </div>
                                     <div class="card-footer bg-transparent">
                                         <button type="button" class="btn btn-outline-primary btn-sm w-100"
@@ -298,5 +306,21 @@
         </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function showConfirmDialog(orderId) {
+    Swal.fire({
+        title: '確定要將此訂單標記為已完成嗎？',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: '確定',
+        cancelButtonText: '取消'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('confirmForm' + orderId).submit();
+        }
+    });
+}
+</script>
 </body>
 </html>

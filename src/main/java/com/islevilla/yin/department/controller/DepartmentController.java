@@ -3,6 +3,7 @@ package com.islevilla.yin.department.controller;
 import com.islevilla.yin.department.model.Department;
 import com.islevilla.yin.department.model.DepartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/backend/department")
+@PreAuthorize("hasAuthority('operation')")
 public class DepartmentController {
 
     @Autowired
