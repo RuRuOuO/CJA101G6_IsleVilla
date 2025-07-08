@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>您的預訂已成立 | 微嶼 Isle Villa</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #007bff;
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .header p {
+            color: #666;
+            margin: 10px 0 0 0;
+        }
+
+        .booking-info {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #495057;
+            min-width: 120px;
+        }
+
+        .info-value {
+            color: #007bff;
+            font-weight: 500;
+        }
+
+        .highlight {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #2196f3;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .contact-info {
+            background-color: #f1f3f4;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 480px) {
+            .info-row {
+                flex-direction: column;
+            }
+
+            .info-label {
+                min-width: auto;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏨 訂房訂單成立通知</h1>
+            <p>親愛的 <span th:text="${member.memberName}">會員</span>，您的訂房已成立！</p>
+        </div>
+
+        <div class="highlight">
+            <strong>訂房成功！</strong> 感謝您選擇 IsleVilla，以下是您的訂房詳細資訊：
+        </div>
+
+        <div class="booking-info">
+            <div class="info-row">
+                <span class="info-label">訂單編號：</span>
+                <span class="info-value" th:text="${booking.id}">發生錯誤</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">入住日期：</span>
+                <span class="info-value" th:text="${#temporals.format(booking.checkInDate, 'yyyy-MM-dd')}">發生錯誤</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">退房日期：</span>
+                <span class="info-value" th:text="${#temporals.format(booking.checkOutDate, 'yyyy-MM-dd')}">發生錯誤</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">房型與間數：</span>
+                <span class="info-value" th:text="${booking.roomTypeSummary}">發生錯誤</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">總金額：</span>
+                <span class="info-value" th:text="${booking.totalAmount} + ' 元'">發生錯誤</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">備註：</span>
+                <span class="info-value" th:text="${booking.remark}"></span>
+            </div>
+        </div>
+
+        <div class="booking-info">
+            <h3 style="font-size: 18px; margin-bottom: 10px;">訂房明細</h3>
+            <table style="width:100%; border-collapse:collapse;">
+                <thead>
+                    <tr style="background:#f8f9fa;">
+                        <th style="padding:8px; border:1px solid #e9ecef; text-align:left;">房型</th>
+                        <th style="padding:8px; border:1px solid #e9ecef; text-align:left;">專案</th>
+                        <th style="padding:8px; border:1px solid #e9ecef; text-align:right;">價格</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="d : ${booking.details}">
+                        <td style="padding:8px; border:1px solid #e9ecef;" th:text="${d.roomTypeName}">房型</td>
+                        <td style="padding:8px; border:1px solid #e9ecef;" th:text="${#strings.isEmpty(d.promotionTitle) ? '-' : d.promotionTitle}">專案</td>
+                        <td style="padding:8px; border:1px solid #e9ecef; text-align:right;" th:text="${d.price} + ' 元'">價格</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="contact-info">
+            <strong>📞 聯絡資訊</strong><br>
+            如有任何問題，歡迎隨時聯絡我們：<br>
+            • 電話：(02) 1234-5678<br>
+            • Email：service@islevilla.com<br>
+            • 服務時間：週一至週日 09:00-18:00
+        </div>
+
+        <div class="footer">
+            <p>祝您有美好的一天！<br/>IsleVilla 團隊敬上</p>
+        </div>
+    </div>
+</body>
+
+</html> 
