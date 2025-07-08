@@ -40,6 +40,8 @@ public interface RoomRVOrderRepository extends JpaRepository<RoomRVOrder, Intege
 
     List<RoomRVOrder> findByRoomOrderStatus(Integer roomRVOrderStatus);
 
+    List<RoomRVOrder> findByMembersOrderByRoomReservationIdDesc(Members member);
+
     List<RoomRVOrder> findByRoomOrderStatusIn(List<Integer> roomRVOrderStatusIn);
 
     // 查詢今天入住或退房的訂單
