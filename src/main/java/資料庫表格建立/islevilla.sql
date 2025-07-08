@@ -1403,6 +1403,14 @@ INSERT INTO employee_permission (permission_id, employee_id)
 SELECT p.permission_id, 1
 FROM permission p;
 
+-- 其他特殊權限添加
+INSERT INTO employee_permission (permission_id, employee_id)
+VALUES ('1',	'4'),
+       ('2',	'3'),
+       ('2',	'7'),
+       ('2',	'8'),
+       ('1',	'2');
+
 -- DROP TABLE IF EXISTS employee_permission;
 
 -- 操作日誌 operation_log （楊捷）
