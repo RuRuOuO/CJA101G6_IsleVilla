@@ -19,7 +19,4 @@ public interface PromotionRepository extends JpaRepository<Promotion, Integer> {
 	@Query(value = "delete from promotion where roomPromotionId =?1", nativeQuery = true)
 	void deleteByRoomPromotionId(int roomPromotionId);
 
-	//● (自訂)條件查詢
-//	@Query(value = "from Promotion where roomPromotionId=?1 and roomPromotionTitle like?2 and promotionStartDate=?3 and promotionEndDate=?4 order by roomPromotionId")
-//	List<Promotion> findByOthers(int roompromotionId , String roompromotionTitle , java.sql.Date promotionStartDate, java.sql.Date promotionEndDate);
 }
