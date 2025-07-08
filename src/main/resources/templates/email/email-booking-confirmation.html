@@ -133,17 +133,37 @@
                 <span class="info-value" th:text="${#temporals.format(booking.checkOutDate, 'yyyy-MM-dd')}">發生錯誤</span>
             </div>
             <div class="info-row">
-                <span class="info-label">房型：</span>
-                <span class="info-value" th:text="${booking.roomType}">發生錯誤</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">房間數量：</span>
-                <span class="info-value" th:text="${booking.roomCount}">發生錯誤</span>
+                <span class="info-label">房型與間數：</span>
+                <span class="info-value" th:text="${booking.roomTypeSummary}">發生錯誤</span>
             </div>
             <div class="info-row">
                 <span class="info-label">總金額：</span>
                 <span class="info-value" th:text="${booking.totalAmount} + ' 元'">發生錯誤</span>
             </div>
+            <div class="info-row">
+                <span class="info-label">備註：</span>
+                <span class="info-value" th:text="${booking.remark}"></span>
+            </div>
+        </div>
+
+        <div class="booking-info">
+            <h3 style="font-size: 18px; margin-bottom: 10px;">訂房明細</h3>
+            <table style="width:100%; border-collapse:collapse;">
+                <thead>
+                    <tr style="background:#f8f9fa;">
+                        <th style="padding:8px; border:1px solid #e9ecef; text-align:left;">房型</th>
+                        <th style="padding:8px; border:1px solid #e9ecef; text-align:left;">專案</th>
+                        <th style="padding:8px; border:1px solid #e9ecef; text-align:right;">價格</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="d : ${booking.details}">
+                        <td style="padding:8px; border:1px solid #e9ecef;" th:text="${d.roomTypeName}">房型</td>
+                        <td style="padding:8px; border:1px solid #e9ecef;" th:text="${#strings.isEmpty(d.promotionTitle) ? '-' : d.promotionTitle}">專案</td>
+                        <td style="padding:8px; border:1px solid #e9ecef; text-align:right;" th:text="${d.price} + ' 元'">價格</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
         <div class="contact-info">

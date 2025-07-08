@@ -401,12 +401,29 @@ public class BookingService {
             com.islevilla.wei.room.model.RoomRVDetail detail = new com.islevilla.wei.room.model.RoomRVDetail();
             Integer roomId = room.get("roomId") != null ? Integer.parseInt(room.get("roomId").toString()) : null;
             Integer roomTypeId = room.get("roomTypeId") != null ? Integer.parseInt(room.get("roomTypeId").toString()) : null;
-            Integer promotionId = room.get("promotionId") != null ? Integer.parseInt(room.get("promotionId").toString()) : null;
-            if (roomId != null) {
-                detail.setRoom(roomRepository.findById(roomId).orElse(null));
+            
+            // 處理 promotionId，可能是空字串或 null
+            Integer promotionId = null;
+            Object promotionIdObj = room.get("promotionId");
+            if (promotionIdObj != null && !promotionIdObj.toString().trim().isEmpty()) {
+                try {
+                    promotionId = Integer.parseInt(promotionIdObj.toString());
+                } catch (NumberFormatException e) {
+                    // 如果無法解析為整數，設為 null
+                    promotionId = null;
+                }
             }
+            
+            // 設置房型（必須）
             if (roomTypeId != null) {
                 detail.setRoomType(roomTypeRepository.findById(roomTypeId).orElse(null));
+            }
+            
+            // 設置具體房間（可選，原價預訂時可能沒有具體房間ID）
+            // 注意：原價預訂時，roomId 實際上是 roomTypeId，所以需要檢查是否有 promotionId
+            if (roomId != null && roomId > 0 && promotionId != null) {
+                // 只有優惠價格預訂時才設置具體房間
+                detail.setRoom(roomRepository.findById(roomId).orElse(null));
             }
             detail.setGuestCount(adults);
             int roomPrice = Integer.parseInt(room.getOrDefault("price", "0").toString());
@@ -455,6 +472,29 @@ public class BookingService {
         booking.setRoomCount(selectedRooms.size());
         booking.setTotalAmount(totalPrice);
         booking.setEmail(guestEmail);
+        booking.setRemark(specialRequests);
+        // 訂房明細
+        java.util.List<Booking.Detail> detailList = new java.util.ArrayList<>();
+        for (java.util.Map room : selectedRooms) {
+            Booking.Detail d = new Booking.Detail();
+            d.setRoomTypeName(room.get("name") != null ? room.get("name").toString() : "");
+            d.setPromotionTitle(room.get("promotionTitle") != null ? room.get("promotionTitle").toString() : "");
+            d.setPrice(room.get("price") != null ? Integer.parseInt(room.get("price").toString()) : 0);
+            detailList.add(d);
+        }
+        booking.setDetails(detailList);
+        // 新增房型x間數 summary
+        java.util.Map<String, Integer> roomTypeCountMap = new java.util.LinkedHashMap<>();
+        for (java.util.Map room : selectedRooms) {
+            String name = room.get("name") != null ? room.get("name").toString() : "";
+            roomTypeCountMap.put(name, roomTypeCountMap.getOrDefault(name, 0) + 1);
+        }
+        StringBuilder summary = new StringBuilder();
+        for (java.util.Map.Entry<String, Integer> entry : roomTypeCountMap.entrySet()) {
+            if (summary.length() > 0) summary.append("、");
+            summary.append(entry.getKey()).append(" x").append(entry.getValue());
+        }
+        booking.setRoomTypeSummary(summary.toString());
         return booking;
     }
 
