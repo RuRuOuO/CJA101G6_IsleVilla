@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>選擇房間 - 微嶼 | Isle Villa</title>
+    <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+    <style>
+        .room-card {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .room-card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .room-card.border-success {
+            border-color: #198754 !important;
+            box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+        }
+    </style>
+</head>
+<body>
+<!-- 載入sidebar -->
+<div th:replace="~{fragments/backFragments :: mobileSidebar}"></div>
+<div th:replace="~{fragments/backFragments :: sidebar}"></div>
+
+<main th:replace="~{fragments/backFragments :: mainContent(~{::myContent})}">
+    <th:block th:fragment="myContent">
+        <!-- 頁面內容 -->
+        <div class="card-header bg-transparent border-0 pt-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0 fw-bold">
+                    <i class="bi bi-house-door me-2"></i>選擇房間 - 訂單 #<span
+                        th:text="${order.roomReservationId}"></span>
+                </h4>
+                <!--                <a th:href="@{/backend/check-in-out/list}" class="btn btn-secondary">-->
+                <!--                    <i class="bi bi-arrow-left me-2"></i>返回-->
+                <!--                </a>-->
+            </div>
+        </div>
+
+        <div class="card-body">
+            <!-- 訂單資訊 -->
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">訂單資訊</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-2"><strong>訂單編號：</strong><span
+                                            th:text="${order.roomReservationId}"></span></p>
+                                    <p class="mb-2"><strong>會員編號：</strong><span
+                                            th:text="${order.members.memberId}"></span></p>
+                                    <p class="mb-2"><strong>入住日期：</strong><span
+                                            th:text="${#temporals.format(order.checkInDate, 'yyyy-MM-dd')}"></span></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-2"><strong>退房日期：</strong><span
+                                            th:text="${#temporals.format(order.checkOutDate, 'yyyy-MM-dd')}"></span></p>
+                                    <p class="mb-2"><strong>總金額：</strong>$<span
+                                            th:text="${order.rvPaidAmount}"></span></p>
+                                    <p class="mb-2"><strong>狀態：</strong>
+                                        <span th:switch="${order.roomOrderStatus}">
+                                            <span th:case="0" class="badge bg-success">訂單成立</span>
+                                            <span th:case="1" class="badge bg-primary">已入住</span>
+                                            <span th:case="2" class="badge bg-secondary">已退房</span>
+                                            <span th:case="3" class="badge bg-warning">申請取消</span>
+                                            <span th:case="4" class="badge bg-danger">確認取消</span>
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 房間選擇表單 -->
+            <form th:action="@{/backend/room-reservation/{orderId}/checkin-with-rooms(orderId=${order.roomReservationId})}"
+                  method="post"
+                  onsubmit="return validateRoomSelection();">
+
+                <div th:if="${availableRooms == null or availableRooms.isEmpty()}" class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    目前沒有可用的房間，無法辦理入住。
+                </div>
+
+                <div th:if="${availableRooms != null and !availableRooms.isEmpty()}">
+                    <h5 class="mb-3">請選擇房間</h5>
+
+                    <div th:each="entry : ${availableRooms}" class="mb-4">
+                        <div th:with="roomTypeId=${entry.key}, rooms=${entry.value}">
+                            <h6 class="fw-bold border-bottom pb-2" th:text="${roomTypeNameMap[rooms[0].roomTypeId]}">
+                                房型名稱</h6>
+                            <div class="row">
+                                <div th:each="room : ${rooms}" class="col-md-6 col-lg-4 mb-3">
+                                    <div class="card h-100 room-card">
+                                        <div class="card-body">
+                                            <div class="form-check">
+                                                <input class="form-check-input"
+                                                       type="radio"
+                                                       th:name="'roomSelection_' + ${roomTypeId}"
+                                                       th:id="'room_' + ${room.roomId}"
+                                                       th:value="${room.roomId}"
+                                                       required>
+                                                <label class="form-check-label w-100" th:for="'room_' + ${room.roomId}">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            <strong th:text="${room.roomId}">房號</strong>
+                                                        </div>
+                                                        <div class="text-end">
+                                                            <span class="badge bg-success">可用</span>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a th:href="@{/backend/check-in-out/list}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>取消
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle me-2"></i>確認入住
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </th:block>
+</main>
+
+<script>
+    // 驗證
+    function validateRoomSelection() {
+        const radioButtons = document.querySelectorAll('input[type="radio"]:checked');
+        if (radioButtons.length === 0) {
+            alert('請選擇至少一個房間');
+            return false;
+        }
+        return confirm('確定要辦理入住嗎？');
+    }
+
+    // 房間卡片點擊效果
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.room-card').forEach(card => {
+            card.addEventListener('click', function () {
+                const radio = this.querySelector('input[type="radio"]');
+                if (radio) {
+                    radio.checked = true;
+                    // 移除同組其他卡片的選中效果
+                    const groupName = radio.name;
+                    document.querySelectorAll(`input[name="${groupName}"]`).forEach(r => {
+                        r.closest('.room-card').classList.remove('border-success');
+                    });
+                    // 添加選中效果
+                    this.classList.add('border-success');
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
