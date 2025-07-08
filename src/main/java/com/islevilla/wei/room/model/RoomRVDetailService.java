@@ -9,8 +9,6 @@ import java.util.List;
 public class RoomRVDetailService {
     @Autowired
     private RoomRVDetailRepository roomRVDetailRepository;
-    @Autowired
-    private RoomRVOrderService roomRVOrderService;
 
     // 查詢全部
     public List<RoomRVDetail> findAll() {
@@ -19,14 +17,14 @@ public class RoomRVDetailService {
 
     // 依照訂單編號查詢出訂單明細
     public List<RoomRVDetail> getDetailsByRoomRVOrderId(Integer roomReservationId) {
-        RoomRVOrder roomRVOrder = roomRVOrderService.getById(roomReservationId);
-        if (roomRVOrder == null) {
-            return List.of();
-        }
-        return roomRVDetailRepository.findByRoomRVOrder(roomRVOrder);
+        return roomRVDetailRepository.findByRoomRVOrderId(roomReservationId);
     }
-    
+
     public Integer getGuestCountByRoomRVOrder(RoomRVOrder roomRVOrder) {
-    	return roomRVDetailRepository.countGuestByRoomRVOrder(roomRVOrder);
+        return roomRVDetailRepository.countGuestByRoomRVOrder(roomRVOrder);
+    }
+
+    public void updateRoomRVDetail(RoomRVDetail roomRVDetail) {
+        roomRVDetailRepository.save(roomRVDetail);
     }
 }

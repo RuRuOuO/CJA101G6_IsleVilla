@@ -11,6 +11,10 @@ import java.util.List;
 public interface RoomRVDetailRepository extends JpaRepository<RoomRVDetail, Integer> {
     // 傳進整個RoomRVOrder entity
     List<RoomRVDetail> findByRoomRVOrder(RoomRVOrder roomRVOrder);
+
+    // 直接透過訂單id查詢訂單明細
+    @Query("SELECT rrd FROM RoomRVDetail rrd WHERE rrd.roomRVOrder.roomReservationId = :roomOrderId")
+    List<RoomRVDetail> findByRoomRVOrderId(@Param("roomOrderId") Integer roomOrderId);
     
     // 接駁預約：查詢每筆訂房訂單的總入住人數
     @Query("SELECT COALESCE(SUM(r.guestCount), 0) FROM RoomRVDetail r WHERE r.roomRVOrder = :roomRVOrder")

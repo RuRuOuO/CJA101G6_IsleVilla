@@ -72,8 +72,11 @@ public class RoomRVOrder {
     @NotNull(message = "請輸入實際付款金額")
     private Integer rvPaidAmount;
 
-    @Column(name = "cancel_reason")
-    private String cancelReason;
+    @Column(name = "rv_cancel_time")
+    private LocalDateTime rvCancelTime; // 取消時間
+
+    @Column(name = "rv_refund_amount")
+    private Integer rvRefundAmount; // 實際退款金額
 
     // @OneToMamy
     @OneToMany(mappedBy = "roomRVOrder", cascade = CascadeType.ALL, orphanRemoval = true)

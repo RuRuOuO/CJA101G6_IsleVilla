@@ -50,7 +50,8 @@
                         <td><span class="d-inline-block text-truncate" style="max-width: 120px;"
                                   th:text="${news.promotion != null ? news.promotion.roomPromotionTitle : '無'}"></span>
                         </td>
-                        <td th:text="${news.newsTime}"></td>
+                        <!--                        <td th:text="${news.newsTime}"></td>-->
+                        <td th:text="${#temporals.format(news.newsTime, 'yyyy-MM-dd HH:mm')}"></td>
                         <td>
                             <img alt="消息圖片" style="max-height:40px; width: 40px; object-fit: cover;"
                                  th:if="${news.newsImage != null}" th:src="@{'/news/image/' + ${news.newsId}}"/>
@@ -100,6 +101,10 @@
                     const txt = $(this).text();
                     $(this).replaceWith($('<span/>').addClass('page-link').text(txt));
                 });
+            },
+            initComplete: function () {
+                // 初始化完成後立即應用排序
+                this.api().order([0, 'desc']).draw();
             }
         });
     });

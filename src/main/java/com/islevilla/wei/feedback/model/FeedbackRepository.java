@@ -17,5 +17,9 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Integer> {
 
     boolean existsByRoomRVOrder_RoomReservationId(Integer roomReservationId);
 
+    List<Feedback> findAllByOrderByFbIdDesc();
+
+    List<Feedback> findByFbPublicAndFbStatusOrderByFbIdDesc(Integer fbPublic, Integer fbStatus);
+
 
 }
