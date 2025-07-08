@@ -114,7 +114,7 @@ public class ShuttleEmailService {
 		// 設定郵件基本資訊
 		helper.setFrom("no-reply@islevilla.com");
 		helper.setTo(emailData.getMemberEmail());
-		helper.setSubject("【測試中】【預約確認】接駁服務預約成功通知");
+		helper.setSubject("【預約確認】接駁服務預約成功通知");
 
 		// 準備模板變數
 		Context context = new Context();
@@ -143,7 +143,7 @@ public class ShuttleEmailService {
 
 		// 設定郵件基本資訊
 		helper.setTo(emailData.getMemberEmail());
-		helper.setSubject("【測試中】【取消確認】接駁服務預約取消通知");
+		helper.setSubject("【取消確認】接駁服務預約取消通知");
 
 		// 準備模板變數
 		Context context = new Context();
