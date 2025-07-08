@@ -100,7 +100,9 @@
                                         <option th:value="1" th:selected="${coupon.couponStatus == 1}">可使用</option>
                                         <option th:value="0" th:selected="${coupon.couponStatus == 0}">已停用</option>
                                     </select>
-                                    <span th:text="${coupon.couponStatus == 1 ? '可使用' : '已停用'}" th:attr="id='text-couponStatus-' + ${iterStat.index}"></span>
+                                    <span class="badge" th:classappend="${coupon.couponStatus == 1} ? ' bg-success' : ' bg-secondary'"
+                                          th:text="${coupon.couponStatus == 1 ? '可使用' : '已停用'}"
+                                          th:attr="id='text-couponStatus-' + ${iterStat.index}"></span>
                                 </td>
                                 <td>
                                     <a type="button" class="btn btn-sm btn-primary"
