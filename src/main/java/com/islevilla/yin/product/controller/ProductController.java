@@ -76,13 +76,18 @@ public class ProductController {
     @GetMapping("/product/list")
     public String homeProduct(
             @RequestParam(value = "productCategoryId", required = false) Integer productCategoryId,
+            @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "page", defaultValue = "0") int page,
             Model model) {
         int pageSize = 12;
         Pageable pageable = PageRequest.of(page, pageSize);
         Page<Product> productPage;
-        if (productCategoryId != null) {
-            productPage = productService.getProductByCategoryIdAndStatus(productCategoryId, (byte)1, pageable);
+        if (productCategoryId != null && keyword != null && !keyword.isEmpty()) {
+            productPage = productService.findByCategoryAndStatusAndNameContaining(productCategoryId, (byte)1, keyword, pageable);
+        } else if (productCategoryId != null) {
+            productPage = productService.getProductByCategoryIdAndStatusAndStock(productCategoryId, (byte)1, pageable);
+        } else if (keyword != null && !keyword.isEmpty()) {
+            productPage = productService.findByStatusAndNameContaining((byte)1, keyword, pageable);
         } else {
             productPage = productService.getProductByStatusAndStock((byte)1, pageable);
         }
@@ -108,9 +113,18 @@ public class ProductController {
         model.addAttribute("selectedCategoryId", productCategoryId);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", productPage.getTotalPages());
-        model.addAttribute("totalElements", productWithImageDTOs.size());
-        String pageURL = "/product/list" + (productCategoryId != null ? "?productCategoryId=" + productCategoryId : "");
-        model.addAttribute("pageURL", pageURL);
+        model.addAttribute("totalElements", productPage.getTotalElements());
+        StringBuilder pageURL = new StringBuilder("/product/list");
+        boolean hasParam = false;
+        if (productCategoryId != null) {
+            pageURL.append("?productCategoryId=").append(productCategoryId);
+            hasParam = true;
+        }
+        if (keyword != null && !keyword.isEmpty()) {
+            pageURL.append(hasParam ? "&" : "?").append("keyword=").append(keyword);
+        }
+        model.addAttribute("pageURL", pageURL.toString());
+        model.addAttribute("keyword", keyword);
         return "front-end/product/listProduct";
     }
 
@@ -196,30 +210,29 @@ public class ProductController {
     //後台-商品列表
     @GetMapping("/backend/product/list")
     @PreAuthorize("hasAuthority('product')")
-    public String listProduct(@RequestParam(value = "categoryId", required = false) Integer categoryId,
-                             @RequestParam(value = "status", required = false) Byte status, 
-                             Model model) {
+    public String listProduct(
+        @RequestParam(value = "categoryId", required = false) Integer categoryId,
+        @RequestParam(value = "status", required = false) Byte status,
+        @RequestParam(value = "search", required = false) String search,
+        Model model) {
         List<Product> productList;
-        
-        if (categoryId != null && status != null) {
-            // 根據類別和狀態過濾商品
+        if (search != null && !search.trim().isEmpty()) {
+            productList = productService.searchProducts(categoryId, status, search.trim());
+        } else if (categoryId != null && status != null) {
             productList = productService.getProductByCategoryIdAndStatus(categoryId, status);
         } else if (categoryId != null) {
-            // 根據類別過濾商品
             productList = productService.getProductByProductCategoryId(categoryId);
         } else if (status != null) {
-            // 根據狀態過濾商品
             productList = productService.getProductByStatus(status);
         } else {
-            // 沒有選擇篩選條件時顯示所有商品
             productList = productService.getAllProducts();
         }
-        
-        model.addAttribute("productList", productList); // 商品列表
-        model.addAttribute("product", new Product());   // 空的 Product 給 modal 表單用
+        model.addAttribute("productList", productList);
+        model.addAttribute("product", new Product());
         model.addAttribute("category", productCategoryService.getAllProductCategory());
         model.addAttribute("selectedCategoryId", categoryId);
         model.addAttribute("selectedStatus", status);
+        model.addAttribute("search", search);
         model.addAttribute("sidebarActive", "product-list");
         return "back-end/product/listProduct";
     }

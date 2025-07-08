@@ -6,6 +6,12 @@
     <title>部門管理 | 微嶼 IsleVilla</title>
     <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+    <style>
+    /* 讓清空按鈕邊框顏色與 input 一致 */
+    #clearSearchBtn {
+        border-color: #ced4da !important;
+    }
+    </style>
 </head>
 <body>
 <!-- ===== 載入sidebar ===== -->
@@ -41,6 +47,7 @@
                             <i class="bi bi-search"></i>
                         </span>
                         <input type="text" class="form-control" id="searchInput" placeholder="搜尋部門名稱" />
+                        <button type="button" class="btn btn-secondary" id="clearSearchBtn" tabindex="-1">清空</button>
                     </div>
                 </div>
             </div>
@@ -199,6 +206,13 @@ $(function(){
     });
     $('#searchInput').on('keyup', function(){
         table.search(this.value).draw();
+    });
+
+    // 清空按鈕功能
+    $('#clearSearchBtn').on('click', function(){
+        $('#searchInput').val('');
+        table.search('').draw();
+        $('#searchInput').focus();
     });
 });
 // 新增部門

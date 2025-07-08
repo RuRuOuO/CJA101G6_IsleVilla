@@ -66,4 +66,26 @@ public class ProductService {
     public Page<Product> getProductByStatusAndStock(Byte status, Pageable pageable) {
         return productRepository.findByProductStatusAndProductQuantityGreaterThan(status, 0, pageable);
     }
+
+    public Page<Product> findByStatusAndNameContaining(Byte status, String keyword, Pageable pageable) {
+        return productRepository.findByProductStatusAndProductQuantityGreaterThanAndProductNameContaining(status, 0, keyword, pageable);
+    }
+    public Page<Product> findByCategoryAndStatusAndNameContaining(Integer categoryId, Byte status, String keyword, Pageable pageable) {
+        return productRepository.findByProductCategoryProductCategoryIdAndProductStatusAndProductQuantityGreaterThanAndProductNameContaining(categoryId, status, 0, keyword, pageable);
+    }
+    public Page<Product> getProductByCategoryIdAndStatusAndStock(Integer categoryId, Byte status, Pageable pageable) {
+        return productRepository.findByProductCategoryProductCategoryIdAndProductStatusAndProductQuantityGreaterThan(categoryId, status, 0, pageable);
+    }
+
+    public List<Product> searchProducts(Integer categoryId, Byte status, String keyword) {
+        if (categoryId != null && status != null) {
+            return productRepository.findByProductCategoryProductCategoryIdAndProductStatusAndProductNameContaining(categoryId, status, keyword);
+        } else if (categoryId != null) {
+            return productRepository.findByProductCategoryProductCategoryIdAndProductNameContaining(categoryId, keyword);
+        } else if (status != null) {
+            return productRepository.findByProductStatusAndProductNameContaining(status, keyword);
+        } else {
+            return productRepository.findByProductNameContaining(keyword);
+        }
+    }
 }

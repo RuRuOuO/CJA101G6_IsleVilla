@@ -6,6 +6,21 @@
     <title>商品管理 | 微嶼 IsleVilla</title>
     <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+    <style>
+    /* ...原有樣式... */
+    #clearAllBtn {
+        height: 38px;
+        padding-top: 0.375rem;
+        padding-bottom: 0.375rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        white-space: nowrap;
+        box-sizing: border-box;
+        display: inline-block;
+    }
+    </style>
 </head>
 <body>
 <!-- ===== 載入sidebar ===== -->
@@ -36,13 +51,13 @@
 
         <div class="card-body">
             <!-- 搜尋與篩選 -->
-            <div class="row mb-4">
+            <div class="row mb-4 align-items-center">
                 <div class="col-md-4">
                     <div class="input-group">
                         <span class="input-group-text">
                             <i class="bi bi-search"></i>
                         </span>
-                        <input type="text" class="form-control" id="searchInput" placeholder="搜尋商品名稱、編號" />
+                        <input type="text" class="form-control" id="searchInput" placeholder="搜尋商品名稱、編號" th:value="${search}" />
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -55,12 +70,13 @@
                         </option>
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <select class="form-select" id="statusFilter">
+                <div class="col-md-3 d-flex align-items-center">
+                    <select class="form-select me-2" id="statusFilter">
                         <option value="">全部狀態</option>
                         <option value="1" th:selected="${selectedStatus != null and selectedStatus == 1}">上架</option>
                         <option value="0" th:selected="${selectedStatus != null and selectedStatus == 0}">下架</option>
                     </select>
+                    <button type="button" class="btn btn-secondary" id="clearAllBtn">清空</button>
                 </div>
             </div>
 
@@ -310,20 +326,23 @@
     document.getElementById('categoryFilter').addEventListener('change', function() {
         const categoryId = this.value;
         const statusFilter = document.getElementById('statusFilter').value;
+        const searchValue = document.getElementById('searchInput').value;
         const url = new URL(window.location);
-        
         if (categoryId) {
             url.searchParams.set('categoryId', categoryId);
         } else {
             url.searchParams.delete('categoryId');
         }
-        
         if (statusFilter) {
             url.searchParams.set('status', statusFilter);
         } else {
             url.searchParams.delete('status');
         }
-        
+        if (searchValue) {
+            url.searchParams.set('search', searchValue);
+        } else {
+            url.searchParams.delete('search');
+        }
         window.location.href = url.toString();
     });
 
@@ -331,20 +350,23 @@
     document.getElementById('statusFilter').addEventListener('change', function() {
         const status = this.value;
         const categoryFilter = document.getElementById('categoryFilter').value;
+        const searchValue = document.getElementById('searchInput').value;
         const url = new URL(window.location);
-        
         if (status) {
             url.searchParams.set('status', status);
         } else {
             url.searchParams.delete('status');
         }
-        
         if (categoryFilter) {
             url.searchParams.set('categoryId', categoryFilter);
         } else {
             url.searchParams.delete('categoryId');
         }
-        
+        if (searchValue) {
+            url.searchParams.set('search', searchValue);
+        } else {
+            url.searchParams.delete('search');
+        }
         window.location.href = url.toString();
     });
 
@@ -721,6 +743,15 @@
                     });
             }
         });
+    });
+
+    // 清空所有篩選與搜尋
+    document.getElementById('clearAllBtn').addEventListener('click', function() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('categoryFilter').selectedIndex = 0;
+        document.getElementById('statusFilter').selectedIndex = 0;
+        // 重新導向到不帶參數的列表頁
+        window.location.href = window.location.pathname;
     });
 
 </script>

@@ -34,4 +34,15 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     Page<Product> findByProductStatusAndProductQuantityGreaterThan(Byte status, int quantity, Pageable pageable);
 
+    Page<Product> findByProductStatusAndProductQuantityGreaterThanAndProductNameContaining(Byte status, int quantity, String keyword, Pageable pageable);
+
+    Page<Product> findByProductCategoryProductCategoryIdAndProductStatusAndProductQuantityGreaterThanAndProductNameContaining(Integer categoryId, Byte status, int quantity, String keyword, Pageable pageable);
+
+    Page<Product> findByProductCategoryProductCategoryIdAndProductStatusAndProductQuantityGreaterThan(Integer categoryId, Byte status, int quantity, Pageable pageable);
+
+    List<Product> findByProductCategoryProductCategoryIdAndProductStatusAndProductNameContaining(Integer categoryId, Byte status, String keyword);
+    List<Product> findByProductCategoryProductCategoryIdAndProductNameContaining(Integer categoryId, String keyword);
+    List<Product> findByProductStatusAndProductNameContaining(Byte status, String keyword);
+    List<Product> findByProductNameContaining(String keyword);
+
 }
