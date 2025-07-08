@@ -1,6 +1,8 @@
 package com.islevilla.wei.checkinout.controller;
 
 import com.islevilla.chen.room.model.Room;
+import com.islevilla.chen.roomType.model.RoomType;
+import com.islevilla.chen.roomType.model.RoomTypeRepository;
 import com.islevilla.wei.checkinout.service.CheckInOutService;
 import com.islevilla.wei.room.model.RoomRVOrder;
 import com.islevilla.wei.room.model.RoomRVOrderService;
@@ -13,6 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 public class CheckInOutController {
@@ -20,6 +23,8 @@ public class CheckInOutController {
     private CheckInOutService checkInOutService;
     @Autowired
     private RoomRVOrderService roomRVOrderService;
+    @Autowired
+    private RoomTypeRepository roomTypeRepository;
 
     // 後台checkIn頁面
     @GetMapping("/backend/check-in-out/list")
@@ -53,6 +58,12 @@ public class CheckInOutController {
             Map<Integer, List<Room>> availableRooms = checkInOutService.getAvailableRoomsForCheckIn(orderId);
             model.addAttribute("order", order);
             model.addAttribute("availableRooms", availableRooms);
+
+            // 新增：查詢所有房型，組成 Map<房型ID, 房型名稱>
+            Map<Integer, String> roomTypeNameMap = roomTypeRepository.findAll()
+                    .stream()
+                    .collect(Collectors.toMap(RoomType::getRoomTypeId, RoomType::getRoomTypeName));
+            model.addAttribute("roomTypeNameMap", roomTypeNameMap); // 新增
             return "back-end/check-in-out/room-selection";
         } catch (Exception e) {
             model.addAttribute("error", "獲取房間資訊失敗" + e.getMessage());
