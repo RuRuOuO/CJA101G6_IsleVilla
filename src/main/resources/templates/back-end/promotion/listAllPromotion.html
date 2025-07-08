@@ -18,19 +18,17 @@
 
     <!-- ===== 標題區 ===== -->
     <div class="card-header bg-transparent border-0 pt-4">
-      <h4 class="card-title fw-bold">
-        <i class="bi bi-tags-fill me-2"></i>優惠專案管理
-      </h4>
-    </div>
-
-    <div class="card-body">
-      <!-- ===== 新增按鈕 ===== -->
-      <div class="mb-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <h4 class="card-title mb-0 fw-bold">
+          <i class="bi bi-tags-fill me-2"></i>優惠專案管理
+        </h4>
         <a class="btn btn-primary" th:href="@{/backend/promotion/add}">
           <i class="bi bi-plus-circle me-2"></i>新增專案
         </a>
       </div>
+    </div>
 
+    <div class="card-body">
       <!-- ===== 即時搜尋欄（前端用） ===== -->
       <div class="input-group input-group-sm mb-3" style="max-width: 180px;">
         <span class="input-group-text bg-white border-end-0">
@@ -66,13 +64,6 @@
                     <input type="hidden" name="roomPromotionId" th:value="${promotion.roomPromotionId}">
                     <button type="submit" class="btn btn-sm btn-primary">
                       <i class="bi bi-pencil-fill"></i>
-                    </button>
-                  </form>
-                  <form method="post" th:action="@{/backend/promotion/delete}" class="m-0"
-                        onsubmit="return confirm('您確定要刪除這筆優惠專案嗎？');">
-                    <input type="hidden" name="roomPromotionId" th:value="${promotion.roomPromotionId}">
-                    <button type="submit" class="btn btn-sm btn-danger">
-                      <i class="bi bi-trash-fill"></i>
                     </button>
                   </form>
                 </div>

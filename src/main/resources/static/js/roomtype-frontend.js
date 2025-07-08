@@ -2,60 +2,58 @@
 // 專門用於客戶端房型展示功能
 
 // 頁面載入完成後初始化
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     console.log('前端房型展示頁面已載入');
-    
+
     // 初始化所有前端功能
     initializeRoomTypeCards();
     initializeImageErrorHandling();
     initializeAnimations();
     addKeyboardSupport();
-    
+
     // 自動清理殘留的 backdrop
     document.querySelectorAll('.modal-backdrop').forEach(e => e.remove());
 });
 
 // 初始化房型卡片點擊事件
 function initializeRoomTypeCards() {
-    const roomTypeCards = document.querySelectorAll('.roomtype-card');
-    
-    roomTypeCards.forEach(card => {
-        const btn = card.querySelector('.roomtype-btn');
-        if (btn) {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const roomTypeId = this.getAttribute('data-roomtype-id');
-                const roomTypeName = this.getAttribute('data-roomtype-name');
-                const roomTypeCapacity = this.getAttribute('data-roomtype-capacity');
-                const roomTypeContent = this.getAttribute('data-roomtype-content');
-                const roomTypePrice = this.getAttribute('data-roomtype-price');
-                
-                showRoomTypeModal(roomTypeId, roomTypeName, roomTypeCapacity, roomTypeContent, roomTypePrice);
-            });
-        }
+    // 修改選擇器以匹配HTML結構：尋找有data-roomtype-id屬性的按鈕
+    const roomTypeButtons = document.querySelectorAll('button[data-roomtype-id]');
+
+    roomTypeButtons.forEach(btn => {
+        btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            const roomTypeId = this.getAttribute('data-roomtype-id');
+            const roomTypeName = this.getAttribute('data-roomtype-name');
+            const roomTypeCapacity = this.getAttribute('data-roomtype-capacity');
+            const roomTypeContent = this.getAttribute('data-roomtype-content');
+            const roomTypePrice = this.getAttribute('data-roomtype-price');
+
+            showRoomTypeModal(roomTypeId, roomTypeName, roomTypeCapacity, roomTypeContent, roomTypePrice);
+        });
     });
-    
-    console.log(`已初始化 ${roomTypeCards.length} 個房型卡片`);
+
+    console.log(`已初始化 ${roomTypeButtons.length} 個房型按鈕`);
 }
 
 // 顯示房型詳細資訊的 Modal
 function showRoomTypeModal(roomTypeId, roomTypeName, roomTypeCapacity, roomTypeContent, roomTypePrice) {
     console.log('顯示房型Modal:', roomTypeName);
-    
+
     // 設定 modal 內容
     const modalTitle = document.getElementById('roomTypeModalTitle');
     const modalCapacity = document.getElementById('modalRoomTypeCapacity');
     const modalPrice = document.getElementById('modalRoomTypePrice');
     const modalContent = document.getElementById('modalRoomTypeContent');
-    
+
     if (modalTitle) modalTitle.textContent = roomTypeName || '房型名稱';
     if (modalCapacity) modalCapacity.innerHTML = `<i class="bi bi-people"></i> 容納人數：${roomTypeCapacity || 0} 人`;
     if (modalPrice) modalPrice.textContent = formatPrice(roomTypePrice || 0);
     if (modalContent) modalContent.textContent = roomTypeContent || '暫無說明';
-    
+
     // 載入房型圖片
     loadRoomTypeImages(roomTypeId);
-    
+
     // 顯示 modal
     const modalElement = document.getElementById('roomTypeModal');
     if (modalElement) {
@@ -69,10 +67,10 @@ function showRoomTypeModal(roomTypeId, roomTypeName, roomTypeCapacity, roomTypeC
 // 載入房型圖片
 function loadRoomTypeImages(roomTypeId) {
     console.log('載入房型圖片:', roomTypeId);
-    
+
     // 顯示載入狀態
     showCarouselLoading();
-    
+
     // 發送請求獲取房型圖片
     fetch(`/roomtype/${roomTypeId}/images`)
         .then(response => {
@@ -99,35 +97,35 @@ function loadRoomTypeImages(roomTypeId) {
 function createImageCarousel(images) {
     const carouselInner = document.getElementById('modalCarouselInner');
     const carouselIndicators = document.getElementById('modalCarouselIndicators');
-    
+
     if (!carouselInner || !carouselIndicators) {
         console.error('找不到輪播容器');
         return;
     }
-    
+
     // 清空現有內容
     carouselInner.innerHTML = '';
     carouselIndicators.innerHTML = '';
-    
+
     // 創建輪播圖片
     images.forEach((image, index) => {
         // 創建圖片項目
         const carouselItem = document.createElement('div');
         carouselItem.className = `carousel-item ${index === 0 ? 'active' : ''}`;
-        
+
         const img = document.createElement('img');
         img.src = `/roomtype/image/${image.photoId}`;
         img.alt = `房型圖片 ${index + 1}`;
         img.className = 'img-fluid';
-        
+
         // 圖片載入錯誤處理
-        img.onerror = function() {
+        img.onerror = function () {
             this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2Y4ZjlmYSIvPgo8dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjNmM3NTdkIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+5ZyW54mH54Sh5rOV6Lyc5YWlPC90ZXh0Pgo8L3N2Zz4=';
         };
-        
+
         carouselItem.appendChild(img);
         carouselInner.appendChild(carouselItem);
-        
+
         // 創建指示器
         const indicator = document.createElement('button');
         indicator.type = 'button';
@@ -135,14 +133,14 @@ function createImageCarousel(images) {
         indicator.setAttribute('data-bs-slide-to', index.toString());
         indicator.className = index === 0 ? 'active' : '';
         indicator.setAttribute('aria-label', `圖片 ${index + 1}`);
-        
+
         if (index === 0) {
             indicator.setAttribute('aria-current', 'true');
         }
-        
+
         carouselIndicators.appendChild(indicator);
     });
-    
+
     console.log(`已載入 ${images.length} 張圖片`);
 }
 
@@ -150,7 +148,7 @@ function createImageCarousel(images) {
 function showCarouselLoading() {
     const carouselInner = document.getElementById('modalCarouselInner');
     const carouselIndicators = document.getElementById('modalCarouselIndicators');
-    
+
     if (carouselInner) {
         carouselInner.innerHTML = `
             <div class="carousel-item active">
@@ -161,7 +159,7 @@ function showCarouselLoading() {
             </div>
         `;
     }
-    
+
     if (carouselIndicators) {
         carouselIndicators.innerHTML = '';
     }
@@ -171,7 +169,7 @@ function showCarouselLoading() {
 function showCarouselNoImages() {
     const carouselInner = document.getElementById('modalCarouselInner');
     const carouselIndicators = document.getElementById('modalCarouselIndicators');
-    
+
     if (carouselInner) {
         carouselInner.innerHTML = `
             <div class="carousel-item active">
@@ -182,7 +180,7 @@ function showCarouselNoImages() {
             </div>
         `;
     }
-    
+
     if (carouselIndicators) {
         carouselIndicators.innerHTML = '';
     }
@@ -192,7 +190,7 @@ function showCarouselNoImages() {
 function showCarouselError() {
     const carouselInner = document.getElementById('modalCarouselInner');
     const carouselIndicators = document.getElementById('modalCarouselIndicators');
-    
+
     if (carouselInner) {
         carouselInner.innerHTML = `
             <div class="carousel-item active">
@@ -203,7 +201,7 @@ function showCarouselError() {
             </div>
         `;
     }
-    
+
     if (carouselIndicators) {
         carouselIndicators.innerHTML = '';
     }
@@ -211,38 +209,42 @@ function showCarouselError() {
 
 // 初始化圖片載入錯誤處理
 function initializeImageErrorHandling() {
-    const images = document.querySelectorAll('.roomtype-image');
-    
+    // 修改選擇器以匹配HTML結構：尋找square-img類別的圖片
+    const images = document.querySelectorAll('.square-img');
+
     images.forEach(img => {
         // 圖片載入失敗處理
-        img.addEventListener('error', function() {
+        img.addEventListener('error', function () {
             console.log('圖片載入失敗:', this.src);
-            
+
             // 建立無圖片占位符
             const container = this.parentElement;
             const placeholder = document.createElement('div');
-            placeholder.className = 'roomtype-no-image';
+            placeholder.className = 'square-img-wrapper d-flex align-items-center justify-content-center bg-light text-muted';
+            placeholder.style.aspectRatio = '1';
             placeholder.innerHTML = `
-                <i class="bi bi-image"></i>
-                <span>暫無圖片</span>
+                <div class="text-center">
+                    <i class="bi bi-image" style="font-size: 2rem;"></i>
+                    <p class="mt-2">暫無圖片</p>
+                </div>
             `;
-            
+
             // 替換圖片
             container.removeChild(this);
             container.appendChild(placeholder);
         });
-        
+
         // 圖片載入成功處理
-        img.addEventListener('load', function() {
+        img.addEventListener('load', function () {
             console.log('圖片載入成功:', this.src);
             this.style.opacity = '1';
         });
-        
+
         // 設定初始透明度
         img.style.opacity = '0';
         img.style.transition = 'opacity 0.3s ease';
     });
-    
+
     console.log(`已初始化 ${images.length} 張圖片載入處理`);
 }
 
@@ -253,7 +255,7 @@ function initializeAnimations() {
         console.log('瀏覽器不支援 Intersection Observer，跳過動畫效果');
         return;
     }
-    
+
     // 監聽滾動事件，實現卡片進入動畫
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -267,38 +269,39 @@ function initializeAnimations() {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
     });
-    
-    // 為每個卡片添加初始動畫樣式
-    const cards = document.querySelectorAll('.roomtype-card');
+
+    // 修改選擇器以匹配HTML結構：尋找每個房型行
+    const cards = document.querySelectorAll('.row.align-items-center.mb-5');
     cards.forEach((card, index) => {
         card.style.opacity = '0';
         card.style.transform = 'translateY(30px)';
         card.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
-        
+
         observer.observe(card);
     });
-    
+
     console.log(`已初始化 ${cards.length} 個卡片動畫效果`);
 }
 
 // 為房型卡片添加鍵盤支援（無障礙設計）
 function addKeyboardSupport() {
-    const buttons = document.querySelectorAll('.roomtype-btn');
-    
+    // 修改選擇器以匹配HTML結構：尋找有data-roomtype-id屬性的按鈕
+    const buttons = document.querySelectorAll('button[data-roomtype-id]');
+
     buttons.forEach(btn => {
-        btn.addEventListener('keydown', function(e) {
+        btn.addEventListener('keydown', function (e) {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 this.click();
             }
         });
-        
+
         // 為按鈕添加 tabindex 確保可以被鍵盤焦點
         if (!btn.hasAttribute('tabindex')) {
             btn.setAttribute('tabindex', '0');
         }
     });
-    
+
     console.log(`已初始化 ${buttons.length} 個按鈕的鍵盤支援`);
 }
 
@@ -341,7 +344,7 @@ function showEmptyState(container, message = '暫無房型資料') {
 }
 
 // 全域錯誤處理
-window.addEventListener('error', function(e) {
+window.addEventListener('error', function (e) {
     console.error('頁面錯誤:', e.error);
 });
 
