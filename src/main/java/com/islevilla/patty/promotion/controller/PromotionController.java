@@ -54,6 +54,7 @@ public class PromotionController {
     public String listAllPromotions(ModelMap model) {
         List<Promotion> list = promotionSvc.getAll();
         model.addAttribute("promotionListData", list);
+        model.addAttribute("sidebarActive", "promotion-list");
         return "back-end/promotion/listAllPromotion";
     }
 

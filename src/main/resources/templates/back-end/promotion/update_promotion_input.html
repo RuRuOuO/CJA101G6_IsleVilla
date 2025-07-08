@@ -24,7 +24,6 @@
                 </h4>
             </div>
             <div class="card-body">
-                <h6 class="card-subtitle mb-4 text-muted">所有欄位皆為必填</h6>
                 <form th:action="@{/backend/promotion/update}" method="post" th:object="${promotion}" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="roomPromotionId" class="form-label">優惠專案編號:</label>
@@ -32,7 +31,8 @@
                     </div>
                     <div class="mb-3">
                         <label for="roomPromotionTitle" class="form-label">優惠專案名稱:</label>
-                        <input type="text" id="roomPromotionTitle" th:field="*{roomPromotionTitle}" class="form-control-plaintext" readonly />
+                        <input type="text" id="roomPromotionTitle" th:field="*{roomPromotionTitle}" class="form-control" />
+                        <div th:if="${#fields.hasErrors('roomPromotionTitle')}" th:errors="*{roomPromotionTitle}" class="text-danger"></div>
                     </div>
                     <div class="mb-3">
                         <label for="promotionStartDate" class="form-label">專案開始日期:</label>
@@ -66,24 +66,50 @@
         const startDateInput = document.getElementById('promotionStartDate');
         const endDateInput = document.getElementById('promotionEndDate');
 
-        // 1. 設定開始日期的最小值為今天
-        const today = new Date().toISOString().split('T')[0];
-        startDateInput.setAttribute('min', today);
+        // 取得今天的日期（使用本地時區）
+        const now = new Date();
+        const today = now.getFullYear() + '-' + 
+                     String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                     String(now.getDate()).padStart(2, '0');
 
-        // 2. 當開始日期變更時，動態設定結束日期的最小值
+        // 檢查優惠專案開始日期是否已經過期
+        const originalStartDate = startDateInput.value;
+        const originalEndDate = endDateInput.value;
+        
+        // 如果原本的開始日期已經過了，就不能修改開始日期
+        if (originalStartDate && originalStartDate < today) {
+            // 開始日期已過期，設為唯讀但保持原本的框框樣式
+            startDateInput.setAttribute('readonly', true);
+            startDateInput.style.backgroundColor = '#f8f9fa'; // 灰色背景
+            startDateInput.style.color = '#6c757d'; // 灰色文字
+            console.log('開始日期已過期，設為唯讀');
+            
+            // 結束日期要設在今天之後
+            endDateInput.setAttribute('min', today);
+        } else {
+            // 開始日期未過期，設定開始日期的最小值為今天
+            startDateInput.setAttribute('min', today);
+            endDateInput.setAttribute('min', today);
+        }
+
+        // 當開始日期變更時，動態設定結束日期的最小值
         startDateInput.addEventListener('change', function() {
-            if (startDateInput.value) {
-                endDateInput.setAttribute('min', startDateInput.value);
-                // 如果結束日期在新的開始日期之前，清空結束日期
-                if (endDateInput.value && endDateInput.value < startDateInput.value) {
+            if (startDateInput.value && !startDateInput.hasAttribute('readonly')) {
+                // 結束日期的最小值取今天和開始日期中的較大值
+                const minEndDate = startDateInput.value > today ? startDateInput.value : today;
+                endDateInput.setAttribute('min', minEndDate);
+                
+                // 如果結束日期在新的最小值之前，清空結束日期
+                if (endDateInput.value && endDateInput.value < minEndDate) {
                     endDateInput.value = '';
                 }
             }
         });
         
-        // 3. 頁面載入時，如果已有開始日期，也觸發一次檢查
-        if (startDateInput.value) {
-            endDateInput.setAttribute('min', startDateInput.value);
+        // 頁面載入時，如果已有開始日期，也觸發一次檢查
+        if (startDateInput.value && !startDateInput.hasAttribute('readonly')) {
+            const minEndDate = startDateInput.value > today ? startDateInput.value : today;
+            endDateInput.setAttribute('min', minEndDate);
         }
     });
 </script>
