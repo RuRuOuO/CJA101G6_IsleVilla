@@ -282,10 +282,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         productItems.forEach(item => {
             const productName = item.querySelector('.product-name').textContent.toLowerCase();
-            const productDescription = item.querySelector('.product-description').textContent.toLowerCase();
-            
+
             // 檢查商品名稱或描述是否包含搜尋關鍵字
-            const isMatch = productName.includes(searchTerm) || productDescription.includes(searchTerm);
+            const isMatch = productName.includes(searchTerm);
             
             if (isMatch) {
                 item.style.display = 'block';
