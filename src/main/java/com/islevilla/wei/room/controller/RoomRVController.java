@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +53,12 @@ public class RoomRVController {
         model.addAttribute("detailMap", detailMap);
         model.addAttribute("refundAmountMap", refundAmountMap);
         model.addAttribute("refundRateMap", refundRateMap);
+        Map<Integer, Long> daysToCheckInMap = new HashMap<>();
+        for (RoomRVOrder order : orderList) {
+            long days = ChronoUnit.DAYS.between(LocalDate.now(), order.getCheckInDate());
+            daysToCheckInMap.put(order.getRoomReservationId(), days);
+        }
+        model.addAttribute("daysToCheckInMap", daysToCheckInMap);
 
         return "front-end/member/member-room-list";
     }
@@ -97,9 +105,15 @@ public class RoomRVController {
 
     @GetMapping("/backend/order-detail/{id}")
     public String getOrderDetail(@PathVariable Integer id, Model model) {
+        System.out.println("收到查詢訂單 id: " + id);
+        RoomRVOrder order = roomRVOrderService.getById(id);
+        System.out.println("查詢結果: " + order);
+        if (order == null) {
+            model.addAttribute("error", "查無此訂單");
+            return "fragments/roomRV :: emptyOrder";
+        }
         List<RoomRVDetail> detailList = roomRVDetailService.getDetailsByRoomRVOrderId(id);
-        RoomRVOrder orderList = roomRVOrderService.getById(id);
-        model.addAttribute("orderList", orderList);
+        model.addAttribute("order", order);
         model.addAttribute("detailList", detailList);
         return "fragments/roomRV :: roomRVOrder";
     }

@@ -148,7 +148,8 @@ CREATE TABLE room_reservation_order (
     room_total_amount		INT				NOT NULL,                                                             		-- 訂房總金額
     rv_discount_amount		INT				NOT NULL,                                                             		-- 折扣金額
     rv_paid_amount			INT				NOT NULL,                                                             		-- 實際付款金額
-	cancel_reason			VARCHAR(100),																				-- 訂單取消理由
+    rv_cancel_time			DATETIME,																					-- 訂單取消時間
+    rv_refund_amount		INT,																						-- 訂單退款金額
     CONSTRAINT pk_room_reservation_id	PRIMARY KEY(room_reservation_id),
     CONSTRAINT fk_rro_member_id			FOREIGN KEY(member_id) REFERENCES members(member_id),
     CONSTRAINT fk_rro_room_promotion_id	FOREIGN KEY(room_promotion_id) REFERENCES promotion(room_promotion_id)

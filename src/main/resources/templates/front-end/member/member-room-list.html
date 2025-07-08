@@ -149,6 +149,7 @@
                                                         th:data-order-id="${order.roomReservationId}"
                                                         th:data-refund-amount="${refundAmountMap[order.roomReservationId]}"
                                                         th:data-refund-rate="${refundRateMap[order.roomReservationId]}"
+                                                        th:data-days-to-checkin="${daysToCheckInMap[order.roomReservationId]}"
                                                         onclick="confirmCancelWithRefund(this)"
                                                 >
                                                     <i class="fas fa-times me-1"></i>取消訂單
@@ -245,14 +246,16 @@
                         >
                         <span th:case="'3'" class="badge bg-warning"
                         >取消確認中<span
-                                class="ms-1" th:text="${#temporals.format(order.rvCancelTime, 'yyyy-MM-dd HH:mm')}"
-                        ></span></span
-                        >
+                                class="ms-1"
+                                th:text="${#temporals.format(order.rvCancelTime, 'yyyy-MM-dd HH:mm')}"
+                        ></span
+                        ></span>
                         <span th:case="'4'" class="badge bg-secondary"
                         >已取消<span
-                                class="ms-1" th:text="${#temporals.format(order.rvCancelTime, 'yyyy-MM-dd HH:mm')}"
-                        ></span></span
-                        >
+                                class="ms-1"
+                                th:text="${#temporals.format(order.rvCancelTime, 'yyyy-MM-dd HH:mm')}"
+                        ></span
+                        ></span>
                         <span th:case="'*'" class="badge bg-dark">未知</span>
                       </span>
                                 </div>
@@ -293,16 +296,26 @@
                             <div class="col-12">
                                 <hr/>
                                 <div class="d-flex">
-                                    <h6 class="text-muted mb-3">訂單總金額：</h6>
-                                    <h5 class="text-primary mb-3">
+                                    <h6 class="text-muted">訂單總金額：</h6>
+                                    <h5 class="text-primary">
                                         NT$ <span th:text="${order.rvPaidAmount}"></span>
                                     </h5>
                                 </div>
-                                <div th:if="${order.roomOrderStatus == 3||order.roomOrderStatus == 4}" class="d-flex">
+                                <div
+                                        th:if="${order.roomOrderStatus == 3||order.roomOrderStatus == 4}"
+                                        class="d-flex"
+                                >
                                     <h6 class="text-muted">退款金額：</h6>
                                     <h5 class="text-danger">
                                         NT$ <span th:text="${order.rvRefundAmount}"></span>
                                     </h5>
+                                    <span class="ms-2 text-muted">
+                        (退款比例
+                        <span
+                                th:text="${refundRateMap[order.roomReservationId]}"
+                        ></span
+                        >%)
+                      </span>
                                 </div>
                             </div>
                         </div>
@@ -383,23 +396,6 @@
                 >
                     <i class="fas fa-times me-1"></i>關閉
                 </button>
-                <form
-                        th:action="@{'/member/room/' + ${order.roomReservationId} + '/cancel'}"
-                        method="post"
-                        th:if="${order.roomOrderStatus==0}"
-                        class="d-inline"
-                >
-                    <button
-                            type="button"
-                            class="btn btn-outline-danger btn-sm w-100"
-                            th:data-order-id="${order.roomReservationId}"
-                            th:data-refund-amount="${refundAmountMap[order.roomReservationId]}"
-                            th:data-refund-rate="${refundRateMap[order.roomReservationId]}"
-                            onclick="confirmCancelWithRefund(this)"
-                    >
-                        <i class="fas fa-times me-1"></i>取消訂單
-                    </button>
-                </form>
             </div>
         </div>
     </div>
@@ -409,12 +405,12 @@
 <footer th:replace="~{fragments/fragments :: footer}"></footer>
 <script>
     function confirmCancelWithRefund(btn) {
-        var refundAmount = btn.getAttribute('data-refund-amount');
-        var refundRate = btn.getAttribute('data-refund-rate');
-        var msg = `依規定可退還 ${refundRate}% ，預計退款金額 NT$${refundAmount}。\n確定要取消訂單嗎？`;
+        var refundAmount = btn.getAttribute("data-refund-amount");
+        var refundRate = btn.getAttribute("data-refund-rate");
+        var daysToCheckIn = btn.getAttribute("data-days-to-checkin");
+        var msg = `距離入住日還有 ${daysToCheckIn} 天。\n依規定可退還 ${refundRate}% ，預計退款金額 NT$${refundAmount}。\n確定要取消訂單嗎？`;
         if (confirm(msg)) {
-            // 找到同一張卡片內的 form 並送出
-            btn.closest('form').submit();
+            btn.closest("form").submit();
         }
     }
 </script>

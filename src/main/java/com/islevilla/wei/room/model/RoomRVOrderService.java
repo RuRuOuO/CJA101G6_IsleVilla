@@ -124,15 +124,15 @@ public class RoomRVOrderService {
 
     // 依照當日離checkin的天數計算退款比例
     public double calculateRefundRate(LocalDate checkInDate) {
-    long daysBetween = ChronoUnit.DAYS.between(LocalDate.now(), checkInDate);
-    if (daysBetween >= 14) return 1.0;
-    if (daysBetween >= 10) return 0.7;
-    if (daysBetween >= 7)  return 0.5;
-    if (daysBetween >= 4)  return 0.4;
-    if (daysBetween >= 2)  return 0.3;
-    if (daysBetween >= 1)  return 0.2;
-    return 0.0;
-}
+        long daysBetween = ChronoUnit.DAYS.between(LocalDate.now(), checkInDate);
+        if (daysBetween >= 14) return 1.0;
+        if (daysBetween >= 10) return 0.7;
+        if (daysBetween >= 7) return 0.5;
+        if (daysBetween >= 4) return 0.4;
+        if (daysBetween >= 2) return 0.3;
+        if (daysBetween >= 1) return 0.2;
+        return 0.0;
+    }
 
     // 回補訂房明細中所有房型庫存量
     @Transactional
