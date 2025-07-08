@@ -3,9 +3,15 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>微嶼 | Isle Villa 後台首頁</title>
+    <title>商品分類管理 | 微嶼 IsleVilla</title>
     <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+    <style>
+    /* ...原有樣式... */
+    #clearSearchBtn {
+        border-color: #ced4da !important;
+    }
+    </style>
 </head>
 <body>
 <!-- ===== 載入sidebar ===== -->
@@ -40,7 +46,8 @@
                         <span class="input-group-text">
                             <i class="bi bi-search"></i>
                         </span>
-                        <input type="text" class="form-control" id="searchInput" placeholder="搜尋分類內容" />
+                        <input type="text" class="form-control" id="searchInput" placeholder="搜尋分類名稱" />
+                        <button type="button" class="btn btn-secondary" id="clearSearchBtn" tabindex="-1">清空</button>
                     </div>
                 </div>
             </div>
@@ -140,6 +147,13 @@ $(function(){
     });
     $('#searchInput').on('keyup', function(){
         table.search(this.value).draw();
+    });
+
+    // 清空按鈕功能
+    $('#clearSearchBtn').on('click', function(){
+        $('#searchInput').val('');
+        table.search('').draw();
+        $('#searchInput').focus();
     });
 });
 // 新增商品分類

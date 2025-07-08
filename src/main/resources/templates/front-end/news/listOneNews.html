@@ -38,7 +38,9 @@
                     </a>
                 </li>
                 <li class="breadcrumb-item">
-                    <a th:href="@{/news/list}" class="text-decoration-none text-reset">最新消息</a>
+                    <a th:href="@{/news/list}" class="text-decoration-none text-reset"
+                    >最新消息</a
+                    >
                 </li>
                 <li class="breadcrumb-item active" aria-current="page">消息詳情</li>
             </ol>
@@ -66,7 +68,12 @@
 
                 <!-- 消息標題 -->
                 <div class="mb-4">
-                    <h2 class="display-5 fw-bold text-dark mb-0" th:text="${news.newsTitle}">消息標題</h2>
+                    <h2
+                            class="display-5 fw-bold text-dark mb-0"
+                            th:text="${news.newsTitle}"
+                    >
+                        消息標題
+                    </h2>
                 </div>
 
                 <div class="mb-4 pb-3 border-bottom">
@@ -74,35 +81,77 @@
                         <!-- 發布日期 -->
                         <i class="fas fa-calendar-alt me-2"></i>
                         <span class="me-2">發布日期：</span>
-                        <span th:text="${#temporals.format(news.newsTime, 'yyyy年MM月dd日 HH:mm')}">
-                            2024年01月01日 12:00
-                        </span>
+                        <span
+                                th:text="${#temporals.format(news.newsTime, 'yyyy年MM月dd日 HH:mm')}"
+                        >
+                  2024年01月01日 12:00
+                </span>
                     </div>
                     <!-- 優惠專案日期-->
-                    <div th:if="${news.promotion != null}"
-                         class="d-flex align-items-center text-muted mb-3">
+                    <div
+                            th:if="${news.promotion != null}"
+                            class="d-flex align-items-center text-muted mb-3"
+                    >
                         <i class="fas fa-clock me-2"></i>
-                        <span class="me-2">專案適用期間：</span>
-                        <span th:text="${#dates.format(news.promotion.promotionStartDate, 'yyyy.MM.dd')}">
-                            2025.01.01
-                        </span>
+                        <span class="me-2">適用專案：</span>
+                        <span class="me-2" th:text="${news.promotion.roomPromotionTitle}">
+                  2025.01.01
+                </span>
+                        <span
+                                th:text="${#dates.format(news.promotion.promotionStartDate, 'yyyy.MM.dd')}"
+                        >
+                  2025.01.01
+                </span>
                         <span>&nbsp;~&nbsp;</span>
-                        <span th:text="${#dates.format(news.promotion.promotionEndDate, 'yyyy.MM.dd')}">
-                            2025.01.01
-                        </span>
+                        <span
+                                th:text="${#dates.format(news.promotion.promotionEndDate, 'yyyy.MM.dd')}"
+                        >
+                  2025.01.01
+                </span>
                     </div>
                 </div>
 
                 <!-- 消息內容 -->
                 <div class="mb-5">
-                    <div class="fs-5 lh-lg text-dark" style="text-align: justify; line-height: 1.8;">
+                    <div
+                            class="fs-5 lh-lg text-dark"
+                            style="text-align: justify; line-height: 1.8"
+                    >
                         <pre th:text="${news.newsContent}">消息內容</pre>
+<!--                        <pre th:if="${news.promotion != null}"-->
+<!--                             th:text="${news.promotion.promotionRemark}">優惠專案內容</pre>-->
+                    </div>
+                    <hr th:if="${promotionPrices != null and #lists.size(promotionPrices) > 0}" class="mt-5">
+                    <div th:if="${promotionPrices != null and #lists.size(promotionPrices) > 0}" class="mb-5">
+                        <h3 class="mb-3">本專案優惠房型與折扣</h3>
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>房型名稱</th>
+                                <th>原價</th>
+<!--                                <th>折扣率</th>-->
+                                <th>優惠價</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="pp : ${promotionPrices}">
+                                <td th:text="${pp.roomType.roomTypeName}">房型名稱</td>
+                                <td th:text="${pp.roomType.roomTypePrice}">原價</td>
+<!--                                <td th:text="${#numbers.formatInteger(pp.roomDiscountRate * 100)} + '%'" class="text-danger">折扣率</td>-->
+                                <td th:text="${T(java.lang.Math).floor(pp.discountedPrice)}" class="text-danger fw-bold">優惠價</td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
                 <!-- 操作按鈕 -->
                 <div class="d-flex flex-column flex-sm-row gap-3 pt-4 border-top">
-                    <button class="btn btn-outline-secondary btn-lg px-4" onclick="history.back()" type="button">
+                    <button
+                            class="btn btn-outline-secondary btn-lg px-4"
+                            onclick="history.back()"
+                            type="button"
+                    >
                         <i class="fas fa-arrow-left me-2"></i>返回上頁
                     </button>
                 </div>

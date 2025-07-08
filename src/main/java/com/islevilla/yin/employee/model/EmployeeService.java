@@ -135,4 +135,16 @@ public class EmployeeService {
         }
         return false;
     }
+
+    public List<Employee> searchEmployees(Integer departmentId, Byte status, String keyword) {
+        if (departmentId != null && status != null) {
+            return employeeRepository.findByDepartment_DepartmentIdAndEmployeeStatusAndEmployeeNameContainingIgnoreCase(departmentId, status, keyword);
+        } else if (departmentId != null) {
+            return employeeRepository.findByDepartment_DepartmentIdAndEmployeeNameContainingIgnoreCase(departmentId, keyword);
+        } else if (status != null) {
+            return employeeRepository.findByEmployeeStatusAndEmployeeNameContainingIgnoreCase(status, keyword);
+        } else {
+            return employeeRepository.findByEmployeeNameContainingIgnoreCase(keyword);
+        }
+    }
 }

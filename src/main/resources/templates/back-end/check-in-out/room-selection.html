@@ -52,14 +52,16 @@
                                 <div class="col-md-6">
                                     <p class="mb-2"><strong>訂單編號：</strong><span
                                             th:text="${order.roomReservationId}"></span></p>
-                                    <p class="mb-2"><strong>會員編號：</strong><span
-                                            th:text="${order.members.memberId}"></span></p>
+                                    <!--                                    <p class="mb-2"><strong>會員編號：</strong><span-->
+                                    <!--                                            th:text="${order.members.memberId}"></span></p>-->
+                                    <p class="mb-2"><strong>會員姓名：</strong><span
+                                            th:text="${order.members.memberName}"></span></p>
                                     <p class="mb-2"><strong>入住日期：</strong><span
                                             th:text="${#temporals.format(order.checkInDate, 'yyyy-MM-dd')}"></span></p>
-                                </div>
-                                <div class="col-md-6">
                                     <p class="mb-2"><strong>退房日期：</strong><span
                                             th:text="${#temporals.format(order.checkOutDate, 'yyyy-MM-dd')}"></span></p>
+                                </div>
+                                <div class="col-md-6">
                                     <p class="mb-2"><strong>總金額：</strong>$<span
                                             th:text="${order.rvPaidAmount}"></span></p>
                                     <p class="mb-2"><strong>狀態：</strong>

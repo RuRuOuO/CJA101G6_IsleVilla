@@ -105,7 +105,8 @@ public String showListRoomType(
 	model.addAttribute("roomTypeList", roomTypeList); 
 	model.addAttribute("saleStatusMap", saleStatusMap);  //下拉選單
 	model.addAttribute("roomTypeNameList", roomTypeName.getRoomTypeNameList());  //下拉選單
-	model.addAttribute("roomTypeName", roomTypeName.getRoomTypeNameMap()); 
+	model.addAttribute("roomTypeName", roomTypeName.getRoomTypeNameMap());
+	model.addAttribute("sidebarActive", "listRoomType-list");
 	return "back-end/roomType/listRoomType";
 }
 	

@@ -1,11 +1,15 @@
 package com.islevilla.wei.feedback.controller;
 
+import com.islevilla.jay.coupon.model.Coupon;
+import com.islevilla.jay.coupon.model.CouponService;
 import com.islevilla.lai.members.model.Members;
 import com.islevilla.wei.feedback.dto.FeedbackDetailDTO;
 import com.islevilla.wei.feedback.dto.FeedbackFormDTO;
 import com.islevilla.wei.feedback.dto.RoomRVOrderDTO;
 import com.islevilla.wei.feedback.model.Feedback;
+import com.islevilla.wei.feedback.model.FeedbackEmailService;
 import com.islevilla.wei.feedback.model.FeedbackService;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +30,12 @@ public class FeedbackController {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private CouponService couponService;
+
+    @Autowired
+    private FeedbackEmailService feedbackEmailService;
 
     // ========== API ==========//
     @GetMapping("/api/feedbacks")
@@ -56,6 +66,27 @@ public class FeedbackController {
     public ResponseEntity<?> submitFeedback(@ModelAttribute FeedbackFormDTO dto, HttpSession session) {
         Members loginMember = (Members) session.getAttribute("member");
         boolean success = feedbackService.saveFeedback(dto, loginMember);
+
+        if (success && loginMember != null) {
+            // 查詢效期內的 coupon
+            List<Coupon> validCoupons = couponService.getAll().stream()
+                .filter(c -> c.getCouponStatus() == 1
+                    && !c.getStartDate().isAfter(java.time.LocalDate.now())
+                    && !c.getEndDate().isBefore(java.time.LocalDate.now()))
+                .toList();
+
+            try {
+                feedbackEmailService.sendThankYouEmail(
+                    loginMember.getMemberEmail(),
+                    loginMember.getMemberName(),
+                    validCoupons
+                );
+            } catch (MessagingException e) {
+                e.printStackTrace();
+                // 可以選擇記錄錯誤，但不影響主流程
+            }
+        }
+
         return success ? ResponseEntity.ok().build() : ResponseEntity.badRequest().body("提交失敗");
     }
 
