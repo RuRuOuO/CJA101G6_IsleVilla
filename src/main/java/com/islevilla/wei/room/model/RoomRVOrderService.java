@@ -5,7 +5,11 @@ import com.islevilla.chen.roomType.model.RoomTypeRepository;
 import com.islevilla.chen.roomTypeAvailability.model.RoomTypeAvailability;
 import com.islevilla.chen.roomTypeAvailability.model.RoomTypeAvailabilityId;
 import com.islevilla.chen.roomTypeAvailability.model.RoomTypeAvailabilityRepository;
+import com.islevilla.lai.email.model.ShuttleEmailService;
 import com.islevilla.lai.members.model.Members;
+import com.islevilla.lai.shuttle.model.ShuttleReservationSeatService;
+import com.islevilla.lai.shuttle.model.ShuttleReservationService;
+import com.islevilla.lai.shuttle.model.ShuttleSeatAvailabilityService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,6 +31,14 @@ public class RoomRVOrderService {
     private RoomTypeAvailabilityRepository roomTypeAvailabilityRepository;
     @Autowired
     private RoomTypeRepository roomTypeRepository;
+    @Autowired
+    private ShuttleReservationService shuttleReservationService;
+    @Autowired
+    private ShuttleReservationSeatService shuttleReservationSeatService;
+    @Autowired
+    private ShuttleSeatAvailabilityService shuttleSeatAvailabilityService;
+    @Autowired
+    private ShuttleEmailService shuttleEmailService;
 
     // 查詢全部 // 分頁
     public Page<RoomRVOrder> getAll(Pageable pageable) {
@@ -108,13 +120,37 @@ public class RoomRVOrderService {
                 throw new RuntimeException("只有申請取消中的訂單才能取消");
             }
 
-            // 獲取訂單明細List
+            // 1. 取消所有關聯的接駁預約
+            List<com.islevilla.lai.shuttle.model.ShuttleReservation> reservations =
+                    shuttleReservationService.getReservationsByRoomReservation(order);
+
+            for (com.islevilla.lai.shuttle.model.ShuttleReservation reservation : reservations) {
+                Integer shuttleReservationId = reservation.getShuttleReservationId();
+                try {
+                    // 1.1 發送取消郵件
+                    shuttleEmailService.sendShuttleReservationCancellation(shuttleReservationId);
+
+                    // 1.2 將預約狀態設為取消
+                    shuttleReservationService.cancelReservation(shuttleReservationId);
+
+                    // 1.3 刪除座位預約
+                    shuttleReservationSeatService.deleteByShuttleReservationId(shuttleReservationId);
+
+                    // 1.4 釋放座位
+                    shuttleSeatAvailabilityService.cancelReservation(
+                            reservation.getShuttleSchedule().getShuttleScheduleId(),
+                            reservation.getShuttleDate(),
+                            reservation.getShuttleNumber()
+                    );
+                } catch (Exception e) {
+                    // 記錄log或處理例外
+                    System.out.println("取消接駁預約失敗: " + e.getMessage());
+                }
+            }
+
+            // 2. 訂單取消與回補庫存
             List<RoomRVDetail> orderDetails = roomRVDetailService.getDetailsByRoomRVOrderId(orderId);
-
-            // 回補每個明細中對應的房型庫存
             restoreRoomTypeAvailability(orderDetails, order.getCheckInDate(), order.getCheckOutDate());
-
-            // 更新訂單狀態
             order.setRoomOrderStatus(4); // 4: 後台取消
             updateRoomRVOrder(order);
 
