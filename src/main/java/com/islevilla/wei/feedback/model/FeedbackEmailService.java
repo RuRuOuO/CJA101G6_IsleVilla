@@ -25,6 +25,7 @@ public class FeedbackEmailService {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
+        helper.setFrom("no-reply@islevilla.com");
         helper.setTo(to);
         helper.setSubject("感謝您的問卷回饋！專屬優惠券已送達");
 

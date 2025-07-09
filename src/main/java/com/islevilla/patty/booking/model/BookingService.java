@@ -357,7 +357,11 @@ public class BookingService {
             List<Integer> photoIds = roomTypePhotoRepository.findWithPhotos(roomType.getRoomTypeId())
                 .stream().map(RoomTypePhoto::getRoomTypePhotoId).collect(Collectors.toList());
             
-            result.add(new RoomTypeWithPromotionsAndPhoto(roomType, promotionWithDiffs, photoIds));
+            RoomTypeWithPromotionsAndPhoto vo = new RoomTypeWithPromotionsAndPhoto(roomType, promotionWithDiffs, photoIds);
+            // === 新增：查詢可用庫存 ===
+            int availableCount = roomTypeAvailabilityService.calculateAvailableRoomsInRange(roomType.getRoomTypeId(), checkin, checkout);
+            vo.setAvailableCount(availableCount);
+            result.add(vo);
         }
         return result;
     }
@@ -531,14 +535,18 @@ public class BookingService {
         private RoomType roomType;
         private List<PromotionWithDiff> promotions;
         private List<Integer> photoIds;
+        private int availableCount; // 新增
         public RoomTypeWithPromotionsAndPhoto(RoomType roomType, List<PromotionWithDiff> promotions, List<Integer> photoIds) {
             this.roomType = roomType;
             this.promotions = promotions;
             this.photoIds = photoIds;
+            this.availableCount = 0; // 預設 0，可後續 set
         }
         public RoomType getRoomType() { return roomType; }
         public List<PromotionWithDiff> getPromotions() { return promotions; }
         public List<Integer> getPhotoIds() { return photoIds; }
+        public int getAvailableCount() { return availableCount; }
+        public void setAvailableCount(int availableCount) { this.availableCount = availableCount; }
     }
 
     public static class PromotionWithDiff {

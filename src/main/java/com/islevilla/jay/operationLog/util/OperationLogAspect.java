@@ -73,30 +73,61 @@ public class OperationLogAspect {
         }
     }
 
-    @AfterReturning("putMappingMethods()")
-    public void logUpdate(JoinPoint joinPoint) {
-        logByType(joinPoint, "修改");
-    }
+    @AfterReturning(pointcut = "putMappingMethods() || postUpdateMethods()", returning = "result")
+    public void logUpdate(JoinPoint joinPoint, Object result) {
+        boolean shouldLog = false;
 
-    @AfterReturning("postUpdateMethods()")
-    public void logPostUpdate(JoinPoint joinPoint) {
-        logByType(joinPoint, "修改");
+        // 1. 處理 String 回傳
+        if (result instanceof String str) {
+            if (str.startsWith("redirect:") || "success".equalsIgnoreCase(str) || str.contains("修改成功") || str.contains("成功")) {
+                shouldLog = true;
+            }
+        }
+
+        // 2. 處理 ResponseEntity 回傳
+        if (result instanceof org.springframework.http.ResponseEntity<?> response) {
+            if (response.getStatusCode().is2xxSuccessful()) {
+                Object body = response.getBody();
+                if (body instanceof String bodyStr) {
+                    if (bodyStr.contains("成功") || bodyStr.equalsIgnoreCase("success")) {
+                        shouldLog = true;
+                    }
+                }
+            }
+        }
+
+        if (shouldLog) {
+            logByType(joinPoint, "修改");
+        }
     }
 
     // 刪除操作自動記錄
-    @AfterReturning("deleteMappingMethods()")
-    public void logDelete(JoinPoint joinPoint) {
-        logByType(joinPoint, "刪除");
-    }
+    @AfterReturning(pointcut = "deleteMappingMethods() || postDeleteMethods() || getDeleteMethods()", returning = "result")
+    public void logDelete(JoinPoint joinPoint, Object result) {
+        boolean shouldLog = false;
 
-    @AfterReturning("postDeleteMethods()")
-    public void logPostDelete(JoinPoint joinPoint) {
-        logByType(joinPoint, "刪除");
-    }
+        // 1. 處理 String 回傳
+        if (result instanceof String str) {
+            if (str.startsWith("redirect:") || "success".equalsIgnoreCase(str) || str.contains("刪除成功") || str.contains("成功")) {
+                shouldLog = true;
+            }
+        }
 
-    @AfterReturning("getDeleteMethods()")
-    public void logGetDelete(JoinPoint joinPoint) {
-        logByType(joinPoint, "刪除");
+        // 2. 處理 ResponseEntity 回傳
+        if (result instanceof org.springframework.http.ResponseEntity<?> response) {
+            if (response.getStatusCode().is2xxSuccessful()) {
+                Object body = response.getBody();
+                if (body instanceof String bodyStr) {
+                    if (bodyStr.contains("成功") || bodyStr.equalsIgnoreCase("success")) {
+                        shouldLog = true;
+                    }
+                }
+            }
+        }
+
+        if (shouldLog) {
+            logByType(joinPoint, "刪除");
+        }
     }
 
     // 根據操作類型記錄日誌
