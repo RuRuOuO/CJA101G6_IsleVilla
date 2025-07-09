@@ -41,7 +41,7 @@ public class ProductController {
             if (product.getProductQuantity() == null || product.getProductQuantity() <= 0) continue;
             // 根據 productId 查詢該產品的第一張圖片
             ProductPhoto mainProductPhoto = productPhotoService.getMainProductPhotoByProductId(product.getProductId());
-            String productImageUrl = "https://dummyimage.com/300x200/";  // 預設圖片 URL
+            String productImageUrl = "https://dummyimage.com/300x200/808080&text=No+Image";  // 預設圖片 URL
             if (mainProductPhoto != null) {
                 // 將圖片轉換為 Base64 或圖片 URL
                 productImageUrl = convertImageToBase64(mainProductPhoto.getProductImage());
@@ -66,7 +66,7 @@ public class ProductController {
     private String convertImageToBase64(byte[] imageBytes) {
         if (imageBytes == null) {
             // 如果圖片是 null，返回預設圖片的 URL
-            return "https://dummyimage.com/300x200/";
+            return "https://dummyimage.com/300x200/808080&text=No+Image";
         }
         // 如果圖片不為 null，將圖片轉換為 Base64 字串
         return "data:image/png;base64," + Base64.getEncoder().encodeToString(imageBytes);
@@ -94,7 +94,7 @@ public class ProductController {
         List<ProductWithImageDTO> productWithImageDTOs = new ArrayList<>();
         for (Product product : productPage.getContent()) {
             ProductPhoto mainProductPhoto = productPhotoService.getMainProductPhotoByProductId(product.getProductId());
-            String productImageUrl = "https://dummyimage.com/300x200/";
+            String productImageUrl = "https://dummyimage.com/300x200/808080&text=No+Image";
             if (mainProductPhoto != null) {
                 productImageUrl = convertImageToBase64(mainProductPhoto.getProductImage());
             }
@@ -163,7 +163,7 @@ public class ProductController {
 
             if (productPhotos == null || productPhotos.isEmpty()) {
                 // 如果沒有圖片，使用預設圖片
-                productImageUrls.add("https://dummyimage.com/400x300/");
+                productImageUrls.add("https://dummyimage.com/400x300/808080&text=No+Image");
             } else {
                 // 將所有圖片轉換為 Base64
                 for (ProductPhoto photo : productPhotos) {
@@ -176,7 +176,7 @@ public class ProductController {
 
             // 如果沒有成功轉換的圖片，使用預設圖片
             if (productImageUrls.isEmpty()) {
-                productImageUrls.add("https://dummyimage.com/400x300/");
+                productImageUrls.add("https://dummyimage.com/400x300/808080&text=No+Image");
             }
 
             // 獲取商品分類資訊
