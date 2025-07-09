@@ -66,7 +66,7 @@
                         <td>
                             <input type="hidden" name="productCategoryId" th:value="${category.productCategoryId}" />
                             <span th:text="${category.productCategoryName}" th:attr="id='text-productCategoryName-' + ${iterStat.index}"></span>
-                            <input type="text" name="productCategoryName" th:value="${category.productCategoryName}" class="form-control d-none" th:attr="id='input-productCategoryName-' + ${iterStat.index}" required />
+                            <input type="text" name="productCategoryName" th:value="${category.productCategoryName}" class="form-control d-none" th:attr="id='input-productCategoryName-' + ${iterStat.index}" required maxlength="30" />
                         </td>
                         <td>
                             <a type="button" class="btn btn-sm btn-primary" th:attr="id='editBtn-' + ${iterStat.index},data-id=${category.productCategoryId},data-name=${category.productCategoryName}" th:onclick="|enableEditRow(${iterStat.index})|">
@@ -100,8 +100,9 @@
                     <div class="row">
                         <div class="col-md-12 mb-3">
                             <label class="form-label">商品分類名稱 <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="productCategoryName" required>
+                            <input type="text" class="form-control" name="productCategoryName" required maxlength="30">
                             <div class="invalid-feedback">請輸入商品分類名稱</div>
+                            <small class="text-muted">最多30個字元</small>
                         </div>
                     </div>
                 </form>
@@ -154,6 +155,54 @@ $(function(){
         $('#searchInput').focus();
     });
 });
+// 商品分類名稱即時驗證
+document.addEventListener('DOMContentLoaded', function() {
+    // 新增商品分類表單驗證
+    const addCategoryName = document.querySelector('#addProductCategoryForm input[name="productCategoryName"]');
+    if (addCategoryName) {
+        addCategoryName.addEventListener('input', function() {
+            validateCategoryName(this);
+        });
+    }
+    
+    // 表格內編輯驗證
+    document.addEventListener('input', function(e) {
+        if (e.target.name === 'productCategoryName' && e.target.classList.contains('form-control')) {
+            validateCategoryName(e.target);
+        }
+    });
+});
+
+function validateCategoryName(field) {
+    const value = field.value.trim();
+    const maxLength = 30;
+    const currentLength = value.length;
+    
+    // 更新字元計數
+    let counter = field.parentNode.querySelector('.char-counter');
+    if (!counter) {
+        counter = document.createElement('small');
+        counter.className = 'char-counter text-muted';
+        field.parentNode.appendChild(counter);
+    }
+    counter.textContent = `${currentLength}/${maxLength}`;
+    
+    // 驗證邏輯
+    if (value.length === 0) {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+        counter.className = 'char-counter text-muted';
+    } else if (value.length > maxLength) {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+        counter.className = 'char-counter text-danger';
+    } else {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+        counter.className = 'char-counter text-muted';
+    }
+}
+
 // 新增商品分類
 function saveProductCategory() {
     const form = document.getElementById('addProductCategoryForm');
@@ -187,6 +236,11 @@ function enableEditRow(idx) {
     document.getElementById('editBtn-' + idx).classList.add('d-none');
     document.getElementById('saveBtn-' + idx).classList.remove('d-none');
     document.getElementById('cancelBtn-' + idx).classList.remove('d-none');
+    
+    // 觸發字元計數更新
+    setTimeout(() => {
+        if (input) input.dispatchEvent(new Event('input'));
+    }, 100);
 }
 function cancelEditRow(idx) {
     document.getElementById('text-productCategoryName-' + idx).classList.remove('d-none');
