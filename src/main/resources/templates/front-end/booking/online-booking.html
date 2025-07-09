@@ -143,6 +143,7 @@
                                                          data-room-price=${roomTypeWithPromotions.roomType.roomTypePrice ?: 0},
                                                          data-room-id=${roomTypeWithPromotions.roomType.roomTypeId},
                                                          data-room-type-id=${roomTypeWithPromotions.roomType.roomTypeId},
+                                                         data-available-rooms=${roomTypeWithPromotions.availableRooms},
                                                          data-promotion-title=''">
                                             選擇
                                         </button>
@@ -174,6 +175,7 @@
                                                     data-room-price=${roomTypeWithPromotions.getDiscountedPrice(promotion)},
                                                     data-room-id=${roomTypeWithPromotions.roomType.roomTypeId},
                                                     data-room-type-id=${roomTypeWithPromotions.roomType.roomTypeId},
+                                                    data-available-rooms=${roomTypeWithPromotions.availableRooms},
                                                     data-promotion-title=${promotion.promotion.roomPromotionTitle != null ? promotion.promotion.roomPromotionTitle : ''},
                                                     data-promotion-id=${promotion.promotion.roomPromotionId != null ? promotion.promotion.roomPromotionId : ''}">
                                         選擇
@@ -538,6 +540,24 @@ document.addEventListener('click', function(e) {
         const roomTypeId = btn.getAttribute('data-room-type-id');
         const promotionTitle = btn.getAttribute('data-promotion-title') || '';
         const promotionId = btn.getAttribute('data-promotion-id') || '';
+        
+        // === 新增：庫存比對邏輯 ===
+        const availableCount = parseInt(btn.getAttribute('data-available-rooms') || '0');
+        const selectedCount = cartRoomsArr.filter(r => r.roomTypeId === roomTypeId).length;
+        
+        console.log('庫存比對:', {
+            roomTypeId: roomTypeId,
+            availableCount: availableCount,
+            selectedCount: selectedCount,
+            cartRoomsArr: cartRoomsArr
+        });
+        
+        if (selectedCount >= availableCount) {
+            alert('此房型已無足夠庫存，無法再選擇！');
+            return;
+        }
+        // === 庫存比對結束 ===
+        
         cartRoomsArr.push({ name: roomName, price, roomId, roomTypeId, promotionTitle, promotionId });
         console.log('加入房型:', { name: roomName, price, roomId, roomTypeId, promotionTitle, promotionId });
         renderCart();
