@@ -84,6 +84,13 @@ public class BookingController {
         System.out.println("房間大人數: " + roomAdultsJson);
         System.out.println("孩童數: " + children);
 
+        // 新增：檢查 checkin 是否大於今天
+        if (!checkin.isAfter(LocalDate.now())) {
+            model.addAttribute("errorMsg", "入住日期必須是明天以後");
+            model.addAttribute("roomTypes", java.util.List.of());
+            return "front-end/booking/online-booking";
+        }
+
         List<Integer> roomAdults = null;
         if (roomAdultsJson != null) {
             try {
@@ -161,6 +168,13 @@ public class BookingController {
                     hasAvailableRooms = false; // 預設為無空房
                 }
                 
+                int availableRooms = 0;
+                try {
+                    availableRooms = roomTypeAvailabilityService.calculateAvailableRoomsInRange(roomTypeId, checkin, checkout);
+                } catch (Exception e) {
+                    availableRooms = 0;
+                }
+                
                 System.out.println("房型 " + roomType.getRoomTypeName() + " 有 " + promotions.size() + " 個有效優惠專案");
                 if (!promotions.isEmpty()) {
                     for (RoomPromotionPrice p : promotions) {
@@ -170,6 +184,7 @@ public class BookingController {
                 
                 RoomTypeWithPromotions rtp = new RoomTypeWithPromotions(roomType, promotions, hasAvailableRooms, firstPhotoId);
                 rtp.setPhotoIds(photoIds); // 設定所有圖片ID
+                rtp.setAvailableRooms(availableRooms);
                 roomTypesWithPromotions.add(rtp);
             }
             
@@ -204,6 +219,7 @@ public class BookingController {
         private boolean hasAvailableRooms;
         private Integer firstPhotoId;
         private List<Integer> photoIds;
+        private int availableRooms;
         
         public RoomTypeWithPromotions(RoomType roomType, List<RoomPromotionPrice> promotions, boolean hasAvailableRooms, Integer firstPhotoId) {
             this.roomType = roomType;
@@ -220,6 +236,8 @@ public class BookingController {
         public Integer getFirstPhotoId() { return firstPhotoId; }
         public List<Integer> getPhotoIds() { return photoIds; }
         public void setPhotoIds(List<Integer> photoIds) { this.photoIds = photoIds; }
+        public int getAvailableRooms() { return availableRooms; }
+        public void setAvailableRooms(int availableRooms) { this.availableRooms = availableRooms; }
         
         // 計算折扣後價格的輔助方法
         public int getDiscountedPrice(RoomPromotionPrice promotion) {
@@ -365,9 +383,13 @@ public class BookingController {
             HttpSession session,
             Model model) {
         try {
-            // 解析 bookingData
-            ObjectMapper mapper = new ObjectMapper();
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
             var bookingData = mapper.readValue(bookingDataJson, java.util.Map.class);
+            LocalDate checkin = LocalDate.parse((String)bookingData.get("checkin"));
+            if (!checkin.isAfter(LocalDate.now())) {
+                model.addAttribute("message", "入住日期必須是明天以後");
+                return "front-end/booking/booking-success";
+            }
             // 取得會員
             var member = session.getAttribute("member");
             if (member == null) {

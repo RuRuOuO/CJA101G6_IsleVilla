@@ -475,11 +475,13 @@ public class BookingService {
         booking.setRemark(specialRequests);
         // 訂房明細
         java.util.List<Booking.Detail> detailList = new java.util.ArrayList<>();
+        int nights = (int) java.time.temporal.ChronoUnit.DAYS.between(checkin, checkout);
         for (java.util.Map room : selectedRooms) {
             Booking.Detail d = new Booking.Detail();
             d.setRoomTypeName(room.get("name") != null ? room.get("name").toString() : "");
             d.setPromotionTitle(room.get("promotionTitle") != null ? room.get("promotionTitle").toString() : "");
-            d.setPrice(room.get("price") != null ? Integer.parseInt(room.get("price").toString()) : 0);
+            int unitPrice = room.get("price") != null ? Integer.parseInt(room.get("price").toString()) : 0;
+            d.setPrice(unitPrice * nights); // 直接存小計
             detailList.add(d);
         }
         booking.setDetails(detailList);
