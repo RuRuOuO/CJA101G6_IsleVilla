@@ -6,6 +6,21 @@
     <title>員工管理 | 微嶼 IsleVilla</title>
     <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+    <style>
+    /* ...原有樣式... */
+    #clearAllBtn {
+        height: 38px;
+        padding-top: 0.375rem;
+        padding-bottom: 0.375rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        white-space: nowrap;
+        box-sizing: border-box;
+        display: inline-block;
+    }
+    </style>
 </head>
 <body>
 <!-- ===== 載入sidebar ===== -->
@@ -34,13 +49,13 @@
         </div>
         <div class="card-body">
             <!-- 搜尋與篩選 -->
-            <div class="row mb-4">
+            <div class="row mb-4 align-items-center">
                 <div class="col-md-4">
                     <div class="input-group">
                         <span class="input-group-text">
                             <i class="bi bi-search"></i>
                         </span>
-                        <input type="text" class="form-control" id="searchInput" placeholder="搜尋員工姓名、編號" />
+                        <input type="text" class="form-control" id="searchInput" placeholder="搜尋員工姓名、編號" th:value="${search}" />
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -53,13 +68,14 @@
                         </option>
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <select class="form-select" id="statusFilter">
+                <div class="col-md-3 d-flex align-items-center">
+                    <select class="form-select me-2" id="statusFilter">
                         <option value="">全部狀態</option>
                         <option value="1" th:selected="${selectedStatus != null and selectedStatus == 1}">在職</option>
                         <option value="0" th:selected="${selectedStatus != null and selectedStatus == 0}">離職</option>
                         <option value="2" th:selected="${selectedStatus != null and selectedStatus == 2}">停職</option>
                     </select>
+                    <button type="button" class="btn btn-secondary" id="clearAllBtn">清空</button>
                 </div>
             </div>
 
@@ -125,7 +141,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    <i class="bi bi-person-plus me-2"></i>新增員工
+                    <i class="bi bi-plus-circle me-2"></i>新增員工
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -134,8 +150,9 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">員工姓名 <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="employeeName" required>
+                            <input type="text" class="form-control" name="employeeName" required maxlength="30">
                             <div class="invalid-feedback">請輸入員工姓名</div>
+                            <small class="text-muted">最多30個字元</small>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">員工信箱 <span class="text-danger">*</span></label>
@@ -148,11 +165,13 @@
                             <label class="form-label">密碼 <span class="text-danger">*</span></label>
                             <input type="password" class="form-control" name="employeePassword" required minlength="6">
                             <div class="invalid-feedback">密碼至少需要6個字元</div>
+                            <small class="text-muted">密碼至少需要6個字元</small>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">確認密碼 <span class="text-danger">*</span></label>
                             <input type="password" class="form-control" name="confirmPassword" required minlength="6">
                             <div class="invalid-feedback">請確認密碼</div>
+                            <small class="text-muted">請再次輸入相同的密碼</small>
                         </div>
                     </div>
                     <div class="row">
@@ -171,21 +190,27 @@
                             <label class="form-label">手機號碼 <span class="text-danger">*</span></label>
                             <input type="tel" class="form-control" name="employeeMobile" required pattern="^09\d{8}$">
                             <div class="invalid-feedback">請輸入正確的手機號碼格式（09開頭，共10位數字）</div>
+                            <small class="text-muted">請輸入10位數字，格式為09開頭（例如：0912345678）</small>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">性別 <span class="text-danger">*</span></label>
-                            <select class="form-select" name="employeeGender" required>
-                                <option value="">請選擇性別</option>
-                                <option value="0">女</option>
-                                <option value="1">男</option>
-                            </select>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="employeeGender" id="addEmployeeGenderFemale" value="0" required>
+                                    <label class="form-check-label" for="addEmployeeGenderFemale">女</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="employeeGender" id="addEmployeeGenderMale" value="1" required>
+                                    <label class="form-check-label" for="addEmployeeGenderMale">男</label>
+                                </div>
+                            </div>
                             <div class="invalid-feedback">請選擇性別</div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">生日 <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" name="employeeBirthdate" required>
+                            <input type="date" class="form-control" name="employeeBirthdate" required max="">
                             <div class="invalid-feedback">請選擇生日</div>
                         </div>
                     </div>
@@ -197,18 +222,26 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">員工狀態 <span class="text-danger">*</span></label>
-                            <select class="form-select" name="employeeStatus" required>
-                                <option value="">請選擇狀態</option>
-                                <option value="1">在職</option>
-                                <option value="0">離職</option>
-                                <option value="2">停職</option>
-                            </select>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="employeeStatus" id="addEmployeeStatusActive" value="1" required>
+                                    <label class="form-check-label" for="addEmployeeStatusActive">在職</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="employeeStatus" id="addEmployeeStatusResigned" value="0" required>
+                                    <label class="form-check-label" for="addEmployeeStatusResigned">離職</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="employeeStatus" id="addEmployeeStatusSuspended" value="2" required>
+                                    <label class="form-check-label" for="addEmployeeStatusSuspended">停職</label>
+                                </div>
+                            </div>
                             <div class="invalid-feedback">請選擇員工狀態</div>
                         </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">地址 <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="employeeAddress" required>
+                        <input type="text" class="form-control" name="employeeAddress" required maxlength="50">
                         <div class="invalid-feedback">請輸入地址</div>
                     </div>
                     <div class="mb-3">
@@ -268,8 +301,10 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">員工姓名 <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="editEmployeeName" name="employeeName" required>
+                            <input type="text" class="form-control" id="editEmployeeName" name="employeeName"  required maxlength="30" >
                             <div class="invalid-feedback">請輸入員工姓名</div>
+                            <small class="text-muted">最多30個字元</small>
+
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">員工信箱 <span class="text-danger">*</span></label>
@@ -291,12 +326,20 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">員工狀態 <span class="text-danger">*</span></label>
-                            <select class="form-select" id="editEmployeeStatus" name="employeeStatus" required>
-                                <option value="">請選擇狀態</option>
-                                <option value="1">在職</option>
-                                <option value="0">離職</option>
-                                <option value="2">停職</option>
-                            </select>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="employeeStatus" id="editEmployeeStatusActive" value="1" required>
+                                    <label class="form-check-label" for="editEmployeeStatusActive">在職</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="employeeStatus" id="editEmployeeStatusResigned" value="0" required>
+                                    <label class="form-check-label" for="editEmployeeStatusResigned">離職</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="employeeStatus" id="editEmployeeStatusSuspended" value="2" required>
+                                    <label class="form-check-label" for="editEmployeeStatusSuspended">停職</label>
+                                </div>
+                            </div>
                             <div class="invalid-feedback">請選擇員工狀態</div>
                         </div>
                     </div>
@@ -305,21 +348,29 @@
                             <label class="form-label">手機號碼 <span class="text-danger">*</span></label>
                             <input type="tel" class="form-control" id="editEmployeeMobile" name="employeeMobile" required pattern="^09\d{8}$">
                             <div class="invalid-feedback">請輸入正確的手機號碼格式（09開頭，共10位數字）</div>
+                            <small class="text-muted">請輸入10位數字，格式為09開頭（例如：0912345678）</small>
+
+
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">性別 <span class="text-danger">*</span></label>
-                            <select class="form-select" id="editEmployeeGender" name="employeeGender" required>
-                                <option value="">請選擇性別</option>
-                                <option value="0">女</option>
-                                <option value="1">男</option>
-                            </select>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="employeeGender" id="editEmployeeGenderFemale" value="0" required>
+                                    <label class="form-check-label" for="editEmployeeGenderFemale">女</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="employeeGender" id="editEmployeeGenderMale" value="1" required>
+                                    <label class="form-check-label" for="editEmployeeGenderMale">男</label>
+                                </div>
+                            </div>
                             <div class="invalid-feedback">請選擇性別</div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">生日 <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" id="editEmployeeBirthdate" name="employeeBirthdate" required>
+                            <input type="date" class="form-control" id="editEmployeeBirthdate" name="employeeBirthdate" required max="">
                             <div class="invalid-feedback">請選擇生日</div>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -333,10 +384,11 @@
                             <label class="form-label">離職日期</label>
                             <input type="date" class="form-control" id="editEmployeeLeavedate" name="employeeLeavedate" disabled>
                             <div class="invalid-feedback">請選擇離職日期</div>
+                            <small class="text-muted">當員工狀態為離職時才需填寫</small>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">地址 <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="editEmployeeAddress" name="employeeAddress" required>
+                            <input type="text" class="form-control" id="editEmployeeAddress" name="employeeAddress" required maxlength="50">
                             <div class="invalid-feedback">請輸入地址</div>
                         </div>
                     </div>
@@ -463,20 +515,23 @@ document.getElementById('searchInput').addEventListener('input', function() {
 document.getElementById('departmentFilter').addEventListener('change', function() {
     const departmentId = this.value;
     const statusFilter = document.getElementById('statusFilter').value;
+    const searchValue = document.getElementById('searchInput').value;
     const url = new URL(window.location);
-    
     if (departmentId) {
         url.searchParams.set('departmentId', departmentId);
     } else {
         url.searchParams.delete('departmentId');
     }
-    
     if (statusFilter) {
         url.searchParams.set('status', statusFilter);
     } else {
         url.searchParams.delete('status');
     }
-    
+    if (searchValue) {
+        url.searchParams.set('search', searchValue);
+    } else {
+        url.searchParams.delete('search');
+    }
     window.location.href = url.toString();
 });
 
@@ -484,20 +539,23 @@ document.getElementById('departmentFilter').addEventListener('change', function(
 document.getElementById('statusFilter').addEventListener('change', function() {
     const status = this.value;
     const departmentFilter = document.getElementById('departmentFilter').value;
+    const searchValue = document.getElementById('searchInput').value;
     const url = new URL(window.location);
-    
     if (status) {
         url.searchParams.set('status', status);
     } else {
         url.searchParams.delete('status');
     }
-    
     if (departmentFilter) {
         url.searchParams.set('departmentId', departmentFilter);
     } else {
         url.searchParams.delete('departmentId');
     }
-    
+    if (searchValue) {
+        url.searchParams.set('search', searchValue);
+    } else {
+        url.searchParams.delete('search');
+    }
     window.location.href = url.toString();
 });
 
@@ -514,6 +572,12 @@ function clearAddEmployeeForm() {
     const permissionCheckboxes = form.querySelectorAll('input[name="permissions"]');
     permissionCheckboxes.forEach(checkbox => {
         checkbox.checked = false;
+    });
+    
+    // 清除所有 radio button
+    const radioButtons = form.querySelectorAll('input[type="radio"]');
+    radioButtons.forEach(radio => {
+        radio.checked = false;
     });
 }
 
@@ -575,11 +639,20 @@ function editEmployee(employeeId) {
         document.getElementById('editEmployeeName').value = employee.employeeName;
         document.getElementById('editEmployeeEmail').value = employee.employeeEmail;
         document.getElementById('editDepartmentId').value = employee.department.departmentId;
-        document.getElementById('editEmployeeStatus').value = employee.employeeStatus;
+        // 設定員工狀態 radio button
+        document.querySelectorAll('#editEmployeeForm input[name="employeeStatus"]').forEach(radio => {
+            radio.checked = radio.value === String(employee.employeeStatus);
+        });
         
         // 自動填入欄位
         document.getElementById('editEmployeeMobile').value = employee.employeeMobile || '';
-        document.getElementById('editEmployeeGender').value = (employee.employeeGender !== null && employee.employeeGender !== undefined) ? String(employee.employeeGender) : '';
+        
+        // 設定性別 radio button
+        const genderValue = (employee.employeeGender !== null && employee.employeeGender !== undefined) ? String(employee.employeeGender) : '';
+        document.querySelectorAll('#editEmployeeForm input[name="employeeGender"]').forEach(radio => {
+            radio.checked = radio.value === genderValue;
+        });
+        
         document.getElementById('editEmployeeBirthdate').value = employee.employeeBirthdate || '';
         document.getElementById('editEmployeeHiredate').value = employee.employeeHiredate || '';
         document.getElementById('editEmployeeLeavedate').value = employee.employeeLeavedate || '';
@@ -626,6 +699,25 @@ function editEmployee(employeeId) {
         // 顯示 modal
         const modal = new bootstrap.Modal(document.getElementById('editEmployeeModal'));
         modal.show();
+        
+        // 觸發字元計數更新
+        setTimeout(() => {
+            const nameField = document.getElementById('editEmployeeName');
+            if (nameField) {
+                nameField.dispatchEvent(new Event('input'));
+                // 確保字數計算器顯示
+                const value = nameField.value.trim();
+                const maxLength = 30;
+                const currentLength = value.length;
+                let counter = nameField.parentNode.querySelector('.char-counter');
+                if (!counter) {
+                    counter = document.createElement('small');
+                    counter.className = 'char-counter text-muted';
+                    nameField.parentNode.appendChild(counter);
+                }
+                counter.textContent = `${currentLength}/${maxLength}`;
+            }
+        }, 100);
     })
     .catch(error => {
         console.error('Error:', error);
@@ -767,12 +859,24 @@ document.addEventListener('DOMContentLoaded', function() {
     // 地址驗證
     document.querySelectorAll('[name="employeeAddress"]').forEach(field => {
         field.addEventListener('input', function() {
-            if (this.value.trim().length > 0) {
-                this.classList.remove('is-invalid');
-                this.classList.add('is-valid');
-            } else {
+            const value = this.value.trim();
+            if (value.length === 0) {
                 this.classList.remove('is-valid');
                 this.classList.add('is-invalid');
+            } else if (value.length > 50) {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+                const feedback = this.parentNode.querySelector('.invalid-feedback');
+                if (feedback) {
+                    feedback.textContent = '地址不能超過50個字元';
+                }
+            } else {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+                const feedback = this.parentNode.querySelector('.invalid-feedback');
+                if (feedback) {
+                    feedback.textContent = '請輸入地址';
+                }
             }
         });
     });
@@ -793,12 +897,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // 性別驗證
     document.querySelectorAll('[name="employeeGender"]').forEach(field => {
         field.addEventListener('change', function() {
-            if (this.value !== '') {
-                this.classList.remove('is-invalid');
-                this.classList.add('is-valid');
+            const form = this.closest('form');
+            const checkedGender = form.querySelector('input[name="employeeGender"]:checked');
+            const genderContainer = form.querySelector('input[name="employeeGender"]').closest('.col-md-6');
+            
+            if (checkedGender) {
+                genderContainer.classList.remove('is-invalid');
+                genderContainer.classList.add('is-valid');
             } else {
-                this.classList.remove('is-valid');
-                this.classList.add('is-invalid');
+                genderContainer.classList.remove('is-valid');
+                genderContainer.classList.add('is-invalid');
             }
         });
     });
@@ -816,32 +924,145 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // 到職日驗證
-    document.querySelectorAll('[name="employeeHiredate"]').forEach(field => {
+    // 生日驗證 - 不能選擇未來日期
+    document.querySelectorAll('[name="employeeBirthdate"]').forEach(field => {
         field.addEventListener('change', function() {
-            if (this.value !== '') {
-                this.classList.remove('is-invalid');
-                this.classList.add('is-valid');
-            } else {
+            const selectedDate = new Date(this.value);
+            const today = new Date();
+            today.setHours(23, 59, 59, 999); // 設為今天的最後一刻
+            
+            if (this.value === '') {
                 this.classList.remove('is-valid');
                 this.classList.add('is-invalid');
+            } else if (selectedDate > today) {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+                const feedback = this.parentNode.querySelector('.invalid-feedback');
+                if (feedback) {
+                    feedback.textContent = '生日不能選擇未來日期';
+                }
+            } else {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+                const feedback = this.parentNode.querySelector('.invalid-feedback');
+                if (feedback) {
+                    feedback.textContent = '請選擇生日';
+                }
+            }
+        });
+    });
+
+
+
+    // 離職日驗證 - 必須在到職日之後
+    document.querySelectorAll('[name="employeeLeavedate"]').forEach(field => {
+        field.addEventListener('change', function() {
+            const form = this.closest('form');
+            const hiredateField = form.querySelector('[name="employeeHiredate"]');
+            
+            if (this.value === '') {
+                this.classList.remove('is-valid');
+                this.classList.remove('is-invalid');
+                return;
+            }
+            
+            if (hiredateField && hiredateField.value !== '') {
+                const hireDate = new Date(hiredateField.value);
+                const leaveDate = new Date(this.value);
+                
+                if (leaveDate <= hireDate) {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                    const feedback = this.parentNode.querySelector('.invalid-feedback');
+                    if (feedback) {
+                        feedback.textContent = '離職日必須在到職日之後';
+                    }
+                } else {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                    const feedback = this.parentNode.querySelector('.invalid-feedback');
+                    if (feedback) {
+                        feedback.textContent = '請選擇離職日期';
+                    }
+                }
+            } else {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
+    });
+
+    // 到職日驗證 - 必須在生日之後
+    document.querySelectorAll('[name="employeeHiredate"]').forEach(field => {
+        field.addEventListener('change', function() {
+            const form = this.closest('form');
+            const birthdateField = form.querySelector('[name="employeeBirthdate"]');
+            const leavedateField = form.querySelector('[name="employeeLeavedate"]');
+            
+            if (this.value === '') {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+                return;
+            }
+            
+            let isValid = true;
+            const hireDate = new Date(this.value);
+            
+            // 檢查是否在生日之後
+            if (birthdateField && birthdateField.value !== '') {
+                const birthDate = new Date(birthdateField.value);
+                if (hireDate <= birthDate) {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                    const feedback = this.parentNode.querySelector('.invalid-feedback');
+                    if (feedback) {
+                        feedback.textContent = '到職日必須在生日之後';
+                    }
+                    isValid = false;
+                }
+            }
+            
+            // 檢查離職日是否在到職日之後
+            if (leavedateField && leavedateField.value !== '') {
+                const leaveDate = new Date(leavedateField.value);
+                if (leaveDate <= hireDate) {
+                    leavedateField.classList.remove('is-valid');
+                    leavedateField.classList.add('is-invalid');
+                    const feedback = leavedateField.parentNode.querySelector('.invalid-feedback');
+                    if (feedback) {
+                        feedback.textContent = '離職日必須在到職日之後';
+                    }
+                }
+            }
+            
+            if (isValid) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+                const feedback = this.parentNode.querySelector('.invalid-feedback');
+                if (feedback) {
+                    feedback.textContent = '請選擇到職日';
+                }
             }
         });
     });
 
     // 員工狀態驗證
-    document.querySelectorAll('[name="employeeStatus"], #editEmployeeStatus').forEach(field => {
+    document.querySelectorAll('[name="employeeStatus"]').forEach(field => {
         field.addEventListener('change', function() {
-            if (this.value !== '') {
-                this.classList.remove('is-invalid');
-                this.classList.add('is-valid');
+            const form = this.closest('form');
+            const checkedStatus = form.querySelector('input[name="employeeStatus"]:checked');
+            const statusContainer = form.querySelector('input[name="employeeStatus"]').closest('.col-md-6');
+            
+            if (checkedStatus) {
+                statusContainer.classList.remove('is-invalid');
+                statusContainer.classList.add('is-valid');
             } else {
-                this.classList.remove('is-valid');
-                this.classList.add('is-invalid');
+                statusContainer.classList.remove('is-valid');
+                statusContainer.classList.add('is-invalid');
             }
             
             // 控制離職日期欄位（僅在編輯表單中）
-            if (this.id === 'editEmployeeStatus') {
+            if (form.id === 'editEmployeeForm') {
                 const leavedateField = document.getElementById('editEmployeeLeavedate');
                 if (this.value === '0') { // 離職狀態
                     leavedateField.disabled = false;
@@ -868,6 +1089,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 permissionContainer.classList.add('is-invalid');
             }
         });
+    });
+
+    // 設定生日欄位的最大日期為今天
+    const today = new Date().toISOString().split('T')[0];
+    document.querySelectorAll('[name="employeeBirthdate"]').forEach(field => {
+        field.max = today;
     });
 
     // 新增員工 Modal 打開時清空表單
@@ -1045,12 +1272,24 @@ addTouchedValidation('[name="employeeMobile"]', function(field, touched) {
 // 地址
 addTouchedValidation('[name="employeeAddress"]', function(field, touched) {
     if (!touched) return;
-    if (field.value.trim().length > 0) {
-        field.classList.remove('is-invalid');
-        field.classList.add('is-valid');
-    } else {
+    const value = field.value.trim();
+    if (value.length === 0) {
         field.classList.remove('is-valid');
         field.classList.add('is-invalid');
+    } else if (value.length > 50) {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+        const feedback = field.parentNode.querySelector('.invalid-feedback');
+        if (feedback) {
+            feedback.textContent = '地址不能超過50個字元';
+        }
+    } else {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+        const feedback = field.parentNode.querySelector('.invalid-feedback');
+        if (feedback) {
+            feedback.textContent = '請輸入地址';
+        }
     }
 });
 
@@ -1069,48 +1308,149 @@ addTouchedValidation('[name="departmentId"], #editDepartmentId', function(field,
 // 性別
 addTouchedValidation('[name="employeeGender"]', function(field, touched) {
     if (!touched) return;
-    if (field.value !== '') {
-        field.classList.remove('is-invalid');
-        field.classList.add('is-valid');
+    const form = field.closest('form');
+    const checkedGender = form.querySelector('input[name="employeeGender"]:checked');
+    const genderContainer = field.closest('.col-md-6');
+    
+    if (checkedGender) {
+        genderContainer.classList.remove('is-invalid');
+        genderContainer.classList.add('is-valid');
     } else {
-        field.classList.remove('is-valid');
-        field.classList.add('is-invalid');
+        genderContainer.classList.remove('is-valid');
+        genderContainer.classList.add('is-invalid');
     }
 });
 
 // 生日
 addTouchedValidation('[name="employeeBirthdate"]', function(field, touched) {
     if (!touched) return;
-    if (field.value !== '') {
-        field.classList.remove('is-invalid');
-        field.classList.add('is-valid');
-    } else {
+    const selectedDate = new Date(field.value);
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    
+    if (field.value === '') {
         field.classList.remove('is-valid');
         field.classList.add('is-invalid');
+    } else if (selectedDate > today) {
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+        const feedback = field.parentNode.querySelector('.invalid-feedback');
+        if (feedback) {
+            feedback.textContent = '生日不能選擇未來日期';
+        }
+    } else {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+        const feedback = field.parentNode.querySelector('.invalid-feedback');
+        if (feedback) {
+            feedback.textContent = '請選擇生日';
+        }
     }
 });
 
 // 到職日
 addTouchedValidation('[name="employeeHiredate"]', function(field, touched) {
     if (!touched) return;
-    if (field.value !== '') {
-        field.classList.remove('is-invalid');
-        field.classList.add('is-valid');
-    } else {
+    const form = field.closest('form');
+    const birthdateField = form.querySelector('[name="employeeBirthdate"]');
+    const leavedateField = form.querySelector('[name="employeeLeavedate"]');
+    
+    if (field.value === '') {
         field.classList.remove('is-valid');
         field.classList.add('is-invalid');
+        return;
+    }
+    
+    let isValid = true;
+    const hireDate = new Date(field.value);
+    
+    // 檢查是否在生日之後
+    if (birthdateField && birthdateField.value !== '') {
+        const birthDate = new Date(birthdateField.value);
+        if (hireDate <= birthDate) {
+            field.classList.remove('is-valid');
+            field.classList.add('is-invalid');
+            const feedback = field.parentNode.querySelector('.invalid-feedback');
+            if (feedback) {
+                feedback.textContent = '到職日必須在生日之後';
+            }
+            isValid = false;
+        }
+    }
+    
+    // 檢查離職日是否在到職日之後
+    if (leavedateField && leavedateField.value !== '') {
+        const leaveDate = new Date(leavedateField.value);
+        if (leaveDate <= hireDate) {
+            leavedateField.classList.remove('is-valid');
+            leavedateField.classList.add('is-invalid');
+            const feedback = leavedateField.parentNode.querySelector('.invalid-feedback');
+            if (feedback) {
+                feedback.textContent = '離職日必須在到職日之後';
+            }
+        }
+    }
+    
+    if (isValid) {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+        const feedback = field.parentNode.querySelector('.invalid-feedback');
+        if (feedback) {
+            feedback.textContent = '請選擇到職日';
+        }
+    }
+});
+
+// 離職日
+addTouchedValidation('[name="employeeLeavedate"]', function(field, touched) {
+    if (!touched) return;
+    const form = field.closest('form');
+    const hiredateField = form.querySelector('[name="employeeHiredate"]');
+    
+    if (field.value === '') {
+        field.classList.remove('is-valid');
+        field.classList.remove('is-invalid');
+        return;
+    }
+    
+    if (hiredateField && hiredateField.value !== '') {
+        const hireDate = new Date(hiredateField.value);
+        const leaveDate = new Date(field.value);
+        
+        if (leaveDate <= hireDate) {
+            field.classList.remove('is-valid');
+            field.classList.add('is-invalid');
+            const feedback = field.parentNode.querySelector('.invalid-feedback');
+            if (feedback) {
+                feedback.textContent = '離職日必須在到職日之後';
+            }
+        } else {
+            field.classList.remove('is-invalid');
+            field.classList.add('is-valid');
+            const feedback = field.parentNode.querySelector('.invalid-feedback');
+            if (feedback) {
+                feedback.textContent = '請選擇離職日期';
+            }
+        }
+    } else {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
     }
 });
 
 // 員工狀態
-addTouchedValidation('[name="employeeStatus"], #editEmployeeStatus', function(field, touched) {
+addTouchedValidation('[name="employeeStatus"]', function(field, touched) {
     if (!touched) return;
-    if (field.value !== '') {
-        field.classList.remove('is-invalid');
-        field.classList.add('is-valid');
+    const form = field.closest('form');
+    const checkedStatus = form.querySelector('input[name="employeeStatus"]:checked');
+    const statusContainer = field.closest('.col-md-6');
+    
+    if (checkedStatus) {
+        statusContainer.classList.remove('is-invalid');
+        statusContainer.classList.add('is-valid');
     } else {
-        field.classList.remove('is-valid');
-        field.classList.add('is-invalid');
+        statusContainer.classList.remove('is-valid');
+        statusContainer.classList.add('is-invalid');
     }
 });
 
@@ -1128,6 +1468,46 @@ addTouchedValidation('input[name="permissions"]', function(field, touched) {
         permissionContainer.classList.remove('is-valid');
         permissionContainer.classList.add('is-invalid');
     }
+});
+
+// 清空所有篩選與搜尋
+document.getElementById('clearAllBtn').addEventListener('click', function() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('departmentFilter').selectedIndex = 0;
+    document.getElementById('statusFilter').selectedIndex = 0;
+    // 重新導向到不帶參數的列表頁
+    window.location.href = window.location.pathname;
+});
+
+// JS 員工姓名即時字數計算
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('input[name="employeeName"]').forEach(field => {
+        field.addEventListener('input', function() {
+            const value = this.value.trim();
+            const maxLength = 30;
+            const currentLength = value.length;
+            let counter = this.parentNode.querySelector('.char-counter');
+            if (!counter) {
+                counter = document.createElement('small');
+                counter.className = 'char-counter text-muted';
+                this.parentNode.appendChild(counter);
+            }
+            counter.textContent = `${currentLength}/${maxLength}`;
+            if (value.length === 0) {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+                counter.className = 'char-counter text-muted';
+            } else if (value.length > maxLength) {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+                counter.className = 'char-counter text-danger';
+            } else {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+                counter.className = 'char-counter text-muted';
+            }
+        });
+    });
 });
 </script>
 </body>

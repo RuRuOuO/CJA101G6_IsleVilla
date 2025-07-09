@@ -41,7 +41,7 @@ public class ProductController {
             if (product.getProductQuantity() == null || product.getProductQuantity() <= 0) continue;
             // 根據 productId 查詢該產品的第一張圖片
             ProductPhoto mainProductPhoto = productPhotoService.getMainProductPhotoByProductId(product.getProductId());
-            String productImageUrl = "https://dummyimage.com/300x200/";  // 預設圖片 URL
+            String productImageUrl = "https://dummyimage.com/300x200/808080&text=No+Image";  // 預設圖片 URL
             if (mainProductPhoto != null) {
                 // 將圖片轉換為 Base64 或圖片 URL
                 productImageUrl = convertImageToBase64(mainProductPhoto.getProductImage());
@@ -66,7 +66,7 @@ public class ProductController {
     private String convertImageToBase64(byte[] imageBytes) {
         if (imageBytes == null) {
             // 如果圖片是 null，返回預設圖片的 URL
-            return "https://dummyimage.com/300x200/";
+            return "https://dummyimage.com/300x200/808080&text=No+Image";
         }
         // 如果圖片不為 null，將圖片轉換為 Base64 字串
         return "data:image/png;base64," + Base64.getEncoder().encodeToString(imageBytes);
@@ -76,22 +76,55 @@ public class ProductController {
     @GetMapping("/product/list")
     public String homeProduct(
             @RequestParam(value = "productCategoryId", required = false) Integer productCategoryId,
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "minPrice", required = false) Integer minPrice,
+            @RequestParam(value = "maxPrice", required = false) Integer maxPrice,
+            @RequestParam(value = "sort", required = false) String sort,
             @RequestParam(value = "page", defaultValue = "0") int page,
             Model model) {
         int pageSize = 12;
         Pageable pageable = PageRequest.of(page, pageSize);
         Page<Product> productPage;
-        if (productCategoryId != null) {
-            productPage = productService.getProductByCategoryIdAndStatus(productCategoryId, (byte)1, pageable);
+        
+        // 根據搜尋條件查詢商品
+        if (productCategoryId != null && keyword != null && !keyword.isEmpty() && minPrice != null && maxPrice != null) {
+            productPage = productService.findByCategoryAndStatusAndNameContainingAndPriceBetween(productCategoryId, (byte)1, keyword, minPrice, maxPrice, pageable);
+        } else if (productCategoryId != null && keyword != null && !keyword.isEmpty() && minPrice != null) {
+            productPage = productService.findByCategoryAndStatusAndNameContainingAndPriceGreaterThanEqual(productCategoryId, (byte)1, keyword, minPrice, pageable);
+        } else if (productCategoryId != null && keyword != null && !keyword.isEmpty() && maxPrice != null) {
+            productPage = productService.findByCategoryAndStatusAndNameContainingAndPriceLessThanEqual(productCategoryId, (byte)1, keyword, maxPrice, pageable);
+        } else if (productCategoryId != null && keyword != null && !keyword.isEmpty()) {
+            productPage = productService.findByCategoryAndStatusAndNameContaining(productCategoryId, (byte)1, keyword, pageable);
+        } else if (productCategoryId != null && minPrice != null && maxPrice != null) {
+            productPage = productService.findByCategoryAndStatusAndPriceBetween(productCategoryId, (byte)1, minPrice, maxPrice, pageable);
+        } else if (productCategoryId != null && minPrice != null) {
+            productPage = productService.findByCategoryAndStatusAndPriceGreaterThanEqual(productCategoryId, (byte)1, minPrice, pageable);
+        } else if (productCategoryId != null && maxPrice != null) {
+            productPage = productService.findByCategoryAndStatusAndPriceLessThanEqual(productCategoryId, (byte)1, maxPrice, pageable);
+        } else if (keyword != null && !keyword.isEmpty() && minPrice != null && maxPrice != null) {
+            productPage = productService.findByStatusAndNameContainingAndPriceBetween((byte)1, keyword, minPrice, maxPrice, pageable);
+        } else if (keyword != null && !keyword.isEmpty() && minPrice != null) {
+            productPage = productService.findByStatusAndNameContainingAndPriceGreaterThanEqual((byte)1, keyword, minPrice, pageable);
+        } else if (keyword != null && !keyword.isEmpty() && maxPrice != null) {
+            productPage = productService.findByStatusAndNameContainingAndPriceLessThanEqual((byte)1, keyword, maxPrice, pageable);
+        } else if (productCategoryId != null) {
+            productPage = productService.getProductByCategoryIdAndStatusAndStock(productCategoryId, (byte)1, pageable);
+        } else if (keyword != null && !keyword.isEmpty()) {
+            productPage = productService.findByStatusAndNameContaining((byte)1, keyword, pageable);
+        } else if (minPrice != null && maxPrice != null) {
+            productPage = productService.findByStatusAndPriceBetween((byte)1, minPrice, maxPrice, pageable);
+        } else if (minPrice != null) {
+            productPage = productService.findByStatusAndPriceGreaterThanEqual((byte)1, minPrice, pageable);
+        } else if (maxPrice != null) {
+            productPage = productService.findByStatusAndPriceLessThanEqual((byte)1, maxPrice, pageable);
         } else {
-            productPage = productService.getProductByStatus((byte)1, pageable);
+            productPage = productService.getProductByStatusAndStock((byte)1, pageable);
         }
-        // 僅顯示庫存大於0的商品
+        
         List<ProductWithImageDTO> productWithImageDTOs = new ArrayList<>();
         for (Product product : productPage.getContent()) {
-            if (product.getProductQuantity() == null || product.getProductQuantity() <= 0) continue;
             ProductPhoto mainProductPhoto = productPhotoService.getMainProductPhotoByProductId(product.getProductId());
-            String productImageUrl = "https://dummyimage.com/300x200/";
+            String productImageUrl = "https://dummyimage.com/300x200/808080&text=No+Image";
             if (mainProductPhoto != null) {
                 productImageUrl = convertImageToBase64(mainProductPhoto.getProductImage());
             }
@@ -105,14 +138,60 @@ public class ProductController {
             );
             productWithImageDTOs.add(productWithImageDTO);
         }
+        
+        // 根據排序條件排序結果
+        if (sort != null && !sort.isEmpty()) {
+            switch (sort) {
+                case "price_asc":
+                    productWithImageDTOs.sort((a, b) -> a.getProductPrice().compareTo(b.getProductPrice()));
+                    break;
+                case "price_desc":
+                    productWithImageDTOs.sort((a, b) -> b.getProductPrice().compareTo(a.getProductPrice()));
+                    break;
+                case "name_asc":
+                    productWithImageDTOs.sort((a, b) -> a.getProductName().compareTo(b.getProductName()));
+                    break;
+                case "name_desc":
+                    productWithImageDTOs.sort((a, b) -> b.getProductName().compareTo(a.getProductName()));
+                    break;
+            }
+        }
+        
         model.addAttribute("product", productWithImageDTOs);
         model.addAttribute("category", productCategoryService.getAllProductCategory());
         model.addAttribute("selectedCategoryId", productCategoryId);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", productPage.getTotalPages());
         model.addAttribute("totalElements", productPage.getTotalElements());
-        String pageURL = "/product/list" + (productCategoryId != null ? "?productCategoryId=" + productCategoryId : "");
-        model.addAttribute("pageURL", pageURL);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("minPrice", minPrice);
+        model.addAttribute("maxPrice", maxPrice);
+        model.addAttribute("sort", sort);
+        
+        // 建立分頁 URL
+        StringBuilder pageURL = new StringBuilder("/product/list");
+        boolean hasParam = false;
+        if (productCategoryId != null) {
+            pageURL.append("?productCategoryId=").append(productCategoryId);
+            hasParam = true;
+        }
+        if (keyword != null && !keyword.isEmpty()) {
+            pageURL.append(hasParam ? "&" : "?").append("keyword=").append(keyword);
+            hasParam = true;
+        }
+        if (minPrice != null) {
+            pageURL.append(hasParam ? "&" : "?").append("minPrice=").append(minPrice);
+            hasParam = true;
+        }
+        if (maxPrice != null) {
+            pageURL.append(hasParam ? "&" : "?").append("maxPrice=").append(maxPrice);
+            hasParam = true;
+        }
+        if (sort != null && !sort.isEmpty()) {
+            pageURL.append(hasParam ? "&" : "?").append("sort=").append(sort);
+        }
+        model.addAttribute("pageURL", pageURL.toString());
+        
         return "front-end/product/listProduct";
     }
 
@@ -151,7 +230,7 @@ public class ProductController {
 
             if (productPhotos == null || productPhotos.isEmpty()) {
                 // 如果沒有圖片，使用預設圖片
-                productImageUrls.add("https://dummyimage.com/400x300/");
+                productImageUrls.add("https://dummyimage.com/400x300/808080&text=No+Image");
             } else {
                 // 將所有圖片轉換為 Base64
                 for (ProductPhoto photo : productPhotos) {
@@ -164,7 +243,7 @@ public class ProductController {
 
             // 如果沒有成功轉換的圖片，使用預設圖片
             if (productImageUrls.isEmpty()) {
-                productImageUrls.add("https://dummyimage.com/400x300/");
+                productImageUrls.add("https://dummyimage.com/400x300/808080&text=No+Image");
             }
 
             // 獲取商品分類資訊
@@ -198,30 +277,29 @@ public class ProductController {
     //後台-商品列表
     @GetMapping("/backend/product/list")
     @PreAuthorize("hasAuthority('product')")
-    public String listProduct(@RequestParam(value = "categoryId", required = false) Integer categoryId,
-                             @RequestParam(value = "status", required = false) Byte status, 
-                             Model model) {
+    public String listProduct(
+        @RequestParam(value = "categoryId", required = false) Integer categoryId,
+        @RequestParam(value = "status", required = false) Byte status,
+        @RequestParam(value = "search", required = false) String search,
+        Model model) {
         List<Product> productList;
-        
-        if (categoryId != null && status != null) {
-            // 根據類別和狀態過濾商品
+        if (search != null && !search.trim().isEmpty()) {
+            productList = productService.searchProducts(categoryId, status, search.trim());
+        } else if (categoryId != null && status != null) {
             productList = productService.getProductByCategoryIdAndStatus(categoryId, status);
         } else if (categoryId != null) {
-            // 根據類別過濾商品
             productList = productService.getProductByProductCategoryId(categoryId);
         } else if (status != null) {
-            // 根據狀態過濾商品
             productList = productService.getProductByStatus(status);
         } else {
-            // 沒有選擇篩選條件時顯示所有商品
             productList = productService.getAllProducts();
         }
-        
-        model.addAttribute("productList", productList); // 商品列表
-        model.addAttribute("product", new Product());   // 空的 Product 給 modal 表單用
+        model.addAttribute("productList", productList);
+        model.addAttribute("product", new Product());
         model.addAttribute("category", productCategoryService.getAllProductCategory());
         model.addAttribute("selectedCategoryId", categoryId);
         model.addAttribute("selectedStatus", status);
+        model.addAttribute("search", search);
         model.addAttribute("sidebarActive", "product-list");
         return "back-end/product/listProduct";
     }

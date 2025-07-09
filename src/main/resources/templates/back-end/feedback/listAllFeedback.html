@@ -66,6 +66,7 @@
                     <tr>
                         <th>編號</th>
                         <th>訂單編號</th>
+                        <th>會員名稱</th>
                         <th>整體評價</th>
                         <th>推薦</th>
                         <th>再訪</th>
@@ -92,6 +93,7 @@
                         <div class="modal-body">
                             <div class="row">
                                 <div class="col-md-6">
+                                    <p><strong>會員名稱：</strong><span id="fbCustomerName" class="text-muted">無</span></p>
                                     <p><strong>好評：</strong><span id="fbCompliment" class="text-muted">無</span></p>
                                     <p><strong>建議：</strong><span id="fbSuggestion" class="text-muted">無</span></p>
                                     <p><strong>填寫時間：</strong><span id="fbCreatedAt"></span></p>
@@ -164,6 +166,7 @@
             tr.innerHTML = `
                 <td>${fb.fbId}</td>
                 <td>${fb.roomReservationId}</td>
+                <td>${fb.customerName || ''}</td>
                 <td><span class="badge bg-warning">${fb.fbOverallRating} ★</span></td>
                 <td>
                     <span class="badge ${fb.fbRecommend === 1 ? 'bg-info' : 'bg-secondary'}">${fb.fbRecommend === 1 ? '推薦' : '不推薦'}</span>
@@ -195,6 +198,7 @@
 
             // 查看詳情按鈕事件
             tr.querySelector('.viewDetailBtn').addEventListener('click', () => {
+                document.getElementById('fbCustomerName').textContent = fb.customerName || '無';
                 document.getElementById('fbCompliment').textContent = fb.fbCompliment || '無';
                 document.getElementById('fbSuggestion').textContent = fb.fbSuggestion || '無';
                 document.getElementById('fbCreatedAt').textContent = new Date(fb.fbCreatedAt).toLocaleString();

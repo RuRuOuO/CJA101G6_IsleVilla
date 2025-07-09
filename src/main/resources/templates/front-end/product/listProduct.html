@@ -58,18 +58,26 @@
             border-color: #86b7fe;
         }
 
-
+        /* 讓搜尋按鈕右側有圓角，與 input-group 一致 */
+        .search-card .input-group .btn-outline-secondary {
+            border-top-right-radius: 0.375rem;
+            border-bottom-right-radius: 0.375rem;
+        }
+        .search-card .input-group .form-control {
+            border-top-left-radius: 0.375rem;
+            border-bottom-left-radius: 0.375rem;
+        }
 
         /* 搜尋結果動畫 */
         .product-item {
             transition: all 0.3s ease;
         }
-        
+
         .product-item.hidden {
             opacity: 0;
             transform: scale(0.8);
         }
-        
+
         /* 無結果訊息樣式 */
         #noResultsMessage {
             min-height: 300px;
@@ -78,53 +86,53 @@
             justify-content: center;
             align-items: center;
         }
-        
+
         #noResultsMessage .bi-search {
             opacity: 0.5;
         }
-        
+
         /* 響應式搜尋區域 */
         @media (max-width: 768px) {
             .search-card .card-body {
                 padding: 1rem;
             }
-            
+
             .search-card .col-md-4 {
                 margin-top: 1rem;
                 text-align: center;
             }
         }
-        
+
         /* 按鈕寬度一致性 */
         .product-card .card-footer .d-flex {
             width: 100%;
         }
-        
+
         .product-card .card-footer .btn,
         .product-card .card-footer form {
             flex: 1 1 0 !important;
             min-width: 0 !important;
             max-width: none !important;
         }
-        
+
         .product-card .card-footer .btn {
             white-space: nowrap;
         }
-        
+
         .product-card .card-footer form .btn {
             width: 100% !important;
         }
         .btn-secondary{
             border: 1px solid white;
         }
-        
+
         /* 價錢樣式 */
         .product-card .card-body {
             display: flex;
             flex-direction: column;
             height: 100%;
         }
-        
+
         .product-card .card-title {
             font-size: 1.1rem;
             margin-bottom: 0.5rem;
@@ -132,7 +140,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        
+
         .product-card .card-text {
             font-size: 0.95rem;
             margin-bottom: 0.5rem;
@@ -143,7 +151,7 @@
             text-overflow: ellipsis;
             flex-grow: 1;
         }
-        
+
         .product-card .price {
             font-weight: bold;
             color: #bfa100;
@@ -183,26 +191,65 @@
             <div class="col ps-0 pe-0 d-flex flex-column">
                 <div class="container mt-4 flex-grow-1">
                     <!-- 搜尋區域 -->
-                    <div class="row mb-4">
+                    <form method="get" th:action="@{/product/list}" class="row mb-4">
+                        <input type="hidden" name="productCategoryId" th:value="${selectedCategoryId}">
                         <div class="col-12">
                             <div class="card search-card">
                                 <div class="card-body">
-                                    <div class="input-group">
-                                        <span class="input-group-text">
-                                            <i class="bi bi-search"></i>
-                                        </span>
-                                        <input type="text" id="productSearchInput" class="form-control" 
-                                               placeholder="搜尋商品名稱"
-                                               aria-label="搜尋商品">
-                                        <button type="button" id="clearSearchBtn" class="btn btn-outline-secondary">
-                                            <i class="bi bi-x-circle me-1"></i>清除搜尋
-                                        </button>
+                                    <div class="row g-3">
+                                        <!-- 商品名稱搜尋 -->
+                                        <div class="col-md-4">
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="bi bi-search"></i>
+                                                </span>
+                                                <input type="text" id="productSearchInput" name="keyword" class="form-control"
+                                                       placeholder="搜尋商品名稱"
+                                                       th:value="${keyword}">
+                                            </div>
+                                        </div>
+                                        <!-- 金額範圍搜尋 -->
+                                        <div class="col-md-2">
+                                            <div class="input-group">
+                                                <span class="input-group-text">NT$</span>
+                                                <input type="number" name="minPrice" class="form-control" placeholder="最低金額"
+                                                       th:value="${minPrice}" min="0">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="input-group">
+                                                <span class="input-group-text">NT$</span>
+                                                <input type="number" name="maxPrice" class="form-control" placeholder="最高金額"
+                                                       th:value="${maxPrice}" min="0">
+                                            </div>
+                                        </div>
+                                        <!-- 排序方式 -->
+                                        <div class="col-md-2">
+                                            <select name="sort" class="form-select">
+                                                <option value="">預設排序</option>
+                                                <option value="price_asc" th:selected="${sort == 'price_asc'}">價格由低到高</option>
+                                                <option value="price_desc" th:selected="${sort == 'price_desc'}">價格由高到低</option>
+                                                <option value="name_asc" th:selected="${sort == 'name_asc'}">名稱 A-Z</option>
+                                                <option value="name_desc" th:selected="${sort == 'name_desc'}">名稱 Z-A</option>
+                                            </select>
+                                        </div>
+                                        <!-- 搜尋和清空按鈕 -->
+                                        <div class="col-md-2">
+                                            <div class="d-flex gap-2">
+                                                <button type="submit" class="btn btn-outline-secondary flex-fill">
+                                                    <i class="bi bi-search me-1"></i>搜尋
+                                                </button>
+                                                <button type="button" class="btn btn-outline-secondary" onclick="clearSearch()">
+                                                    <i class="bi bi-x-lg"></i>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    
+                    </form>
+
                     <!-- 搜尋結果統計 -->
                     <div class="row mb-3">
                         <div class="col-12">
@@ -211,7 +258,7 @@
                             </small>
                         </div>
                     </div>
-                    
+
                     <!-- 商品卡片區域 -->
                     <div class="row row-cols-1 row-cols-md-3 g-4" id="productContainer">
                         <div class="col product-item" th:each="prod : ${product}">
@@ -226,7 +273,8 @@
                                         <a th:href="@{/product/detail/{productId}(productId=${prod.productId})}"
                                            class="btn btn-secondary btn-sm text-center"
                                            style="flex: 1 1 0; min-width: 0; white-space: nowrap;">查看詳情</a>
-                                        <form id="addToCartForm" th:action="@{/addToCart}" method="post" class="add-to-cart-form" style="display: none;">
+                                        <!-- 修正：每個商品的 form 都有唯一 id -->
+                                        <form th:id="'addToCartForm-' + ${prod.productId}" th:action="@{/addToCart}" method="post" class="add-to-cart-form" style="display: none;">
                                             <input type="hidden" name="productId" th:value="${prod.productId}" />
                                             <input type="hidden" name="quantity" value="1" />
                                             <input type="hidden" name="stock" th:value="${prod.productQuantity}" />
@@ -234,18 +282,18 @@
                                         <button type="submit"
                                                 class="btn btn-primary btn-sm text-center w-100"
                                                 style="white-space: nowrap;"
-                                                form="addToCartForm">加入購物車</button>
+                                                th:form="'addToCartForm-' + ${prod.productId}">加入購物車</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- 分頁區域 -->
                     <div class="d-flex justify-content-center">
                         <th:block th:replace="~{fragments/fragments :: paginationFragment(currentPage=${currentPage}, totalPages=${totalPages}, pageURL=${pageURL})}"/>
                     </div>
-                    
+
                     <!-- 無搜尋結果提示 -->
                     <div id="noResultsMessage" class="text-center py-5" style="display: none;">
                         <i class="bi bi-search display-1 text-muted"></i>
@@ -268,84 +316,6 @@
 <!-- 搜尋功能 JavaScript -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('productSearchInput');
-    const clearSearchBtn = document.getElementById('clearSearchBtn');
-    const productContainer = document.getElementById('productContainer');
-    const productItems = document.querySelectorAll('.product-item');
-    const searchResultCount = document.getElementById('searchResultCount');
-    const noResultsMessage = document.getElementById('noResultsMessage');
-    
-    // 搜尋功能
-    function performSearch() {
-        const searchTerm = searchInput.value.toLowerCase().trim();
-        let visibleCount = 0;
-        
-        productItems.forEach(item => {
-            const productName = item.querySelector('.product-name').textContent.toLowerCase();
-
-            // 檢查商品名稱或描述是否包含搜尋關鍵字
-            const isMatch = productName.includes(searchTerm);
-            
-            if (isMatch) {
-                item.style.display = 'block';
-                visibleCount++;
-            } else {
-                item.style.display = 'none';
-            }
-        });
-        
-        // 更新搜尋結果統計
-        searchResultCount.textContent = visibleCount;
-        
-        // 顯示/隱藏無結果訊息
-        if (visibleCount === 0 && searchTerm !== '') {
-            noResultsMessage.style.display = 'block';
-            productContainer.style.display = 'none';
-        } else {
-            noResultsMessage.style.display = 'none';
-            productContainer.style.display = 'flex';
-        }
-        
-        // 更新清除搜尋按鈕狀態
-        clearSearchBtn.style.display = searchTerm !== '' ? 'inline-block' : 'none';
-    }
-    
-    // 清除搜尋
-    function clearSearch() {
-        searchInput.value = '';
-        productItems.forEach(item => {
-            item.style.display = 'block';
-        });
-        searchResultCount.textContent = productItems.length;
-        noResultsMessage.style.display = 'none';
-        productContainer.style.display = 'flex';
-        clearSearchBtn.style.display = 'none';
-    }
-    
-    // 事件監聽器
-    searchInput.addEventListener('input', performSearch);
-    clearSearchBtn.addEventListener('click', clearSearch);
-    
-    // 初始化清除搜尋按鈕狀態
-    clearSearchBtn.style.display = 'none';
-    
-    // 搜尋框焦點效果
-    searchInput.addEventListener('focus', function() {
-        this.parentElement.classList.add('border-primary');
-    });
-    
-    searchInput.addEventListener('blur', function() {
-        this.parentElement.classList.remove('border-primary');
-    });
-    
-    // 鍵盤快捷鍵
-    searchInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            clearSearch();
-            this.blur();
-        }
-    });
-
     // 加入購物車AJAX
     document.querySelectorAll('.add-to-cart-form').forEach(function(form) {
         form.addEventListener('submit', function(e) {
@@ -388,6 +358,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+function clearSearch() {
+    // 清空所有搜尋欄位
+    document.getElementById('productSearchInput').value = '';
+    document.querySelector('input[name="minPrice"]').value = '';
+    document.querySelector('input[name="maxPrice"]').value = '';
+    document.querySelector('select[name="sort"]').value = '';
+    
+    // 重新導向到基本商品列表頁面（保持當前分類）
+    const currentCategoryId = document.querySelector('input[name="productCategoryId"]').value;
+    let redirectUrl = '/product/list';
+    if (currentCategoryId) {
+        redirectUrl += '?productCategoryId=' + currentCategoryId;
+    }
+    window.location.href = redirectUrl;
+}
 </script>
 </body>
 </html>

@@ -250,7 +250,7 @@ ${generateStars(review.fbOverallRating)}
                 loading.classList.add("d-none");
 
                 if (data && data.length > 0) {
-                    allReviews = data.sort((a, b) => new Date(b.fbCreatedAt) - new Date(a.fbCreatedAt));
+                    allReviews = data;
                     renderPage(currentPage);
                 } else {
                     noReviews.classList.remove("d-none");

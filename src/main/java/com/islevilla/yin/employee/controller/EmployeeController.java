@@ -52,30 +52,29 @@ public class EmployeeController {
 //    }
     //渲染員工列表
     @GetMapping("/list")
-    public String listEmployee(@RequestParam(value = "departmentId", required = false) Integer departmentId,
-                              @RequestParam(value = "status", required = false) Byte status, 
-                              Model model) {
+    public String listEmployee(
+        @RequestParam(value = "departmentId", required = false) Integer departmentId,
+        @RequestParam(value = "status", required = false) Byte status,
+        @RequestParam(value = "search", required = false) String search,
+        Model model) {
         List<Employee> employees;
-        
-        if (departmentId != null && status != null) {
-            // 根據部門和狀態過濾員工
+        if (search != null && !search.trim().isEmpty()) {
+            employees = employeeService.searchEmployees(departmentId, status, search.trim());
+        } else if (departmentId != null && status != null) {
             employees = employeeService.getEmployeeByDepartmentIdAndStatus(departmentId, status);
         } else if (departmentId != null) {
-            // 根據部門過濾員工
             employees = employeeService.getEmployeeByDepartmentId(departmentId);
         } else if (status != null) {
-            // 根據狀態過濾員工
             employees = employeeService.getEmployeeByStatus(status);
         } else {
-            // 沒有選擇篩選條件時顯示所有員工
             employees = employeeService.getAllEmployees();
         }
-        
         model.addAttribute("employees", employees);
         model.addAttribute("departments", departmentService.getAllDepartments());
         model.addAttribute("selectedDepartmentId", departmentId);
         model.addAttribute("selectedStatus", status);
         model.addAttribute("permissions", permissionService.getAllPermissions());
+        model.addAttribute("search", search);
         model.addAttribute("sidebarActive", "employee-list");
         return "back-end/employee/listEmployee";
     }

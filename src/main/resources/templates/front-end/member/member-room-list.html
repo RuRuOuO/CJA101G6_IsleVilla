@@ -298,24 +298,17 @@
                                 <div class="d-flex">
                                     <h6 class="text-muted">訂單總金額：</h6>
                                     <h5 class="text-primary">
-                                        NT$ <span th:text="${order.rvPaidAmount}"></span>
+                                        NT$ <span th:text="${totalAmountMap[order.roomReservationId]}"></span>
                                     </h5>
                                 </div>
-                                <div
-                                        th:if="${order.roomOrderStatus == 3||order.roomOrderStatus == 4}"
-                                        class="d-flex"
-                                >
+                                <div th:if="${order.roomOrderStatus == 3 || order.roomOrderStatus == 4}" class="d-flex">
                                     <h6 class="text-muted">退款金額：</h6>
                                     <h5 class="text-danger">
-                                        NT$ <span th:text="${order.rvRefundAmount}"></span>
+                                        NT$ <span th:text="${refundAmountMap[order.roomReservationId]}"></span>
                                     </h5>
                                     <span class="ms-2 text-muted">
-                        (退款比例
-                        <span
-                                th:text="${refundRateMap[order.roomReservationId]}"
-                        ></span
-                        >%)
-                      </span>
+        (退款比例 <span th:text="${refundRateMap[order.roomReservationId]}"></span>%)
+    </span>
                                 </div>
                             </div>
                         </div>
@@ -365,21 +358,22 @@
                                         <div class="col-6 mb-2">
                                             <small class="text-muted">原價</small>
                                             <div class="text-decoration-line-through text-muted">
-                                                NT$ <span th:text="${detail.roomPrice}"></span>
+                                                NT$ <span th:text="${detailOriginalAmountMap[order.roomReservationId][detail.roomReservationDetailId]}"></span>
                                             </div>
                                         </div>
                                         <div class="col-6 mb-2">
                                             <small class="text-muted">折扣金額</small>
                                             <div class="text-danger">
-                                                -NT$
-                                                <span th:text="${detail.rvDiscountAmount}"></span>
+                                                -NT$ <span th:text="${detailDiscountAmountMap[order.roomReservationId][detail.roomReservationDetailId]}"></span>
                                             </div>
                                         </div>
                                     </div>
+
+                                    <!-- 實付金額 -->
                                     <div class="col-12">
                                         <small class="text-muted">實付金額</small>
                                         <div class="fs-5 text-primary fw-bold">
-                                            NT$ <span th:text="${detail.rvPaidAmount}"></span>
+                                            NT$ <span th:text="${detailActualAmountMap[order.roomReservationId][detail.roomReservationDetailId]}"></span>
                                         </div>
                                     </div>
                                 </div>
