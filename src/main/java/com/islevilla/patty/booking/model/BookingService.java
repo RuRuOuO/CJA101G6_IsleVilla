@@ -426,8 +426,23 @@ public class BookingService {
                 detail.setRoom(roomRepository.findById(roomId).orElse(null));
             }
             detail.setGuestCount(adults);
-            int roomPrice = Integer.parseInt(room.getOrDefault("price", "0").toString());
-            detail.setRoomPrice(roomPrice);
+            int nights = (int) java.time.temporal.ChronoUnit.DAYS.between(checkin, checkout);
+            // 取得房型原價
+            int roomTypePrice = 0;
+            if (detail.getRoomType() != null && detail.getRoomType().getRoomTypePrice() != null) {
+                roomTypePrice = detail.getRoomType().getRoomTypePrice();
+            }
+            int actualUnitPrice = Integer.parseInt(room.getOrDefault("price", "0").toString());
+            // 原價 = 房型原價 x 夜數
+            detail.setRoomPrice(roomTypePrice * nights);
+            // 折扣金額 = (房型原價 - 實際單價) x 夜數
+            int discountAmount = (roomTypePrice - actualUnitPrice) * nights;
+            detail.setRvDiscountAmount(discountAmount > 0 ? discountAmount : 0);
+            // 實付金額 = 實際單價 x 夜數
+            detail.setRvPaidAmount(actualUnitPrice * nights);
+            detail.setRoomRVOrder(order);
+            details.add(detail);
+
             if (promotionId != null) {
                 com.islevilla.patty.promotion.model.Promotion promotion = 
                     entityManager.find(com.islevilla.patty.promotion.model.Promotion.class, promotionId);
@@ -435,17 +450,18 @@ public class BookingService {
                     selectedPromotion = promotion;
                     if (detail.getRoomType() != null) {
                         int originalPrice = detail.getRoomType().getRoomTypePrice();
-                        int discountAmount = originalPrice - roomPrice;
-                        detail.setRvDiscountAmount(discountAmount);
-                        totalDiscountAmount += discountAmount;
+                        discountAmount = (originalPrice - actualUnitPrice) * nights;
+                        detail.setRvDiscountAmount(discountAmount > 0 ? discountAmount : 0);
+                    }
+                    // 設定 promotionTitle
+                    try {
+                        java.lang.reflect.Method setPromotionTitle = detail.getClass().getMethod("setPromotionTitle", String.class);
+                        setPromotionTitle.invoke(detail, promotion.getRoomPromotionTitle());
+                    } catch(Exception e) {
+                        // RoomRVDetail 沒有 promotionTitle 屬性就略過
                     }
                 }
-            } else {
-                detail.setRvDiscountAmount(0);
             }
-            detail.setRvPaidAmount(roomPrice);
-            detail.setRoomRVOrder(order);
-            details.add(detail);
         }
         if (selectedPromotion != null) {
             order.setPromotion(selectedPromotion);
@@ -475,11 +491,13 @@ public class BookingService {
         booking.setRemark(specialRequests);
         // 訂房明細
         java.util.List<Booking.Detail> detailList = new java.util.ArrayList<>();
+        int nights = (int) java.time.temporal.ChronoUnit.DAYS.between(checkin, checkout);
         for (java.util.Map room : selectedRooms) {
             Booking.Detail d = new Booking.Detail();
             d.setRoomTypeName(room.get("name") != null ? room.get("name").toString() : "");
             d.setPromotionTitle(room.get("promotionTitle") != null ? room.get("promotionTitle").toString() : "");
-            d.setPrice(room.get("price") != null ? Integer.parseInt(room.get("price").toString()) : 0);
+            int unitPrice = room.get("price") != null ? Integer.parseInt(room.get("price").toString()) : 0;
+            d.setPrice(unitPrice * nights); // 直接存小計
             detailList.add(d);
         }
         booking.setDetails(detailList);

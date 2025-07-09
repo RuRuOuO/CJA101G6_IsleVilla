@@ -58,10 +58,11 @@ public class ProductApiController {
     // 送出修改商品
     @PostMapping("/edit")
     @PreAuthorize("hasAuthority('product')")
-    public ResponseEntity<String> updateProduct(@ModelAttribute Product product,
-                                                @RequestParam(value = "oldPhotoOrder", required = false) String oldPhotoOrderJson,
-                                                @RequestParam(value = "deletedPhotoIds", required = false) String deletedPhotoIdsJson,
-                                                @RequestParam(value = "newPhotos", required = false) List<MultipartFile> newPhotos) {
+    public ResponseEntity<String> updateProduct(
+            @ModelAttribute Product product,
+            @RequestParam(value = "photoOrder", required = false) String photoOrderJson,
+            @RequestParam(value = "deletedPhotoIds", required = false) String deletedPhotoIdsJson,
+            @RequestParam(value = "newPhotos", required = false) List<MultipartFile> newPhotos) {
         try {
             productService.updateProduct(product);
             ObjectMapper mapper = new ObjectMapper();
@@ -72,32 +73,38 @@ public class ProductApiController {
                     productPhotoService.deleteById(id);
                 }
             }
-            // 2. 更新舊圖排序
-            if (oldPhotoOrderJson != null && !oldPhotoOrderJson.isEmpty()) {
-                List<Integer> oldOrder = mapper.readValue(oldPhotoOrderJson, mapper.getTypeFactory().constructCollectionType(List.class, Integer.class));
-                for (int i = 0; i < oldOrder.size(); i++) {
-                    ProductPhoto photo = productPhotoService.getPhotoById(oldOrder.get(i));
-                    if (photo != null) {
-                        photo.setDisplayOrder(i);
-                        productPhotoService.save(photo);
-                    }
-                }
-            }
-            // 3. 新圖依排序存入
-            int startOrder = 0;
-            if (oldPhotoOrderJson != null && !oldPhotoOrderJson.isEmpty()) {
-                List<Integer> oldOrder = mapper.readValue(oldPhotoOrderJson, mapper.getTypeFactory().constructCollectionType(List.class, Integer.class));
-                startOrder = oldOrder.size();
-            }
-            if (newPhotos != null) {
-                for (int i = 0; i < newPhotos.size(); i++) {
-                    MultipartFile file = newPhotos.get(i);
-                    if (!file.isEmpty()) {
-                        ProductPhoto photo = new ProductPhoto();
-                        photo.setProductId(product.getProductId());
-                        photo.setProductImage(file.getBytes());
-                        photo.setDisplayOrder(startOrder + i);
-                        productPhotoService.save(photo);
+            // 2. 依照 photoOrder 混合排序處理
+            if (photoOrderJson != null && !photoOrderJson.isEmpty()) {
+                List<?> orderList = mapper.readValue(photoOrderJson, List.class);
+                int newPhotoIdx = 0;
+                for (int i = 0; i < orderList.size(); i++) {
+                    Object obj = orderList.get(i);
+                    if (obj instanceof java.util.Map) {
+                        java.util.Map map = (java.util.Map) obj;
+                        Boolean isNew = (Boolean) map.get("isNew");
+                        if (isNew != null && isNew) {
+                            // 新圖
+                            if (newPhotos != null && newPhotoIdx < newPhotos.size()) {
+                                MultipartFile file = newPhotos.get(newPhotoIdx++);
+                                if (!file.isEmpty()) {
+                                    ProductPhoto photo = new ProductPhoto();
+                                    photo.setProductId(product.getProductId());
+                                    photo.setProductImage(file.getBytes());
+                                    photo.setDisplayOrder(i);
+                                    productPhotoService.save(photo);
+                                }
+                            }
+                        } else {
+                            // 舊圖
+                            Integer id = (Integer) map.get("id");
+                            if (id != null) {
+                                ProductPhoto photo = productPhotoService.getPhotoById(id);
+                                if (photo != null) {
+                                    photo.setDisplayOrder(i);
+                                    productPhotoService.save(photo);
+                                }
+                            }
+                        }
                     }
                 }
             }

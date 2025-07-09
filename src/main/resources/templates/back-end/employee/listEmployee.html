@@ -192,11 +192,16 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">性別 <span class="text-danger">*</span></label>
-                            <select class="form-select" name="employeeGender" required>
-                                <option value="">請選擇性別</option>
-                                <option value="0">女</option>
-                                <option value="1">男</option>
-                            </select>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="employeeGender" id="addEmployeeGenderFemale" value="0" required>
+                                    <label class="form-check-label" for="addEmployeeGenderFemale">女</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="employeeGender" id="addEmployeeGenderMale" value="1" required>
+                                    <label class="form-check-label" for="addEmployeeGenderMale">男</label>
+                                </div>
+                            </div>
                             <div class="invalid-feedback">請選擇性別</div>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -213,12 +218,20 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">員工狀態 <span class="text-danger">*</span></label>
-                            <select class="form-select" name="employeeStatus" required>
-                                <option value="">請選擇狀態</option>
-                                <option value="1">在職</option>
-                                <option value="0">離職</option>
-                                <option value="2">停職</option>
-                            </select>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="employeeStatus" id="addEmployeeStatusActive" value="1" required>
+                                    <label class="form-check-label" for="addEmployeeStatusActive">在職</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="employeeStatus" id="addEmployeeStatusResigned" value="0" required>
+                                    <label class="form-check-label" for="addEmployeeStatusResigned">離職</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="employeeStatus" id="addEmployeeStatusSuspended" value="2" required>
+                                    <label class="form-check-label" for="addEmployeeStatusSuspended">停職</label>
+                                </div>
+                            </div>
                             <div class="invalid-feedback">請選擇員工狀態</div>
                         </div>
                     </div>
@@ -307,12 +320,20 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">員工狀態 <span class="text-danger">*</span></label>
-                            <select class="form-select" id="editEmployeeStatus" name="employeeStatus" required>
-                                <option value="">請選擇狀態</option>
-                                <option value="1">在職</option>
-                                <option value="0">離職</option>
-                                <option value="2">停職</option>
-                            </select>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="employeeStatus" id="editEmployeeStatusActive" value="1" required>
+                                    <label class="form-check-label" for="editEmployeeStatusActive">在職</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="employeeStatus" id="editEmployeeStatusResigned" value="0" required>
+                                    <label class="form-check-label" for="editEmployeeStatusResigned">離職</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="employeeStatus" id="editEmployeeStatusSuspended" value="2" required>
+                                    <label class="form-check-label" for="editEmployeeStatusSuspended">停職</label>
+                                </div>
+                            </div>
                             <div class="invalid-feedback">請選擇員工狀態</div>
                         </div>
                     </div>
@@ -324,11 +345,16 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">性別 <span class="text-danger">*</span></label>
-                            <select class="form-select" id="editEmployeeGender" name="employeeGender" required>
-                                <option value="">請選擇性別</option>
-                                <option value="0">女</option>
-                                <option value="1">男</option>
-                            </select>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="employeeGender" id="editEmployeeGenderFemale" value="0" required>
+                                    <label class="form-check-label" for="editEmployeeGenderFemale">女</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="employeeGender" id="editEmployeeGenderMale" value="1" required>
+                                    <label class="form-check-label" for="editEmployeeGenderMale">男</label>
+                                </div>
+                            </div>
                             <div class="invalid-feedback">請選擇性別</div>
                         </div>
                     </div>
@@ -537,6 +563,12 @@ function clearAddEmployeeForm() {
     permissionCheckboxes.forEach(checkbox => {
         checkbox.checked = false;
     });
+    
+    // 清除所有 radio button
+    const radioButtons = form.querySelectorAll('input[type="radio"]');
+    radioButtons.forEach(radio => {
+        radio.checked = false;
+    });
 }
 
 // 新增員工
@@ -597,11 +629,20 @@ function editEmployee(employeeId) {
         document.getElementById('editEmployeeName').value = employee.employeeName;
         document.getElementById('editEmployeeEmail').value = employee.employeeEmail;
         document.getElementById('editDepartmentId').value = employee.department.departmentId;
-        document.getElementById('editEmployeeStatus').value = employee.employeeStatus;
+        // 設定員工狀態 radio button
+        document.querySelectorAll('#editEmployeeForm input[name="employeeStatus"]').forEach(radio => {
+            radio.checked = radio.value === String(employee.employeeStatus);
+        });
         
         // 自動填入欄位
         document.getElementById('editEmployeeMobile').value = employee.employeeMobile || '';
-        document.getElementById('editEmployeeGender').value = (employee.employeeGender !== null && employee.employeeGender !== undefined) ? String(employee.employeeGender) : '';
+        
+        // 設定性別 radio button
+        const genderValue = (employee.employeeGender !== null && employee.employeeGender !== undefined) ? String(employee.employeeGender) : '';
+        document.querySelectorAll('#editEmployeeForm input[name="employeeGender"]').forEach(radio => {
+            radio.checked = radio.value === genderValue;
+        });
+        
         document.getElementById('editEmployeeBirthdate').value = employee.employeeBirthdate || '';
         document.getElementById('editEmployeeHiredate').value = employee.employeeHiredate || '';
         document.getElementById('editEmployeeLeavedate').value = employee.employeeLeavedate || '';
@@ -815,12 +856,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // 性別驗證
     document.querySelectorAll('[name="employeeGender"]').forEach(field => {
         field.addEventListener('change', function() {
-            if (this.value !== '') {
-                this.classList.remove('is-invalid');
-                this.classList.add('is-valid');
+            const form = this.closest('form');
+            const checkedGender = form.querySelector('input[name="employeeGender"]:checked');
+            const genderContainer = form.querySelector('input[name="employeeGender"]').closest('.col-md-6');
+            
+            if (checkedGender) {
+                genderContainer.classList.remove('is-invalid');
+                genderContainer.classList.add('is-valid');
             } else {
-                this.classList.remove('is-valid');
-                this.classList.add('is-invalid');
+                genderContainer.classList.remove('is-valid');
+                genderContainer.classList.add('is-invalid');
             }
         });
     });
@@ -852,18 +897,22 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // 員工狀態驗證
-    document.querySelectorAll('[name="employeeStatus"], #editEmployeeStatus').forEach(field => {
+    document.querySelectorAll('[name="employeeStatus"]').forEach(field => {
         field.addEventListener('change', function() {
-            if (this.value !== '') {
-                this.classList.remove('is-invalid');
-                this.classList.add('is-valid');
+            const form = this.closest('form');
+            const checkedStatus = form.querySelector('input[name="employeeStatus"]:checked');
+            const statusContainer = form.querySelector('input[name="employeeStatus"]').closest('.col-md-6');
+            
+            if (checkedStatus) {
+                statusContainer.classList.remove('is-invalid');
+                statusContainer.classList.add('is-valid');
             } else {
-                this.classList.remove('is-valid');
-                this.classList.add('is-invalid');
+                statusContainer.classList.remove('is-valid');
+                statusContainer.classList.add('is-invalid');
             }
             
             // 控制離職日期欄位（僅在編輯表單中）
-            if (this.id === 'editEmployeeStatus') {
+            if (form.id === 'editEmployeeForm') {
                 const leavedateField = document.getElementById('editEmployeeLeavedate');
                 if (this.value === '0') { // 離職狀態
                     leavedateField.disabled = false;
@@ -1091,12 +1140,16 @@ addTouchedValidation('[name="departmentId"], #editDepartmentId', function(field,
 // 性別
 addTouchedValidation('[name="employeeGender"]', function(field, touched) {
     if (!touched) return;
-    if (field.value !== '') {
-        field.classList.remove('is-invalid');
-        field.classList.add('is-valid');
+    const form = field.closest('form');
+    const checkedGender = form.querySelector('input[name="employeeGender"]:checked');
+    const genderContainer = field.closest('.col-md-6');
+    
+    if (checkedGender) {
+        genderContainer.classList.remove('is-invalid');
+        genderContainer.classList.add('is-valid');
     } else {
-        field.classList.remove('is-valid');
-        field.classList.add('is-invalid');
+        genderContainer.classList.remove('is-valid');
+        genderContainer.classList.add('is-invalid');
     }
 });
 
@@ -1125,14 +1178,18 @@ addTouchedValidation('[name="employeeHiredate"]', function(field, touched) {
 });
 
 // 員工狀態
-addTouchedValidation('[name="employeeStatus"], #editEmployeeStatus', function(field, touched) {
+addTouchedValidation('[name="employeeStatus"]', function(field, touched) {
     if (!touched) return;
-    if (field.value !== '') {
-        field.classList.remove('is-invalid');
-        field.classList.add('is-valid');
+    const form = field.closest('form');
+    const checkedStatus = form.querySelector('input[name="employeeStatus"]:checked');
+    const statusContainer = field.closest('.col-md-6');
+    
+    if (checkedStatus) {
+        statusContainer.classList.remove('is-invalid');
+        statusContainer.classList.add('is-valid');
     } else {
-        field.classList.remove('is-valid');
-        field.classList.add('is-invalid');
+        statusContainer.classList.remove('is-valid');
+        statusContainer.classList.add('is-invalid');
     }
 });
 

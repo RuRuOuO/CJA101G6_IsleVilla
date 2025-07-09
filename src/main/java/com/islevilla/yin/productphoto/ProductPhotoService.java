@@ -26,19 +26,12 @@ public class ProductPhotoService {
     }
 
     public ProductPhoto getMainProductPhotoByProductId(Integer productId) {
-        // 根據 productId 查詢排序第一張的圖片（displayOrder = 1）
+        // 直接回傳 displayOrder 最小的那一張
         List<ProductPhoto> productPhotos = productPhotoRepository.findByProductIdOrderByDisplayOrderAsc(productId);
         if (productPhotos != null && !productPhotos.isEmpty()) {
-            // 找到排序第一張的圖片
-            for (ProductPhoto photo : productPhotos) {
-                if (photo.getDisplayOrder() != null && photo.getDisplayOrder() == 1) {
-                    return photo;
-                }
-            }
-            // 如果沒有排序為1的圖片，回傳第一張
             return productPhotos.get(0);
         }
-        return null;  // 如果沒有圖片，返回 null
+        return null;
     }
 
     public void save(ProductPhoto productPhoto) {

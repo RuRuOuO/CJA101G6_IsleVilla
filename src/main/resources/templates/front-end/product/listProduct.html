@@ -196,16 +196,54 @@
                         <div class="col-12">
                             <div class="card search-card">
                                 <div class="card-body">
-                                    <div class="input-group">
-                                        <span class="input-group-text">
-                                            <i class="bi bi-search"></i>
-                                        </span>
-                                        <input type="text" id="productSearchInput" name="keyword" class="form-control"
-                                               placeholder="搜尋商品名稱"
-                                               th:value="${keyword}">
-                                        <button type="submit" class="btn btn-outline-secondary" style="border-top-right-radius: 8px !important; border-bottom-right-radius: 8px !important;">
-                                            搜尋
-                                        </button>
+                                    <div class="row g-3">
+                                        <!-- 商品名稱搜尋 -->
+                                        <div class="col-md-4">
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="bi bi-search"></i>
+                                                </span>
+                                                <input type="text" id="productSearchInput" name="keyword" class="form-control"
+                                                       placeholder="搜尋商品名稱"
+                                                       th:value="${keyword}">
+                                            </div>
+                                        </div>
+                                        <!-- 金額範圍搜尋 -->
+                                        <div class="col-md-2">
+                                            <div class="input-group">
+                                                <span class="input-group-text">NT$</span>
+                                                <input type="number" name="minPrice" class="form-control" placeholder="最低金額"
+                                                       th:value="${minPrice}" min="0">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="input-group">
+                                                <span class="input-group-text">NT$</span>
+                                                <input type="number" name="maxPrice" class="form-control" placeholder="最高金額"
+                                                       th:value="${maxPrice}" min="0">
+                                            </div>
+                                        </div>
+                                        <!-- 排序方式 -->
+                                        <div class="col-md-2">
+                                            <select name="sort" class="form-select">
+                                                <option value="">預設排序</option>
+                                                <option value="price_asc" th:selected="${sort == 'price_asc'}">價格由低到高</option>
+                                                <option value="price_desc" th:selected="${sort == 'price_desc'}">價格由高到低</option>
+                                                <option value="name_asc" th:selected="${sort == 'name_asc'}">名稱 A-Z</option>
+                                                <option value="name_desc" th:selected="${sort == 'name_desc'}">名稱 Z-A</option>
+                                            </select>
+                                        </div>
+                                        <!-- 搜尋和清空按鈕 -->
+                                        <div class="col-md-2">
+                                            <div class="d-flex gap-2">
+                                                <button type="submit" class="btn btn-outline-secondary flex-fill">
+                                                    <i class="bi bi-search me-1"></i>搜尋
+                                                </button>
+                                                <button type="button" class="btn btn-outline-secondary" onclick="clearSearch()">
+                                                    <i class="bi bi-x-lg"></i>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -235,7 +273,8 @@
                                         <a th:href="@{/product/detail/{productId}(productId=${prod.productId})}"
                                            class="btn btn-secondary btn-sm text-center"
                                            style="flex: 1 1 0; min-width: 0; white-space: nowrap;">查看詳情</a>
-                                        <form id="addToCartForm" th:action="@{/addToCart}" method="post" class="add-to-cart-form" style="display: none;">
+                                        <!-- 修正：每個商品的 form 都有唯一 id -->
+                                        <form th:id="'addToCartForm-' + ${prod.productId}" th:action="@{/addToCart}" method="post" class="add-to-cart-form" style="display: none;">
                                             <input type="hidden" name="productId" th:value="${prod.productId}" />
                                             <input type="hidden" name="quantity" value="1" />
                                             <input type="hidden" name="stock" th:value="${prod.productQuantity}" />
@@ -243,7 +282,7 @@
                                         <button type="submit"
                                                 class="btn btn-primary btn-sm text-center w-100"
                                                 style="white-space: nowrap;"
-                                                form="addToCartForm">加入購物車</button>
+                                                th:form="'addToCartForm-' + ${prod.productId}">加入購物車</button>
                                     </div>
                                 </div>
                             </div>
@@ -319,6 +358,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+function clearSearch() {
+    // 清空所有搜尋欄位
+    document.getElementById('productSearchInput').value = '';
+    document.querySelector('input[name="minPrice"]').value = '';
+    document.querySelector('input[name="maxPrice"]').value = '';
+    document.querySelector('select[name="sort"]').value = '';
+    
+    // 重新導向到基本商品列表頁面（保持當前分類）
+    const currentCategoryId = document.querySelector('input[name="productCategoryId"]').value;
+    let redirectUrl = '/product/list';
+    if (currentCategoryId) {
+        redirectUrl += '?productCategoryId=' + currentCategoryId;
+    }
+    window.location.href = redirectUrl;
+}
 </script>
 </body>
 </html>
