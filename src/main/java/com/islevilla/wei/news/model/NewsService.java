@@ -37,15 +37,15 @@ public class NewsService {
     }
 
     public Page<News> getAll(Pageable pageable) {
-        return newsRepository.findAll(pageable);
+        return newsRepository.findAllByOrderByNewsIdDesc(pageable);
     }
 
     public Page<News> getPublished(Pageable pageable) {
-        return newsRepository.findAllByNewsStatus(1, pageable);
+        return newsRepository.findAllByNewsStatusOrderByNewsIdDesc(1, pageable);
     }
 
     public List<News> getLatestThreeNews() {
-        return newsRepository.findTop3ByNewsStatusOrderByNewsTimeDesc(1);
+        return newsRepository.findTop3ByNewsStatusOrderByNewsIdDesc(1);
     }
 
     public News getById(Integer newsId) {
