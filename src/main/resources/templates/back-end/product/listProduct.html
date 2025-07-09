@@ -178,11 +178,16 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="productStatus" class="form-label">狀態 <span class="text-danger">*</span></label>
-                        <select class="form-select" id="productStatus" th:field="*{productStatus}" required>
-                            <option value="">請選擇狀態</option>
-                            <option th:value="1" th:selected="*{productStatus == 1}">上架</option>
-                            <option th:value="0" th:selected="*{productStatus == 0}">下架</option>
-                        </select>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="productStatus" id="addProductStatusActive" value="1" required>
+                                <label class="form-check-label" for="addProductStatusActive">上架</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="productStatus" id="addProductStatusInactive" value="0" required>
+                                <label class="form-check-label" for="addProductStatusInactive">下架</label>
+                            </div>
+                        </div>
                         <div class="invalid-feedback">請選擇商品狀態</div>
                     </div>
                 </div>
@@ -260,11 +265,16 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="editProductStatus" class="form-label">狀態 <span class="text-danger">*</span></label>
-                        <select class="form-select" id="editProductStatus" th:field="*{productStatus}" required>
-                            <option value="">請選擇狀態</option>
-                            <option th:value="1" th:selected="*{productStatus == 1}">上架</option>
-                            <option th:value="0" th:selected="*{productStatus == 0}">下架</option>
-                        </select>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="productStatus" id="editProductStatusActive" value="1" required>
+                                <label class="form-check-label" for="editProductStatusActive">上架</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="productStatus" id="editProductStatusInactive" value="0" required>
+                                <label class="form-check-label" for="editProductStatusInactive">下架</label>
+                            </div>
+                        </div>
                         <div class="invalid-feedback">請選擇商品狀態</div>
                     </div>
                 </div>
@@ -524,14 +534,18 @@
         });
 
         // 狀態驗證
-        document.querySelectorAll('#productStatus, #editProductStatus').forEach(field => {
+        document.querySelectorAll('[name="productStatus"]').forEach(field => {
             field.addEventListener('change', function() {
-                if (this.value !== '') {
-                    this.classList.remove('is-invalid');
-                    this.classList.add('is-valid');
+                const form = this.closest('form');
+                const checkedStatus = form.querySelector('input[name="productStatus"]:checked');
+                const statusContainer = form.querySelector('input[name="productStatus"]').closest('.col-md-6');
+                
+                if (checkedStatus) {
+                    statusContainer.classList.remove('is-invalid');
+                    statusContainer.classList.add('is-valid');
                 } else {
-                    this.classList.remove('is-valid');
-                    this.classList.add('is-invalid');
+                    statusContainer.classList.remove('is-valid');
+                    statusContainer.classList.add('is-invalid');
                 }
             });
         });
@@ -567,7 +581,10 @@
         editModal.querySelector('#editProductPrice').value                       = price;
         editModal.querySelector('#editProductDescription').value                 = desc;
         editModal.querySelector('#editProductQuantity').value                    = qty;
-        editModal.querySelector('#editProductStatus').value                      = stat;
+        // 設定商品狀態 radio button
+        document.querySelectorAll('#editProductForm input[name="productStatus"]').forEach(radio => {
+            radio.checked = radio.value === stat;
+        });
         editModal.querySelector('#editProductCategory').value                    = cat;
         // 每次都重設圖片狀態並載入舊圖
         productPhotoList = [];
