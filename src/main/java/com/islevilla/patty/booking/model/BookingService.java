@@ -426,24 +426,20 @@ public class BookingService {
                 detail.setRoom(roomRepository.findById(roomId).orElse(null));
             }
             detail.setGuestCount(adults);
-            int roomPrice = Integer.parseInt(room.getOrDefault("price", "0").toString());
-            detail.setRoomPrice(roomPrice);
-            if (promotionId != null) {
-                com.islevilla.patty.promotion.model.Promotion promotion = 
-                    entityManager.find(com.islevilla.patty.promotion.model.Promotion.class, promotionId);
-                if (promotion != null) {
-                    selectedPromotion = promotion;
-                    if (detail.getRoomType() != null) {
-                        int originalPrice = detail.getRoomType().getRoomTypePrice();
-                        int discountAmount = originalPrice - roomPrice;
-                        detail.setRvDiscountAmount(discountAmount);
-                        totalDiscountAmount += discountAmount;
-                    }
-                }
-            } else {
-                detail.setRvDiscountAmount(0);
+            int nights = (int) java.time.temporal.ChronoUnit.DAYS.between(checkin, checkout);
+            // 取得房型原價
+            int roomTypePrice = 0;
+            if (detail.getRoomType() != null && detail.getRoomType().getRoomTypePrice() != null) {
+                roomTypePrice = detail.getRoomType().getRoomTypePrice();
             }
-            detail.setRvPaidAmount(roomPrice);
+            int actualUnitPrice = Integer.parseInt(room.getOrDefault("price", "0").toString());
+            // 原價 = 房型原價 x 夜數
+            detail.setRoomPrice(roomTypePrice * nights);
+            // 折扣金額 = (房型原價 - 實際單價) x 夜數
+            int discountAmount = (roomTypePrice - actualUnitPrice) * nights;
+            detail.setRvDiscountAmount(discountAmount > 0 ? discountAmount : 0);
+            // 實付金額 = 實際單價 x 夜數
+            detail.setRvPaidAmount(actualUnitPrice * nights);
             detail.setRoomRVOrder(order);
             details.add(detail);
         }
