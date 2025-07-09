@@ -66,7 +66,10 @@
                         <td>
                             <input type="hidden" name="productCategoryId" th:value="${category.productCategoryId}" />
                             <span th:text="${category.productCategoryName}" th:attr="id='text-productCategoryName-' + ${iterStat.index}"></span>
-                            <input type="text" name="productCategoryName" th:value="${category.productCategoryName}" class="form-control d-none" th:attr="id='input-productCategoryName-' + ${iterStat.index}" required maxlength="30" />
+                            <div class="d-none" th:attr="id='input-container-' + ${iterStat.index}">
+                                <input type="text" name="productCategoryName" th:value="${category.productCategoryName}" class="form-control" th:attr="id='input-productCategoryName-' + ${iterStat.index}" required maxlength="30" />
+                                <small class="text-muted">最多30個字元</small>
+                            </div>
                         </td>
                         <td>
                             <a type="button" class="btn btn-sm btn-primary" th:attr="id='editBtn-' + ${iterStat.index},data-id=${category.productCategoryId},data-name=${category.productCategoryName}" th:onclick="|enableEditRow(${iterStat.index})|">
@@ -230,22 +233,24 @@ function saveProductCategory() {
 }
 function enableEditRow(idx) {
     document.getElementById('text-productCategoryName-' + idx).classList.add('d-none');
+    var inputContainer = document.getElementById('input-container-' + idx);
+    inputContainer.classList.remove('d-none');
     var input = document.getElementById('input-productCategoryName-' + idx);
-    input.classList.remove('d-none');
     input.removeAttribute('readonly');
     document.getElementById('editBtn-' + idx).classList.add('d-none');
     document.getElementById('saveBtn-' + idx).classList.remove('d-none');
     document.getElementById('cancelBtn-' + idx).classList.remove('d-none');
     
-    // 觸發字元計數更新
-    setTimeout(() => {
-        if (input) input.dispatchEvent(new Event('input'));
-    }, 100);
+    // 立即創建並顯示字元計數
+    if (input) {
+        validateCategoryName(input);
+    }
 }
 function cancelEditRow(idx) {
     document.getElementById('text-productCategoryName-' + idx).classList.remove('d-none');
+    var inputContainer = document.getElementById('input-container-' + idx);
+    inputContainer.classList.add('d-none');
     var input = document.getElementById('input-productCategoryName-' + idx);
-    input.classList.add('d-none');
     input.setAttribute('readonly', true);
     document.getElementById('editBtn-' + idx).classList.remove('d-none');
     document.getElementById('saveBtn-' + idx).classList.add('d-none');
