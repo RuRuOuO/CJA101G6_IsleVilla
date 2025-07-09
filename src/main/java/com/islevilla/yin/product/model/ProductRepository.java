@@ -45,4 +45,29 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     List<Product> findByProductStatusAndProductNameContaining(Byte status, String keyword);
     List<Product> findByProductNameContaining(String keyword);
 
+    // 價格範圍搜尋方法
+    Page<Product> findByProductStatusAndProductQuantityGreaterThanAndProductPriceBetween(Byte status, int quantity, Integer minPrice, Integer maxPrice, Pageable pageable);
+    
+    Page<Product> findByProductStatusAndProductQuantityGreaterThanAndProductNameContainingAndProductPriceBetween(Byte status, int quantity, String keyword, Integer minPrice, Integer maxPrice, Pageable pageable);
+    
+    Page<Product> findByProductCategoryProductCategoryIdAndProductStatusAndProductQuantityGreaterThanAndProductPriceBetween(Integer categoryId, Byte status, int quantity, Integer minPrice, Integer maxPrice, Pageable pageable);
+    
+    Page<Product> findByProductCategoryProductCategoryIdAndProductStatusAndProductQuantityGreaterThanAndProductNameContainingAndProductPriceBetween(Integer categoryId, Byte status, int quantity, String keyword, Integer minPrice, Integer maxPrice, Pageable pageable);
+    
+    // 單邊價格範圍搜尋方法
+    Page<Product> findByProductStatusAndProductQuantityGreaterThanAndProductPriceGreaterThanEqual(Byte status, int quantity, Integer minPrice, Pageable pageable);
+    
+    Page<Product> findByProductStatusAndProductQuantityGreaterThanAndProductPriceLessThanEqual(Byte status, int quantity, Integer maxPrice, Pageable pageable);
+    
+    Page<Product> findByProductStatusAndProductQuantityGreaterThanAndProductNameContainingAndProductPriceGreaterThanEqual(Byte status, int quantity, String keyword, Integer minPrice, Pageable pageable);
+    
+    Page<Product> findByProductStatusAndProductQuantityGreaterThanAndProductNameContainingAndProductPriceLessThanEqual(Byte status, int quantity, String keyword, Integer maxPrice, Pageable pageable);
+    
+    Page<Product> findByProductCategoryProductCategoryIdAndProductStatusAndProductQuantityGreaterThanAndProductPriceGreaterThanEqual(Integer categoryId, Byte status, int quantity, Integer minPrice, Pageable pageable);
+    
+    Page<Product> findByProductCategoryProductCategoryIdAndProductStatusAndProductQuantityGreaterThanAndProductPriceLessThanEqual(Integer categoryId, Byte status, int quantity, Integer maxPrice, Pageable pageable);
+    
+    Page<Product> findByProductCategoryProductCategoryIdAndProductStatusAndProductQuantityGreaterThanAndProductNameContainingAndProductPriceGreaterThanEqual(Integer categoryId, Byte status, int quantity, String keyword, Integer minPrice, Pageable pageable);
+    
+    Page<Product> findByProductCategoryProductCategoryIdAndProductStatusAndProductQuantityGreaterThanAndProductNameContainingAndProductPriceLessThanEqual(Integer categoryId, Byte status, int quantity, String keyword, Integer maxPrice, Pageable pageable);
 }
