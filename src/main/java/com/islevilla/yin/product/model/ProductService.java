@@ -77,6 +77,56 @@ public class ProductService {
         return productRepository.findByProductCategoryProductCategoryIdAndProductStatusAndProductQuantityGreaterThan(categoryId, status, 0, pageable);
     }
 
+    // 價格範圍搜尋方法
+    public Page<Product> findByStatusAndPriceBetween(Byte status, Integer minPrice, Integer maxPrice, Pageable pageable) {
+        return productRepository.findByProductStatusAndProductQuantityGreaterThanAndProductPriceBetween(status, 0, minPrice, maxPrice, pageable);
+    }
+    
+    public Page<Product> findByStatusAndNameContainingAndPriceBetween(Byte status, String keyword, Integer minPrice, Integer maxPrice, Pageable pageable) {
+        return productRepository.findByProductStatusAndProductQuantityGreaterThanAndProductNameContainingAndProductPriceBetween(status, 0, keyword, minPrice, maxPrice, pageable);
+    }
+    
+    public Page<Product> findByCategoryAndStatusAndPriceBetween(Integer categoryId, Byte status, Integer minPrice, Integer maxPrice, Pageable pageable) {
+        return productRepository.findByProductCategoryProductCategoryIdAndProductStatusAndProductQuantityGreaterThanAndProductPriceBetween(categoryId, status, 0, minPrice, maxPrice, pageable);
+    }
+    
+    public Page<Product> findByCategoryAndStatusAndNameContainingAndPriceBetween(Integer categoryId, Byte status, String keyword, Integer minPrice, Integer maxPrice, Pageable pageable) {
+        return productRepository.findByProductCategoryProductCategoryIdAndProductStatusAndProductQuantityGreaterThanAndProductNameContainingAndProductPriceBetween(categoryId, status, 0, keyword, minPrice, maxPrice, pageable);
+    }
+
+    // 單邊價格範圍搜尋方法
+    public Page<Product> findByStatusAndPriceGreaterThanEqual(Byte status, Integer minPrice, Pageable pageable) {
+        return productRepository.findByProductStatusAndProductQuantityGreaterThanAndProductPriceGreaterThanEqual(status, 0, minPrice, pageable);
+    }
+    
+    public Page<Product> findByStatusAndPriceLessThanEqual(Byte status, Integer maxPrice, Pageable pageable) {
+        return productRepository.findByProductStatusAndProductQuantityGreaterThanAndProductPriceLessThanEqual(status, 0, maxPrice, pageable);
+    }
+    
+    public Page<Product> findByStatusAndNameContainingAndPriceGreaterThanEqual(Byte status, String keyword, Integer minPrice, Pageable pageable) {
+        return productRepository.findByProductStatusAndProductQuantityGreaterThanAndProductNameContainingAndProductPriceGreaterThanEqual(status, 0, keyword, minPrice, pageable);
+    }
+    
+    public Page<Product> findByStatusAndNameContainingAndPriceLessThanEqual(Byte status, String keyword, Integer maxPrice, Pageable pageable) {
+        return productRepository.findByProductStatusAndProductQuantityGreaterThanAndProductNameContainingAndProductPriceLessThanEqual(status, 0, keyword, maxPrice, pageable);
+    }
+    
+    public Page<Product> findByCategoryAndStatusAndPriceGreaterThanEqual(Integer categoryId, Byte status, Integer minPrice, Pageable pageable) {
+        return productRepository.findByProductCategoryProductCategoryIdAndProductStatusAndProductQuantityGreaterThanAndProductPriceGreaterThanEqual(categoryId, status, 0, minPrice, pageable);
+    }
+    
+    public Page<Product> findByCategoryAndStatusAndPriceLessThanEqual(Integer categoryId, Byte status, Integer maxPrice, Pageable pageable) {
+        return productRepository.findByProductCategoryProductCategoryIdAndProductStatusAndProductQuantityGreaterThanAndProductPriceLessThanEqual(categoryId, status, 0, maxPrice, pageable);
+    }
+    
+    public Page<Product> findByCategoryAndStatusAndNameContainingAndPriceGreaterThanEqual(Integer categoryId, Byte status, String keyword, Integer minPrice, Pageable pageable) {
+        return productRepository.findByProductCategoryProductCategoryIdAndProductStatusAndProductQuantityGreaterThanAndProductNameContainingAndProductPriceGreaterThanEqual(categoryId, status, 0, keyword, minPrice, pageable);
+    }
+    
+    public Page<Product> findByCategoryAndStatusAndNameContainingAndPriceLessThanEqual(Integer categoryId, Byte status, String keyword, Integer maxPrice, Pageable pageable) {
+        return productRepository.findByProductCategoryProductCategoryIdAndProductStatusAndProductQuantityGreaterThanAndProductNameContainingAndProductPriceLessThanEqual(categoryId, status, 0, keyword, maxPrice, pageable);
+    }
+
     public List<Product> searchProducts(Integer categoryId, Byte status, String keyword) {
         if (categoryId != null && status != null) {
             return productRepository.findByProductCategoryProductCategoryIdAndProductStatusAndProductNameContaining(categoryId, status, keyword);
