@@ -229,6 +229,39 @@ public class CouponController {
         couponService.save(coupon);
         return "redirect:/backend/coupon/list";
     }
+
+    // AJAX 新增優惠券
+    @PostMapping("/add-ajax")
+    @ResponseBody
+    public java.util.Map<String, Object> addCouponAjax(@RequestBody com.islevilla.jay.coupon.model.Coupon coupon) {
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+        java.util.List<String> errorMessages = new java.util.ArrayList<>();
+
+        // 1. 檢查優惠券代碼是否重複
+        boolean codeExists = !couponService.findByCouponCode(coupon.getCouponCode()).isEmpty();
+        if (codeExists) errorMessages.add("優惠券代碼已存在，請重新輸入。");
+        // 2. 檢查日期邏輯
+        if (coupon.getStartDate() == null || coupon.getEndDate() == null) {
+            errorMessages.add("請輸入完整的啟用日期與結束日期。");
+        } else if (coupon.getEndDate().isBefore(coupon.getStartDate())) {
+            errorMessages.add("結束日期不能小於啟用日期。");
+        }
+        // 3. 折扣金額要小於等於最低消費金額
+        if (coupon.getDiscountValue() == null || coupon.getMinSpend() == null || coupon.getDiscountValue() > coupon.getMinSpend()) {
+            errorMessages.add("折扣金額必須小於或等於最低消費金額。");
+        }
+
+        if (!errorMessages.isEmpty()) {
+            result.put("success", false);
+            result.put("errors", errorMessages);
+            return result;
+        }
+
+        com.islevilla.jay.coupon.model.Coupon saved = couponService.save(coupon);
+        result.put("success", true);
+        result.put("coupon", saved);
+        return result;
+    }
 }
 
 

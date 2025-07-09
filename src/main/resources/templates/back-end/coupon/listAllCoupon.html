@@ -167,6 +167,56 @@ $(function(){
     $('#couponCodeSearchInput').on('keyup', function(){
         table.column(1).search(this.value).draw();
     });
+
+    // 新增優惠券 AJAX 提交
+    $('#addCouponModal form').on('submit', function(e){
+        e.preventDefault();
+        var form = this;
+        var data = {
+            couponCode: form.elements['couponCode'].value,
+            discountValue: form.elements['discountValue'].value,
+            minSpend: form.elements['minSpend'].value,
+            startDate: form.elements['startDate'].value,
+            endDate: form.elements['endDate'].value,
+            couponStatus: form.elements['couponStatus'].value
+        };
+        fetch('/backend/coupon/add-ajax', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(json => {
+            if(json.success){
+                // 關閉modal
+                var modal = bootstrap.Modal.getInstance(document.getElementById('addCouponModal'));
+                modal.hide();
+                // 重新整理頁面（或可自行 append 新資料到表格）
+                location.reload();
+            }else{
+                // 顯示錯誤訊息
+                var alertDiv = form.querySelector('.alert-danger');
+                if(!alertDiv){
+                    alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-danger';
+                    form.querySelector('.modal-body').prepend(alertDiv);
+                }
+                alertDiv.innerHTML = '<ul><li>' + json.errors.join('</li><li>') + '</li></ul>';
+                alertDiv.style.display = 'block';
+            }
+        });
+    });
+
+    // 新增優惠券 Modal 每次打開時清空欄位與錯誤訊息
+    $('#addCouponModal').on('show.bs.modal', function (event) {
+        var form = this.querySelector('form');
+        if(form) form.reset();
+        var alertDiv = form.querySelector('.alert-danger');
+        if(alertDiv){
+            alertDiv.style.display = 'none';
+            alertDiv.innerHTML = '';
+        }
+    });
 });
 </script>
 
@@ -238,23 +288,30 @@ $(function(){
                         </div>
                         <div class="mb-3">
                             <label for="couponCode" class="form-label">優惠券代碼</label>
-                            <input type="text" class="form-control" id="couponCode" th:field="*{couponCode}" required>
+                            <input type="text" class="form-control" id="couponCode" name="couponCode" th:field="*{couponCode}" required>
                         </div>
                         <div class="mb-3">
                             <label for="discountValue" class="form-label">折扣金額</label>
-                            <input type="number" class="form-control" id="discountValue" th:field="*{discountValue}" required>
+                            <input type="number" class="form-control" id="discountValue" name="discountValue" th:field="*{discountValue}" required>
                         </div>
                         <div class="mb-3">
                             <label for="minSpend" class="form-label">最低消費金額</label>
-                            <input type="number" class="form-control" id="minSpend" th:field="*{minSpend}" required>
+                            <input type="number" class="form-control" id="minSpend" name="minSpend" th:field="*{minSpend}" required>
                         </div>
                         <div class="mb-3">
                             <label for="startDate" class="form-label">啟用日期</label>
-                            <input type="date" class="form-control" id="startDate" th:field="*{startDate}" th:value="${startDateStr}" required>
+                            <input type="date" class="form-control" id="startDate" name="startDate" th:field="*{startDate}" th:value="${startDateStr}" required>
                         </div>
                         <div class="mb-3">
                             <label for="endDate" class="form-label">結束日期</label>
-                            <input type="date" class="form-control" id="endDate" th:field="*{endDate}" required>
+                            <input type="date" class="form-control" id="endDate" name="endDate" th:field="*{endDate}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="couponStatus" class="form-label">狀態</label>
+                            <select class="form-control" id="couponStatus" name="couponStatus" th:field="*{couponStatus}" required>
+                                <option th:value="1">可使用</option>
+                                <option th:value="0">已停用</option>
+                            </select>
                         </div>
                     </div>
                     <div class="modal-footer">
