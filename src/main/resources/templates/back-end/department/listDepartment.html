@@ -66,7 +66,10 @@
                         <td>
                             <input type="hidden" name="departmentId" th:value="${department.departmentId}" />
                             <span th:text="${department.departmentName}" th:attr="id='text-departmentName-' + ${iterStat.index}"></span>
-                            <input type="text" name="departmentName" th:value="${department.departmentName}" class="form-control d-none" th:attr="id='input-departmentName-' + ${iterStat.index}" required maxlength="30" />
+                            <div class="d-none" th:attr="id='input-container-' + ${iterStat.index}">
+                                <input type="text" name="departmentName" th:value="${department.departmentName}" class="form-control" th:attr="id='input-departmentName-' + ${iterStat.index}" required maxlength="30" />
+                                <small class="text-muted">最多30個字元</small>
+                            </div>
                         </td>
                         <td>
                             <a type="button" class="btn btn-sm btn-primary" th:attr="id='editBtn-' + ${iterStat.index},data-id=${department.departmentId},data-name=${department.departmentName}" th:onclick="|enableEditRow(${iterStat.index})|">
@@ -93,7 +96,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    <i class="bi bi-building-add me-2"></i>新增部門
+                    <i class="bi bi-plus-circle me-2"></i>新增部門
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -298,22 +301,24 @@ function saveDepartment() {
 }
 function enableEditRow(idx) {
     document.getElementById('text-departmentName-' + idx).classList.add('d-none');
+    var inputContainer = document.getElementById('input-container-' + idx);
+    inputContainer.classList.remove('d-none');
     var input = document.getElementById('input-departmentName-' + idx);
-    input.classList.remove('d-none');
     input.removeAttribute('readonly');
     document.getElementById('editBtn-' + idx).classList.add('d-none');
     document.getElementById('saveBtn-' + idx).classList.remove('d-none');
     document.getElementById('cancelBtn-' + idx).classList.remove('d-none');
     
-    // 觸發字元計數更新
-    setTimeout(() => {
-        if (input) input.dispatchEvent(new Event('input'));
-    }, 100);
+    // 立即創建並顯示字元計數
+    if (input) {
+        validateDepartmentName(input);
+    }
 }
 function cancelEditRow(idx) {
     document.getElementById('text-departmentName-' + idx).classList.remove('d-none');
+    var inputContainer = document.getElementById('input-container-' + idx);
+    inputContainer.classList.add('d-none');
     var input = document.getElementById('input-departmentName-' + idx);
-    input.classList.add('d-none');
     input.setAttribute('readonly', true);
     document.getElementById('editBtn-' + idx).classList.remove('d-none');
     document.getElementById('saveBtn-' + idx).classList.add('d-none');
