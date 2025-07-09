@@ -235,7 +235,8 @@
                                         <a th:href="@{/product/detail/{productId}(productId=${prod.productId})}"
                                            class="btn btn-secondary btn-sm text-center"
                                            style="flex: 1 1 0; min-width: 0; white-space: nowrap;">查看詳情</a>
-                                        <form id="addToCartForm" th:action="@{/addToCart}" method="post" class="add-to-cart-form" style="display: none;">
+                                        <!-- 修正：每個商品的 form 都有唯一 id -->
+                                        <form th:id="'addToCartForm-' + ${prod.productId}" th:action="@{/addToCart}" method="post" class="add-to-cart-form" style="display: none;">
                                             <input type="hidden" name="productId" th:value="${prod.productId}" />
                                             <input type="hidden" name="quantity" value="1" />
                                             <input type="hidden" name="stock" th:value="${prod.productQuantity}" />
@@ -243,7 +244,7 @@
                                         <button type="submit"
                                                 class="btn btn-primary btn-sm text-center w-100"
                                                 style="white-space: nowrap;"
-                                                form="addToCartForm">加入購物車</button>
+                                                th:form="'addToCartForm-' + ${prod.productId}">加入購物車</button>
                                     </div>
                                 </div>
                             </div>
