@@ -69,7 +69,6 @@ public String showListRoomType(
         @RequestParam(value = "roomTypeSaleStatus", required = false) String roomTypeSaleStatus,
         Model model) {
 	
-    List<RoomType> roomTypeList;
 
     Byte saleStatus = null;
     if (roomTypeSaleStatus != null && !roomTypeSaleStatus.isEmpty()) {
@@ -79,20 +78,8 @@ public String showListRoomType(
     boolean hasRoomTypeId = roomTypeId != null && roomTypeId != 0;
     boolean hasSaleStatus = saleStatus != null;
 
-    if (!hasRoomTypeId && !hasSaleStatus) {
-        // 沒有任何條件：查詢全部
-        roomTypeList = roomTypeService.findAll();
-    } else if (hasRoomTypeId && hasSaleStatus) {
-        // 兩個條件都存在：複合查詢
-        roomTypeList = roomTypeService.compoundQuery(roomTypeId, saleStatus);
-    } else if (hasRoomTypeId) {
-        // 只有房型 ID 
-    	RoomType result=roomTypeService.findById(roomTypeId);
-    	roomTypeList = List.of(result); // Java 9+，將單筆轉成 List
-    } else {
-        // 只有上下架狀態
-        roomTypeList = roomTypeService.findByRoomTypeSaleStatus(saleStatus);
-    }
+    // 使用複合查詢來處理所有情況
+    List<RoomType> roomTypeList = roomTypeService.compoundQuery(roomTypeId, saleStatus);
     
 	System.out.println("進入頁面");
 	System.out.println("從資料庫查詢到的 RoomType 筆數: " + roomTypeList.size()); // 檢查筆數
@@ -224,7 +211,7 @@ public String showListRoomType(
 			// 重新載入頁面所需資料
 			prepareModelForView(model);
 			model.addAttribute("roomType", roomType);
-			model.addAttribute("addErrorMessage", List.of("處理圖片時發生錯誤: " + e.getMessage()));
+			model.addAttribute("addErrorMessage", List.of("處理圖片時發生錯誤"));
 			
 			return "back-end/roomType/listRoomType";
 		}

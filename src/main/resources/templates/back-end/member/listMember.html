@@ -27,9 +27,9 @@
                     <h4 class="card-title mb-0 fw-bold ">
                         <i class="bi bi-people-fill me-2"></i>會員帳號管理
                     </h4>
-                    <a class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addMemberModal">
-                        <i class="bi bi-plus-circle me-2"></i>新增會員
-                    </a>
+<!--                     <a class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addMemberModal"> -->
+<!--                         <i class="bi bi-plus-circle me-2"></i>新增會員 -->
+<!--                     </a> -->
                 </div>
             </div>
 
@@ -41,31 +41,30 @@
                             <span class="input-group-text">
                                 <i class="bi bi-search"></i>
                             </span>
-                            <input type="text" class="form-control" id="searchInput" placeholder="搜尋會員姓名、編號" />
+                            <input type="text" class="form-control" id="searchInput" placeholder="搜尋會員姓名、編號" th:value="${searchKeyword}"/>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <select class="form-select" id="genderFilter">
                             <option value="">所有性別</option>
-                            <option value="0" th:selected="${selectedStatus != null and selectedStatus == 0}">男生
-                            </option>
-                            <option value="1" th:selected="${selectedStatus != null and selectedStatus == 1}">女生
-                            </option>
-                            <option value="2" th:selected="${selectedStatus != null and selectedStatus == 2}">其它
-                            </option>
+                            <option value="0" th:selected="${selectedStatus != null and selectedStatus == 0}">男生</option>
+                            <option value="1" th:selected="${selectedStatus != null and selectedStatus == 1}">女生</option>
+                            <option value="2" th:selected="${selectedStatus != null and selectedStatus == 2}">其它</option>
                         </select>
                     </div>
                     <div class="col-md-3">
                         <select class="form-select" id="statusFilter">
                             <option value="">所有狀態</option>
-                            <option value="0" th:selected="${selectedStatus != null and selectedStatus == 0}">未驗證
-                            </option>
-                            <option value="1" th:selected="${selectedStatus != null and selectedStatus == 1}">已驗證
-                            </option>
-                            <option value="2" th:selected="${selectedStatus != null and selectedStatus == 2}">停用
-                            </option>
+                            <option value="0" th:selected="${selectedStatus != null and selectedStatus == 0}">未驗證</option>
+                            <option value="1" th:selected="${selectedStatus != null and selectedStatus == 1}">已驗證</option>
+                            <option value="2" th:selected="${selectedStatus != null and selectedStatus == 2}">停用</option>
                         </select>
                     </div>
+                    <div class="col-md-2">
+				        <button type="button" class="btn btn-primary" onclick="applyFilters()">
+				            <i class="bi bi-search"></i> 搜尋
+				        </button>
+				    </div>
                 </div>
 
                 <!-- 會員表格 -->
@@ -129,92 +128,7 @@
                 <!-- //////////////////// 頁面內容放在這個card裡面//////////////////// -->
             </div>
         </th:block>
-        </div>
     </main>
-    <!-- 新增會員 Modal -->
-    <div class="modal fade" id="addMemberModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="bi bi-plus-circle me-2"></i>新增會員
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="card-header bg-transparent border-0 pt-4">
-                    <div class="d-flex justify-content-between align-items-center">
-
-
-                    </div>
-                </div>
-                <form th:object="${member}" method="post" id="addMemberForm" novalidate enctype="multipart/form-data">
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="memberName" class="form-label">會員姓名 <span
-                                        class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="memberName" th:field="*{memberName}"
-                                    required>
-                                <div class="invalid-feedback">請輸入會員姓名</div>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="memberEmail" class="form-label">會員電子信箱 <span
-                                        class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="memberEmail" th:field="*{memberEmail}"
-                                    required>
-                                <div class="invalid-feedback">請輸入會員電子信箱</div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="memberAddress" class="form-label">會員地址 <span
-                                    class="text-danger">*</span></label>
-                            <textarea class="form-control" id="memberAddress" th:field="*{memberAddress}" rows="3"
-                                required></textarea>
-                            <div class="invalid-feedback">請輸入會員地址</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="memberGender" class="form-label">會員性別 <span
-                                        class="text-danger">*</span></label>
-                                <select class="form-select" id="memberGender" th:field="*{memberGender}" required>
-                                    <option value="">請選擇性別</option>
-                                    <option th:value="0" th:selected="*{memberGender == 0}">男生</option>
-                                    <option th:value="1" th:selected="*{memberGender == 1}">女生</option>
-                                    <option th:value="2" th:selected="*{memberGender == 2}">其它</option>
-                                </select>
-                                <div class="invalid-feedback">請選擇會員性別</div>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="memberStatus" class="form-label">狀態 <span
-                                        class="text-danger">*</span></label>
-                                <select class="form-select" id="memberStatus" th:field="*{memberStatus}" required>
-                                    <option value="">請選擇狀態</option>
-                                    <option th:value="0" th:selected="*{memberStatus == 0}">未驗證</option>
-                                    <option th:value="1" th:selected="*{memberStatus == 1}">已驗證</option>
-                                    <option th:value="2" th:selected="*{memberStatus == 2}">停用</option>
-                                </select>
-                                <div class="invalid-feedback">請選擇會員狀態</div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">會員照片（可拖曳）</label>
-                            <input type="file" class="form-control" id="addMemberPhotoInput" accept="image/*" multiple
-                                style="max-width:300px;">
-                            <div class="mt-2 d-flex flex-wrap gap-2" id="addMemberPhotoPreview"></div>
-                            <small class="text-muted">點擊右上角可刪除</small>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                        <button type="submit" class="btn btn-success">
-                            <i class="bi bi-check-circle me-2"></i>儲存
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <!-- 修改會員 Modal -->
     <div class="modal fade" id="editMemberModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -231,7 +145,7 @@
 
                     </div>
                 </div>
-                <form th:object="${member}" method="post" id="editMemberForm" novalidate enctype="multipart/form-data">
+                <form th:object="${member}" th:action="@{/backend/member/update}" method="post" id="editMemberForm" novalidate enctype="multipart/form-data">
                     <div class="modal-body">
                         <input type="hidden" name="memberId" />
                         <div class="row">
@@ -283,11 +197,10 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">會員照片（可拖曳）</label>
-                            <div id="memberPhotoSortArea" class="d-flex flex-wrap gap-2"></div>
-                            <input type="file" class="form-control mt-2" id="editMemberPhotoInput" accept="image/*"
-                                multiple style="max-width:300px;">
-                            <small class="text-muted">點擊右上角可刪除</small>
+                            <label class="form-label">會員照片</label>
+                            <div id="memberPhotoArea" class="mb-2"></div>
+                            <input type="file" class="form-control" name="newMemberPhoto" id="editMemberPhotoInput" accept="image/*" style="max-width:300px;">
+<!--                             <small class="text-muted">點擊右上角可刪除</small> -->
                         </div>
                     </div>
                     <div class="modal-footer">

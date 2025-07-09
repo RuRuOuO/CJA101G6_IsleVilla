@@ -442,6 +442,26 @@ public class BookingService {
             detail.setRvPaidAmount(actualUnitPrice * nights);
             detail.setRoomRVOrder(order);
             details.add(detail);
+
+            if (promotionId != null) {
+                com.islevilla.patty.promotion.model.Promotion promotion = 
+                    entityManager.find(com.islevilla.patty.promotion.model.Promotion.class, promotionId);
+                if (promotion != null) {
+                    selectedPromotion = promotion;
+                    if (detail.getRoomType() != null) {
+                        int originalPrice = detail.getRoomType().getRoomTypePrice();
+                        discountAmount = (originalPrice - actualUnitPrice) * nights;
+                        detail.setRvDiscountAmount(discountAmount > 0 ? discountAmount : 0);
+                    }
+                    // 設定 promotionTitle
+                    try {
+                        java.lang.reflect.Method setPromotionTitle = detail.getClass().getMethod("setPromotionTitle", String.class);
+                        setPromotionTitle.invoke(detail, promotion.getRoomPromotionTitle());
+                    } catch(Exception e) {
+                        // RoomRVDetail 沒有 promotionTitle 屬性就略過
+                    }
+                }
+            }
         }
         if (selectedPromotion != null) {
             order.setPromotion(selectedPromotion);

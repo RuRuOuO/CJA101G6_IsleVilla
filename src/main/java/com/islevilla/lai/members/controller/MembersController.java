@@ -8,6 +8,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -692,7 +694,7 @@ public class MembersController {
 
 		// 根據篩選條件查詢會員
 		if (search != null && !search.trim().isEmpty()) {
-			memberList = membersService.searchMembers(search);
+			memberList = membersService.searchMembers(search.trim());
 		} else if (gender != null && status != null) {
 			// 根據會員性別和會員狀態過濾會員
 			memberList = membersService.getMemberByMemberGenderAndMemberStatus(gender, status);
@@ -716,6 +718,71 @@ public class MembersController {
 
 
 		return "back-end/member/listMember";
+	}
+	
+	// 後台 - 修改會員資料
+	@PostMapping("/backend/member/update")
+	@PreAuthorize("hasAuthority('service')")
+	public String updateMember(@ModelAttribute Members member,
+	        @RequestParam(value = "newMemberPhoto", required = false) MultipartFile memberPhoto,
+	        @RequestParam(value = "deletePhoto", required = false) String deletePhoto,
+	        RedirectAttributes redirectAttributes) {
+	    try {
+	        // 取得現有會員資料
+	        Members existingMember = membersService.getOneMember(member.getMemberId());
+	        if (existingMember == null) {
+	            redirectAttributes.addFlashAttribute("error", "會員不存在");
+	            return "redirect:/backend/member/list";
+	        }
+
+	        // 更新基本資料
+	        existingMember.setMemberName(member.getMemberName());
+	        existingMember.setMemberEmail(member.getMemberEmail());
+	        existingMember.setMemberAddress(member.getMemberAddress());
+	        existingMember.setMemberGender(member.getMemberGender());
+	        existingMember.setMemberStatus(member.getMemberStatus());
+
+	        // 處理照片上傳
+	        if ("true".equals(deletePhoto)) {
+	            // 刪除照片
+	            existingMember.setMemberPhoto(null);
+	        } else if (memberPhoto != null && !memberPhoto.isEmpty()) {
+	            // 上傳新照片
+	            try {
+	                existingMember.setMemberPhoto(memberPhoto.getBytes());
+	            } catch (IOException e) {
+	                redirectAttributes.addFlashAttribute("error", "照片上傳失敗：" + e.getMessage());
+	                return "redirect:/backend/member/list";
+	            }
+	        }
+
+	        // 儲存更新
+	        membersService.updateMember(existingMember);
+	        redirectAttributes.addFlashAttribute("success", "會員資料更新成功");
+
+	    } catch (Exception e) {
+	    	System.out.println("更新失敗：" + e.getMessage());
+	        redirectAttributes.addFlashAttribute("error", "更新失敗：" + e.getMessage());
+	    }
+
+	    return "redirect:/backend/member/list";
+	}
+	
+	// 後台 - 取得會員照片
+	@GetMapping("/backend/member/{memberId}/photo")
+	@PreAuthorize("hasAuthority('service')")
+	public ResponseEntity<byte[]> getMemberPhotoBackend(@PathVariable Integer memberId) {
+	    try {
+	        Members member = membersService.getOneMember(memberId);
+	        if (member != null && member.getMemberPhoto() != null) {
+	            HttpHeaders headers = new HttpHeaders();
+	            headers.setContentType(MediaType.IMAGE_PNG);
+	            return new ResponseEntity<>(member.getMemberPhoto(), headers, HttpStatus.OK);
+	        }
+	        return ResponseEntity.notFound().build();
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	    }
 	}
 
 	/**

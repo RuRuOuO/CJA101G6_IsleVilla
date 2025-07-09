@@ -6,6 +6,7 @@
     <title>商品管理 | 微嶼 IsleVilla</title>
     <!-- ===== 載入統一樣式 ===== -->
     <th:block th:replace="~{fragments/backFragments :: styles}"></th:block>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <style>
     /* ...原有樣式... */
     #clearAllBtn {
@@ -155,8 +156,9 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="productName" class="form-label">商品名稱 <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="productName" th:field="*{productName}" required>
+                        <input type="text" class="form-control" id="productName" th:field="*{productName}" required maxlength="30">
                         <div class="invalid-feedback">請輸入商品名稱</div>
+                        <small class="text-muted">最多30個字元</small>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="productPrice" class="form-label">價格 <span class="text-danger">*</span></label>
@@ -166,8 +168,9 @@
                 </div>
                 <div class="mb-3">
                     <label for="productDescription" class="form-label">商品描述 <span class="text-danger">*</span></label>
-                    <textarea class="form-control" id="productDescription" th:field="*{productDescription}" rows="3" required></textarea>
+                    <textarea class="form-control" id="productDescription" th:field="*{productDescription}" rows="3" required maxlength="200"></textarea>
                     <div class="invalid-feedback">請輸入商品描述</div>
+                    <small class="text-muted">最多200個字元</small>
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -177,11 +180,16 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="productStatus" class="form-label">狀態 <span class="text-danger">*</span></label>
-                        <select class="form-select" id="productStatus" th:field="*{productStatus}" required>
-                            <option value="">請選擇狀態</option>
-                            <option th:value="1" th:selected="*{productStatus == 1}">上架</option>
-                            <option th:value="0" th:selected="*{productStatus == 0}">下架</option>
-                        </select>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="productStatus" id="addProductStatusActive" value="1" required>
+                                <label class="form-check-label" for="addProductStatusActive">上架</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="productStatus" id="addProductStatusInactive" value="0" required>
+                                <label class="form-check-label" for="addProductStatusInactive">下架</label>
+                            </div>
+                        </div>
                         <div class="invalid-feedback">請選擇商品狀態</div>
                     </div>
                 </div>
@@ -215,13 +223,13 @@
     </div>
 </div>
 
-<!-- 修改員工 Modal -->
+<!-- 修改商品 Modal -->
 <div class="modal fade" id="editProductModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    <i class="bi bi-plus-circle me-2"></i>修改商品
+                    <i class="bi bi-pencil me-2"></i>修改商品
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -237,8 +245,9 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="editProductName" class="form-label">商品名稱 <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="editProductName" th:field="*{productName}" required>
+                        <input type="text" class="form-control" id="editProductName" th:field="*{productName}" required maxlength="30">
                         <div class="invalid-feedback">請輸入商品名稱</div>
+                        <small class="text-muted">最多30個字元</small>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="editProductPrice" class="form-label">價格 <span class="text-danger">*</span></label>
@@ -248,8 +257,9 @@
                 </div>
                 <div class="mb-3">
                     <label for="editProductDescription" class="form-label">商品描述 <span class="text-danger">*</span></label>
-                    <textarea class="form-control" id="editProductDescription" th:field="*{productDescription}" rows="3" required></textarea>
+                    <textarea class="form-control" id="editProductDescription" th:field="*{productDescription}" rows="3" required maxlength="200"></textarea>
                     <div class="invalid-feedback">請輸入商品描述</div>
+                    <small class="text-muted">最多200個字元</small>
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -259,11 +269,16 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="editProductStatus" class="form-label">狀態 <span class="text-danger">*</span></label>
-                        <select class="form-select" id="editProductStatus" th:field="*{productStatus}" required>
-                            <option value="">請選擇狀態</option>
-                            <option th:value="1" th:selected="*{productStatus == 1}">上架</option>
-                            <option th:value="0" th:selected="*{productStatus == 0}">下架</option>
-                        </select>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="productStatus" id="editProductStatusActive" value="1" required>
+                                <label class="form-check-label" for="editProductStatusActive">上架</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="productStatus" id="editProductStatusInactive" value="0" required>
+                                <label class="form-check-label" for="editProductStatusInactive">下架</label>
+                            </div>
+                        </div>
                         <div class="invalid-feedback">請選擇商品狀態</div>
                     </div>
                 </div>
@@ -471,12 +486,32 @@
         // 商品名稱驗證
         document.querySelectorAll('#productName, #editProductName').forEach(field => {
             field.addEventListener('input', function() {
-                if (this.value.trim().length > 0) {
-                    this.classList.remove('is-invalid');
-                    this.classList.add('is-valid');
-                } else {
+                const value = this.value.trim();
+                const maxLength = 30;
+                const currentLength = value.length;
+                
+                // 更新字元計數
+                let counter = this.parentNode.querySelector('.char-counter');
+                if (!counter) {
+                    counter = document.createElement('small');
+                    counter.className = 'char-counter text-muted';
+                    this.parentNode.appendChild(counter);
+                }
+                counter.textContent = `${currentLength}/${maxLength}`;
+                
+                // 驗證邏輯
+                if (value.length === 0) {
                     this.classList.remove('is-valid');
                     this.classList.add('is-invalid');
+                    counter.className = 'char-counter text-muted';
+                } else if (value.length > maxLength) {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                    counter.className = 'char-counter text-danger';
+                } else {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                    counter.className = 'char-counter text-muted';
                 }
             });
         });
@@ -498,12 +533,32 @@
         // 商品描述驗證
         document.querySelectorAll('#productDescription, #editProductDescription').forEach(field => {
             field.addEventListener('input', function() {
-                if (this.value.trim().length > 0) {
-                    this.classList.remove('is-invalid');
-                    this.classList.add('is-valid');
-                } else {
+                const value = this.value.trim();
+                const maxLength = 200;
+                const currentLength = value.length;
+                
+                // 更新字元計數
+                let counter = this.parentNode.querySelector('.char-counter');
+                if (!counter) {
+                    counter = document.createElement('small');
+                    counter.className = 'char-counter text-muted';
+                    this.parentNode.appendChild(counter);
+                }
+                counter.textContent = `${currentLength}/${maxLength}`;
+                
+                // 驗證邏輯
+                if (value.length === 0) {
                     this.classList.remove('is-valid');
                     this.classList.add('is-invalid');
+                    counter.className = 'char-counter text-muted';
+                } else if (value.length > maxLength) {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                    counter.className = 'char-counter text-danger';
+                } else {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                    counter.className = 'char-counter text-muted';
                 }
             });
         });
@@ -523,14 +578,18 @@
         });
 
         // 狀態驗證
-        document.querySelectorAll('#productStatus, #editProductStatus').forEach(field => {
+        document.querySelectorAll('[name="productStatus"]').forEach(field => {
             field.addEventListener('change', function() {
-                if (this.value !== '') {
-                    this.classList.remove('is-invalid');
-                    this.classList.add('is-valid');
+                const form = this.closest('form');
+                const checkedStatus = form.querySelector('input[name="productStatus"]:checked');
+                const statusContainer = form.querySelector('input[name="productStatus"]').closest('.col-md-6');
+                
+                if (checkedStatus) {
+                    statusContainer.classList.remove('is-invalid');
+                    statusContainer.classList.add('is-valid');
                 } else {
-                    this.classList.remove('is-valid');
-                    this.classList.add('is-invalid');
+                    statusContainer.classList.remove('is-valid');
+                    statusContainer.classList.add('is-invalid');
                 }
             });
         });
@@ -566,8 +625,20 @@
         editModal.querySelector('#editProductPrice').value                       = price;
         editModal.querySelector('#editProductDescription').value                 = desc;
         editModal.querySelector('#editProductQuantity').value                    = qty;
-        editModal.querySelector('#editProductStatus').value                      = stat;
+        // 設定商品狀態 radio button
+        document.querySelectorAll('#editProductForm input[name="productStatus"]').forEach(radio => {
+            radio.checked = radio.value === stat;
+        });
         editModal.querySelector('#editProductCategory').value                    = cat;
+        
+        // 觸發字元計數更新
+        setTimeout(() => {
+            const nameField = editModal.querySelector('#editProductName');
+            const descField = editModal.querySelector('#editProductDescription');
+            if (nameField) nameField.dispatchEvent(new Event('input'));
+            if (descField) descField.dispatchEvent(new Event('input'));
+        }, 100);
+        
         // 每次都重設圖片狀態並載入舊圖
         productPhotoList = [];
         deletedPhotoIds = [];
@@ -649,18 +720,21 @@
     async function submitEditProductForm(e) {
         e.preventDefault();
         const form = e.target;
-        // ...原有欄位驗證...
         const formData = new FormData(form);
-        // 送出排序後的舊圖ID陣列
-        const oldPhotoOrder = productPhotoList.filter(p => !p.isNew && p.id).map(p => p.id);
-        formData.append('oldPhotoOrder', JSON.stringify(oldPhotoOrder));
-        // 送出要刪除的舊圖ID陣列
-        formData.append('deletedPhotoIds', JSON.stringify(deletedPhotoIds));
-        // 送出新圖檔案，依排序append
-        productPhotoList.filter(p => p.isNew).forEach(fileObj => {
-            formData.append('newPhotos', fileObj.file);
+        // 新做法：送出完整排序陣列
+        const photoOrder = [];
+        let newFileIdx = 0;
+        productPhotoList.forEach((p, idx) => {
+            if (p.isNew && p.file) {
+                photoOrder.push({ isNew: true, fileIdx: newFileIdx });
+                formData.append('newPhotos', p.file); // 新圖 file 依順序 append
+                newFileIdx++;
+            } else if (!p.isNew && p.id) {
+                photoOrder.push({ isNew: false, id: p.id });
+            }
         });
-        // ...其他欄位append...
+        formData.append('photoOrder', JSON.stringify(photoOrder));
+        formData.append('deletedPhotoIds', JSON.stringify(deletedPhotoIds));
         // fetch送出
         const resp = await fetch('/backend/product/edit', {
             method: 'POST',
@@ -729,9 +803,7 @@
                     next:     '下一頁'
                 }
             },
-            columnDefs: [
-                { orderable: false, targets: -1 }
-            ],
+            // 移除 columnDefs 的 orderable: false 設定，讓所有欄位都可排序
             drawCallback: function(){
                 var $pg = $('#productTable_wrapper .pagination');
                 $pg.find('li.disabled a, li.active a')

@@ -39,11 +39,7 @@ public class RoomTypeAvailabilityService {
 	// 全部房型和單月份查詢
 	@Transactional(readOnly = true)
 	public List<RoomTypeAvailability> findAllByYearMonth(int year,int month) {
-		List<RoomTypeAvailability> result = roomTypeAvailabilityRepository.findAllByYearMonth(year,month);
-		if (result.isEmpty()) {
-			throw new BusinessException("查無當月記錄");
-		}
-		return result;
+		return roomTypeAvailabilityRepository.findAllByYearMonth(year,month);
 	}
 	
 	
@@ -82,6 +78,36 @@ public class RoomTypeAvailabilityService {
 		}
 	}
 	
+	/**
+	 * 初始化新房型的每日庫存記錄 (數量為0)
+	 * @param roomTypeId 新增房型的ID
+	 */
+	@Transactional
+	public void initializeAvailabilityForNewRoomType(Integer roomTypeId) {
+		LocalDate startDate = LocalDate.now();
+		LocalDate endDate = startDate.plusMonths(3); // 初始化未來三個月的庫存
+
+		Optional<RoomType> roomTypeOpt = roomTypeRepository.findById(roomTypeId);
+		if (!roomTypeOpt.isPresent()) {
+			throw new BusinessException("初始化庫存失敗：找不到房型ID " + roomTypeId);
+		}
+		RoomType roomType = roomTypeOpt.get();
+
+		LocalDate date = startDate;
+		while (!date.isAfter(endDate)) {
+			RoomTypeAvailabilityId id = new RoomTypeAvailabilityId(roomTypeId, date);
+			Optional<RoomTypeAvailability> existing = roomTypeAvailabilityRepository.findById(id);
+
+			if (!existing.isPresent()) { // 只在記錄不存在時才新增
+				RoomTypeAvailability newAvailability = new RoomTypeAvailability();
+				newAvailability.setRoomTypeAvailabilityId(id);
+				newAvailability.setRoomType(roomType);
+				newAvailability.setRoomTypeAvailabilityCount(0); // 新增房型初始庫存為0
+				roomTypeAvailabilityRepository.save(newAvailability);
+			}
+			date = date.plusDays(1);
+		}
+	}
 	
 
 	//=======給patty用的=======
@@ -411,4 +437,5 @@ public class RoomTypeAvailabilityService {
 	  return roomTypeAvailabilityRepository.findAll();
 	 }
 	//==================================
+
 }
