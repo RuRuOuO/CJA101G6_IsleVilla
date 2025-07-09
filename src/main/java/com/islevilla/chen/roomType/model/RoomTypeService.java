@@ -96,14 +96,5 @@ public class RoomTypeService {
 	public List<RoomType> compoundQuery(Integer roomTypeId, Byte roomTypeSaleStatus){
 		return roomTypeRepository.searchRoomTypes(roomTypeId, roomTypeSaleStatus);
 	}
-	//根據房型上下架狀態查詢
-	@Transactional(readOnly = true)
-	public List<RoomType> findByRoomTypeSaleStatus(Byte roomTypeSaleStatus) {
-		List<RoomType> list = roomTypeRepository.findByRoomTypeSaleStatus(roomTypeSaleStatus);
-		 if (list.isEmpty()) {
-		        throw new BusinessException("查無符合條件的房型資料！");
-		    }
-		return list;
-	}
 }
 
