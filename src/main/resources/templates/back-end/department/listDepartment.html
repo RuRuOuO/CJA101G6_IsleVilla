@@ -190,9 +190,7 @@ $(function(){
                 next:     '下一頁'
             }
         },
-        columnDefs: [
-            { orderable: false, targets: -1 }
-        ],
+        // 移除 columnDefs 的 orderable: false 設定，讓所有欄位都可排序
         drawCallback: function(){
             var $pg = $('#departmentTable_wrapper .pagination');
             $pg.find('li.disabled a, li.active a')

@@ -650,18 +650,21 @@
     async function submitEditProductForm(e) {
         e.preventDefault();
         const form = e.target;
-        // ...原有欄位驗證...
         const formData = new FormData(form);
-        // 送出排序後的舊圖ID陣列
-        const oldPhotoOrder = productPhotoList.filter(p => !p.isNew && p.id).map(p => p.id);
-        formData.append('oldPhotoOrder', JSON.stringify(oldPhotoOrder));
-        // 送出要刪除的舊圖ID陣列
-        formData.append('deletedPhotoIds', JSON.stringify(deletedPhotoIds));
-        // 送出新圖檔案，依排序append
-        productPhotoList.filter(p => p.isNew).forEach(fileObj => {
-            formData.append('newPhotos', fileObj.file);
+        // 新做法：送出完整排序陣列
+        const photoOrder = [];
+        let newFileIdx = 0;
+        productPhotoList.forEach((p, idx) => {
+            if (p.isNew && p.file) {
+                photoOrder.push({ isNew: true, fileIdx: newFileIdx });
+                formData.append('newPhotos', p.file); // 新圖 file 依順序 append
+                newFileIdx++;
+            } else if (!p.isNew && p.id) {
+                photoOrder.push({ isNew: false, id: p.id });
+            }
         });
-        // ...其他欄位append...
+        formData.append('photoOrder', JSON.stringify(photoOrder));
+        formData.append('deletedPhotoIds', JSON.stringify(deletedPhotoIds));
         // fetch送出
         const resp = await fetch('/backend/product/edit', {
             method: 'POST',
@@ -730,9 +733,7 @@
                     next:     '下一頁'
                 }
             },
-            columnDefs: [
-                { orderable: false, targets: -1 }
-            ],
+            // 移除 columnDefs 的 orderable: false 設定，讓所有欄位都可排序
             drawCallback: function(){
                 var $pg = $('#productTable_wrapper .pagination');
                 $pg.find('li.disabled a, li.active a')
