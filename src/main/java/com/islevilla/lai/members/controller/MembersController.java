@@ -724,7 +724,7 @@ public class MembersController {
 	@PostMapping("/backend/member/update")
 	@PreAuthorize("hasAuthority('service')")
 	public String updateMember(@ModelAttribute Members member,
-	        @RequestParam(value = "memberPhoto", required = false) MultipartFile memberPhoto,
+	        @RequestParam(value = "newMemberPhoto", required = false) MultipartFile memberPhoto,
 	        @RequestParam(value = "deletePhoto", required = false) String deletePhoto,
 	        RedirectAttributes redirectAttributes) {
 	    try {
@@ -752,17 +752,13 @@ public class MembersController {
 	                existingMember.setMemberPhoto(memberPhoto.getBytes());
 	            } catch (IOException e) {
 	                redirectAttributes.addFlashAttribute("error", "照片上傳失敗：" + e.getMessage());
-	                System.out.println("照片上傳失敗：" + e.getMessage());
 	                return "redirect:/backend/member/list";
 	            }
 	        }
-	        System.out.println("測試123");
 
 	        // 儲存更新
 	        membersService.updateMember(existingMember);
 	        redirectAttributes.addFlashAttribute("success", "會員資料更新成功");
-	        
-	        System.out.println("測試456");
 
 	    } catch (Exception e) {
 	    	System.out.println("更新失敗：" + e.getMessage());
