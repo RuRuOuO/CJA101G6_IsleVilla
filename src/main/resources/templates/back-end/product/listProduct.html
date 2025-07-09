@@ -156,8 +156,9 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="productName" class="form-label">商品名稱 <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="productName" th:field="*{productName}" required>
+                        <input type="text" class="form-control" id="productName" th:field="*{productName}" required maxlength="30">
                         <div class="invalid-feedback">請輸入商品名稱</div>
+                        <small class="text-muted">最多30個字元</small>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="productPrice" class="form-label">價格 <span class="text-danger">*</span></label>
@@ -167,8 +168,9 @@
                 </div>
                 <div class="mb-3">
                     <label for="productDescription" class="form-label">商品描述 <span class="text-danger">*</span></label>
-                    <textarea class="form-control" id="productDescription" th:field="*{productDescription}" rows="3" required></textarea>
+                    <textarea class="form-control" id="productDescription" th:field="*{productDescription}" rows="3" required maxlength="200"></textarea>
                     <div class="invalid-feedback">請輸入商品描述</div>
+                    <small class="text-muted">最多200個字元</small>
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -243,8 +245,9 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="editProductName" class="form-label">商品名稱 <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="editProductName" th:field="*{productName}" required>
+                        <input type="text" class="form-control" id="editProductName" th:field="*{productName}" required maxlength="30">
                         <div class="invalid-feedback">請輸入商品名稱</div>
+                        <small class="text-muted">最多30個字元</small>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="editProductPrice" class="form-label">價格 <span class="text-danger">*</span></label>
@@ -254,8 +257,9 @@
                 </div>
                 <div class="mb-3">
                     <label for="editProductDescription" class="form-label">商品描述 <span class="text-danger">*</span></label>
-                    <textarea class="form-control" id="editProductDescription" th:field="*{productDescription}" rows="3" required></textarea>
+                    <textarea class="form-control" id="editProductDescription" th:field="*{productDescription}" rows="3" required maxlength="200"></textarea>
                     <div class="invalid-feedback">請輸入商品描述</div>
+                    <small class="text-muted">最多200個字元</small>
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -482,12 +486,32 @@
         // 商品名稱驗證
         document.querySelectorAll('#productName, #editProductName').forEach(field => {
             field.addEventListener('input', function() {
-                if (this.value.trim().length > 0) {
-                    this.classList.remove('is-invalid');
-                    this.classList.add('is-valid');
-                } else {
+                const value = this.value.trim();
+                const maxLength = 30;
+                const currentLength = value.length;
+                
+                // 更新字元計數
+                let counter = this.parentNode.querySelector('.char-counter');
+                if (!counter) {
+                    counter = document.createElement('small');
+                    counter.className = 'char-counter text-muted';
+                    this.parentNode.appendChild(counter);
+                }
+                counter.textContent = `${currentLength}/${maxLength}`;
+                
+                // 驗證邏輯
+                if (value.length === 0) {
                     this.classList.remove('is-valid');
                     this.classList.add('is-invalid');
+                    counter.className = 'char-counter text-muted';
+                } else if (value.length > maxLength) {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                    counter.className = 'char-counter text-danger';
+                } else {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                    counter.className = 'char-counter text-muted';
                 }
             });
         });
@@ -509,12 +533,32 @@
         // 商品描述驗證
         document.querySelectorAll('#productDescription, #editProductDescription').forEach(field => {
             field.addEventListener('input', function() {
-                if (this.value.trim().length > 0) {
-                    this.classList.remove('is-invalid');
-                    this.classList.add('is-valid');
-                } else {
+                const value = this.value.trim();
+                const maxLength = 200;
+                const currentLength = value.length;
+                
+                // 更新字元計數
+                let counter = this.parentNode.querySelector('.char-counter');
+                if (!counter) {
+                    counter = document.createElement('small');
+                    counter.className = 'char-counter text-muted';
+                    this.parentNode.appendChild(counter);
+                }
+                counter.textContent = `${currentLength}/${maxLength}`;
+                
+                // 驗證邏輯
+                if (value.length === 0) {
                     this.classList.remove('is-valid');
                     this.classList.add('is-invalid');
+                    counter.className = 'char-counter text-muted';
+                } else if (value.length > maxLength) {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                    counter.className = 'char-counter text-danger';
+                } else {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                    counter.className = 'char-counter text-muted';
                 }
             });
         });
@@ -586,6 +630,15 @@
             radio.checked = radio.value === stat;
         });
         editModal.querySelector('#editProductCategory').value                    = cat;
+        
+        // 觸發字元計數更新
+        setTimeout(() => {
+            const nameField = editModal.querySelector('#editProductName');
+            const descField = editModal.querySelector('#editProductDescription');
+            if (nameField) nameField.dispatchEvent(new Event('input'));
+            if (descField) descField.dispatchEvent(new Event('input'));
+        }, 100);
+        
         // 每次都重設圖片狀態並載入舊圖
         productPhotoList = [];
         deletedPhotoIds = [];
