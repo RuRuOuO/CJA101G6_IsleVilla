@@ -26,6 +26,16 @@
         </div>
 
         <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="newsSearchInput" placeholder="搜尋標題"/>
+                    </div>
+                </div>
+            </div>
             <div class="table-responsive">
                 <table class="table table-hover" id="newsTable">
                     <thead>
@@ -81,14 +91,13 @@
 <th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>
 
 <script>
-    // 初始化 DataTable
     $(document).ready(function () {
-        $('#newsTable').DataTable({
-            dom: "t<'d-flex justify-content-center my-3'p>",
-            // pagingType: 'simple_numbers',
-            paging: false, // 關閉分頁
+        var table = $('#newsTable').DataTable({
+            dom: "t<'d-flex justify-content-center my-3'p>", // 不要 f
+            paging: false,
             lengthChange: false,
             info: false,
+            searching: true,
             language: {
                 paginate: {
                     previous: '上一頁',
@@ -103,9 +112,13 @@
                 });
             },
             initComplete: function () {
-                // 初始化完成後立即應用排序
                 this.api().order([0, 'desc']).draw();
             }
+        });
+
+        // 只針對標題欄搜尋
+        $('#newsSearchInput').on('input', function () {
+            table.column(1).search(this.value).draw();
         });
     });
 </script>
