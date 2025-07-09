@@ -183,9 +183,9 @@
                             <div class="card p-4 shadow-sm">
                                 <div class="d-flex justify-content-between align-items-center mb-4">
                                     <h3 class="mb-0">編輯個人資訊</h3>
-                                    <button type="button" class="btn btn-secondary" onclick="toggleEditMode()">
-                                        <i class="fas fa-times me-2"></i>取消編輯
-                                    </button>
+<!--                                     <button type="button" class="btn btn-secondary" onclick="toggleEditMode()"> -->
+<!--                                         <i class="fas fa-times me-2"></i>取消編輯 -->
+<!--                                     </button> -->
                                 </div>
 
                                 <form th:action="@{/member/update}" method="post" enctype="multipart/form-data"
@@ -291,7 +291,7 @@
                                                         class="text-danger">*</span></label>
                                                 <input type="password" class="form-control" id="newPassword"
                                                     name="newPassword" required minlength="6">
-                                                <small class="form-text text-muted">密碼長度至少6個字元</small>
+                                                <small class="form-text text-muted">密碼須包含英數字，長度至少8個字元</small>
                                             </div>
                                             <div class="mb-3">
                                                 <label for="confirmPassword" class="form-label">確認新密碼 <span

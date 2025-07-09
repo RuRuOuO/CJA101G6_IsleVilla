@@ -540,7 +540,8 @@ public class MembersController {
 
 			redirectAttributes.addFlashAttribute("successMessage", "資料更新成功！");
 		} catch (Exception e) {
-			redirectAttributes.addFlashAttribute("errorMessage", "資料更新失敗：" + e.getMessage());
+//			redirectAttributes.addFlashAttribute("errorMessage", "資料更新失敗：" + e.getMessage());
+			redirectAttributes.addFlashAttribute("errorMessage", "資料更新失敗！");
 		}
 		// 更新邏輯
 		session.setAttribute("member", membersService.getOneMember(member.getMemberId())); // 更新 session 中的會員資料

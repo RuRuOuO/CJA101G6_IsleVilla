@@ -31,6 +31,11 @@ public class ShuttleReservationService {
 	public List<ShuttleReservation> getReservationsByMember(Members member) {
 		return shuttleReservationRepository.findByMembers(member);
 	}
+	
+	// 根據會員獲取預約記錄（根據接駁預約編號Desc）
+	public List<ShuttleReservation> getReservationsByMemberOrderByShuttleReservationIdDesc(Members member) {
+		return shuttleReservationRepository.findByMembersOrderByShuttleReservationIdDesc(member);
+	}
 
 	// 根據訂房記錄獲取預約記錄
 	public List<ShuttleReservation> getReservationsByRoomReservation(RoomRVOrder roomRVOrder) {

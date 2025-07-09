@@ -16,6 +16,9 @@ public interface ShuttleReservationRepository extends JpaRepository<ShuttleReser
 
 	// 根據會員查詢預約記錄
 	List<ShuttleReservation> findByMembers(Members member);
+	
+	// 根據會員查詢預約記錄（根據接駁預約編號Desc）
+	List<ShuttleReservation> findByMembersOrderByShuttleReservationIdDesc(Members member);
 
 	List<ShuttleReservation> findByMembers_MemberId(Integer memberId);
 
