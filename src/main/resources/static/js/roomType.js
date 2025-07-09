@@ -361,30 +361,30 @@ let sortableAddPhotoArea;        // 新增頁面的拖曳排序實例
 
 // 載入房型資料進行更新
 //當使用者點擊修改按鈕時，自動載入該房型的基本資料和圖片
-function loadRoomTypeForUpdate(button) {
-    // 取得房型資料
-    const roomTypeId = button.getAttribute('data-id');
-    const roomTypeName = button.getAttribute('data-name');
-    const roomTypeCode = button.getAttribute('data-code');
-    const roomTypeQuantity = button.getAttribute('data-quantity');
-    const roomTypeCapacity = button.getAttribute('data-capacity');
-    const roomTypeContent = button.getAttribute('data-content');
-    const roomTypePrice = button.getAttribute('data-price');
-    const roomTypeSaleStatus = button.getAttribute('data-status');
-    
-    // 填入表單資料
-    document.getElementById('updateRoomTypeForm').querySelector('input[name="roomTypeId"]').value = roomTypeId;
-    document.getElementById('updateRoomTypeName').value = roomTypeName;
-    document.getElementById('updateRoomTypeCode').value = roomTypeCode;
-    document.getElementById('updateRoomTypeQuantity').value = roomTypeQuantity;
-    document.getElementById('updateRoomTypeCapacity').value = roomTypeCapacity;
-    document.getElementById('updateRoomTypeContent').value = roomTypeContent;
-    document.getElementById('updateRoomTypePrice').value = roomTypePrice;
-    document.getElementById('updateRoomTypeSaleStatus').value = roomTypeSaleStatus;
-    
-    // 載入房型圖片
-    loadRoomTypePhotos(roomTypeId);
-}
+//function loadRoomTypeForUpdate(button) {
+//    // 取得房型資料
+//    const roomTypeId = button.getAttribute('data-id');
+//    const roomTypeName = button.getAttribute('data-name');
+//    const roomTypeCode = button.getAttribute('data-code');
+//    const roomTypeQuantity = button.getAttribute('data-quantity');
+//    const roomTypeCapacity = button.getAttribute('data-capacity');
+//    const roomTypeContent = button.getAttribute('data-content');
+//    const roomTypePrice = button.getAttribute('data-price');
+//    const roomTypeSaleStatus = button.getAttribute('data-status');
+//    
+//    // 填入表單資料
+//    document.getElementById('updateRoomTypeForm').querySelector('input[name="roomTypeId"]').value = roomTypeId;
+//    document.getElementById('updateRoomTypeName').value = roomTypeName;
+//    document.getElementById('updateRoomTypeCode').value = roomTypeCode;
+//    document.getElementById('updateRoomTypeQuantity').value = roomTypeQuantity;
+//    document.getElementById('updateRoomTypeCapacity').value = roomTypeCapacity;
+//    document.getElementById('updateRoomTypeContent').value = roomTypeContent;
+//    document.getElementById('updateRoomTypePrice').value = roomTypePrice;
+//    document.getElementById('updateRoomTypeSaleStatus').value = roomTypeSaleStatus;
+//    
+//    // 載入房型圖片
+//    loadRoomTypePhotos(roomTypeId);
+//}
 
 // 載入房型圖片
 // 從後端API載入房型的現有圖片

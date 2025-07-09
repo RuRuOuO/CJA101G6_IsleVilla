@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,11 +12,17 @@ import com.islevilla.chen.room.model.Room;
 import com.islevilla.chen.util.exception.BusinessException;
 import com.islevilla.chen.util.map.RoomTypeName;
 
+import com.islevilla.chen.roomTypeAvailability.model.RoomTypeAvailabilityService;
+
 @Service
 public class RoomTypeService {
 
 	@Autowired
 	private RoomTypeRepository roomTypeRepository;
+	
+	@Autowired
+	@Lazy
+	private RoomTypeAvailabilityService roomTypeAvailabilityService;
 	
 	@Transactional
 	public RoomType addRoomType(RoomType roomType) {
@@ -34,7 +41,12 @@ public class RoomTypeService {
 	    // 在新增時，將房型數量預設為 0
 	    roomType.setRoomTypeQuantity(0);
 	    
-		return roomTypeRepository.save(roomType);
+		RoomType savedRoomType = roomTypeRepository.save(roomType);
+	
+	// 在新增房型後，初始化其每日庫存記錄
+	roomTypeAvailabilityService.initializeAvailabilityForNewRoomType(savedRoomType.getRoomTypeId());
+	
+	return savedRoomType;
 	}
 	
 	@Transactional
@@ -99,11 +111,7 @@ public class RoomTypeService {
 	//根據房型上下架狀態查詢
 	@Transactional(readOnly = true)
 	public List<RoomType> findByRoomTypeSaleStatus(Byte roomTypeSaleStatus) {
-		List<RoomType> list = roomTypeRepository.findByRoomTypeSaleStatus(roomTypeSaleStatus);
-		 if (list.isEmpty()) {
-		        throw new BusinessException("查無符合條件的房型資料！");
-		    }
-		return list;
+		return roomTypeRepository.findByRoomTypeSaleStatus(roomTypeSaleStatus);
 	}
 }
 

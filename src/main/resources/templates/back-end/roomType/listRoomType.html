@@ -43,7 +43,7 @@
 								<option th:each="roomTypeName : ${roomTypeNameList}"
 									th:value="${roomTypeName.roomTypeId}"
 									th:text="${roomTypeName.roomTypeName}"
-									th:selected="${roomTypeName.roomTypeId != null and roomTypeName.roomTypeId == getRoomTypeNameList}">
+									th:selected="${roomTypeName.roomTypeId == selectedRoomTypeId}">
 								</option>
 							</select>
 						</div>
