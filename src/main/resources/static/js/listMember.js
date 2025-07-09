@@ -1,8 +1,8 @@
 // ========== 全域變數 ==========
 let memberTable;
-let addPhotoFiles = [];
-let editPhotoFiles = [];
-let currentMemberPhotos = [];
+let addPhotoFile = null;
+let editPhotoFile = null;
+let currentMemberPhoto = null;
 
 // ========== 頁面載入完成後初始化 ==========
 document.addEventListener('DOMContentLoaded', function () {
@@ -89,42 +89,40 @@ function getStatusText(status) {
 // ========== Modal 初始化 ==========
 function initializeModals() {
     // 編輯會員 Modal 打開時的處理
-    $('#editMemberModal').on('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        const modal = this;
+	$('#editMemberModal').on('show.bs.modal', function (event) {
+	        const button = event.relatedTarget;
+	        const modal = this;
 
-        // 取得資料屬性
-        const memberId = button.getAttribute('data-id');
-        const email = button.getAttribute('data-email');
-        const name = button.getAttribute('data-name');
-        const birthdate = button.getAttribute('data-birthdate');
-        const gender = button.getAttribute('data-gender');
-        const phone = button.getAttribute('data-phone');
-        const address = button.getAttribute('data-address');
-        const status = button.getAttribute('data-status');
+	        // 取得資料屬性
+	        const memberId = button.getAttribute('data-id');
+	        const email = button.getAttribute('data-email');
+	        const name = button.getAttribute('data-name');
+	        const birthdate = button.getAttribute('data-birthdate');
+	        const gender = button.getAttribute('data-gender');
+	        const phone = button.getAttribute('data-phone');
+	        const address = button.getAttribute('data-address');
+	        const status = button.getAttribute('data-status');
 
-        // 填入表單資料
-        modal.querySelector('input[name="memberId"]').value = memberId;
-        modal.querySelector('#editMemberName').value = name;
-        modal.querySelector('#editMemberEmail').value = email;
-        modal.querySelector('#editMemberAddress').value = address;
-        modal.querySelector('#editMemberGender').value = gender;
-        modal.querySelector('#editMemberStatus').value = status;
+	        // 填入表單資料
+	        modal.querySelector('input[name="memberId"]').value = memberId;
+	        modal.querySelector('#editMemberName').value = name;
+	        modal.querySelector('#editMemberEmail').value = email;
+	        modal.querySelector('#editMemberAddress').value = address;
+	        modal.querySelector('#editMemberGender').value = gender;
+	        modal.querySelector('#editMemberStatus').value = status;
 
-        // 清空照片預覽
-        editPhotoFiles = [];
-        currentMemberPhotos = [];
-        document.getElementById('memberPhotoSortArea').innerHTML = '';
+	        // 清空照片預覽並載入現有照片
+	        editPhotoFile = null;
+	        currentMemberPhoto = null;
+	        document.getElementById('memberPhotoArea').innerHTML = '';
+	        loadMemberPhotos(memberId);
+	    });
 
-        // 載入現有照片
-        loadMemberPhotos(memberId);
-    });
-
-    // Modal 關閉時清空表單
-    $('#addMemberModal, #editMemberModal').on('hidden.bs.modal', function () {
-        clearFormValidation(this);
-        resetPhotoUpload();
-    });
+		// Modal 關閉時清空表單
+		    $('#addMemberModal, #editMemberModal').on('hidden.bs.modal', function () {
+		        clearFormValidation(this);
+		        resetPhotoUpload();
+		    });
 }
 
 // ========== 照片上傳功能初始化 ==========
@@ -133,7 +131,7 @@ function initializePhotoUpload() {
     const addPhotoInput = document.getElementById('addMemberPhotoInput');
     if (addPhotoInput) {
         addPhotoInput.addEventListener('change', function (e) {
-            handlePhotoUpload(e.target.files, 'add');
+            handlePhotoUpload(e.target.files[0], 'add');
         });
     }
 
@@ -141,38 +139,39 @@ function initializePhotoUpload() {
     const editPhotoInput = document.getElementById('editMemberPhotoInput');
     if (editPhotoInput) {
         editPhotoInput.addEventListener('change', function (e) {
-            handlePhotoUpload(e.target.files, 'edit');
+            handlePhotoUpload(e.target.files[0], 'edit');
         });
     }
-
-    // 初始化拖曳排序功能
-    initializeSortable();
 }
 
 // ========== 處理照片上傳 ==========
-function handlePhotoUpload(files, mode) {
+function handlePhotoUpload(file, mode) {
+    if (!file || !file.type.startsWith('image/')) {
+        showNotification('請選擇有效的圖片檔案', 'error');
+        return;
+    }
+
     const previewContainer = mode === 'add' ?
         document.getElementById('addMemberPhotoPreview') :
-        document.getElementById('memberPhotoSortArea');
+        document.getElementById('memberPhotoArea');
 
-    Array.from(files).forEach(file => {
-        if (file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const photoId = 'photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                const photoElement = createPhotoPreviewElement(e.target.result, photoId, mode);
-                previewContainer.appendChild(photoElement);
+    // 清空現有預覽
+    previewContainer.innerHTML = '';
 
-                // 儲存檔案參考
-                if (mode === 'add') {
-                    addPhotoFiles.push({ id: photoId, file: file });
-                } else {
-                    editPhotoFiles.push({ id: photoId, file: file });
-                }
-            };
-            reader.readAsDataURL(file);
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const photoId = 'photo_' + Date.now();
+        const photoElement = createPhotoPreviewElement(e.target.result, photoId, mode);
+        previewContainer.appendChild(photoElement);
+
+        // 儲存檔案參考
+        if (mode === 'add') {
+            addPhotoFile = file;
+        } else {
+            editPhotoFile = file;
         }
-    });
+    };
+    reader.readAsDataURL(file);
 }
 
 // ========== 建立照片預覽元素 ==========
@@ -185,7 +184,7 @@ function createPhotoPreviewElement(src, photoId, mode, isExisting = false) {
     }
 
     div.innerHTML = `
-        <img src="${src}" class="img-thumbnail" style="width: 100px; height: 100px; object-fit: cover;">
+        <img src="${src}" class="img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
         <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 rounded-circle" 
                 style="width: 25px; height: 25px; padding: 0; font-size: 12px;"
                 onclick="removePhoto('${photoId}', '${mode}')">
@@ -202,14 +201,19 @@ function removePhoto(photoId, mode) {
     if (photoElement) {
         photoElement.remove();
 
-        // 從檔案陣列中移除
+        // 清空檔案參考
         if (mode === 'add') {
-            addPhotoFiles = addPhotoFiles.filter(item => item.id !== photoId);
+            addPhotoFile = null;
+            const input = document.getElementById('addMemberPhotoInput');
+            if (input) input.value = '';
         } else {
-            editPhotoFiles = editPhotoFiles.filter(item => item.id !== photoId);
-            // 如果是現有照片，加入到刪除清單
+            editPhotoFile = null;
+            const input = document.getElementById('editMemberPhotoInput');
+            if (input) input.value = '';
+            
+            // 如果是現有照片，標記為已刪除
             if (photoElement.getAttribute('data-existing') === 'true') {
-                // 這裡可以加入刪除現有照片的邏輯
+                currentMemberPhoto = null;
                 console.log('移除現有照片:', photoId);
             }
         }
@@ -217,40 +221,46 @@ function removePhoto(photoId, mode) {
 }
 
 // ========== 初始化拖曳排序 ==========
-function initializeSortable() {
-    const sortArea = document.getElementById('memberPhotoSortArea');
-    if (sortArea && typeof Sortable !== 'undefined') {
-        new Sortable(sortArea, {
-            animation: 150,
-            ghostClass: 'sortable-ghost',
-            chosenClass: 'sortable-chosen',
-            dragClass: 'sortable-drag'
-        });
-    }
-}
+//function initializeSortable() {
+//    const sortArea = document.getElementById('memberPhotoSortArea');
+//    if (sortArea && typeof Sortable !== 'undefined') {
+//        new Sortable(sortArea, {
+//            animation: 150,
+//            ghostClass: 'sortable-ghost',
+//            chosenClass: 'sortable-chosen',
+//            dragClass: 'sortable-drag'
+//        });
+//    }
+//}
 
 // ========== 載入會員現有照片 ==========
 function loadMemberPhotos(memberId) {
-    // 這裡應該發送 AJAX 請求到後端獲取會員照片
-    // 為了示範，我們使用假資料
-    fetch(`/api/members/${memberId}/photos`)
+    // 清空現有照片
+    currentMemberPhoto = null;
+    const container = document.getElementById('memberPhotoArea');
+    container.innerHTML = '';
+
+    // 發送請求獲取會員照片
+    fetch(`/backend/member/${memberId}/photo`)
         .then(response => {
             if (response.ok) {
-                return response.json();
+                return response.blob();
             }
-            throw new Error('無法載入照片');
+            // 如果沒有照片，直接返回
+            return null;
         })
-        .then(photos => {
-            const container = document.getElementById('memberPhotoSortArea');
-            photos.forEach((photo, index) => {
-                const photoId = 'existing_' + index;
-                const photoElement = createPhotoPreviewElement(photo.url, photoId, 'edit', true);
+        .then(blob => {
+            if (blob) {
+                const photoUrl = URL.createObjectURL(blob);
+                const photoId = 'existing_photo';
+                const photoElement = createPhotoPreviewElement(photoUrl, photoId, 'edit', true);
                 container.appendChild(photoElement);
-                currentMemberPhotos.push({ id: photoId, url: photo.url });
-            });
+                currentMemberPhoto = { id: photoId, url: photoUrl };
+            }
         })
         .catch(error => {
             console.error('載入照片失敗:', error);
+            // 不顯示錯誤訊息，因為會員可能沒有照片
         });
 }
 
@@ -320,15 +330,16 @@ function isValidEmail(email) {
 function handleFormSubmit(form, mode) {
     const formData = new FormData(form);
 
-    // 添加照片檔案
-    const photoFiles = mode === 'add' ? addPhotoFiles : editPhotoFiles;
-    photoFiles.forEach((photoItem, index) => {
-        formData.append('photos', photoItem.file);
-    });
+    // 添加照片檔案（如果有的話）
+    const photoFile = mode === 'add' ? addPhotoFile : editPhotoFile;
+    if (photoFile) {
+        formData.append('memberPhoto', photoFile);
+    }
 
-    // 添加照片排序資訊
-    const photoOrder = getPhotoOrder(mode);
-    formData.append('photoOrder', JSON.stringify(photoOrder));
+    // 如果是編輯模式且刪除了現有照片，需要通知後端
+    if (mode === 'edit' && !photoFile && !currentMemberPhoto) {
+        formData.append('deletePhoto', 'true');
+    }
 
     // 發送請求
     const url = mode === 'add' ? '/backend/member/add' : '/backend/member/update';
@@ -361,14 +372,14 @@ function handleFormSubmit(form, mode) {
 }
 
 // ========== 取得照片排序 ==========
-function getPhotoOrder(mode) {
-    const container = mode === 'add' ?
-        document.getElementById('addMemberPhotoPreview') :
-        document.getElementById('memberPhotoSortArea');
-
-    const photos = container.querySelectorAll('[data-photo-id]');
-    return Array.from(photos).map(photo => photo.getAttribute('data-photo-id'));
-}
+//function getPhotoOrder(mode) {
+//    const container = mode === 'add' ?
+//        document.getElementById('addMemberPhotoPreview') :
+//        document.getElementById('memberPhotoSortArea');
+//
+//    const photos = container.querySelectorAll('[data-photo-id]');
+//    return Array.from(photos).map(photo => photo.getAttribute('data-photo-id'));
+//}
 
 // ========== 清空表單驗證樣式 ==========
 function clearFormValidation(modal) {
@@ -380,12 +391,12 @@ function clearFormValidation(modal) {
 
 // ========== 重置照片上傳 ==========
 function resetPhotoUpload() {
-    addPhotoFiles = [];
-    editPhotoFiles = [];
-    currentMemberPhotos = [];
+    addPhotoFile = null;
+    editPhotoFile = null;
+    currentMemberPhoto = null;
 
     const addPreview = document.getElementById('addMemberPhotoPreview');
-    const editPreview = document.getElementById('memberPhotoSortArea');
+    const editPreview = document.getElementById('memberPhotoArea');
 
     if (addPreview) addPreview.innerHTML = '';
     if (editPreview) editPreview.innerHTML = '';
