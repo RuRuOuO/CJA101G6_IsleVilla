@@ -94,7 +94,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    <i class="bi bi-tag-plus me-2"></i>新增商品分類
+                    <i class="bi bi-plus-circle me-2"></i>新增商品分類
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -294,7 +294,10 @@ function deleteCategory(productCategoryId) {
         if (result === 'success') {
             alert('刪除成功！');
             location.reload();
-        } else {
+        }else if(result.includes('商品類別內還有商品')) {
+            alert('商品類別內還有商品，不能刪除該類別');
+        }
+        else {
             alert('刪除失敗：' + result);
         }
     })
