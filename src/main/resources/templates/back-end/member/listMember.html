@@ -27,9 +27,6 @@
                     <h4 class="card-title mb-0 fw-bold ">
                         <i class="bi bi-people-fill me-2"></i>會員帳號管理
                     </h4>
-<!--                     <a class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addMemberModal"> -->
-<!--                         <i class="bi bi-plus-circle me-2"></i>新增會員 -->
-<!--                     </a> -->
                 </div>
             </div>
 
@@ -41,30 +38,37 @@
                             <span class="input-group-text">
                                 <i class="bi bi-search"></i>
                             </span>
-                            <input type="text" class="form-control" id="searchInput" placeholder="搜尋會員姓名、編號" th:value="${searchKeyword}"/>
+                            <input type="text" class="form-control" id="searchInput" placeholder="搜尋會員姓名、編號"
+                                th:value="${searchKeyword}" />
                         </div>
                     </div>
                     <div class="col-md-3">
                         <select class="form-select" id="genderFilter">
                             <option value="">所有性別</option>
-                            <option value="0" th:selected="${selectedStatus != null and selectedStatus == 0}">男生</option>
-                            <option value="1" th:selected="${selectedStatus != null and selectedStatus == 1}">女生</option>
-                            <option value="2" th:selected="${selectedStatus != null and selectedStatus == 2}">其它</option>
+                            <option value="0" th:selected="${selectedStatus != null and selectedStatus == 0}">男生
+                            </option>
+                            <option value="1" th:selected="${selectedStatus != null and selectedStatus == 1}">女生
+                            </option>
+                            <option value="2" th:selected="${selectedStatus != null and selectedStatus == 2}">其它
+                            </option>
                         </select>
                     </div>
                     <div class="col-md-3">
                         <select class="form-select" id="statusFilter">
                             <option value="">所有狀態</option>
-                            <option value="0" th:selected="${selectedStatus != null and selectedStatus == 0}">未驗證</option>
-                            <option value="1" th:selected="${selectedStatus != null and selectedStatus == 1}">已驗證</option>
-                            <option value="2" th:selected="${selectedStatus != null and selectedStatus == 2}">停用</option>
+                            <option value="0" th:selected="${selectedStatus != null and selectedStatus == 0}">未驗證
+                            </option>
+                            <option value="1" th:selected="${selectedStatus != null and selectedStatus == 1}">已驗證
+                            </option>
+                            <option value="2" th:selected="${selectedStatus != null and selectedStatus == 2}">停用
+                            </option>
                         </select>
                     </div>
                     <div class="col-md-2">
-				        <button type="button" class="btn btn-primary" onclick="applyFilters()">
-				            <i class="bi bi-search"></i> 搜尋
-				        </button>
-				    </div>
+                        <button type="button" class="btn btn-primary" onclick="applyFilters()">
+                            <i class="bi bi-search"></i> 搜尋
+                        </button>
+                    </div>
                 </div>
 
                 <!-- 會員表格 -->
@@ -139,13 +143,8 @@
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="card-header bg-transparent border-0 pt-4">
-                    <div class="d-flex justify-content-between align-items-center">
-
-
-                    </div>
-                </div>
-                <form th:object="${member}" th:action="@{/backend/member/update}" method="post" id="editMemberForm" novalidate enctype="multipart/form-data">
+                <form th:object="${member}" th:action="@{/backend/member/update}" method="post" id="editMemberForm"
+                    novalidate enctype="multipart/form-data">
                     <div class="modal-body">
                         <input type="hidden" name="memberId" />
                         <div class="row">
@@ -199,8 +198,8 @@
                         <div class="mb-3">
                             <label class="form-label">會員照片</label>
                             <div id="memberPhotoArea" class="mb-2"></div>
-                            <input type="file" class="form-control" name="newMemberPhoto" id="editMemberPhotoInput" accept="image/*" style="max-width:300px;">
-<!--                             <small class="text-muted">點擊右上角可刪除</small> -->
+                            <input type="file" class="form-control" name="newMemberPhoto" id="editMemberPhotoInput"
+                                accept="image/*" style="max-width:300px;">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -215,7 +214,7 @@
     </div>
 
 
-	<script src="/js/listMember.js"></script>
+    <script src="/js/listMember.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <!-- ===== 載入統一腳本 ===== -->
     <th:block th:replace="~{fragments/backFragments :: scripts}"></th:block>

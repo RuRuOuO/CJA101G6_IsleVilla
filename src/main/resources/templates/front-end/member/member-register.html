@@ -42,7 +42,7 @@
                                             class="text-danger">*</span></label>
                                     <input type="email" class="form-control" id="memberEmail" name="memberEmail"
                                         th:value="${member?.memberEmail}" placeholder="請輸入電子信箱" required>
-                                    <div class="invalid-feedback" id="emailError"></div>
+                                    <div class="invalid-feedback" id="memberEmailError"></div>
                                 </div>
 
                                 <div class="col-md-6 mb-3">
@@ -50,7 +50,7 @@
                                             class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="memberName" name="memberName"
                                         th:value="${member?.memberName}" placeholder="請輸入姓名" required maxlength="30">
-                                    <div class="invalid-feedback" id="nameError"></div>
+                                    <div class="invalid-feedback" id="memberNameError"></div>
                                 </div>
                             </div>
 
@@ -65,8 +65,9 @@
                                             <i class="fas fa-eye" id="toggleIcon1"></i>
                                         </button>
                                     </div>
+                                    <div class="form-text">可使用英文字母大小寫、數字和特殊符號</div>
                                     <div class="form-text">密碼至少8位數，需包含英文字母和數字</div>
-                                    <div class="invalid-feedback" id="passwordError"></div>
+                                    <div class="invalid-feedback" id="memberPasswordError"></div>
                                 </div>
 
                                 <div class="col-md-6 mb-3">
@@ -89,7 +90,7 @@
                                             class="text-danger">*</span></label>
                                     <input type="date" class="form-control" id="memberBirthdate" name="memberBirthdate"
                                         th:value="${member?.memberBirthdate}" required>
-                                    <div class="invalid-feedback" id="birthdateError"></div>
+                                    <div class="invalid-feedback" id="memberBirthdateError"></div>
                                 </div>
 
                                 <div class="col-md-6 mb-3">
@@ -101,7 +102,7 @@
                                         <option value="1" th:selected="${member?.memberGender == 1}">女生</option>
                                         <option value="2" th:selected="${member?.memberGender == 2}">其他</option>
                                     </select>
-                                    <div class="invalid-feedback" id="genderError"></div>
+                                    <div class="invalid-feedback" id="memberGenderError"></div>
                                 </div>
                             </div>
 
@@ -110,16 +111,16 @@
                                         class="text-danger">*</span></label>
                                 <input type="tel" class="form-control" id="memberPhone" name="memberPhone"
                                     th:value="${member?.memberPhone}" placeholder="請輸入電話號碼" required maxlength="20">
-                                <div class="invalid-feedback" id="phoneError"></div>
+                                <div class="invalid-feedback" id="memberPhoneError"></div>
                             </div>
 
                             <div class="mb-3">
                                 <label for="memberAddress" class="form-label">地址 <span
                                         class="text-danger">*</span></label>
                                 <textarea class="form-control" id="memberAddress" name="memberAddress" rows="3"
-                                    placeholder="請輸入完整地址" required maxlength="200"
+                                    placeholder="請輸入地址" required maxlength="200"
                                     th:text="${member?.memberAddress}"></textarea>
-                                <div class="invalid-feedback" id="addressError"></div>
+                                <div class="invalid-feedback" id="memberAddressError"></div>
                             </div>
 
                             <div class="mb-3">
@@ -127,7 +128,7 @@
                                 <input type="file" class="form-control" id="memberPhoto" name="memberPhoto"
                                     accept="image/*">
                                 <div class="form-text">支援 JPG、PNG、GIF 格式，檔案大小不超過 5MB</div>
-                                <div class="invalid-feedback" id="photoError"></div>
+                                <div class="invalid-feedback" id="memberPhotoError"></div>
                             </div>
 
                             <div class="mb-3 form-check">
@@ -137,7 +138,7 @@
                                     <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">服務條款</a> 和
                                     <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">隱私政策</a>
                                 </label>
-                                <div class="invalid-feedback" id="termsError"></div>
+                                <div class="invalid-feedback" id="agreeTermsError"></div>
                             </div>
 
                             <div class="d-grid mb-3">

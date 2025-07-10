@@ -58,11 +58,6 @@
     border-radius: 10px 0 0 10px;
 }
 
-.input-group .form-control {
-    border-left: none;
-    border-radius: 0 10px 10px 0;
-}
-
 .input-group .btn {
     border-radius: 0 10px 10px 0;
     border: 2px solid #e3e6f0;

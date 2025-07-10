@@ -13,7 +13,6 @@ import com.islevilla.lai.members.model.MembersService;
 import com.islevilla.jay.productOrderDetail.model.ProductOrderDetailService;
 import com.islevilla.jay.coupon.model.Coupon;
 import com.islevilla.jay.memberCoupon.model.MemberCouponService;
-import com.islevilla.lai.email.model.EmailService;
 import com.islevilla.jay.email.model.ProductEmailService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
