@@ -9,23 +9,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SeatRepository extends JpaRepository<Seat, Integer> {
 
-	// 查詢正常狀態的座位
-	List<Seat> findBySeatStatus(Integer seatStatus);
-
-	// 根據座位號碼查詢
-	Seat findBySeatNumber(String seatNumber);
-
-	// 查詢可用座位數量
-	@Query("SELECT COUNT(s) FROM Seat s WHERE s.seatStatus = 1")
-	Integer countAvailableSeats();
-	
 	// 查詢不可用座位數量
 	@Query("SELECT COUNT(s) FROM Seat s WHERE s.seatStatus = 0")
 	Integer countUnavailableSeats();
-	
+
 	// 查詢所有座位並按座位號排序
-    List<Seat> findAllByOrderBySeatNumber();
-    
-    // 查詢可用座位
-    List<Seat> findBySeatStatusOrderBySeatNumber(Integer seatStatus);
+	List<Seat> findAllByOrderBySeatNumber();
 }
