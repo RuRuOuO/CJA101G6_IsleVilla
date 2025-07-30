@@ -68,7 +68,8 @@ public class ShuttleReservationController {
 		}
 
 		// 查詢預約
-		List<ShuttleReservation> shuttleReservationList = shuttleReservationService.getReservationsByMemberOrderByShuttleReservationIdDesc(member);
+		List<ShuttleReservation> shuttleReservationList = shuttleReservationService
+				.getReservationsByMemberOrderByShuttleReservationIdDesc(member);
 		if (!shuttleReservationList.isEmpty()) {
 			model.addAttribute("shuttleReservationList", shuttleReservationList);
 			Map<Integer, List<ShuttleReservationSeat>> seatMap = new HashMap<>();

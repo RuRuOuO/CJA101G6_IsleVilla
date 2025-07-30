@@ -7,7 +7,6 @@ import java.time.Period;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,7 +27,9 @@ import com.islevilla.lai.members.model.MembersPasswordResetTokensService;
 import com.islevilla.lai.members.model.MembersService;
 import com.islevilla.lai.util.PasswordConvert;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 
@@ -91,11 +92,11 @@ public class MembersController {
 				}
 
 				// 如果選擇記住我，設定較長的session timeout（可選）
-//		                if (rememberMe) {
-//              		      session.setMaxInactiveInterval(30 * 24 * 60 * 60); // 30天
-//                		} else {
-//		                    session.setMaxInactiveInterval(8 * 60 * 60); // 8小時
-//		                }
+				if (rememberMe) {
+					session.setMaxInactiveInterval(30 * 24 * 60 * 60); // 30天
+				} else {
+					session.setMaxInactiveInterval(8 * 60 * 60); // 8小時
+				}
 
 				// 更新最後登入時間
 				membersService.updateMemberLastLoginTime(member.getMemberId(), LocalDateTime.now());
@@ -299,9 +300,7 @@ public class MembersController {
 		return "front-end/member/member-forgot-password";
 	}
 
-	/**
-	 * 處理忘記密碼請求
-	 */
+	// 處理忘記密碼請求
 	@PostMapping("/member/forgot-password")
 	public String processForgotPassword(@RequestParam String memberEmail, HttpSession session,
 			RedirectAttributes redirectAttributes) {
@@ -342,9 +341,7 @@ public class MembersController {
 		}
 	}
 
-	/**
-	 * 顯示重設密碼頁面
-	 */
+	// 顯示重設密碼頁面
 	@GetMapping("/member/reset-password")
 	public String showResetPasswordPage(@RequestParam String token, Model model) {
 		// 驗證token
@@ -365,9 +362,7 @@ public class MembersController {
 		return "front-end/member/member-reset-password";
 	}
 
-	/**
-	 * 處理重設密碼請求
-	 */
+	// 處理重設密碼請求
 	@PostMapping("/member/reset-password")
 	public String processResetPassword(@RequestParam String token, @RequestParam String newPassword,
 			@RequestParam String confirmPassword, RedirectAttributes redirectAttributes) {
@@ -436,7 +431,8 @@ public class MembersController {
 
 	// 處理登出請求
 	@PostMapping("/member/logout")
-	public String logout(HttpSession session, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+	public String logout(HttpSession session, HttpServletRequest request, RedirectAttributes redirectAttributes,
+			HttpServletResponse response) {
 
 		try {
 			// 獲取當前登入的會員資訊（記錄日誌用）
@@ -451,17 +447,16 @@ public class MembersController {
 			session.invalidate();
 
 			// 清除可能的 cookies（如果有使用記住我功能）
-//            Cookie[] cookies = request.getCookies();
-//            if (cookies != null) {
-//                for (Cookie cookie : cookies) {
-//                    if ("JSESSIONID".equals(cookie.getName()) || 
-//                        "rememberMe".equals(cookie.getName())) {
-//                        cookie.setMaxAge(0);
-//                        cookie.setPath("/");
-//                        // response.addCookie(cookie); // 需要在方法參數加入 HttpServletResponse response
-//                    }
-//                }
-//            }
+			Cookie[] cookies = request.getCookies();
+			if (cookies != null) {
+				for (Cookie cookie : cookies) {
+					if ("JSESSIONID".equals(cookie.getName()) || "rememberMe".equals(cookie.getName())) {
+						cookie.setMaxAge(0);
+						cookie.setPath("/");
+						response.addCookie(cookie); // 在方法參數加入 HttpServletResponse response
+					}
+				}
+			}
 
 			// 添加成功訊息
 			redirectAttributes.addFlashAttribute("logoutSuccess", true);
@@ -597,94 +592,6 @@ public class MembersController {
 
 	// -------------------------後台 - 會員帳號管理--------------------- //
 
-	// 會員管理首頁
-	@GetMapping("/backend/member/management")
-	public String membersIndex(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size,
-			@RequestParam(defaultValue = "memberCreatedAt") String sortBy,
-			@RequestParam(defaultValue = "desc") String sortDir, @RequestParam(required = false) String search,
-			@RequestParam(required = false) Integer status, @RequestParam(required = false) Integer gender,
-			Model model) {
-
-		Page<Members> membersPage;
-
-		// 根據搜尋條件查詢
-		if (search != null && !search.trim().isEmpty()) {
-			membersPage = membersService.searchMembers(search.trim(), page, size);
-		} else if (status != null || gender != null) {
-			membersPage = membersService.findMembersWithConditions(null, null, status, gender, page, size);
-		} else {
-			membersPage = membersService.getAll(page, size, sortBy, sortDir);
-		}
-
-		// 添加模型屬性
-		model.addAttribute("membersPage", membersPage);
-		model.addAttribute("currentPage", page);
-		model.addAttribute("pageSize", size);
-		model.addAttribute("sortBy", sortBy);
-		model.addAttribute("sortDir", sortDir);
-		model.addAttribute("search", search);
-		model.addAttribute("status", status);
-		model.addAttribute("gender", gender);
-		model.addAttribute("totalMembers", membersService.getTotalMembersCount());
-		model.addAttribute("statusStats", membersService.getMemberStatusStatistics());
-
-		return "back-end/member/member-management";
-	}
-
-	// ############################後臺測試############################ //
-
-//    //後台-會員列表
-//    @GetMapping("/backend/member/list")
-//    @PreAuthorize("hasAuthority('service')")
-//    public String listMember(@RequestParam(value = "gender", required = false) Integer gender,
-//                             @RequestParam(value = "status", required = false) Integer status, 
-//                             Model model) {
-//        List<Members> memberList;
-//        
-//        if (gender != null && status != null) {
-//            // 根據會員性別和會員狀態過濾會員
-//            memberList = membersService.getMemberByMemberGenderAndMemberStatus(gender, status);
-//        } else if (gender != null) {
-//            // 根據會員性別過濾會員
-//        	memberList = membersService.getMemberByMemberGender(gender);
-//        } else if (status != null) {
-//            // 根據會員狀態過濾會員
-//        	memberList = membersService.getMemberByMemberStatus(status);
-//        } else {
-//            // 沒有選擇篩選條件時顯示所有會員
-//        	memberList = membersService.getAll();
-//        }
-//        
-//        model.addAttribute("memberList", memberList); // 商品列表
-//        model.addAttribute("member", new Members());   // 空的 Members 給 modal 表單用
-//        model.addAttribute("selectedGender", gender);
-//        model.addAttribute("selectedStatus", status);
-//        return "back-end/member/listMember";
-//    }
-
-	// 後台-編輯會員頁
-//    @GetMapping("/backend/member/edit/{memberId}")
-//    @PreAuthorize("hasAuthority('service')")
-//    public String showEditMemberPage(@PathVariable Integer memberId, Model model) {
-//        Members member = membersService.getOneMember(memberId);
-//        model.addAttribute("member", member);
-//        return "back-end/member/editMember";
-//    }
-
-//    // 查詢會員圖片
-//    @GetMapping("/backend/member/photo/{memberId}")
-//    @ResponseBody
-//    public ResponseEntity<byte[]> getMemberPhotoBackEnd(@PathVariable Integer memberId) {
-//	    // 照片顯示邏輯
-//		Members member = membersService.getOneMember(memberId);
-//	    if (member != null && member.getMemberPhoto() != null) {
-//	        return ResponseEntity.ok()
-//	                .contentType(MediaType.IMAGE_JPEG)
-//	                .body(member.getMemberPhoto());
-//	    }
-//	    return ResponseEntity.notFound().build();
-//	}
-
 	// 後台 - 顯示會員列表頁面
 	@GetMapping("/backend/member/list")
 	@PreAuthorize("hasAuthority('service')")
@@ -717,101 +624,73 @@ public class MembersController {
 		model.addAttribute("searchKeyword", search);
 		model.addAttribute("sidebarActive", "member-list");
 
-
 		return "back-end/member/listMember";
 	}
-	
+
 	// 後台 - 修改會員資料
 	@PostMapping("/backend/member/update")
 	@PreAuthorize("hasAuthority('service')")
 	public String updateMember(@ModelAttribute Members member,
-	        @RequestParam(value = "newMemberPhoto", required = false) MultipartFile memberPhoto,
-	        @RequestParam(value = "deletePhoto", required = false) String deletePhoto,
-	        RedirectAttributes redirectAttributes) {
-	    try {
-	        // 取得現有會員資料
-	        Members existingMember = membersService.getOneMember(member.getMemberId());
-	        if (existingMember == null) {
-	            redirectAttributes.addFlashAttribute("error", "會員不存在");
-	            return "redirect:/backend/member/list";
-	        }
+			@RequestParam(value = "newMemberPhoto", required = false) MultipartFile memberPhoto,
+			@RequestParam(value = "deletePhoto", required = false) String deletePhoto,
+			RedirectAttributes redirectAttributes) {
+		try {
+			// 取得現有會員資料
+			Members existingMember = membersService.getOneMember(member.getMemberId());
+			if (existingMember == null) {
+				redirectAttributes.addFlashAttribute("error", "會員不存在");
+				return "redirect:/backend/member/list";
+			}
 
-	        // 更新基本資料
-	        existingMember.setMemberName(member.getMemberName());
-	        existingMember.setMemberEmail(member.getMemberEmail());
-	        existingMember.setMemberAddress(member.getMemberAddress());
-	        existingMember.setMemberGender(member.getMemberGender());
-	        existingMember.setMemberStatus(member.getMemberStatus());
+			// 更新基本資料
+			existingMember.setMemberName(member.getMemberName());
+			existingMember.setMemberEmail(member.getMemberEmail());
+			existingMember.setMemberAddress(member.getMemberAddress());
+			existingMember.setMemberGender(member.getMemberGender());
+			existingMember.setMemberStatus(member.getMemberStatus());
 
-	        // 處理照片上傳
-	        if ("true".equals(deletePhoto)) {
-	            // 刪除照片
-	            existingMember.setMemberPhoto(null);
-	        } else if (memberPhoto != null && !memberPhoto.isEmpty()) {
-	            // 上傳新照片
-	            try {
-	                existingMember.setMemberPhoto(memberPhoto.getBytes());
-	            } catch (IOException e) {
-	                redirectAttributes.addFlashAttribute("error", "照片上傳失敗：" + e.getMessage());
-	                return "redirect:/backend/member/list";
-	            }
-	        }
+			// 處理照片上傳
+			if ("true".equals(deletePhoto)) {
+				// 刪除照片
+				existingMember.setMemberPhoto(null);
+			} else if (memberPhoto != null && !memberPhoto.isEmpty()) {
+				// 上傳新照片
+				try {
+					existingMember.setMemberPhoto(memberPhoto.getBytes());
+				} catch (IOException e) {
+					redirectAttributes.addFlashAttribute("error", "照片上傳失敗：" + e.getMessage());
+					return "redirect:/backend/member/list";
+				}
+			}
 
-	        // 儲存更新
-	        membersService.updateMember(existingMember);
-	        redirectAttributes.addFlashAttribute("success", "會員資料更新成功");
+			// 儲存更新
+			membersService.updateMember(existingMember);
+			redirectAttributes.addFlashAttribute("success", "會員資料更新成功");
 
-	    } catch (Exception e) {
-	    	System.out.println("更新失敗：" + e.getMessage());
-	        redirectAttributes.addFlashAttribute("error", "更新失敗：" + e.getMessage());
-	    }
+		} catch (Exception e) {
+			System.out.println("更新失敗：" + e.getMessage());
+			redirectAttributes.addFlashAttribute("error", "更新失敗：" + e.getMessage());
+		}
 
-	    return "redirect:/backend/member/list";
+		return "redirect:/backend/member/list";
 	}
-	
+
 	// 後台 - 取得會員照片
 	@GetMapping("/backend/member/{memberId}/photo")
 	@PreAuthorize("hasAuthority('service')")
 	public ResponseEntity<byte[]> getMemberPhotoBackend(@PathVariable Integer memberId) {
-	    try {
-	        Members member = membersService.getOneMember(memberId);
-	        if (member != null && member.getMemberPhoto() != null) {
-	            HttpHeaders headers = new HttpHeaders();
-	            headers.setContentType(MediaType.IMAGE_PNG);
-	            return new ResponseEntity<>(member.getMemberPhoto(), headers, HttpStatus.OK);
-	        }
-	        return ResponseEntity.notFound().build();
-	    } catch (Exception e) {
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-	    }
+		try {
+			Members member = membersService.getOneMember(memberId);
+			if (member != null && member.getMemberPhoto() != null) {
+				HttpHeaders headers = new HttpHeaders();
+				headers.setContentType(MediaType.IMAGE_PNG);
+				return new ResponseEntity<>(member.getMemberPhoto(), headers, HttpStatus.OK);
+			}
+			return ResponseEntity.notFound().build();
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
 	}
-
-	/**
-	 * 新增會員
-	 */
-//    @PostMapping("/add")
-//    public String addMember(@Valid Members member,
-//                          BindingResult bindingResult,
-//                          @RequestParam(value = "photos", required = false) List<MultipartFile> photos,
-//                          RedirectAttributes redirectAttributes,
-//                          Model model) {
-//        
-//        if (bindingResult.hasErrors()) {
-//            // 如果有驗證錯誤，重新顯示頁面
-//            List<Members> memberList = membersService.getAll();
-//            model.addAttribute("memberList", memberList);
-//            return "members/listMember";
-//        }
-//        
-//        try {
-//            membersService.addMember(member, photos);
-//            redirectAttributes.addFlashAttribute("successMessage", "會員新增成功！");
-//        } catch (RuntimeException e) {
-//            redirectAttributes.addFlashAttribute("errorMessage", "新增失敗：" + e.getMessage());
-//        }
-//        
-//        return "redirect:/admin/members";
-//    }
 
 	// ----------------------------工具方法---------------------------- //
 

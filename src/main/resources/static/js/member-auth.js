@@ -169,15 +169,10 @@ function validateEmail(fieldId) {
 
 function validateName(fieldId) {
     const field = document.getElementById(fieldId);
-    const value = field.value.trim();
+    const value = field.value;
     
     if (!value) {
         showFieldError(field, '請輸入姓名');
-        return false;
-    }
-    
-    if (value.length < 2) {
-        showFieldError(field, '姓名至少需要2個字元');
         return false;
     }
     
@@ -218,7 +213,7 @@ function validateConfirmPassword(fieldId) {
     const password = document.getElementById('memberPassword').value;
     const confirmPassword = field.value;
     
-    if (!confirmPassword) {
+    if (!confirmPassword || password.length < 8) {
         showFieldError(field, '請確認密碼');
         return false;
     }
@@ -245,8 +240,8 @@ function validateBirthdate(fieldId) {
     const today = new Date();
     const age = today.getFullYear() - birthDate.getFullYear();
     
-    if (age < 13) {
-        showFieldError(field, '年齡必須滿13歲');
+    if (age < 18) {
+        showFieldError(field, '年齡必須滿18歲');
         return false;
     }
     
@@ -261,7 +256,7 @@ function validateBirthdate(fieldId) {
 
 function validateGender(fieldId) {
     const field = document.getElementById(fieldId);
-    const value = field.value;
+    const value = field.value.trim();
     
     if (!value) {
         showFieldError(field, '請選擇性別');
@@ -301,13 +296,8 @@ function validateAddress(fieldId) {
         return false;
     }
     
-    if (value.length < 10) {
-        showFieldError(field, '請輸入完整地址');
-        return false;
-    }
-    
     if (value.length > 200) {
-        showFieldError(field, '地址不能超過200个字元');
+        showFieldError(field, '地址不能超過200個字元');
         return false;
     }
     
@@ -363,6 +353,12 @@ function addRealTimeValidation() {
     if (email) {
         email.addEventListener('blur', () => validateEmail('memberEmail'));
     }
+	
+	// 姓名即時驗證
+    const name = document.getElementById('memberName');
+    if (name) {
+        name.addEventListener('blur', () => validateName('memberName'));
+    }
     
     // 密碼即時驗證 - 只在註冊頁面啟用
     const password = document.getElementById('memberPassword');
@@ -378,7 +374,25 @@ function addRealTimeValidation() {
     if (confirmPassword) {
         confirmPassword.addEventListener('input', () => validateConfirmPassword('confirmPassword'));
     }
-    
+	
+	// 生日即時驗證
+    const birthdate = document.getElementById('memberBirthdate');
+    if (birthdate) {
+        birthdate.addEventListener('blur', () => validateBirthdate('memberBirthdate'));
+    }
+	
+	// 性別即時驗證
+    const gender = document.getElementById('memberGender');
+    if (gender) {
+        gender.addEventListener('blur', () => validateGender('memberGender'));
+    }
+	
+	// 地址即時驗證
+    const address = document.getElementById('memberAddress');
+    if (address) {
+        address.addEventListener('blur', () => validateAddress('memberAddress'));
+    }
+	
     // 電話即時驗證
     const phone = document.getElementById('memberPhone');
     if (phone) {
@@ -436,6 +450,7 @@ function initPasswordStrengthIndicator() {
         
         // 創建強度文字說明
         const strengthText = document.createElement('small');
+		strengthText.id = 'passwordStrength';
         strengthText.className = 'text-muted mt-1 d-block';
         strengthText.textContent = '密碼強度：';
         
@@ -454,6 +469,7 @@ function initPasswordStrengthIndicator() {
 
 function updatePasswordStrength(password) {
     const strengthIndicator = document.querySelector('.password-strength');
+	const strengthText = document.getElementById('passwordStrength');
     if (!strengthIndicator) return;
     
     let strength = 0;
@@ -477,10 +493,13 @@ function updatePasswordStrength(password) {
     strengthIndicator.className = 'password-strength';
     if (strength <= 2) {
         strengthIndicator.classList.add('weak');
+		strengthText.innerText = '密碼強度：弱';
     } else if (strength <= 4) {
         strengthIndicator.classList.add('medium');
+		strengthText.innerText = '密碼強度：中';
     } else {
         strengthIndicator.classList.add('strong');
+		strengthText.innerText = '密碼強度：強';
     }
 }
 
