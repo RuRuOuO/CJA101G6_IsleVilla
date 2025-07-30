@@ -43,3 +43,5 @@ src/main/resources/static/img/home/ignore/
 src/main/resources/static/img/news/ignore/news5.png
 src/main/resources/static/img/news/ignore/
 src/main/resources/secure-config.properties
+
+*.kdenlive

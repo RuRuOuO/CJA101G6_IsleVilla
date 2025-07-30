@@ -40,77 +40,25 @@ public class RoomRVController {
         Map<Integer, List<RoomRVDetail>> detailMap = new HashMap<>();
         Map<Integer, Integer> refundAmountMap = new HashMap<>();
         Map<Integer, Integer> refundRateMap = new HashMap<>();
-        Map<Integer, Long> daysToCheckInMap = new HashMap<>();
-
-        // 新增：計算各種金額的 Map
-        Map<Integer, Integer> totalAmountMap = new HashMap<>();
-        Map<Integer, Integer> originalAmountMap = new HashMap<>();
-        Map<Integer, Map<Integer, Integer>> detailActualAmountMap = new HashMap<>();
-        Map<Integer, Map<Integer, Integer>> detailOriginalAmountMap = new HashMap<>();
-        Map<Integer, Map<Integer, Integer>> detailDiscountAmountMap = new HashMap<>();
-
         for (RoomRVOrder order : orderList) {
-            Integer orderId = order.getRoomReservationId();
-            List<RoomRVDetail> details = roomRVDetailService.getDetailsByRoomRVOrderId(orderId);
-            detailMap.put(orderId, details);
+            List<RoomRVDetail> details = roomRVDetailService.getDetailsByRoomRVOrderId(order.getRoomReservationId());
+            detailMap.put(order.getRoomReservationId(), details);
 
-            // 計算入住天數
-            long days = ChronoUnit.DAYS.between(order.getCheckInDate(), order.getCheckOutDate());
-
-            // 計算各明細的金額
-            Map<Integer, Integer> detailActualAmounts = new HashMap<>();
-            Map<Integer, Integer> detailOriginalAmounts = new HashMap<>();
-            Map<Integer, Integer> detailDiscountAmounts = new HashMap<>();
-            int totalAmount = 0;
-            int originalAmount = 0;
-
-            for (RoomRVDetail detail : details) {
-                Integer detailId = detail.getRoomReservationDetailId();
-
-                // 計算原始金額（未折扣）
-                int detailOriginalAmount = (int) (detail.getRoomPrice() * days);
-                detailOriginalAmounts.put(detailId, detailOriginalAmount);
-                originalAmount += detailOriginalAmount;
-
-                // 計算總折扣金額（折扣金額 × 天數）
-                int detailDiscountAmount = (int) (detail.getRvDiscountAmount() * days);
-                detailDiscountAmounts.put(detailId, detailDiscountAmount);
-
-                // 計算實付金額（已折扣）
-                int actualPrice = detail.getRoomPrice() - detail.getRvDiscountAmount();
-                int detailActualAmount = (int) (actualPrice * days);
-                detailActualAmounts.put(detailId, detailActualAmount);
-                totalAmount += detailActualAmount;
-            }
-
-            // 存入各種金額 Map
-            totalAmountMap.put(orderId, totalAmount);
-            originalAmountMap.put(orderId, originalAmount);
-            detailActualAmountMap.put(orderId, detailActualAmounts);
-            detailOriginalAmountMap.put(orderId, detailOriginalAmounts);
-            detailDiscountAmountMap.put(orderId, detailDiscountAmounts);
-
-            // 計算退款比例與金額
+            // 預先計算退款比例與金額
             double rate = roomRVOrderService.calculateRefundRate(order.getCheckInDate());
-            int refundAmount = (int) Math.round(totalAmount * rate);
-            refundAmountMap.put(orderId, refundAmount);
-            refundRateMap.put(orderId, (int) Math.round(rate * 100));
-
-            // 計算距離入住日天數
-            long daysToCheckIn = ChronoUnit.DAYS.between(LocalDate.now(), order.getCheckInDate());
-            daysToCheckInMap.put(orderId, daysToCheckIn);
+            int refundAmount = (int) Math.round(order.getRvPaidAmount() * rate);
+            refundAmountMap.put(order.getRoomReservationId(), refundAmount);
+            refundRateMap.put(order.getRoomReservationId(), (int) Math.round(rate * 100));
         }
-
-        // 將所有 Map 加入 model
         model.addAttribute("detailMap", detailMap);
         model.addAttribute("refundAmountMap", refundAmountMap);
         model.addAttribute("refundRateMap", refundRateMap);
+        Map<Integer, Long> daysToCheckInMap = new HashMap<>();
+        for (RoomRVOrder order : orderList) {
+            long days = ChronoUnit.DAYS.between(LocalDate.now(), order.getCheckInDate());
+            daysToCheckInMap.put(order.getRoomReservationId(), days);
+        }
         model.addAttribute("daysToCheckInMap", daysToCheckInMap);
-        model.addAttribute("totalAmountMap", totalAmountMap);
-        model.addAttribute("originalAmountMap", originalAmountMap);
-        model.addAttribute("detailActualAmountMap", detailActualAmountMap);
-        model.addAttribute("detailOriginalAmountMap", detailOriginalAmountMap);
-        model.addAttribute("detailDiscountAmountMap", detailDiscountAmountMap);
 
         return "front-end/member/member-room-list";
     }
